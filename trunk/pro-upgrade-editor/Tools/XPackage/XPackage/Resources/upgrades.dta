@@ -1,0 +1,11 @@
+(##songshortname##
+   (upgrade_version 1)
+   (midi_file "songs_upgrades/##profilename##")
+   (song_id ##songid##)
+   (rank
+      (real_guitar ##guitardifficulty##)
+      (real_bass ##bassdifficulty##)
+   )
+   (real_guitar_tuning (0 0 0 0 0 0))
+   (real_bass_tuning (0 0 0 0))
+)

@@ -150,6 +150,7 @@ namespace Sanford.Multimedia.Midi
                     ret.Add(m);
                 }
             }
+            
             return ret;
         }
 
@@ -251,6 +252,7 @@ namespace Sanford.Multimedia.Midi
                 {
                     newTrack.EndOfTrackOffset = ticks - previousTicks;
                 }
+                
                 trackIndex++;
             }
 

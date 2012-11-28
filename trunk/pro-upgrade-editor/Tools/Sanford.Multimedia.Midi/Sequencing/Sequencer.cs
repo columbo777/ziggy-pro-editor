@@ -235,14 +235,10 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-          
-
                 return clock.Ticks;
             }
             set
             {
-          
-
                 bool wasPlaying;
 
                 lock(lockObject)

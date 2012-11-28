@@ -94,45 +94,17 @@ namespace ProUpgradeEditor.UI
             }
 
 
-            public List<SongCacheItem> GetBatchSongList(bool selectedSongsOnly)
+            public IEnumerable<SongCacheItem> GetBatchSongList(bool selectedSongsOnly)
             {
                 if (!selectedSongsOnly)
-                    return this;
+                    return this.ToList();
                 else
                     return MultiSelectedSongs;
             }
 
-            public List<SongCacheItem> MultiSelectedSongs
+            public IEnumerable<SongCacheItem> MultiSelectedSongs
             {
-                get
-                {
-                    var ret = new List<SongCacheItem>();
-                    for (int i = 0; i < 5; i++)
-                    {
-                        ret.Clear();
-                        try
-                        {
-                            if (listBoxSongList.SelectedItems != null)
-                            {
-                                for (int x = 0; x < listBoxSongList.SelectedItems.Count; x++)
-                                {
-                                    var item = listBoxSongList.SelectedItems[x] as SongCacheItem;
-                                    if (item != null)
-                                    {
-                                        item = this.SingleOrDefault(y => y.CacheSongID == item.CacheSongID);
-                                        if (item != null)
-                                        {
-                                            ret.Add(item);
-                                        }
-                                    }
-                                }
-                            }
-                            break;
-                        }
-                        catch { Thread.Sleep(100); }
-                    }
-                    return ret;
-                }
+                get { return listBoxSongList.SelectedItems.ToEnumerable<SongCacheItem>().ToList(); }
             }
             
             public void PopulateList()

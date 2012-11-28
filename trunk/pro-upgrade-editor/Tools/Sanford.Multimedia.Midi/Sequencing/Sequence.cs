@@ -78,6 +78,7 @@ namespace Sanford.Multimedia.Midi
                 {
                     var events = reader.Read(ms);
                     reader.Track.Sequence = this;
+                    reader.Track.FileType = this.FileType;
                     newTracks.Add(reader.Track);
                 }
 
@@ -165,6 +166,7 @@ namespace Sanford.Multimedia.Midi
                 {
                     reader.Read(stream);
                     reader.Track.Sequence = this;
+                    reader.Track.FileType = this.FileType;
                     newTracks.Add(reader.Track);
                 }
 
@@ -309,6 +311,7 @@ namespace Sanford.Multimedia.Midi
                 {
                     reader.Read(stream);
                     reader.Track.Sequence = this;
+                    reader.Track.FileType = this.FileType;
                     newTracks.Add(reader.Track);
 
                     percentage = (i + 1f) / newProperties.TrackCount;
@@ -459,6 +462,7 @@ namespace Sanford.Multimedia.Midi
         public void Add(Track item)
         {
             item.Sequence = this;
+            item.FileType = this.FileType;
             tracks.Add(item);
             properties.TrackCount = tracks.Count;
         }
@@ -466,6 +470,7 @@ namespace Sanford.Multimedia.Midi
         public void Insert(int index, Track item)
         {
             item.Sequence = this;
+            item.FileType = this.FileType;
             tracks.Insert(index, item);
             properties.TrackCount = tracks.Count;
         }
@@ -473,8 +478,17 @@ namespace Sanford.Multimedia.Midi
         public void MoveTrack(int startIndex, int destIndex)
         {
             var track = tracks[startIndex];
+            
             tracks.Remove(track);
-            tracks.Insert(destIndex, track);
+
+            if (destIndex >= tracks.Count)
+            {
+                tracks.Add(track);
+            }
+            else
+            {
+                tracks.Insert(destIndex, track);
+            }
         }
 
         public void Clear()

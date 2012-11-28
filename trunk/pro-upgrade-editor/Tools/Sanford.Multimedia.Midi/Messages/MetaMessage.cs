@@ -12,6 +12,7 @@ namespace Sanford.Multimedia.Midi
     /// </summary>
     public enum MetaType
     {
+        
         /// <summary>
         /// Represents sequencer number type.
         /// </summary>
@@ -90,7 +91,9 @@ namespace Sanford.Multimedia.Midi
         /// <summary>
         /// Represents the proprietary event type.
         /// </summary>
-        ProprietaryEvent = 0x7F
+        ProprietaryEvent = 0x7F,
+
+        Unknown = 0xFF,
     }
 
     #endregion
@@ -108,10 +111,6 @@ namespace Sanford.Multimedia.Midi
 	[ImmutableObject(true)]
 	public sealed class MetaMessage : IMidiMessage
 	{
-        #region MetaMessage Members
-
-        #region Constants
-
         /// <summary>
         /// The amount to shift data bytes when calculating the hash code.
         /// </summary>
@@ -141,19 +140,11 @@ namespace Sanford.Multimedia.Midi
         /// </summary>
         public const int KeySigLength = 2;
 
-        #endregion
-
-        #region Class Fields
-
         /// <summary>
         /// End of track meta message.
         /// </summary>
         public static readonly MetaMessage EndOfTrackMessage = 
             new MetaMessage(MetaType.EndOfTrack, new byte[0]);
-
-        #endregion
-
-        #region Fields
 
         // The meta message type.
         private MetaType type;
@@ -164,32 +155,6 @@ namespace Sanford.Multimedia.Midi
         // The hash code value.
         private int hashCode;
 
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Initializes a new instance of the MetaMessage class.
-        /// </summary>
-        /// <param name="type">
-        /// The type of MetaMessage.
-        /// </param>
-        /// <param name="data">
-        /// The MetaMessage data.
-        /// </param>
-        /// <exception cref="ArgumentException">
-        /// The length of the MetaMessage is not valid for the MetaMessage type.
-        /// </exception>
-        /// <remarks>
-        /// Each MetaMessage has type and length properties. For certain 
-        /// types, the length of the message data must be a specific value. For
-        /// example, tempo messages must have a data length of exactly three. 
-        /// Some MetaMessage types can have any data length. Text messages are
-        /// an example of a MetaMessage that can have a variable data length.
-        /// When a MetaMessage is created, the length of the data is checked
-        /// to make sure that it is valid for the specified type. If it is not,
-        /// an exception is thrown. 
-        /// </remarks>
 		public MetaMessage(MetaType type, byte[] data)
         {
             
@@ -203,43 +168,16 @@ namespace Sanford.Multimedia.Midi
 
         }
 
-        #endregion
-
-        #region Methods
-        
-        /// <summary>
-        /// Gets a copy of the data bytes for this meta message.
-        /// </summary>
-        /// <returns>
-        /// A copy of the data bytes for this meta message.
-        /// </returns>
         public byte[] GetBytes()
         {
             return (byte[])data.Clone();
         }
 
-        /// <summary>
-        /// Returns a value for the current MetaMessage suitable for use in 
-        /// hashing algorithms.
-        /// </summary>
-        /// <returns>
-        /// A hash code for the current MetaMessage.
-        /// </returns>
         public override int GetHashCode()
         {
             return hashCode;            
         }
 
-        /// <summary>
-        /// Determines whether two MetaMessage instances are equal.
-        /// </summary>
-        /// <param name="obj">
-        /// The MetaMessage to compare with the current MetaMessage.
-        /// </param>
-        /// <returns>
-        /// <b>true</b> if the specified MetaMessage is equal to the current 
-        /// MetaMessage; otherwise, <b>false</b>.
-        /// </returns>
         public override bool Equals(object obj)
         {
             
@@ -331,16 +269,6 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets the element at the specified index.
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// index is less than zero or greater than or equal to Length.
-        /// </exception>
         public byte this[int index]
         {
             get
@@ -373,12 +301,6 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
-        #endregion
-
-        #endregion        
-
-        #region IMidiMessage Members
-
         /// <summary>
         /// Gets the status value.
         /// </summary>
@@ -402,6 +324,5 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
-        #endregion
     }
 }

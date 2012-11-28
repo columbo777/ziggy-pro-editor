@@ -8,6 +8,12 @@ namespace ProUpgradeEditor.Common
 {
     public class XMLUtil
     {
+        public static XmlDocument LoadXml(string xml)
+        {
+            XmlDocument ret = new XmlDocument();
+            ret.LoadXml(xml);
+            return ret;
+        }
         public static string GetNodeValue(XmlNode rootNode, string xpath)
         {
             string ret = string.Empty;
@@ -105,6 +111,23 @@ namespace ProUpgradeEditor.Common
             }
             return null;
         }
+        public static string SetNodeValue(XmlNode n, string value)
+        {
+            string ret = string.Empty;
+            if (n != null)
+            {
+                if (n.NodeType == XmlNodeType.Attribute)
+                {
+                    n.Value = value;
+                }
+                else
+                {
+                    n.InnerText = value;
+                }
+                
+            }
+            return ret;
+        }
         public static string SetNodeValue(XmlNode rootNode, string xpath, string value)
         {
             string ret = string.Empty;
@@ -128,11 +151,15 @@ namespace ProUpgradeEditor.Common
 
         public static bool NodeExists(XmlNode rootNode, string xpath)
         {
+            if (rootNode == null)
+                return false;
             return (rootNode.SelectSingleNode(xpath) == null ? false : true);
         }
 
         public static XmlNode AddNode(XmlNode parentNode, string name)
         {
+            if (parentNode == null)
+                return null;
             XmlNode doc = parentNode.OwnerDocument;
             if (doc == null)
                 doc = parentNode;
@@ -141,7 +168,7 @@ namespace ProUpgradeEditor.Common
             return parentNode.AppendChild(n);
         }
 
-        public static XmlNode AddAttribute(XmlNode parentNode, string name, string value)
+        public static XmlAttribute AddAttribute(XmlNode parentNode, string name, string value)
         {
             if (parentNode.Attributes[name] == null)
             {

@@ -6,10 +6,14 @@ using ProUpgradeEditor.Common;
 
 namespace ProUpgradeEditor.DataLayer
 {
-    public class GuitarMessageList : List<GuitarMessage>
+    public class GuitarMessageList : IEnumerable<GuitarMessage>
     {
-        public GuitarMessageList()
+        List<GuitarMessage> Messages;
+        GuitarTrack track;
+        public GuitarMessageList(GuitarTrack track)
         {
+            this.track = track;
+            Messages = new List<GuitarMessage>();
         }
 
         [Flags()]
@@ -85,39 +89,67 @@ namespace ProUpgradeEditor.DataLayer
             }
         }
 
-        public new void AddRange(IEnumerable<GuitarMessage> mess)
+        
+        public void AddRange(IEnumerable<GuitarMessage> mess)
         {
             if (mess != null && mess.Any())
             {
                 foreach (var msg in mess)
                 {
-                    base.Add(msg);
+                    Messages.Add(msg);
                     FlagDirty(msg);
                 }
             }
         }
 
-        public new void Add(GuitarMessage mess)
+        
+        public void Add(GuitarMessage mess)
         {
-            base.Add(mess);
+            if (mess is GuitarTrainer)
+            {
+                var m = mess as GuitarTrainer;
+                Add(m.Start);
+                if (m.Norm.MidiEvent != null)
+                {
+                    Add(m.Norm);
+                }
+                Add(m.End);
+                internalAdd(m);
+            }
+            else
+            {
+                internalAdd(mess);
+            }
+        }
+
+        private void internalAdd(GuitarMessage mess)
+        {
+            var l = Messages.LastOrDefault();
+            if (l != null && mess.AbsoluteTicks >= l.AbsoluteTicks)
+            {
+                Messages.Add(mess);
+            }
+            else
+            {
+                var t = mess.AbsoluteTicks;
+                var gt = Messages.LastOrDefault(x => x.AbsoluteTicks < t);
+                if (gt == null)
+                    Messages.Add(mess);
+                else
+                    Messages.Insert(Messages.IndexOf(gt)+1, mess);
+            }
             FlagDirty(mess);
         }
 
-        public new void Remove(GuitarMessage mess)
+        public void Remove(GuitarMessage mess)
         {
-            base.Remove(mess);
+            Messages.Remove(mess);
             FlagDirty(mess);
         }
 
-        public new void RemoveAt(int idx)
+        public void RemoveAt(int idx)
         {
-            Remove(base[idx]);
-        }
-
-        public new void Insert(int idx, GuitarMessage mess)
-        {
-            base.Insert(idx, mess);
-            FlagDirty(mess);
+            Remove(Messages[idx]);
         }
 
 
@@ -128,7 +160,7 @@ namespace ProUpgradeEditor.DataLayer
             {
                 if(dirtyState.HasFlag(GMDirtyState.Chords))
                 {
-                    chords = this.Where(x => x is GuitarChord).Cast<GuitarChord>().SortTicks().ToArray();
+                    chords = Messages.Where(x => x is GuitarChord).Cast<GuitarChord>().SortTicks().ToArray();
                     dirtyState ^= GMDirtyState.Chords;
                 }
                 return chords;
@@ -140,9 +172,10 @@ namespace ProUpgradeEditor.DataLayer
         {
             get
             {
+                
                 if (dirtyState.HasFlag(GMDirtyState.Powerup))
                 {
-                    powerups = this.Where(x => x is GuitarPowerup).SortTicks().Cast<GuitarPowerup>().ToArray();
+                    powerups = Messages.Where(x => x is GuitarPowerup).SortTicks().Cast<GuitarPowerup>().ToArray();
                     dirtyState ^= GMDirtyState.Powerup;
                 }
                 return powerups;
@@ -156,7 +189,7 @@ namespace ProUpgradeEditor.DataLayer
             {
                 if ((dirtyState & GMDirtyState.Solo) == GMDirtyState.Solo)
                 {
-                    solos = this.Where(x => x is GuitarSolo).SortTicks().Cast<GuitarSolo>().ToArray();
+                    solos = Messages.Where(x => x is GuitarSolo).SortTicks().Cast<GuitarSolo>().ToArray();
                     dirtyState ^= GMDirtyState.Solo;
                 }
                 return solos;
@@ -170,7 +203,7 @@ namespace ProUpgradeEditor.DataLayer
             {
                 if ((dirtyState & GMDirtyState.Tempo) == GMDirtyState.Tempo)
                 {
-                    tempos = this.Where(x => x is GuitarTempo).SortTicks().Cast<GuitarTempo>().ToArray();
+                    tempos = Messages.Where(x => x is GuitarTempo).SortTicks().Cast<GuitarTempo>().ToArray();
                     dirtyState ^= GMDirtyState.Tempo;
                 }
                 return tempos;
@@ -184,7 +217,7 @@ namespace ProUpgradeEditor.DataLayer
             {
                 if ((dirtyState & GMDirtyState.Timesig) == GMDirtyState.Timesig)
                 {
-                    timeSignatures = this.Where(x => x is GuitarTimeSignature).SortTicks().Cast<GuitarTimeSignature>().ToArray();
+                    timeSignatures = Messages.Where(x => x is GuitarTimeSignature).SortTicks().Cast<GuitarTimeSignature>().ToArray();
                     dirtyState ^= GMDirtyState.Timesig;
                 }
                 return timeSignatures;
@@ -198,7 +231,7 @@ namespace ProUpgradeEditor.DataLayer
             {
                 if ((dirtyState & GMDirtyState.Arpeggio) == GMDirtyState.Arpeggio)
                 {
-                    arpeggios = this.Where(x => x is GuitarArpeggio).SortTicks().Cast<GuitarArpeggio>().ToArray();
+                    arpeggios = Messages.Where(x => x is GuitarArpeggio).SortTicks().Cast<GuitarArpeggio>().ToArray();
                     dirtyState ^= GMDirtyState.Arpeggio;
                 }
                 return arpeggios;
@@ -212,7 +245,7 @@ namespace ProUpgradeEditor.DataLayer
             {
                 if ((dirtyState & GMDirtyState.BigRock) == GMDirtyState.BigRock)
                 {
-                    bigRockEndings = this.Where(x => x is GuitarBigRockEnding).SortTicks().Cast<GuitarBigRockEnding>().ToArray();
+                    bigRockEndings = Messages.Where(x => x is GuitarBigRockEnding).SortTicks().Cast<GuitarBigRockEnding>().ToArray();
                     dirtyState ^= GMDirtyState.BigRock;
                 }
                 return bigRockEndings;
@@ -226,7 +259,7 @@ namespace ProUpgradeEditor.DataLayer
             {
                 if ((dirtyState & GMDirtyState.SingleNote) == GMDirtyState.SingleNote)
                 {
-                    singleStringTremelos = this.Where(x => x is GuitarSingleStringTremelo).SortTicks().Cast<GuitarSingleStringTremelo>().ToArray();
+                    singleStringTremelos = Messages.Where(x => x is GuitarSingleStringTremelo).SortTicks().Cast<GuitarSingleStringTremelo>().ToArray();
                     dirtyState ^= GMDirtyState.SingleNote;
                 }
                 return singleStringTremelos;
@@ -240,7 +273,7 @@ namespace ProUpgradeEditor.DataLayer
             {
                 if (dirtyState.HasFlag(GMDirtyState.MultiNote))
                 {
-                    multiStringTremelos = this.Where(x => x is GuitarMultiStringTremelo).SortTicks().Cast<GuitarMultiStringTremelo>().ToArray();
+                    multiStringTremelos = Messages.Where(x => x is GuitarMultiStringTremelo).SortTicks().Cast<GuitarMultiStringTremelo>().ToArray();
                     dirtyState ^= GMDirtyState.MultiNote;
                 }
                 return multiStringTremelos;
@@ -254,7 +287,7 @@ namespace ProUpgradeEditor.DataLayer
             {
                 if (dirtyState.HasFlag(GMDirtyState.TextEvent))
                 {
-                    textEvents = this.Where(x => x is GuitarTextEvent).SortTicks().Cast<GuitarTextEvent>().ToArray();
+                    textEvents = Messages.Where(x => x is GuitarTextEvent).SortTicks().Cast<GuitarTextEvent>().ToArray();
                     dirtyState ^= GMDirtyState.TextEvent;
                 }
                 return textEvents;
@@ -268,7 +301,7 @@ namespace ProUpgradeEditor.DataLayer
             {
                 if (dirtyState.HasFlag(GMDirtyState.Trainer))
                 {
-                    trainers = this.Where(x => x is GuitarTrainer).SortTicks().Cast<GuitarTrainer>().ToArray();
+                    trainers = Messages.Where(x => x is GuitarTrainer).SortTicks().Cast<GuitarTrainer>().ToArray();
                     dirtyState ^= GMDirtyState.Trainer;
                 }
                 return trainers;
@@ -283,11 +316,21 @@ namespace ProUpgradeEditor.DataLayer
             {
                 if (dirtyState.HasFlag(GMDirtyState.HandPosition))
                 {
-                    handPositions = this.Where(x => x is GuitarHandPosition).SortTicks().Cast<GuitarHandPosition>().ToArray();
+                    handPositions = Messages.Where(x => x is GuitarHandPosition).SortTicks().Cast<GuitarHandPosition>().ToArray();
                     dirtyState ^= GMDirtyState.HandPosition;
                 }
                 return handPositions;
             }
+        }
+
+        public IEnumerable<GuitarMessage> GetBetweenTick(int downTick, int upTick)
+        {
+            return Messages.Where(x => x.DownTick < upTick && x.UpTick > downTick && x.IsDeleted == false);
+        }
+
+        public bool Contains(GuitarMessage mess)
+        {
+            return Messages.Contains(mess);
         }
 
         public GuitarChord LastChord
@@ -352,6 +395,18 @@ namespace ProUpgradeEditor.DataLayer
             {
                 return Solos[Solos.Length - 1] as GuitarSolo;
             }
+        }
+
+
+
+        public IEnumerator<GuitarMessage> GetEnumerator()
+        {
+            return Messages.GetEnumerator();
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return Messages.GetEnumerator();
         }
     }
 }

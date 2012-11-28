@@ -35,9 +35,6 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.contentPanel = new System.Windows.Forms.Panel();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.hScrollBar1 = new System.Windows.Forms.HScrollBar();
-            this.vScrollBar1 = new System.Windows.Forms.VScrollBar();
             this.panel2 = new System.Windows.Forms.Panel();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.listMessages = new System.Windows.Forms.ListBox();
@@ -73,12 +70,15 @@
             this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.trackBarHZoom = new System.Windows.Forms.TrackBar();
+            this.trackBarVZoom = new System.Windows.Forms.TrackBar();
             this.menuStrip1.SuspendLayout();
-            this.contentPanel.SuspendLayout();
             this.panel2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarHZoom)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarVZoom)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -98,27 +98,27 @@
             this.closeToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "&File";
             // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.openToolStripMenuItem.Text = "&Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.closeToolStripMenuItem.Text = "&Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -132,50 +132,15 @@
             // 
             // contentPanel
             // 
-            this.contentPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.contentPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.contentPanel.Controls.Add(this.panel1);
-            this.contentPanel.Controls.Add(this.hScrollBar1);
-            this.contentPanel.Controls.Add(this.vScrollBar1);
-            this.contentPanel.Location = new System.Drawing.Point(2, 26);
+            this.contentPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.contentPanel.AutoScroll = true;
+            this.contentPanel.Location = new System.Drawing.Point(0, 26);
             this.contentPanel.Margin = new System.Windows.Forms.Padding(12);
             this.contentPanel.Name = "contentPanel";
-            this.contentPanel.Size = new System.Drawing.Size(712, 344);
+            this.contentPanel.Size = new System.Drawing.Size(688, 321);
             this.contentPanel.TabIndex = 0;
-            // 
-            // panel1
-            // 
-            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(689, 322);
-            this.panel1.TabIndex = 3;
-            this.panel1.Resize += new System.EventHandler(this.panel1_Resize);
-            // 
-            // hScrollBar1
-            // 
-            this.hScrollBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.hScrollBar1.Location = new System.Drawing.Point(0, 323);
-            this.hScrollBar1.Name = "hScrollBar1";
-            this.hScrollBar1.Size = new System.Drawing.Size(690, 17);
-            this.hScrollBar1.TabIndex = 2;
-            this.hScrollBar1.ValueChanged += new System.EventHandler(this.hScrollBar1_ValueChanged);
-            // 
-            // vScrollBar1
-            // 
-            this.vScrollBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.vScrollBar1.Location = new System.Drawing.Point(690, 0);
-            this.vScrollBar1.Name = "vScrollBar1";
-            this.vScrollBar1.Size = new System.Drawing.Size(17, 321);
-            this.vScrollBar1.TabIndex = 1;
-            this.vScrollBar1.Scroll += new System.Windows.Forms.ScrollEventHandler(this.vScrollBar1_Scroll);
-            this.vScrollBar1.ValueChanged += new System.EventHandler(this.vScrollBar1_ValueChanged);
             // 
             // panel2
             // 
@@ -191,8 +156,8 @@
             // 
             // groupBox3
             // 
-            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox3.Controls.Add(this.listMessages);
             this.groupBox3.Location = new System.Drawing.Point(506, 6);
             this.groupBox3.Name = "groupBox3";
@@ -203,9 +168,9 @@
             // 
             // listMessages
             // 
-            this.listMessages.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listMessages.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.listMessages.FormattingEnabled = true;
             this.listMessages.Location = new System.Drawing.Point(6, 19);
             this.listMessages.Name = "listMessages";
@@ -227,9 +192,9 @@
             // 
             // listTracks
             // 
-            this.listTracks.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listTracks.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.listTracks.FormattingEnabled = true;
             this.listTracks.Location = new System.Drawing.Point(10, 20);
             this.listTracks.Name = "listTracks";
@@ -582,6 +547,37 @@
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             this.checkBox1.Click += new System.EventHandler(this.checkMidiChannelClick);
             // 
+            // trackBarHZoom
+            // 
+            this.trackBarHZoom.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.trackBarHZoom.AutoSize = false;
+            this.trackBarHZoom.BackColor = System.Drawing.Color.White;
+            this.trackBarHZoom.Location = new System.Drawing.Point(0, 347);
+            this.trackBarHZoom.Maximum = 100;
+            this.trackBarHZoom.Name = "trackBarHZoom";
+            this.trackBarHZoom.Size = new System.Drawing.Size(715, 25);
+            this.trackBarHZoom.TabIndex = 30;
+            this.trackBarHZoom.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.trackBarHZoom.Scroll += new System.EventHandler(this.trackBarHZoom_Scroll);
+            this.trackBarHZoom.ValueChanged += new System.EventHandler(this.trackBarHZoom_ValueChanged);
+            // 
+            // trackBarVZoom
+            // 
+            this.trackBarVZoom.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.trackBarVZoom.AutoSize = false;
+            this.trackBarVZoom.BackColor = System.Drawing.Color.White;
+            this.trackBarVZoom.Location = new System.Drawing.Point(688, 23);
+            this.trackBarVZoom.Maximum = 100;
+            this.trackBarVZoom.Name = "trackBarVZoom";
+            this.trackBarVZoom.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.trackBarVZoom.Size = new System.Drawing.Size(26, 324);
+            this.trackBarVZoom.TabIndex = 31;
+            this.trackBarVZoom.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.trackBarVZoom.Scroll += new System.EventHandler(this.trackBarVZoom_Scroll);
+            // 
             // MidiViewer
             // 
             this.AllowDrop = true;
@@ -589,6 +585,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(715, 519);
+            this.Controls.Add(this.trackBarVZoom);
+            this.Controls.Add(this.trackBarHZoom);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.contentPanel);
             this.Controls.Add(this.panel2);
@@ -597,16 +595,16 @@
             this.Name = "MidiViewer";
             this.ShowIcon = false;
             this.Text = "Midi Viewer";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MidiViewer_FormClosed);
             this.Load += new System.EventHandler(this.MidiViewer_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            this.contentPanel.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarHZoom)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarVZoom)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -655,10 +653,9 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.HScrollBar hScrollBar1;
-        private System.Windows.Forms.VScrollBar vScrollBar1;
         private System.Windows.Forms.ListBox listMessages;
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.TrackBar trackBarHZoom;
+        private System.Windows.Forms.TrackBar trackBarVZoom;
         
     }
 }

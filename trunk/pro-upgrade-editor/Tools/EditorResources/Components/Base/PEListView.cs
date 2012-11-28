@@ -13,7 +13,7 @@ using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Sanford.Multimedia.Midi;
-using ProUpgradeEditor.DataLayer;
+using ProUpgradeEditor;
 using System.Collections;
 
 

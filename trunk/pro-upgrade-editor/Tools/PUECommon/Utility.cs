@@ -21,45 +21,117 @@ namespace ProUpgradeEditor.Common
 
     public static class Utility
     {
-        public const int HandPositionData1 = 108;
-
         public static int ScollToSelectionOffset = 300;
-        
 
         
-        public const int PowerupData1 = 116;
-        public const int SoloData1 = 115;
-        public const int SoloData1_G5 = 103;
-
-        public const int SingleStringTremeloData1 = 127;
-        public const int MultiStringTremeloData1 = 126;
-
-        public const int ChannelDefault = 0;
-        public const int ChannelSlideReversed = 11;
-        public const int ChannelStrumHigh = 13;
-        public const int ChannelStrumMid = 14;
         public const int ChannelStrumLow = 15;
-
-        public static GuitarDifficulty[] EasyMediumHardExpert = new GuitarDifficulty[] { GuitarDifficulty.Easy, GuitarDifficulty.Medium, GuitarDifficulty.Hard, GuitarDifficulty.Expert };
-
-        public static readonly int[] BigRockEndingData1 = new int[] { 120, 121, 122, 123, 124, 125 };
-        
+        public const int ChannelStrumMid = 14;
+        public const int ChannelStrumHigh = 13;
+        public const int ChannelSlideReversed = 11;
         public const int ChannelTap = 4;
         public const int ChannelX = 3;
         public const int ChannelArpeggio = 1;
         public const int ChannelStringBend = 2;
+        public const int ChannelDefault = 0;
         
+        public const int SingleStringTremeloData1 = 127;
+        public const int MultiStringTremeloData1 = 126;
+
+        public static readonly int[] BigRockEndingData1 = new int[] { 120, 121, 122, 123, 124, 125 };
+
+        public const int PowerupData1 = 116;
+        public const int SoloData1 = 115;
+
+        public const int ExpertSoloData1_G5 = 103;
+        public const int HardSoloData1_G5 = 91;
+        public const int MediumSoloData1_G5 = 79;
+        public const int EasySoloData1_G5 = 67;
+
+        public static readonly int[] SoloData1_G5 = new int[] { EasySoloData1_G5, MediumSoloData1_G5, HardSoloData1_G5, ExpertSoloData1_G5 };
+
+        public const int HandPositionData1 = 108;
 
         public const int ExpertStrumData1 = 105;
+        public const int ExpertArpeggioData1 = 104;
         
         public const int ExpertSlideData1 = 103;
-        public const int ExpertArpeggioData1 = 104;
         public const int ExpertHammeronData1 = 102;
+        
+
+        public const int ExpertData1HighE = 101;
+        public const int ExpertData1B = 100;
+        public const int ExpertData1G = 99;
+        public const int ExpertData1D = 98;
+        public const int ExpertData1A = 97;
+        public const int ExpertData1LowE = 96;
+
+        public const int HardData1B5 = 88;
+        public const int HardData1G5 = 87;
+        public const int HardData1D5 = 86;
+        public const int HardData1A5 = 85;
+        public const int HardData1LowE5 = 84;
 
         public const int HardStrumData1 = 81;
-        public const int HardSlideData1 = 79;
         public const int HardArpeggioData1 = 80;
+        public const int HardSlideData1 = 79;
         public const int HardHammeronData1 = 78;
+
+        public const int HardData1HighE = 77;
+        public const int HardData1B = 76;
+        public const int HardData1G = 75;
+        public const int HardData1D = 74;
+        public const int HardData1A = 73;
+        public const int HardData1LowE = 72;
+        
+        public const int MediumData1G5 = 75;
+        public const int MediumData1D5 = 74;
+        public const int MediumData1A5 = 73;
+        public const int MediumData1LowE5 = 72;
+
+        public const int EasyData1D5 = 62;
+        public const int EasyData1A5 = 61;
+        public const int EasyData1LowE5 = 60;
+
+        public const int MediumSlideData1 = 55;
+        public const int MediumHammeronData1 = 54;
+        public const int MediumData1HighE = 53;
+        public const int MediumData1B = 52;
+        public const int MediumData1G = 51;
+        public const int MediumData1D = 50;
+        public const int MediumData1A = 49;
+        public const int MediumData1LowE = 48;
+
+        public const int EasySlideData1 = 31;
+        public const int EasyHammeronData1 = 30;
+        public const int EasyData1HighE = 29;
+        public const int EasyData1B = 28;
+        public const int EasyData1G = 27;
+        public const int EasyData1D = 26;
+        public const int EasyData1A = 25;
+        public const int EasyData1LowE = 24;
+        
+        public const int ChordNameHiddenData1 = 17;
+        public const int ChordNameEbData1 = 15;
+        public const int ChordNameDData1 = 14;
+        public const int ChordNameDbData1 = 13;
+        public const int ChordNameCData1 = 12;
+        public const int ChordNameBData1 = 11;
+        public const int ChordNameBbData1 = 10;
+        public const int ChordNameAData1 = 9;
+        public const int ChordNameAbData1 = 8;
+        public const int ChordNameGData1 = 7;
+        public const int ChordNameGbData1 = 6;
+        public const int ChordNameFData1 = 5;
+        public const int ChordNameEData1 = 4;
+
+        public static int[] AllSlideData1 = { ExpertSlideData1, HardSlideData1, MediumSlideData1, EasySlideData1 };
+        public static int[] AllStrumData1 = { ExpertStrumData1, HardStrumData1 };
+        public static int[] AllArpeggioData1 = { ExpertArpeggioData1, HardArpeggioData1 };
+        public static int[] AllHammeronData1 = { ExpertHammeronData1, HardHammeronData1, MediumHammeronData1, EasyHammeronData1 };
+
+
+        public static GuitarDifficulty[] EasyMediumHardExpert = new GuitarDifficulty[] { GuitarDifficulty.Easy, GuitarDifficulty.Medium, GuitarDifficulty.Hard, GuitarDifficulty.Expert };
+
 
         public static int MinimumNoteWidth = 0;
 
@@ -90,8 +162,6 @@ namespace ProUpgradeEditor.Common
         public static int HScrollLargeChange = 500;
 
         public static int MaxBackups = 20;
-
-        
 
         public static string DTADifficultyNoPart = "000";
         public static string DTADifficultyWarmup = "1";
@@ -137,7 +207,7 @@ namespace ProUpgradeEditor.Common
                 return HardArpeggioData1;
             }
 
-            return -1;
+            return Int32.MinValue;
         }
 
         public static int GetSlideData1(GuitarDifficulty diff)
@@ -183,36 +253,25 @@ namespace ProUpgradeEditor.Common
             {
                 return HardHammeronData1;
             }
+            else if (diff == GuitarDifficulty.Medium)
+            {
+                return MediumHammeronData1;
+            }
+            else if (diff == GuitarDifficulty.Easy)
+            {
+                return EasyHammeronData1;
+            }
             else
             {
                 return -1;
             }
         }
 
-        public const int MediumSlideData1 = 55;
-
-        public const int EasySlideData1 = 31;
-
-        public static int[] AllSlideData1 = { ExpertSlideData1, HardSlideData1, MediumSlideData1, EasySlideData1 };
-        public static int[] AllStrumData1 = { ExpertStrumData1, HardStrumData1};
-        public static int[] AllArpeggioData1 = { ExpertArpeggioData1, HardArpeggioData1 };
-        public static int[] AllHammeronData1 = { ExpertHammeronData1, HardHammeronData1 };
-
-
-
         public static int WarnOnInvalidStrum = 1;
 
         public static int GridSnapDistance = 4;
         public static int NoteSnapDistance = 4;
         
-
-        
-        /*
-        public static int topLineOffset = 10;
-        
-        
-
-        public static int NoteHeight = 12;*/
         public static int NoteCloseWidth = 8;
 
         public static bool IsCloseTick(int a, int b)
@@ -275,64 +334,6 @@ namespace ProUpgradeEditor.Common
         public static SolidBrush TextEventBrush = new SolidBrush(Color.FromArgb(80, 100, 150, 200));
         public static SolidBrush SelectedTextEventBrush = new SolidBrush(Color.FromArgb(120, 200, 0, 150));
 
-        public const int ExpertData1LowE = 96;
-        public const int ExpertData1A = 97;
-        public const int ExpertData1D = 98;
-        public const int ExpertData1G = 99;
-        public const int ExpertData1B = 100;
-        public const int ExpertData1HighE = 101;
-
-        public const int HardData1LowE = 72;
-        public const int HardData1A = 73;
-        public const int HardData1D = 74;
-        public const int HardData1G = 75;
-        public const int HardData1B = 76;
-        public const int HardData1HighE = 77;
-
-        public const int MediumData1LowE = 48;
-        public const int MediumData1A = 49;
-        public const int MediumData1D = 50;
-        public const int MediumData1G = 51;
-        public const int MediumData1B = 52;
-        public const int MediumData1HighE = 53;
-
-        public const int EasyData1LowE = 24;
-        public const int EasyData1A = 25;
-        public const int EasyData1D = 26;
-        public const int EasyData1G = 27;
-        public const int EasyData1B = 28;
-        public const int EasyData1HighE = 29;
-
-
-        public const int EasyData1LowE5 = 60;
-        public const int EasyData1A5 = 61;
-        public const int EasyData1D5 = 62;
-
-        public const int MediumData1LowE5= 72;
-        public const int MediumData1A5 = 73;
-        public const int MediumData1D5 = 74;
-        public const int MediumData1G5 = 75;
-
-        public const int HardData1LowE5 = 84;
-        public const int HardData1A5 = 85;
-        public const int HardData1D5 = 86;
-        public const int HardData1G5 = 87;
-        public const int HardData1B5 = 88;
-
-
-        public const int ChordNameHiddenData1 = 17;
-        public const int ChordNameEbData1 = 15;
-        public const int ChordNameDData1 = 14;
-        public const int ChordNameDbData1 = 13;
-        public const int ChordNameCData1 = 12;
-        public const int ChordNameBData1 = 11;
-        public const int ChordNameBbData1 = 10;
-        public const int ChordNameAData1 = 9;
-        public const int ChordNameAbData1 = 8;
-        public const int ChordNameGData1 = 7;
-        public const int ChordNameGbData1 = 6;
-        public const int ChordNameFData1 = 5;
-        public const int ChordNameEData1 = 4;
 
         public static int[] ChordNameEvents
         {
@@ -340,6 +341,7 @@ namespace ProUpgradeEditor.Common
             {
                 return new int[] 
                 { 
+                    ChordNameHiddenData1,
                     ChordNameEbData1,
                     ChordNameDData1,
                     ChordNameDbData1,
@@ -362,58 +364,66 @@ namespace ProUpgradeEditor.Common
             {
                 if (ExpertData1Strings.Contains(data1))
                     return GuitarDifficulty.Expert;
-                if (HardData1Strings.Contains(data1))
+                else if (HardData1Strings.Contains(data1))
                     return GuitarDifficulty.Hard;
-                if (MediumData1Strings.Contains(data1))
+                else if (MediumData1Strings.Contains(data1))
                     return GuitarDifficulty.Medium;
-                if (EasyData1Strings.Contains(data1))
+                else if (EasyData1Strings.Contains(data1))
                     return GuitarDifficulty.Easy;
 
-                if (data1 == HandPositionData1)
+                else if (data1 == HandPositionData1)
                     return GuitarDifficulty.All;
 
-                if (data1 == ExpertArpeggioData1)
+                else if (data1 == ExpertArpeggioData1)
                     return GuitarDifficulty.Expert;
 
-                if (data1 == ExpertSlideData1)
+                else if (data1 == ExpertSlideData1)
                     return GuitarDifficulty.Expert;
 
-                if (data1 == ExpertHammeronData1)
+                else if (data1 == ExpertHammeronData1)
                     return GuitarDifficulty.Expert;
 
-                if (data1 == ExpertStrumData1)
+                else if (data1 == ExpertStrumData1)
                     return GuitarDifficulty.Expert;
 
-                if (data1 == HardStrumData1)
+                else if (data1 == HardStrumData1)
                     return GuitarDifficulty.Hard;
 
-                if (data1 == HardSlideData1)
+                else if (data1 == HardSlideData1)
                     return GuitarDifficulty.Hard;
 
-                if (data1 == HardArpeggioData1)
+                else if (data1 == HardArpeggioData1)
                     return GuitarDifficulty.Hard;
 
-                if (data1 == HardHammeronData1)
+                else if (data1 == HardHammeronData1)
                     return GuitarDifficulty.Hard;
 
-                if (data1 == MediumSlideData1)
+                else if (data1 == MediumHammeronData1)
                     return GuitarDifficulty.Medium;
 
-                if (data1 == EasySlideData1)
+                else if (data1 == EasyHammeronData1)
                     return GuitarDifficulty.Easy;
 
-                if (data1 == PowerupData1)
+                else if (data1 == MediumSlideData1)
+                    return GuitarDifficulty.Medium;
+
+                else if (data1 == EasySlideData1)
+                    return GuitarDifficulty.Easy;
+
+                else if (data1 == PowerupData1)
                     return GuitarDifficulty.All;
 
-                if (data1 == SoloData1)
+                else if (data1 == SoloData1)
                     return GuitarDifficulty.All;
 
-                if (data1 == SingleStringTremeloData1)
+                else if (data1 == SingleStringTremeloData1)
                     return GuitarDifficulty.All;
 
-                if (data1 == MultiStringTremeloData1)
+                else if (data1 == MultiStringTremeloData1)
                     return GuitarDifficulty.All;
-                if (BigRockEndingData1.Contains(data1))
+                else if (BigRockEndingData1.Contains(data1))
+                    return GuitarDifficulty.All;
+                else if (ChordNameEvents.Contains(data1))
                     return GuitarDifficulty.All;
             }
             else
@@ -427,19 +437,38 @@ namespace ProUpgradeEditor.Common
                 if (EasyData1StringsG5.Contains(data1))
                     return GuitarDifficulty.Easy;
 
-                if (data1 == SoloData1 || data1 == SoloData1_G5)
+                if (data1 == ExpertSoloData1_G5)
+                    return GuitarDifficulty.Expert;
+                if (data1 == HardSoloData1_G5)
+                    return GuitarDifficulty.Hard;
+                if (data1 == MediumSoloData1_G5)
+                    return GuitarDifficulty.Medium;
+                if (data1 == EasySoloData1_G5)
+                    return GuitarDifficulty.Easy;
+                if (data1 == SoloData1)
                     return GuitarDifficulty.All;
 
                 if (data1 == PowerupData1)
                     return GuitarDifficulty.All;
 
                 if(BigRockEndingData1.Contains(data1))
-                        return GuitarDifficulty.All;
-
+                    return GuitarDifficulty.All;
             }
             
-
             return GuitarDifficulty.Unknown;
+        }
+
+        public static int GetSoloData1_G5(GuitarDifficulty difficulty)
+        {
+            if (difficulty.IsUnknown() || difficulty.IsAll() || difficulty.IsExpert())
+                return ExpertSoloData1_G5;
+            if (difficulty.IsHard())
+                return HardSoloData1_G5;
+            else if (difficulty.IsMedium())
+                return MediumSoloData1_G5;
+            else if (difficulty.IsEasy())
+                return EasySoloData1_G5;
+            return ExpertSoloData1_G5;
         }
 
         public static int GetModifierData1ForDifficulty(
@@ -447,6 +476,9 @@ namespace ProUpgradeEditor.Common
             GuitarDifficulty sourceDifficulty,
             GuitarDifficulty targetDifficulty)
         {
+            if (targetDifficulty.IsUnknown())
+                targetDifficulty = sourceDifficulty;
+
             if (AllHammeronData1.Contains(sourceData1))
             {
                 if (targetDifficulty == GuitarDifficulty.Expert)
@@ -456,6 +488,14 @@ namespace ProUpgradeEditor.Common
                 else if (targetDifficulty == GuitarDifficulty.Hard)
                 {
                     return HardHammeronData1;
+                }
+                else if (targetDifficulty == GuitarDifficulty.Medium)
+                {
+                    return MediumHammeronData1;
+                }
+                else if (targetDifficulty == GuitarDifficulty.Easy)
+                {
+                    return EasyHammeronData1;
                 }
                 else
                 {

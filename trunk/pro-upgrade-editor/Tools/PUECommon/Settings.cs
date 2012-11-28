@@ -155,6 +155,19 @@ namespace ProUpgradeEditor
                             lastFile != DefaultSettingFilePath)
                         {
                             SettingFilePath = lastFile;
+                            if (File.Exists(SettingFilePath))
+                            {
+                                try
+                                {
+                                    XmlDocument doc = new XmlDocument();
+                                    doc.Load(SettingFilePath);
+                                    this.xml = doc;
+                                    root = XMLUtil.GetNode(xml, "root");
+                                    if (root == null)
+                                        xml = null;
+                                }
+                                catch { }
+                            }
                         }
 
                         loadSaved = false;
@@ -172,6 +185,8 @@ namespace ProUpgradeEditor
                                 x.Load(SettingFilePath);
                                 this.xml = x;
                                 root = XMLUtil.GetNode(xml, "root");
+                                if (root == null)
+                                    xml = null;
                             }
                             catch { }
                         }
@@ -200,9 +215,12 @@ namespace ProUpgradeEditor
             }
             else
             {
-                var cfg = XMLUtil.AddNode(root, "config");
-                XMLUtil.AddAttribute(cfg, "name", name);
-                XMLUtil.AddAttribute(cfg, "value", value.ToString());
+                if (root != null)
+                {
+                    var cfg = XMLUtil.AddNode(root, "config");
+                    XMLUtil.AddAttribute(cfg, "name", name);
+                    XMLUtil.AddAttribute(cfg, "value", value.ToString());
+                }
             }
         }
 
@@ -215,9 +233,12 @@ namespace ProUpgradeEditor
             }
             else
             {
-                var cfg = XMLUtil.AddNode(root, "config");
-                XMLUtil.AddAttribute(cfg, "name", name);
-                XMLUtil.AddAttribute(cfg, "value", value);
+                if (root != null)
+                {
+                    var cfg = XMLUtil.AddNode(root, "config");
+                    XMLUtil.AddAttribute(cfg, "name", name);
+                    XMLUtil.AddAttribute(cfg, "value", value);
+                }
             }
         }
 
@@ -311,7 +332,7 @@ namespace ProUpgradeEditor
         }
         public void SaveConfig()
         {
-            if (defaultxml != null)
+            if (defaultxml != null && xml != null)
             {
                 if (string.IsNullOrEmpty(SettingFilePath) == false &&
                     SettingFilePath != DefaultSettingFilePath &&

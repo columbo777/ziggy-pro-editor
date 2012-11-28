@@ -69,7 +69,7 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
-        public void Replace(MidiEvent evOld, MidiEvent evNew)
+        public void ReplaceEvent(MidiEvent evOld, MidiEvent evNew)
         {
             evOld.Dirty = true;
             evNew.Dirty = true;
@@ -94,9 +94,11 @@ namespace Sanford.Multimedia.Midi
                 evNew.Next = null;
                 tail = evNew;
 
-                endOfTrackMidiEvent.SetAbsoluteTicks(Length);
-                endOfTrackMidiEvent.Previous = tail;
+                
             }
+
+            endOfTrackMidiEvent.SetAbsoluteTicks(Length);
+            endOfTrackMidiEvent.Previous = tail;
 
             evOld.Next = evOld.Previous = null;
 
@@ -158,10 +160,7 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                foreach (var mm in Events.Where(x => x.MidiMessage.MessageType == MessageType.Meta))
-                {
-                    yield return mm;
-                }
+                return Events.Where(x => x.MessageType == MessageType.Meta);
             }
         }
 
@@ -170,10 +169,7 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                foreach(var timeSig in Meta.Where(x => x.MetaMessage.MetaType == MetaType.TimeSignature))
-                {
-                    yield return timeSig;       
-                }
+                return Meta.Where(x => x.MetaMessage.MetaType == MetaType.TimeSignature);
             }
         }
 
@@ -182,10 +178,7 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                foreach (var ev in Meta.Where(x => x.MetaMessage.MetaType == MetaType.Tempo))
-                {
-                    yield return ev;
-                }
+                return Meta.Where(x => x.MetaMessage.MetaType == MetaType.Tempo);
             }
         }
 
@@ -194,11 +187,9 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                foreach(var cm in Events.Where(x=> x.MidiMessage.MessageType == MessageType.Channel &&
-                    (x.ChannelMessage.Command == ChannelCommand.NoteOn || x.ChannelMessage.Command == ChannelCommand.NoteOff)))
-                {
-                    yield return cm;
-                }
+                return Events.Where(x =>
+                    x.MessageType == MessageType.Channel &&
+                    (x.ChannelMessage.Command == ChannelCommand.NoteOn || x.ChannelMessage.Command == ChannelCommand.NoteOff));
             }
         }
 
@@ -220,8 +211,7 @@ namespace Sanford.Multimedia.Midi
                 newMidiEvent.Previous = tail;
                 tail.Next = newMidiEvent;
                 tail = newMidiEvent;
-                endOfTrackMidiEvent.SetAbsoluteTicks(Length);
-                endOfTrackMidiEvent.Previous = tail;
+                
             }
             else
             {
@@ -246,7 +236,8 @@ namespace Sanford.Multimedia.Midi
 
                 current.Previous = newMidiEvent;
             }
-
+            endOfTrackMidiEvent.SetAbsoluteTicks(Length);
+            endOfTrackMidiEvent.Previous = tail;
             count++;
 
             return newMidiEvent;
@@ -287,8 +278,6 @@ namespace Sanford.Multimedia.Midi
             
             this.dirty = true;
 
-         
-
             ev.Deleted = true;
             ev.Dirty = true;
             
@@ -313,8 +302,6 @@ namespace Sanford.Multimedia.Midi
                 endOfTrackMidiEvent.SetAbsoluteTicks(Length);
                 endOfTrackMidiEvent.Previous = tail;
             }
-
-            
 
             ev.Next = ev.Previous = null;
             count--;
@@ -435,8 +422,6 @@ namespace Sanford.Multimedia.Midi
                 return;
             }
 
-
-
             count += trkCount;
 
             MidiEvent a = head;
@@ -541,8 +526,6 @@ namespace Sanford.Multimedia.Midi
                 return;
             }
 
-            
-
             count += trk.Count - 1;
 
             MidiEvent a = head;
@@ -620,7 +603,7 @@ namespace Sanford.Multimedia.Midi
             set
             {
                 endOfTrackOffset = value;
-                endOfTrackMidiEvent.SetAbsoluteTicks(value);
+                endOfTrackMidiEvent.SetAbsoluteTicks(Length);
             }
         }
 
@@ -630,7 +613,7 @@ namespace Sanford.Multimedia.Midi
     {
 
 
-        public static IEnumerable<MidiEvent> SortTicks(this IEnumerable<MidiEvent> list, bool ascending = true)
+        public static IEnumerable<MidiEvent> SortEvents(this IEnumerable<MidiEvent> list, bool ascending = true)
         {
             if (ascending)
             {

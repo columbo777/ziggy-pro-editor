@@ -4,19 +4,20 @@ using System.Linq;
 using System.Text;
 using Sanford.Multimedia.Midi;
 
-namespace ProUpgradeEditor.DataLayer
+namespace ProUpgradeEditor
 {
     [Flags()]
     public enum GuitarDifficulty
     {
-        None = 0,
-        Easy = 1 << 0,
-        Medium = 1 << 1,
-        Hard = 1 << 2,
-        Expert = 1 << 3,
-        EasyMediumHardExpert = Easy|Medium|Hard|Expert,
+        All = 1 << 0,
+        Easy = 1 << 1,
+        Medium = 1 << 2,
+        Hard = 1 << 3,
+        Expert = 1 << 4,
+        EasyMediumHardExpert = Easy | Medium | Hard | Expert,
         EasyMediumHard = Easy | Medium | Hard,
-        All = 1 << 4,
+        EasyMedium = Easy | Medium,
+        HardExpert = Hard | Expert,
         Unknown = 1<<5
     }
 

@@ -435,6 +435,7 @@ namespace Sanford.Multimedia.Midi
 	[ImmutableObject(true)]
 	public sealed class ChannelMessage : ShortMessage
 	{
+
         #region ChannelEventArgs Members
 
         #region Constants
@@ -689,7 +690,10 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                return UnpackCommand(msg);
+                var ret = UnpackCommand(msg);
+                if (ret == ChannelCommand.NoteOn && Data2 == 0)
+                    ret = ChannelCommand.NoteOff;
+                return ret;
             }
         }
         

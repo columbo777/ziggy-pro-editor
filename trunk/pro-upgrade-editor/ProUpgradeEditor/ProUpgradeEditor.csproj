@@ -41,7 +41,7 @@
     <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -94,9 +94,6 @@
     </Reference>
     <Reference Include="NAudio.WindowsMediaFormat">
       <HintPath>..\Tools\NAudio\NAudio.WindowsMediaFormat.dll</HintPath>
-    </Reference>
-    <Reference Include="PUECommon">
-      <HintPath>..\lib\PUECommon.dll</HintPath>
     </Reference>
     <Reference Include="Sanford.Multimedia, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -251,6 +248,12 @@
   <ItemGroup>
     <Folder Include="Common\" />
     <Folder Include="DataLayer\Guitar6\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Tools\PUECommon\PUECommon.csproj">
+      <Project>{7767D3DD-6E1C-419E-9092-F3F3DDDF3D87}</Project>
+      <Name>PUECommon</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

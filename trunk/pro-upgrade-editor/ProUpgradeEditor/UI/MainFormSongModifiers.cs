@@ -39,15 +39,11 @@ namespace ProUpgradeEditor.UI
             }
             catch{}
 
-            try
-            {
-                RefreshTextEvents();
-            }
-            catch { }
         }
 
         public void RefreshTrainers()
         {
+            RefreshTextEvents();
             RefreshTrainer(GuitarTrainerType.ProGuitar);
             RefreshTrainer(GuitarTrainerType.ProBass);   
         }
@@ -63,8 +59,9 @@ namespace ProUpgradeEditor.UI
             {
                 foreach (var mev in ProGuitarTrack.Messages.TextEvents)
                 {
-                    if((checkBoxShowTrainersInTextEvents.Checked == true && mev.Type != GuitarTrainerMetaEventType.Unknown) ||
-                        mev.Type == GuitarTrainerMetaEventType.Unknown)
+                    if((checkBoxShowTrainersInTextEvents.Checked == true && 
+                        mev.TrainerType != GuitarTrainerMetaEventType.Unknown) ||
+                        mev.TrainerType == GuitarTrainerMetaEventType.Unknown)
                     {
                         listTextEvents.Items.Add(mev);
                     }
@@ -73,10 +70,7 @@ namespace ProUpgradeEditor.UI
             }
 
             listTextEvents.EndUpdate();
-            if (!reloading)
-            {
-                ReloadTrack(SelectNextEnum.ForceKeepSelection, false);
-            }
+            
             EditorPro.Invalidate();
         }
 
@@ -94,7 +88,7 @@ namespace ProUpgradeEditor.UI
                 {
                     list = listProBassTrainers;
                 }
-
+                
                 if (list != null)
                 {
                     list.BeginUpdate();
@@ -102,6 +96,7 @@ namespace ProUpgradeEditor.UI
                     list.Items.Clear();
                     if (EditorPro.IsLoaded)
                     {
+                        ProGuitarTrack.RefreshTrainers();
                         foreach (var trainer in ProGuitarTrack.Messages.Trainers)
                         {
                             if (trainer.TrainerType == type)
@@ -193,7 +188,10 @@ namespace ProUpgradeEditor.UI
         {
             try
             {
-                if (Utility.GetArpeggioData1(GetEditorDifficulty()) == -1)
+                if (!EditorPro.IsLoaded)
+                    return;
+
+                if (Utility.GetArpeggioData1(EditorPro.CurrentDifficulty).IsNull())
                     return;
 
                 if (listBox3.Items.Count == 0)
@@ -216,18 +214,7 @@ namespace ProUpgradeEditor.UI
                         if (c.DownTick < m.UpTick &&
                             c.UpTick > m.DownTick)
                         {
-                            for (int x = 0; x < c.Notes.Length; x++)
-                            {
-                                var n = c.Notes[x];
-                                if (n != null)
-                                {
-                                    if (n.Channel == Utility.ChannelArpeggio)
-                                    {
-                                        gt.Remove(n);
-
-                                    }
-                                }
-                            }
+                            c.Notes.Where(x => x.IsArpeggioNote).ToList().ForEach(x => c.Notes.Remove(x));
                         }
                     }
                     gt.Remove(m);
@@ -388,13 +375,14 @@ namespace ProUpgradeEditor.UI
                             if (ms.AbsoluteTicks != st ||
                                 me.AbsoluteTicks != ed)
                             {
+                                
                                 EditorPro.GuitarTrack.Remove(ms);
-                                EditorPro.GuitarTrack.Insert(
-                                    st, ms.MidiMessage);
+                                obj.SetDownEvent(EditorPro.GuitarTrack.Insert(
+                                    st, ms.MidiMessage));
 
                                 EditorPro.GuitarTrack.Remove(me);
-                                EditorPro.GuitarTrack.Insert(
-                                    ed, me.MidiMessage);
+                                obj.SetUpEvent(EditorPro.GuitarTrack.Insert(
+                                    ed, me.MidiMessage));
                             }
                         }
                     }

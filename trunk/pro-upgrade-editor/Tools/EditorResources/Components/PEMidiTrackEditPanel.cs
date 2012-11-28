@@ -9,20 +9,50 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
 using Sanford.Multimedia.Midi;
+using ProUpgradeEditor;
 using ProUpgradeEditor.DataLayer;
 
 namespace EditorResources.Components
 {
 
-    
-
-    
 
     [DesignerCategory("UserControl")]
     public partial class PEMidiTrackEditPanel : PUEControl
     {
+        int ItemHeight
+        {
+            get
+            {
+                return 25;
+            }
+        }
+        List<PEMidiTrack> TrackList
+        {
+            get
+            {
+                var ret = new List<PEMidiTrack>();
+                if (panelTracks != null)
+                {
+                    
+                    foreach (var c in panelTracks.Controls)
+                    {
+                        var pc = c as PEMidiTrack;
+                        if (pc != null)
+                        {
+                            ret.Add(pc);
+                        }
+                    }
+
+                    ret.Sort((x, y) => x.TabIndex > y.TabIndex ? 1 : x.TabIndex < y.TabIndex ? -1 : 0);
+                }
+                return ret;
+            }
+        }
+
         Sequence sequence;
         public Sequence Sequence { get { return sequence; } }
+
+
 
         public bool IsPro { get; set; }
 
@@ -34,151 +64,331 @@ namespace EditorResources.Components
             }
             return sequence;
         }
-
-
-        GuitarDifficulty selectedDifficulty;
-
-        public GuitarDifficulty SelectedDifficulty
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public PEMidiTrack SelectedTrack
         {
-            get { return selectedDifficulty; }
-            internal set { selectedDifficulty = value; }
-        }
-
-        Track selectedTrack = null;
-        public Track SelectedTrack
-        {
-            get { return selectedTrack; }
-            internal set 
+            get
             {
-                selectedTrack = value;
+                return TrackList.SingleOrDefault(x => x.PanelMidiTrack.BackColor == Color.LightSteelBlue);
+            }
+            internal set
+            {
+                TrackList.Where(x => x != value).ForEach(x => x.PanelMidiTrack.BackColor = Color.Transparent);
+
+                value.IfObjectNotNull(x =>
+                    {
+                        x.PanelMidiTrack.BackColor = Color.LightSteelBlue;
+                        textBoxTrackName.Text = x.Track.Name;
+                    },
+                    Else =>
+                    {
+                        textBoxTrackName.Text = "";
+                    });
             }
         }
 
-        public PEMidiTrackEditPanel() : base()
+        public PEMidiTrackEditPanel()
+            : base()
         {
             InitializeComponent();
 
             if (DesignMode)
                 return;
-            selectedDifficulty = GuitarDifficulty.All;
-            this.listTracks.View = View.Details;
-            this.listTracks.HeaderStyle = ColumnHeaderStyle.Nonclickable;
-            this.listTracks.HideSelection = true;
-            listTracks.GridLines = false;
-            listTracks.Scrollable = true;
-            
-            listTracks.Activation = ItemActivation.OneClick;
-
-            if (!DesignMode)
-            {
-                listTracks.OnSelectedItemChanged += new EventHandler<PEListView.PEListViewEventArgs>(listTracks_OnSelectedItemChanged);
-                listTracks.OnItemClicked += new EventHandler<PEListView.PEListViewEventArgs>(listTracks_OnItemClicked);
-            }
-        }
-
-        void listTracks_OnItemClicked(object sender, PEListView.PEListViewEventArgs e)
-        {
-            if (TrackClicked != null && e != null && e.Item != null)
-            {
-                listTracks.SelectedItem = e.Item;
-                SetSelectedItem(e.Item.Track, e.Item.Difficulty);
-                TrackClicked(this, sequence, e.Item.Track, e.Item.Difficulty);
-            }
-        }
-
-        void listTracks_OnSelectedItemChanged(object sender, PEListView.PEListViewEventArgs e)
-        {
-            
-        }
-
-
-        private void listTracks_SelectedIndexChanged(object sender, EventArgs e)
-        {
 
         }
-
 
         [Category("Custom")]
-        public event TrackEventHandler TrackAdded;
+        public event EventHandler RequestBackup;
 
         [Category("Custom")]
-        public event TrackEventHandler TrackRemoved;
+        public event TrackEditPanelEventHandler TrackAdded;
 
         [Category("Custom")]
-        public event TrackEventHandler TrackClicked;
+        public event TrackEditPanelEventHandler TrackRemoved;
+
+        [Category("Custom")]
+        public event TrackEditPanelEventHandler TrackClicked;
 
 
-        private void CreateItemList()
+        void CreatePanelTracks(Sequence seq)
         {
-            
-            Track lastSel = selectedTrack;
-            var lastDiff = selectedDifficulty;
 
-            listTracks.BeginUpdate();
-            listTracks.Items.Clear();
-
-            if (sequence != null)
+            bool refresh = false;
+            if (seq != null)
             {
-                foreach (var t in sequence)
+                if (seq != this.sequence)
+                    refresh = true;
+                else
                 {
-                    var li = new PEListView.PEListViewItem(listTracks, null, t.Name, t, GuitarDifficulty.All);
-
-                    var item = listTracks.Items.Add(li);
-
-                    AddSubTracks(item, t);
+                    if (panelTracks.Controls.Count != seq.Count)
+                        refresh = true;
+                    else
+                    {
+                        for (int x = 0; x < seq.Count; x++)
+                        {
+                            PEMidiTrack tr = TrackList[x];
+                            var trk = seq[x];
+                            if (trk != tr.Track)
+                            {
+                                refresh = true;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
-
-            ReselectOldSelection(lastSel, lastDiff);
-
-            listTracks.EndUpdate();
-            
-            
-        }
-
-        private void ReselectOldSelection(Track lastSel, GuitarDifficulty lastDiff)
-        {
-            DeselectAll();
-            var item = GetItem(lastSel, lastDiff);
-            if (item != null)
+            else
             {
-                listTracks.ActivateItem(item);
-
-                listTracks.EnsureVisible(item.Index);
+                refresh = true;
             }
-            
-        }
-
-        void AddSubTracks(PEListView.PEListViewItem item, Track track)
-        {
-            listTracks.Items.Add(new PEListView.PEListViewItem(listTracks, item, "Expert", track, GuitarDifficulty.Expert));
-            listTracks.Items.Add(new PEListView.PEListViewItem(listTracks, item, "Hard", track, GuitarDifficulty.Hard));
-            listTracks.Items.Add(new PEListView.PEListViewItem(listTracks, item, "Medium", track, GuitarDifficulty.Medium));
-            listTracks.Items.Add(new PEListView.PEListViewItem(listTracks, item, "Easy", track, GuitarDifficulty.Easy));
-        }
-
-        public override void Refresh()
-        {
-            if (DesignMode)
+            if (!refresh)
+            {
                 return;
+            }
 
-            
-            var track = selectedTrack;
-            var diff = selectedDifficulty;
+            SuspendLayout();
+            this.sequence = seq;
+            Track osel = null;
+            if (SelectedTrack != null)
+            {
+                osel = SelectedTrack.Track;
+            }
+            if (Sequence != null)
+            {
+                panelTracks.SuspendLayout();
 
-            CreateItemList();
-            
-            ReselectOldSelection(track, diff);
+                panelTracks.Controls.Clear();
+                foreach (var tr in sequence)
+                {
+                    var peTrack = new PEMidiTrack(tr);
+                    peTrack.TabIndex = panelTracks.Controls.Count;
+
+                    peTrack.TrackClicked += new TrackEventHandler(t_TrackClicked);
+                    peTrack.TrackDifficultyChanged += new TrackEventHandler(t_TrackDifficultyChanged);
+                    peTrack.TrackNameDoubleClicked += new TrackEventHandler(t_TrackNameDoubleClicked);
+
+                    peTrack.AllowDrop = true;
+
+                    peTrack.DifficultyItemDropped += new PEMidiTrackDifficultyDropEventHandler(peTrack_DifficultyItemDropped);
+                    peTrack.ItemDropped += new PEMidiTrackDropEventHandler(peTrack_ItemDropped);
+                    peTrack.MouseMove += new MouseEventHandler(peTrack_MouseMove);
+                    peTrack.Dock = DockStyle.Top;
+                    peTrack.ItemBeginDrag += new PEMidiTrackDropEventHandler(peTrack_ItemBeginDrag);
+                    peTrack.ItemDifficultyBeginDrag += new PEMidiTrackDifficultyDropEventHandler(peTrack_ItemDifficultyBeginDrag);
+                    peTrack.ItemDragCancel += new PEMidiTrackDropEventHandler(peTrack_ItemDragCancel);
+                    peTrack.DragOver += new DragEventHandler(peTrack_DragOver);
+                    panelTracks.Controls.Add(peTrack);
+                    peTrack.BringToFront();
+                }
+
+                panelTracks.ResumeLayout(true);
+
+                if (osel != null)
+                {
+                    SelectedTrack = TrackList.FirstOrDefault(x => x.Track == osel);
+                }
+            }
+            else
+            {
+                panelTracks.Controls.Clear();
+                textBoxTrackName.Text = "";
+            }
+
+            ResumeLayout();
+        }
+
+        void peTrack_DragOver(object sender, DragEventArgs e)
+        {
+            panelTracks.Invalidate();
+        }
+
+        void peTrack_ItemDragCancel(PEMidiTrack sender, DragEventArgs e)
+        {
+            dragItem = null;
+            panelTracks.Invalidate();
+        }
+
+        void peTrack_ItemDifficultyBeginDrag(PEMidiTrack sender, GuitarDifficulty difficulty, DragEventArgs e)
+        {
+            dragItem = sender;
+            panelTracks.Invalidate();
+        }
+
+        PEMidiTrack dragItem;
+        void peTrack_ItemBeginDrag(PEMidiTrack sender, DragEventArgs e)
+        {
+            dragItem = sender;
+            panelTracks.Invalidate();
+        }
+
+        void peTrack_MouseMove(object sender, MouseEventArgs e)
+        {
+            panelTracks.Invalidate();
+        }
+
+        void DoRequestBackup()
+        {
+            if (RequestBackup != null)
+                RequestBackup(this, null);
+        }
+
+        private void panelTracks_DragDrop(object sender, DragEventArgs e)
+        {
+            var o = e.GetDropObject<PEMidiTrack>();
+            o.IfObjectNotNull(xx =>
+            {
+                if (o != sender)
+                {
+                    DoRequestBackup();
+
+                    Track newTrack = null;
+                    if (Sequence == null)
+                    {
+                        var targetType = o.Track.Sequence.FileType == FileType.Guitar5 ? FileType.Pro : FileType.Guitar5;
+
+                        var seq = new Sequence(targetType, o.Track.Sequence.Division);
+                        this.sequence = seq;
+                        if (!o.Track.IsTempo())
+                        {
+                            var tempo = o.Track.Sequence.Tracks.Where(x => x.IsTempo());
+                            if (tempo.Any())
+                            {
+                                seq.AddTempo(tempo.First().ConvertToPro());
+                            }
+                        }
+                        newTrack = o.Track.Clone(seq.FileType);
+                        seq.Add(newTrack);
+                    }
+                    else
+                    {
+                        
+                        if (this.Sequence == o.Track.Sequence)
+                        {
+                            this.Sequence.MoveTrack(o.Track.GetTrackIndex(), GetInsertAt());
+                        }
+                        else
+                        {
+                            newTrack = o.Track.Clone(Sequence.FileType);
+
+                            sequence.Insert(GetInsertAt(), newTrack);
+
+                            if (!sequence.Tracks.Any(x => x.IsTempo()))
+                            {
+                                var tempo = o.Track.Sequence.Tracks.Where(x => x.IsTempo());
+                                if (tempo.Any())
+                                {
+                                    sequence.AddTempo(tempo.First().ConvertToPro());
+                                }
+                            }
+                        }
+                    }
+
+                    CreatePanelTracks(this.sequence);
+                    TrackAdded.IfObjectNotNull(tc => tc(this, this.sequence, newTrack, SelectedDifficulty));
+                }
+            });
+            dragItem = null;
+        }
+
+
+        private void panelTracks_DragOver(object sender, DragEventArgs e)
+        {
+            if (e.HasDropObject<PEMidiTrack>())
+                e.Effect = DragDropEffects.All;
+
+        }
+
+
+        void peTrack_ItemDropped(PEMidiTrack sender, DragEventArgs e)
+        {
+            var o = e.GetDropObject<PEMidiTrack>();
+            o.IfObjectNotNull(x =>
+            {
+                if (o != sender)
+                {
+                    DoRequestBackup();
+
+                    Track t = null;
+                    if (sender.Track.Sequence == o.Track.Sequence)
+                    {
+                        t = o.Track;
+                        sender.Track.Sequence.MoveTrack(o.Track.GetTrackIndex(), GetInsertAt());
+                    }
+                    else
+                    {
+                        var senderSeq = sender.Track.Sequence;
+                        var oSeq = o.Track.Sequence;
+                        t = o.Track.Clone(sender.Track.FileType);
+
+                        t.Name = sender.Track.Name;
+
+                        sender.Track.Sequence.Insert(GetInsertAt(), t);
+
+                        if (!ModifierKeys.HasFlag(Keys.Shift))
+                        {
+                            sender.Track.Sequence.Remove(sender.Track);
+                        }
+                    }
+                    Refresh();
+                    SetSelectedItem(t, SelectedDifficulty);
+                }
+            });
+            dragItem = null;
+        }
+
+        
+
+        void peTrack_DifficultyItemDropped(PEMidiTrack sender, GuitarDifficulty difficulty, DragEventArgs e)
+        {
+            var o = e.GetDropObject<PEMidiTrack.PETrackDifficulty>();
+            o.IfObjectNotNull(op =>
+            {
+                DoRequestBackup();
+                sender.Track.GetChanMessagesByDifficulty(difficulty).ToList().ForEach(x => sender.Track.Remove(x));
+
+                var otrack = o.MidiTrack.Track;
+
+                otrack.CloneDifficulty(o.Difficulty, difficulty, sender.Track.FileType).
+                    GetChanMessagesByDifficulty(difficulty).ForEach(x => sender.Track.Insert(x.AbsoluteTicks, x.ChannelMessage));
+
+                SetSelectedItem(sender.Track, o.Difficulty);
+                TrackClicked.IfObjectNotNull(x => x(this, sender.Track.Sequence, sender.Track, difficulty));
+            });
+        }
+
+
+
+        void t_TrackNameDoubleClicked(object sender, Track track, GuitarDifficulty difficulty)
+        {
+            textBoxTrackName.Text = track.Name;
+
+            (sender as PEMidiTrack).IfObjectNotNull(x => SelectedTrack = x);
+        }
+
+        void t_TrackDifficultyChanged(object sender, Track track, GuitarDifficulty difficulty)
+        {
+            (sender as PEMidiTrack).IfObjectNotNull(x =>
+                {
+                    SelectedTrack = x;
+                });
+
+            this.SelectedDifficulty = difficulty;
+
+            TrackClicked.IfObjectNotNull(x => x(this, track.Sequence, track, difficulty));
+        }
+
+        void t_TrackClicked(object sender, Track track, GuitarDifficulty difficulty)
+        {
+            TrackClicked.IfObjectNotNull(x => x(this, track.Sequence, track, difficulty));
         }
 
         private void refreshToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Refresh();
+            CreatePanelTracks(this.sequence);
         }
 
         private void buttonCreate_Click(object sender, EventArgs e)
         {
-            WriteDebug("TrackEdit.CreateClick");
 
             if (!string.IsNullOrEmpty(textBoxTrackName.Text))
             {
@@ -190,9 +400,11 @@ namespace EditorResources.Components
 
                     Refresh();
 
+                    SetSelectedItem(track, SelectedDifficulty);
+
                     if (TrackAdded != null)
                     {
-                        TrackAdded(this, sequence, track, GuitarDifficulty.All);
+                        TrackAdded(this, sequence, track, SelectedDifficulty);
                     }
                 }
             }
@@ -200,299 +412,195 @@ namespace EditorResources.Components
 
         private void buttonCopy_Click(object sender, EventArgs e)
         {
-            WriteDebug("TrackEdit.CopyClick");
-
-            if (SelectedTrack != null && sequence != null && textBoxTrackName.Text.Length>0)
+            if (SelectedTrack != null && sequence != null && textBoxTrackName.Text.Length > 0)
             {
-
                 var track = new Track(sequence.FileType, textBoxTrackName.Text);
-                track.Merge(SelectedTrack);
+                track.Merge(SelectedTrack.Track);
                 sequence.Add(track);
 
                 Refresh();
-
+                SetSelectedItem(track, SelectedDifficulty);
                 if (TrackAdded != null)
                 {
-                    TrackAdded(this, sequence, track, GuitarDifficulty.All);
+                    TrackAdded(this, sequence, track, SelectedDifficulty);
                 }
-                
             }
-            
         }
 
+        bool internalRemoveTrack(Track track)
+        {
+            var ret = false;
+
+            if (track == null)
+                return ret;
+
+            if (sequence != null && sequence.Contains(track))
+            {
+                sequence.Remove(track);
+                ret = true;
+            }
+
+            var t = TrackList.SingleOrDefault(x => x.Track == track);
+            if (t != null)
+            {
+                ret = true;
+                if (panelTracks.Controls.Contains(t))
+                {
+                    panelTracks.Controls.Remove(t);
+                }
+            }
+            return ret;
+        }
 
         private void ButtonDelete_Click(object sender, EventArgs e)
         {
             if (SelectedTrack != null && sequence != null)
             {
-                sequence.Remove(selectedTrack);
-
-                Refresh();
-
-                if (TrackRemoved != null)
+                DoRequestBackup();
+                var name = SelectedTrack.Track.Name;
+                if (internalRemoveTrack(SelectedTrack.Track))
                 {
-                    TrackRemoved(this, sequence, SelectedTrack, GuitarDifficulty.All);
-                }
-            }
-        }
-
-
-        private void listToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.listTracks.View = View.List;
-        }
-
-        private void detailsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.listTracks.View = View.Details;
-        }
-
-        PEListView.PEListViewItem GetItem(Track track, GuitarDifficulty difficulty = GuitarDifficulty.All)
-        {
-            return listTracks.Items.SingleOrDefault(x=> x.Track == track && x.Difficulty == difficulty);
-        }
-
-        void DeselectAll()
-        {
-            listTracks.Items.ToList().ForEach(x=>{
-                x.Selected = false;
-            });
-        }
-
-        
-        void SetSelectedItem(Track track, GuitarDifficulty difficulty)
-        {
-            if (track == null)
-            {
-                DeselectAll();
-            }
-            else
-            {
-                if (sequence == null || sequence != track.Sequence)
-                {
-                    sequence = track.Sequence;
-
                     Refresh();
+
+                    if (TrackRemoved != null)
+                    {
+                        TrackRemoved(this, sequence, SelectedTrack.Track, SelectedDifficulty);
+                    }
+
+                    SelectSimilarTrack(name);
+
                 }
-                
-                internalSetSelected(GetItem(track, difficulty));
             }
-            Invalidate();
         }
 
-        void internalSetSelected(PEListView.PEListViewItem item)
+        private void SelectSimilarTrack(string name)
+        {
+            Track similar = null;
+            if (name.IsGuitarTrackName() || name.IsBassTrackName())
+            {
+                var t = sequence.Tracks.FirstOrDefault(x => name.IsGuitarTrackName() ? x.Name.IsGuitarTrackName() : name.IsBassTrackName());
+
+                if (t == null)
+                {
+                    similar = sequence.LastOrDefault();
+                }
+            }
+            if (similar != null)
+            {
+                SetSelectedItem(similar, SelectedDifficulty);
+            }
+        }
+
+        void SetSelectedItem(Track item, GuitarDifficulty difficulty)
         {
             if (item != null)
             {
-                item.Selected = true;
-                selectedTrack = item.Track;
-                if (item.Track != null)
-                {
-                    textBoxTrackName.Text = item.Track.Name;
-                }
-                else
-                {
-                    textBoxTrackName.Text = "";
-                }
-                selectedDifficulty = item.Difficulty;
-                listTracks.SelectedItem = item;
-                
+                SelectedTrack = TrackList.SingleOrDefault(x => x.Track == item);
             }
             else
             {
-                selectedTrack = null;
-                selectedDifficulty = GuitarDifficulty.All;
-                textBoxTrackName.Text = "";
+                SelectedTrack = null;
             }
+            SelectedDifficulty = difficulty;
+
+            panelTracks.Invalidate();
         }
 
-        GuitarDifficulty GetDifficulty(PEListView.PEListViewItem item)
-        {
-            var ret = GuitarDifficulty.All;
-            if (item != null)
-            {
-                if (item.Text == "Expert")
-                {
-                    ret = GuitarDifficulty.Expert;
-                }
-                else if (item.Text == "Hard")
-                {
-                    ret = GuitarDifficulty.Hard;
-                }
-                else if (item.Text == "Medium")
-                {
-                    ret = GuitarDifficulty.Medium;
-                }
-                else if (item.Text == "Easy")
-                {
-                    ret = GuitarDifficulty.Easy;
-                }
-            }
-            return ret;
-        }
-
-        private void peListView1_ItemActivate(object sender, EventArgs e)
-        {
-            if (DesignMode)
-                return;
-
-            internalSetSelected(listTracks.SelectedItem);
-            
-        }
 
         private void buttonRename_Click(object sender, EventArgs e)
         {
             if (SelectedTrack != null && textBoxTrackName.Text.Length > 0)
             {
-                SelectedTrack.Name = textBoxTrackName.Text;
-                
-                Refresh();
+                DoRequestBackup();
+                SelectedTrack.Track.Name = textBoxTrackName.Text;
+                CreatePanelTracks(this.sequence);
             }
         }
 
-        private void listTracks_DragEnter(object sender, DragEventArgs e)
+        public GuitarDifficulty SelectedDifficulty
         {
-            if (DesignMode)
-                return;
-
-            if (GetDragDropItem(e) != null)
+            get
             {
-                e.Effect = DragDropEffects.All;
+                GuitarDifficulty ret = GuitarDifficulty.Expert;
+                SelectedTrack.IfObjectNotNull(x => ret = x.SelectedDifficulty);
+                return ret;
             }
-        }
-
-        PEListView.PEListViewItem GetDragDropItem(DragEventArgs e)
-        {
-            PEListView.PEListViewItem ret = null;
-
-            if (e.Data.GetDataPresent(DataFormats.Serializable, false) == true)
+            set
             {
-                try
-                {
-                    object o = e.Data.GetData(DataFormats.Serializable, false);
-                    if (o != null)
-                    {
-                        ret = o as PEListView.PEListViewItem;
-                    }
-                }
-                catch { }
-            }
-            return ret;
-        }
-
-        private void listTracks_DragDrop(object sender, DragEventArgs e)
-        {
-            if (DesignMode)
-                return;
-
-            var item = GetDragDropItem(e);
-
-            if (item != null)
-            {
-                if (!listTracks.Items.Contains(item))
-                {
-                    sequence = internalGetSequence(true);
-                    if (sequence != null)
-                    {
-                        var t = new Track(sequence.FileType);
-                        t.Merge(item.Track);
-                        t.Name = item.Track.Name;
-
-                        var pItem = listTracks.GetItemFromScreenPoint(new Point(e.X, e.Y));
-
-                        InsertTrackAfterItem(t, pItem);
-                    }
-                }
-                else
-                {
-                    if (listTracks.Items.Count > 0)
-                    {
-                        sequence = internalGetSequence(false);
-                        if (sequence != null)
-                        {
-                            var pItem = listTracks.GetItemFromScreenPoint(new Point(e.X, e.Y));
-
-                            if (pItem != null && pItem != item)
-                            {
-
-                                var pIndex = listTracks.Items.IndexOf(pItem);
-                                var index = listTracks.Items.IndexOf(item);
-
-                                sequence.MoveTrack(index, pIndex);
-
-                                CreateItemList();
-
-                                if (TrackAdded != null)
-                                {
-                                    TrackAdded(this, sequence, pItem.Track, pItem.Difficulty);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private void InsertTrackAfterItem(Track t, PEListView.PEListViewItem pItem)
-        {
-            var listItem = new PEListView.PEListViewItem(listTracks, null, t.Name, t, GuitarDifficulty.All);
-
-            if (pItem == null)
-            {
-                sequence.Add(t);
-
-                listTracks.Items.Add(listItem);
-            }
-            else
-            {
-                var index = listTracks.Items.IndexOf(pItem);
-
-                if (index + 1 >= sequence.Count)
-                {
-                    sequence.Add(t);
-                }
-                else
-                {
-                    sequence.Insert(index + 1, t);
-                }
-            }
-
-            CreateItemList();
-
-            if (TrackAdded != null)
-            {
-                TrackAdded(this, sequence, t, GuitarDifficulty.All);
+                SelectedTrack.IfObjectNotNull(x => x.SelectedDifficulty = value);
             }
         }
 
         public void SetTrack(Track track, GuitarDifficulty difficulty)
         {
-            this.sequence = track != null ? track.Sequence : null;
-            this.selectedTrack = track;
-            this.selectedDifficulty = difficulty;
-            this.Refresh();
-        }
-        
-
-        private void listTracks_ItemDrag(object sender, ItemDragEventArgs e)
-        {
-            if (DesignMode)
-                return;
-
-            if (e.Button == System.Windows.Forms.MouseButtons.Left)
+            if (this.sequence == null || (track != null && this.sequence != null && !this.sequence.Contains(track)))
             {
-                listTracks.DoDragDrop(e.Item, DragDropEffects.All);
+                this.sequence = track != null ? track.Sequence : null;
+                this.CreatePanelTracks(this.sequence);
+            }
+
+            SetSelectedItem(track, difficulty);
+        }
+
+
+        public override void Refresh()
+        {
+            this.CreatePanelTracks(this.sequence);
+            base.Refresh();
+            panelTracks.Invalidate();
+        }
+
+        private void panelTracks_Paint(object sender, PaintEventArgs e)
+        {
+            if (MouseButtons == System.Windows.Forms.MouseButtons.Left)
+            {
+                var insertPoint = GetInsertPoint();
+                if (insertPoint.IsNull() == false)
+                {
+                    e.Graphics.Flush();
+                    using (var p = new Pen(Color.FromArgb(200, Color.Red), 1.5f))
+                    {
+                        e.Graphics.DrawLine(p, 0, (insertPoint ), panelTracks.Width, (insertPoint ));
+                    }
+                    e.Graphics.Flush();
+                }
             }
         }
 
-        private void PEMidiTrackEditPanel_DragDrop(object sender, DragEventArgs e)
+        private int GetInsertPoint()
         {
-            listTracks_DragDrop(sender, e);
+            int ret = Int32.MinValue;
+            var panel = panelTracks.GetChildAtPoint(
+                panelTracks.PointToClient(MousePosition)) as PEMidiTrack;
+            if (panel == null && panelTracks.Controls.Count > 0)
+                panel = TrackList.Last();
+            if (panel != null)
+            {
+                if (panelTracks.PointToClient(MousePosition).Y 
+                    <= panel.Top + panel.Height / 2)
+                    ret = panel.Top;
+                else
+                    ret = panel.Bottom;
+            }
+            return ret;
         }
 
-        private void PEMidiTrackEditPanel_DragEnter(object sender, DragEventArgs e)
+        private int GetInsertAt()
         {
-            listTracks_DragEnter(sender, e);
+            int ret = 0;
+            var panel = panelTracks.GetChildAtPoint(
+                panelTracks.PointToClient(MousePosition)) as PEMidiTrack;
+            if (panel == null && panelTracks.Controls.Count > 0)
+                panel = TrackList.Last();
+            if (panel != null)
+            {
+                if (panelTracks.PointToClient(MousePosition).Y
+                    <= panel.Top + panel.Height / 2)
+                    ret = panel.TabIndex;
+                else
+                    ret = panel.TabIndex+1;
+            }
+            return ret;
         }
 
     }

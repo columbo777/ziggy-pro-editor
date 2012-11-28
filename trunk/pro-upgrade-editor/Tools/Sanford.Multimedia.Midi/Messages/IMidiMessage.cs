@@ -41,6 +41,7 @@ namespace Sanford.Multimedia.Midi
     /// </summary>
     public enum MessageType
     {
+        Unknown,
         Channel,
 
         SystemExclusive,

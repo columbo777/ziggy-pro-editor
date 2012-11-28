@@ -6,12 +6,21 @@ using System.Windows.Forms;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using Sanford.Multimedia.Midi;
-using ProUpgradeEditor.DataLayer;
+using ProUpgradeEditor;
 
 namespace EditorResources.Components
 {
-    public delegate void TrackEventHandler(
+    public delegate void TrackEditPanelEventHandler(
         PEMidiTrackEditPanel sender, Sequence sequence, Track track, GuitarDifficulty difficulty);
+
+    public delegate void TrackEventHandler(
+        object sender, Track track, GuitarDifficulty difficulty);
+
+    public delegate void PEMidiTrackDifficultyDropEventHandler(
+        PEMidiTrack sender, GuitarDifficulty difficulty, DragEventArgs e);
+
+    public delegate void PEMidiTrackDropEventHandler(
+        PEMidiTrack sender, DragEventArgs e);
 
     public class PUEControl : UserControl
     {

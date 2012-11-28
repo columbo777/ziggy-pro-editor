@@ -36,6 +36,8 @@ namespace ProUpgradeEditor.DataLayer
                 ret.Data1 = Utility.GetStringLowE5(diff) + noteString;
             }
 
+            ret.Data2 = noteFret + 100;
+
             ret.NoteFretDown = noteFret;
             if (isX)
             {
@@ -64,6 +66,7 @@ namespace ProUpgradeEditor.DataLayer
         {
             var ret = GetNote(track, diff, downTick, upTick, noteString, noteFret, isTap, isArpeggio, isX);
 
+
             var cb = new ChannelMessageBuilder();
             cb.Data1 = ret.Data1;
             cb.Data2 = ret.Data2;
@@ -75,6 +78,7 @@ namespace ProUpgradeEditor.DataLayer
             var downEvent = track.Insert(downTick, cb.Result);
 
             cb.Command = ChannelCommand.NoteOff;
+            cb.Data2 = 0;
             cb.Build();
 
             var upEvent = track.Insert(upTick, cb.Result);
@@ -82,6 +86,8 @@ namespace ProUpgradeEditor.DataLayer
             ret.SetDownEvent(downEvent);
             ret.SetUpEvent(upEvent);
 
+            
+            ret.IsNew = true;
             return ret;
         }
 

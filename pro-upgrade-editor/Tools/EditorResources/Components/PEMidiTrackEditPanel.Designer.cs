@@ -39,14 +39,13 @@
             this.detailsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.textBoxTrackName = new System.Windows.Forms.TextBox();
-            this.buttonRename = new System.Windows.Forms.Button();
-            this.buttonCreate = new System.Windows.Forms.Button();
-            this.buttonCopy = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
-            this.listTracks = new EditorResources.Components.PEListView();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.ButtonDelete = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.buttonCopy = new System.Windows.Forms.Button();
+            this.buttonCreate = new System.Windows.Forms.Button();
+            this.ButtonDelete = new System.Windows.Forms.Button();
+            this.buttonRename = new System.Windows.Forms.Button();
+            this.panelTracks = new System.Windows.Forms.Panel();
             this.menuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -83,7 +82,7 @@
             this.refreshToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(240, 24);
+            this.menuStrip.Size = new System.Drawing.Size(239, 24);
             this.menuStrip.TabIndex = 5;
             // 
             // viewToolStripMenuItem
@@ -101,14 +100,12 @@
             this.listToolStripMenuItem.Name = "listToolStripMenuItem";
             this.listToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.listToolStripMenuItem.Text = "List";
-            this.listToolStripMenuItem.Click += new System.EventHandler(this.listToolStripMenuItem_Click);
             // 
             // detailsToolStripMenuItem
             // 
             this.detailsToolStripMenuItem.Name = "detailsToolStripMenuItem";
             this.detailsToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.detailsToolStripMenuItem.Text = "Details";
-            this.detailsToolStripMenuItem.Click += new System.EventHandler(this.detailsToolStripMenuItem_Click);
             // 
             // refreshToolStripMenuItem
             // 
@@ -125,51 +122,8 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxTrackName.Location = new System.Drawing.Point(3, 304);
             this.textBoxTrackName.Name = "textBoxTrackName";
-            this.textBoxTrackName.Size = new System.Drawing.Size(161, 20);
+            this.textBoxTrackName.Size = new System.Drawing.Size(160, 20);
             this.textBoxTrackName.TabIndex = 6;
-            // 
-            // buttonRename
-            // 
-            this.buttonRename.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonRename.ImageIndex = 5;
-            this.buttonRename.ImageList = this.imageList1;
-            this.buttonRename.Location = new System.Drawing.Point(167, 301);
-            this.buttonRename.Name = "buttonRename";
-            this.buttonRename.Size = new System.Drawing.Size(24, 24);
-            this.buttonRename.TabIndex = 7;
-            this.buttonRename.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip1.SetToolTip(this.buttonRename, "Rename Track");
-            this.buttonRename.UseVisualStyleBackColor = true;
-            this.buttonRename.Click += new System.EventHandler(this.buttonRename_Click);
-            // 
-            // buttonCreate
-            // 
-            this.buttonCreate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonCreate.ImageIndex = 7;
-            this.buttonCreate.ImageList = this.imageList1;
-            this.buttonCreate.Location = new System.Drawing.Point(190, 301);
-            this.buttonCreate.Name = "buttonCreate";
-            this.buttonCreate.Size = new System.Drawing.Size(24, 24);
-            this.buttonCreate.TabIndex = 9;
-            this.buttonCreate.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip1.SetToolTip(this.buttonCreate, "Create New Track");
-            this.buttonCreate.UseVisualStyleBackColor = true;
-            this.buttonCreate.Click += new System.EventHandler(this.buttonCreate_Click);
-            // 
-            // buttonCopy
-            // 
-            this.buttonCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonCopy.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.buttonCopy.ImageIndex = 6;
-            this.buttonCopy.ImageList = this.imageList1;
-            this.buttonCopy.Location = new System.Drawing.Point(213, 301);
-            this.buttonCopy.Name = "buttonCopy";
-            this.buttonCopy.Size = new System.Drawing.Size(24, 24);
-            this.buttonCopy.TabIndex = 10;
-            this.buttonCopy.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip1.SetToolTip(this.buttonCopy, "Copy Track");
-            this.buttonCopy.UseVisualStyleBackColor = true;
-            this.buttonCopy.Click += new System.EventHandler(this.buttonCopy_Click);
             // 
             // label1
             // 
@@ -181,42 +135,34 @@
             this.label1.TabIndex = 11;
             this.label1.Text = "Track Name:";
             // 
-            // listTracks
+            // buttonCopy
             // 
-            this.listTracks.Activation = System.Windows.Forms.ItemActivation.OneClick;
-            this.listTracks.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.listTracks.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.listTracks.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1});
-            this.listTracks.Cursor = System.Windows.Forms.Cursors.Default;
-            this.listTracks.FullRowSelect = true;
-            this.listTracks.GridLines = true;
-            this.listTracks.HeaderColorBottom = System.Drawing.Color.Silver;
-            this.listTracks.HeaderColorTop = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
-            this.listTracks.HeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.listTracks.HideSelection = false;
-            this.listTracks.LabelWrap = false;
-            this.listTracks.Location = new System.Drawing.Point(-1, 24);
-            this.listTracks.Name = "listTracks";
-            this.listTracks.OwnerDraw = true;
-            this.listTracks.SelectedItem = null;
-            this.listTracks.Size = new System.Drawing.Size(242, 261);
-            this.listTracks.TabIndex = 4;
-            this.listTracks.TileSize = new System.Drawing.Size(32, 32);
-            this.listTracks.UseCompatibleStateImageBehavior = false;
-            this.listTracks.View = System.Windows.Forms.View.Details;
-            this.listTracks.ItemActivate += new System.EventHandler(this.peListView1_ItemActivate);
-            this.listTracks.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.listTracks_ItemDrag);
-            this.listTracks.SelectedIndexChanged += new System.EventHandler(this.listTracks_SelectedIndexChanged);
-            this.listTracks.DragDrop += new System.Windows.Forms.DragEventHandler(this.listTracks_DragDrop);
-            this.listTracks.DragEnter += new System.Windows.Forms.DragEventHandler(this.listTracks_DragEnter);
+            this.buttonCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonCopy.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.buttonCopy.ImageIndex = 6;
+            this.buttonCopy.ImageList = this.imageList1;
+            this.buttonCopy.Location = new System.Drawing.Point(212, 301);
+            this.buttonCopy.Name = "buttonCopy";
+            this.buttonCopy.Size = new System.Drawing.Size(24, 24);
+            this.buttonCopy.TabIndex = 10;
+            this.buttonCopy.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.toolTip1.SetToolTip(this.buttonCopy, "Copy Track");
+            this.buttonCopy.UseVisualStyleBackColor = true;
+            this.buttonCopy.Click += new System.EventHandler(this.buttonCopy_Click);
             // 
-            // columnHeader1
+            // buttonCreate
             // 
-            this.columnHeader1.Text = "Tracks";
-            this.columnHeader1.Width = 240;
+            this.buttonCreate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonCreate.ImageIndex = 7;
+            this.buttonCreate.ImageList = this.imageList1;
+            this.buttonCreate.Location = new System.Drawing.Point(189, 301);
+            this.buttonCreate.Name = "buttonCreate";
+            this.buttonCreate.Size = new System.Drawing.Size(24, 24);
+            this.buttonCreate.TabIndex = 9;
+            this.buttonCreate.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.toolTip1.SetToolTip(this.buttonCreate, "Create New Track");
+            this.buttonCreate.UseVisualStyleBackColor = true;
+            this.buttonCreate.Click += new System.EventHandler(this.buttonCreate_Click);
             // 
             // ButtonDelete
             // 
@@ -231,24 +177,53 @@
             this.ButtonDelete.UseVisualStyleBackColor = true;
             this.ButtonDelete.Click += new System.EventHandler(this.ButtonDelete_Click);
             // 
+            // buttonRename
+            // 
+            this.buttonRename.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonRename.ImageIndex = 5;
+            this.buttonRename.ImageList = this.imageList1;
+            this.buttonRename.Location = new System.Drawing.Point(166, 301);
+            this.buttonRename.Name = "buttonRename";
+            this.buttonRename.Size = new System.Drawing.Size(24, 24);
+            this.buttonRename.TabIndex = 7;
+            this.buttonRename.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.toolTip1.SetToolTip(this.buttonRename, "Rename Track");
+            this.buttonRename.UseVisualStyleBackColor = true;
+            this.buttonRename.Click += new System.EventHandler(this.buttonRename_Click);
+            // 
+            // panelTracks
+            // 
+            this.panelTracks.AllowDrop = true;
+            this.panelTracks.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelTracks.AutoScroll = true;
+            this.panelTracks.BackColor = System.Drawing.Color.White;
+            this.panelTracks.Location = new System.Drawing.Point(1, 23);
+            this.panelTracks.Name = "panelTracks";
+            this.panelTracks.Size = new System.Drawing.Size(237, 262);
+            this.panelTracks.TabIndex = 12;
+            this.panelTracks.DragDrop += new System.Windows.Forms.DragEventHandler(this.panelTracks_DragDrop);
+            this.panelTracks.DragOver += new System.Windows.Forms.DragEventHandler(this.panelTracks_DragOver);
+            this.panelTracks.Paint += new System.Windows.Forms.PaintEventHandler(this.panelTracks_Paint);
+            // 
             // PEMidiTrackEditPanel
             // 
             this.AllowDrop = true;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.Controls.Add(this.panelTracks);
             this.Controls.Add(this.textBoxTrackName);
-            this.Controls.Add(this.listTracks);
             this.Controls.Add(this.menuStrip);
             this.Controls.Add(this.buttonCopy);
             this.Controls.Add(this.buttonCreate);
             this.Controls.Add(this.ButtonDelete);
             this.Controls.Add(this.buttonRename);
             this.Controls.Add(this.label1);
+            this.DoubleBuffered = true;
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "PEMidiTrackEditPanel";
-            this.Size = new System.Drawing.Size(240, 354);
-            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.PEMidiTrackEditPanel_DragDrop);
-            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.PEMidiTrackEditPanel_DragEnter);
+            this.Size = new System.Drawing.Size(239, 354);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
             this.ResumeLayout(false);
@@ -260,8 +235,6 @@
 
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.Button ButtonDelete;
-        private PEListView listTracks;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
         private System.Windows.Forms.MenuStrip menuStrip;
@@ -275,6 +248,7 @@
         private System.Windows.Forms.Button buttonCopy;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Panel panelTracks;
 
     }
 }

@@ -17,7 +17,7 @@ namespace ProUpgradeEditor.DataLayer
             GuitarArpeggio ret = null;
             var d1 = Utility.GetArpeggioData1(difficulty);
 
-            if(d1 != -1)
+            if(!d1.IsNull())
             {
                 MidiEvent downEvent, upEvent;
                 Utility.CreateMessage(track, d1, 100, 0, downTick, upTick, out downEvent, out upEvent);

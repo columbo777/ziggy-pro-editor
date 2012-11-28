@@ -34,11 +34,16 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{94ADB0D8-7FAE-4551-B931-1EECFE9E5069}"
 	ProjectSection(SolutionItems) = preProject
 		Local.testsettings = Local.testsettings
+		Performance4.psess = Performance4.psess
 		ProUpgradeEditor.vsmdi = ProUpgradeEditor.vsmdi
 		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
 EndProject
 Global
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
+	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = ProUpgradeEditor.vsmdi
 	EndGlobalSection
@@ -77,8 +82,8 @@ Global
 		{501A0458-E01C-404D-A55D-11627CC4B48F}.Editor|x86.ActiveCfg = Editor|Any CPU
 		{501A0458-E01C-404D-A55D-11627CC4B48F}.Form Test|Any CPU.ActiveCfg = Form Test|Any CPU
 		{501A0458-E01C-404D-A55D-11627CC4B48F}.Form Test|Any CPU.Build.0 = Form Test|Any CPU
-		{501A0458-E01C-404D-A55D-11627CC4B48F}.Form Test|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{501A0458-E01C-404D-A55D-11627CC4B48F}.Form Test|Mixed Platforms.Build.0 = Debug|Any CPU
+		{501A0458-E01C-404D-A55D-11627CC4B48F}.Form Test|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{501A0458-E01C-404D-A55D-11627CC4B48F}.Form Test|Mixed Platforms.Build.0 = Release|Any CPU
 		{501A0458-E01C-404D-A55D-11627CC4B48F}.Form Test|x86.ActiveCfg = Form Test|Any CPU
 		{501A0458-E01C-404D-A55D-11627CC4B48F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{501A0458-E01C-404D-A55D-11627CC4B48F}.Release|Any CPU.Build.0 = Release|Any CPU
@@ -169,8 +174,8 @@ Global
 		{F0F523DA-3085-4BE5-AC09-5F680F0E392E}.Editor|x86.ActiveCfg = Release|Any CPU
 		{F0F523DA-3085-4BE5-AC09-5F680F0E392E}.Form Test|Any CPU.ActiveCfg = Form Test|Any CPU
 		{F0F523DA-3085-4BE5-AC09-5F680F0E392E}.Form Test|Any CPU.Build.0 = Form Test|Any CPU
-		{F0F523DA-3085-4BE5-AC09-5F680F0E392E}.Form Test|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{F0F523DA-3085-4BE5-AC09-5F680F0E392E}.Form Test|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F0F523DA-3085-4BE5-AC09-5F680F0E392E}.Form Test|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F0F523DA-3085-4BE5-AC09-5F680F0E392E}.Form Test|Mixed Platforms.Build.0 = Release|Any CPU
 		{F0F523DA-3085-4BE5-AC09-5F680F0E392E}.Form Test|x86.ActiveCfg = Form Test|Any CPU
 		{F0F523DA-3085-4BE5-AC09-5F680F0E392E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0F523DA-3085-4BE5-AC09-5F680F0E392E}.Release|Any CPU.Build.0 = Release|Any CPU

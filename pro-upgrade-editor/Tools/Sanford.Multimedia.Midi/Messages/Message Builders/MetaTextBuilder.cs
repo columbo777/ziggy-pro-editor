@@ -42,6 +42,13 @@ namespace Sanford.Multimedia.Midi
 	/// </summary>
 	public class MetaTextBuilder : IMessageBuilder
 	{
+        public static MetaMessage Create(MetaType type, string str)
+        {
+            var tb = new MetaTextBuilder(type, str);
+            tb.Build();
+            return tb.Result;
+        }
+
         #region MetaTextBuilder Members
 
         #region Fields

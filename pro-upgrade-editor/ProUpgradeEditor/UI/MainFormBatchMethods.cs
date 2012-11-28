@@ -58,7 +58,7 @@ namespace ProUpgradeEditor.UI
 
             var songs = SongList.GetBatchSongList(checkBoxMultiSelectionSongList.Checked);
 
-            progressBarGenCompletedDifficulty.Maximum = songs.Count;
+            progressBarGenCompletedDifficulty.Maximum = songs.Count();
 
 
             foreach (SongCacheItem item in songs)
@@ -132,7 +132,7 @@ namespace ProUpgradeEditor.UI
 
             var songs = SongList.GetBatchSongList(checkBoxMultiSelectionSongList.Checked);
 
-            progressBarGenCompletedDifficulty.Maximum = songs.Count;
+            progressBarGenCompletedDifficulty.Maximum = songs.Count();
 
             foreach (SongCacheItem item in songs)
             {
@@ -223,7 +223,7 @@ namespace ProUpgradeEditor.UI
 
             var songs = SongList.GetBatchSongList(checkBoxMultiSelectionSongList.Checked);
 
-            progressBarGenCompletedDifficulty.Maximum = songs.Count;
+            progressBarGenCompletedDifficulty.Maximum = songs.Count();
 
 
             buttonSongLibCancel.Enabled = true;
@@ -311,7 +311,7 @@ namespace ProUpgradeEditor.UI
 
             var songs = SongList.GetBatchSongList(checkBoxMultiSelectionSongList.Checked);
 
-            progressBarGenCompletedDifficulty.Maximum = songs.Count;
+            progressBarGenCompletedDifficulty.Maximum = songs.Count();
 
             foreach (SongCacheItem item in songs)
             {
@@ -363,6 +363,9 @@ namespace ProUpgradeEditor.UI
             {
                 Track originalG5Track = null, originalProTrack = null;
 
+                if (!EditorG5.IsLoaded || !EditorPro.IsLoaded)
+                    return false;
+
                 var g5Track = EditorG5.GuitarTrack;
                 var proTrack = EditorPro.GuitarTrack;
 
@@ -372,7 +375,7 @@ namespace ProUpgradeEditor.UI
                 originalG5Track = g5Track.GetTrack();
                 originalProTrack = proTrack.GetTrack();
 
-                var currentDifficulty = GetEditorDifficulty();
+                var currentDifficulty = EditorPro.CurrentDifficulty;
 
                 EditorPro.BackupSequence();
 
@@ -402,8 +405,8 @@ namespace ProUpgradeEditor.UI
                 }
 
 
-                var guitarDifficulties = GuitarDifficulty.None;
-                var bassDifficulties = GuitarDifficulty.None;
+                var guitarDifficulties = GuitarDifficulty.Unknown;
+                var bassDifficulties = GuitarDifficulty.Unknown;
 
                 if (config.SelectedDifficultyOnly)
                 {
@@ -450,14 +453,14 @@ namespace ProUpgradeEditor.UI
                 {
                     if (selectedTrackGuitar)
                     {
-                        if (guitarDifficulties != GuitarDifficulty.None)
+                        if (!guitarDifficulties.IsUnknown())
                         {
                             GenerateDifficultiesForTrack(originalG5Track, originalProTrack, currentDifficulty, guitarDifficulties);
                         }
                     }
                     else if (selectedTrackBass)
                     {
-                        if (bassDifficulties != GuitarDifficulty.None)
+                        if (!bassDifficulties.IsUnknown())
                         {
                             GenerateDifficultiesForTrack(originalG5Track, originalProTrack, currentDifficulty, bassDifficulties);
                         }
@@ -465,7 +468,7 @@ namespace ProUpgradeEditor.UI
                 }
                 else
                 {
-                    if (genGuitar && guitarDifficulties != GuitarDifficulty.None)
+                    if (genGuitar && guitarDifficulties.IsUnknown())
                     {
                         var gt5 = EditorG5.GetGuitar5MidiTrack();
                         var gt6 = EditorPro.GetTrackGuitar17();
@@ -482,7 +485,7 @@ namespace ProUpgradeEditor.UI
                         }
                     }
 
-                    if (genBass && bassDifficulties != GuitarDifficulty.None)
+                    if (genBass && bassDifficulties.IsUnknown())
                     {
                         var gt5 = EditorG5.GetGuitar5BassMidiTrack();
                         var gt6 = EditorPro.GetTrackBass17();
@@ -529,14 +532,11 @@ namespace ProUpgradeEditor.UI
                     Set108Events(config);
                 }
 
-                SetEditorDifficulty(currentDifficulty);
                 EditorG5.SetTrack5(originalG5Track, currentDifficulty);
                 EditorPro.SetTrack6(originalProTrack, currentDifficulty);
-                ReloadTracks();
+                
             }
             catch { return false; }
-
-            RefreshTracks();
 
             return true;
         }
@@ -548,38 +548,31 @@ namespace ProUpgradeEditor.UI
                 guitarDifficulties ^= GuitarDifficulty.Expert;
             }
 
-            if (guitarDifficulties == GuitarDifficulty.None || guitarDifficulties == GuitarDifficulty.Unknown)
+            if (guitarDifficulties.IsUnknown())
                 return;
 
-            SetEditorDifficulty(currentDifficulty);
-            RemoveEventsByDifficulty6(guitarDifficulties);
-
+            originalProTrack.RemoveDifficulty(guitarDifficulties);
+            
             if (guitarDifficulties.IsHard())
             {
-                SetEditorDifficulty(GuitarDifficulty.Hard);
                 GenDiffNotes(originalG5Track, originalProTrack, GuitarDifficulty.Hard);
             }
 
             if (guitarDifficulties.IsMedium())
             {
-                SetEditorDifficulty(GuitarDifficulty.Medium);
                 GenDiffNotes(originalG5Track, originalProTrack, GuitarDifficulty.Medium);
             }
 
             if (guitarDifficulties.IsEasy())
             {
-                SetEditorDifficulty(GuitarDifficulty.Easy);
                 GenDiffNotes(originalG5Track, originalProTrack, GuitarDifficulty.Easy);
             }
 
-            SetEditorDifficulty(currentDifficulty);
         }
 
         private void GenDiffNotes(Track tG5, Track tG6, GuitarDifficulty diff)
         {
 
-
-            SetEditorDifficulty(GuitarDifficulty.Expert);
             EditorG5.SetTrack5(tG5, GuitarDifficulty.Expert);
             EditorPro.SetTrack6(tG6, GuitarDifficulty.Expert);
 
@@ -587,11 +580,10 @@ namespace ProUpgradeEditor.UI
             var expertArpeggios = EditorPro.GuitarTrack.Messages.Arpeggios;
             var xchords = EditorPro.GuitarTrack.Messages.Chords.ToList();
 
-            SetEditorDifficulty(diff);
+            
             EditorPro.SetTrack6(tG6, diff);
-
-
             EditorG5.SetTrack5(tG5, diff);
+
             var g5c = EditorG5.GuitarTrack.Messages.Chords;
 
             var g6e = Utility.GetStringLowE(diff);
@@ -654,7 +646,7 @@ namespace ProUpgradeEditor.UI
                     }
                 }
             }
-
+            ReloadTrack();
 
             if (diff == GuitarDifficulty.Hard)
             {
@@ -667,6 +659,7 @@ namespace ProUpgradeEditor.UI
                         GuitarArpeggio.CreateArpeggio(ProGuitarTrack, diff, bet.GetMinTick(), bet.GetMaxTick());
                     }
                 }
+                ReloadTrack();
             }
 
 
@@ -692,6 +685,7 @@ namespace ProUpgradeEditor.UI
         {
             RefreshTracks5();
             RefreshTracks6();
+            
         }
 
         private bool ExecuteBatchRebuildCON()
@@ -706,7 +700,7 @@ namespace ProUpgradeEditor.UI
 
                 var songs = SongList.GetBatchSongList(checkBoxMultiSelectionSongList.Checked);
 
-                progressBarGenCompletedDifficulty.Maximum = songs.Count;
+                progressBarGenCompletedDifficulty.Maximum = songs.Count();
 
                 foreach (SongCacheItem item in songs)
                 {
@@ -790,7 +784,7 @@ namespace ProUpgradeEditor.UI
 
                 var songs = SongList.GetBatchSongList(checkBoxMultiSelectionSongList.Checked);
 
-                progressBarGenCompletedDifficulty.Maximum = songs.Count;
+                progressBarGenCompletedDifficulty.Maximum = songs.Count();
 
 
                 foreach (SongCacheItem item in songs)
@@ -805,7 +799,7 @@ namespace ProUpgradeEditor.UI
                     }
                     try
                     {
-                        progressBarGenCompletedDifficulty.Value = songs.IndexOf(item);
+                        progressBarGenCompletedDifficulty.Value = songs.IndexOf(item).GetIfNull(0);
 
 
                         if ((checkBoxBatchProcessIncomplete.Checked == false && !item.IsComplete))
@@ -851,18 +845,12 @@ namespace ProUpgradeEditor.UI
         {
             try
             {
-                //var resultFile = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath),
-                //     "BatchErrors.txt");
-
-                //File.WriteAllText(resultFile, textBoxSongLibBatchResults.Text);
-
                 OpenNotepad(textBoxSongLibBatchResults.Text.GetBytes());
-
             }
             catch { }
         }
 
-        public bool CheckConPackage(Package pk, ref List<string> fileErrors)
+        public bool CheckConPackage(Package pk, ref List<string> fileErrors, SongCacheItem item)
         {
 
             try
@@ -883,160 +871,146 @@ namespace ProUpgradeEditor.UI
                 catch
                 {
                     fileErrors.Add("error extracting upgrades.dta");
+                    return false;
                 }
-
-
 
                 if (upgradeDTA == null)
                 {
                     fileErrors.Add("Cannot find DTA file in package");
+                    return false;
+                }
+
+                string upgradeFileData = string.Empty;
+                try
+                {
+                    upgradeFileData = Encoding.ASCII.GetString(upgradeDTA.Data);
+                }
+                catch
+                {
+                    fileErrors.Add("error reading upgrades.dta");
+                }
+
+                if (string.IsNullOrEmpty(upgradeFileData))
+                {
+                    fileErrors.Add("upgrades.dta file is empty");
                 }
                 else
                 {
-                    string upgradeFileData = string.Empty;
+                    string dtaSongID = string.Empty;
                     try
                     {
-                        upgradeFileData = Encoding.ASCII.GetString(upgradeDTA.Data);
+                        dtaSongID = DTAGetSongID(upgradeDTA.Data);
                     }
-                    catch
-                    {
-                        fileErrors.Add("error reading upgrades.dta");
-                    }
+                    catch { }
 
-                    if (string.IsNullOrEmpty(upgradeFileData))
+                    if (dtaSongID.IsEmpty())
                     {
-                        fileErrors.Add("upgrades.dta file is empty");
+                        fileErrors.Add("song id missing in upgrades.dta");
                     }
                     else
                     {
-                        string dtaSongID = string.Empty;
+
+                        var g6D = InstrumentDifficulty.INVALID;
                         try
                         {
-                            dtaSongID = DTAGetSongID(upgradeDTA.Data);
+                            g6D = InstrumentDifficultyUtil.DTAGetGuitarDifficulty(upgradeDTA.Data);
                         }
                         catch { }
 
-                        if (string.IsNullOrEmpty(dtaSongID))
+                        if (g6D == InstrumentDifficulty.INVALID)
                         {
-                            fileErrors.Add("song id missing in upgrades.dta");
+                            fileErrors.Add("invalid guitar difficulty in upgrades.dta");
+                        }
+
+                        var g6B = InstrumentDifficulty.INVALID;
+                        try
+                        {
+                            g6B = InstrumentDifficultyUtil.DTAGetBassDifficulty(upgradeDTA.Data);
+                        }
+                        catch { }
+
+                        if (g6B == InstrumentDifficulty.INVALID)
+                        {
+                            fileErrors.Add("invalid bass difficulty in upgrades.dta");
+                        }
+
+
+                        var mid = pk.GetFiles("songs_upgrades", ".mid|.midi");
+                        if (mid == null || mid.Length == 0)
+                        {
+                            fileErrors.Add("No \".mid\" file found in package");
+                        }
+
+                        string shortName = string.Empty;
+                        try
+                        {
+                            shortName = DTAGetSongShortName(upgradeDTA.Data);
+                        }
+                        catch { }
+
+                        if (shortName.IsEmpty())
+                        {
+                            fileErrors.Add("Song Name Missing from DTA");
                         }
                         else
                         {
-                            int i = dtaSongID.ToInt();
-                            if (i.IsNull())
+
+                            string proName = DTAGetProFileName(upgradeDTA.Data);
+
+                            if (proName.IsEmpty())
                             {
-                                fileErrors.Add("song id invalid in upgrades.dta");
-                            }
-                            else if (i == 0)
-                            {
-                                fileErrors.Add("song id cannot be zero in upgrades.dta");
+                                fileErrors.Add("Missing pro file name in upgrades.dta");
                             }
                             else
                             {
-                                var g6D = InstrumentDifficulty.INVALID;
-                                try
-                                {
-                                    g6D = InstrumentDifficultyUtil.DTAGetGuitarDifficulty(upgradeDTA.Data);
-                                }
-                                catch { }
+                                proName = proName.Trim('"');
 
-                                if (g6D == InstrumentDifficulty.INVALID)
-                                {
-                                    fileErrors.Add("invalid guitar difficulty in upgrades.dta");
-                                }
+                                var s = proName.Split('/');
 
-                                var g6B = InstrumentDifficulty.INVALID;
-                                try
+                                if (s == null || s.Length != 2 || s[0] != "songs_upgrades")
                                 {
-                                    g6B = InstrumentDifficultyUtil.DTAGetGuitarDifficulty(upgradeDTA.Data);
-                                }
-                                catch { }
-
-                                if (g6B == InstrumentDifficulty.INVALID)
-                                {
-                                    fileErrors.Add("invalid bass difficulty in upgrades.dta");
-                                }
-
-
-                                var mid = pk.GetFiles("songs_upgrades", ".mid|.midi");
-                                if (mid == null || mid.Length == 0)
-                                {
-                                    fileErrors.Add("No \".mid\" file found in package");
-                                }
-
-                                string shortName = string.Empty;
-                                try
-                                {
-                                    shortName = DTAGetSongShortName(upgradeDTA.Data);
-                                }
-                                catch { }
-
-                                if (string.IsNullOrEmpty(shortName))
-                                {
-                                    fileErrors.Add("Song Name Missing from DTA");
+                                    fileErrors.Add("Invalid path to pro mid file in upgrades.dta: " + proName);
                                 }
                                 else
                                 {
+                                    var proMid = pk.GetFile("songs_upgrades", s[1]);
 
-                                    string proName = DTAGetProFileName(upgradeDTA.Data);
-
-                                    if (string.IsNullOrEmpty(proName))
+                                    if (proMid == null)
                                     {
-                                        fileErrors.Add("Missing pro file name in upgrades.dta");
+                                        fileErrors.Add("pro midi file set in upgrades.dta not found in package");
                                     }
                                     else
                                     {
-                                        proName = proName.Trim('"');
-
-                                        var s = proName.Split('/');
-
-                                        if (s == null || s.Length != 2 || s[0] != "songs_upgrades")
+                                        var sq = new Sequence(FileType.Pro);
+                                        bool loaded = false;
+                                        try
                                         {
-                                            fileErrors.Add("Invalid path to pro mid file in upgrades.dta: " + proName);
+                                            sq.Load(new MemoryStream(proMid.Data));
+
+                                            loaded = sq.Tracks.Where(tn => tn.Name.IsProTrackName()).Any();
                                         }
-                                        else
+                                        catch
                                         {
-                                            var proMid = pk.GetFile("songs_upgrades", s[1]);
-
-                                            if (proMid == null)
-                                            {
-                                                fileErrors.Add("pro midi file set in upgrades.dta not found in package");
-                                            }
-                                            else
-                                            {
-                                                var sq = new Sequence(FileType.Pro);
-                                                bool loaded = false;
-                                                try
-                                                {
-                                                    sq.Load(new MemoryStream(proMid.Data));
-
-                                                    loaded = sq.Tracks.Where(tn => GuitarTrack.TrackNames6.Contains(tn.Name)).Count() > 0;
-                                                }
-                                                catch
-                                                {
-                                                    fileErrors.Add("Unable to open pro midi file from package");
-                                                }
-
-                                                if (loaded)
-                                                {
-                                                    var errors = VerifySongData(proName, sq);
-                                                    foreach (var er in errors)
-                                                    {
-                                                        fileErrors.Add(er);
-                                                    }
-                                                }
-
-
-
-
-                                            }
+                                            fileErrors.Add("Unable to open pro midi file from package");
                                         }
+
+                                        if (loaded)
+                                        {
+                                            var osel = EditorPro.SelectedTrackDifficulty;
+
+                                            fileErrors.AddRange(VerifySongData(proName, sq, item));
+
+                                            EditorPro.SelectedTrackDifficulty = osel;
+                                        }
+
                                     }
                                 }
                             }
                         }
+
                     }
                 }
+
             }
             catch { }
 
@@ -1050,21 +1024,7 @@ namespace ProUpgradeEditor.UI
             List<string> fileErrors = new List<string>();
             try
             {
-
-                CheckConPackage(data, ref fileErrors);
-                /*
-                if (item.HasGuitar == true &&
-                    g6D == InstrumentDifficulty.NOPART)
-                {
-                    fileErrors.Add("Has Guitar is marked for song but difficulty is set to no part");
-                }
-                if (item.HasBass == true &&
-                    g6B == InstrumentDifficulty.NOPART)
-                {
-                    fileErrors.Add("Has Bass is marked for song but difficulty is set to no part");
-                }*/
-
-
+                CheckConPackage(data, ref fileErrors, null);
             }
             catch
             {
@@ -1089,7 +1049,7 @@ namespace ProUpgradeEditor.UI
             {
                 ret = true;
             }
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             foreach (string s in fileErrors)
             {
                 if (silent)
@@ -1139,19 +1099,8 @@ namespace ProUpgradeEditor.UI
                 else
                 {
                     var pk = Package.Load(ReadFileBytes(item.G6ConFile));
-                    CheckConPackage(pk, ref fileErrors);
-                    /*
-                    if (item.HasGuitar == true &&
-                        g6D == InstrumentDifficulty.NOPART)
-                    {
-                        fileErrors.Add("Has Guitar is marked for song but difficulty is set to no part");
-                    }
-                    if (item.HasBass == true &&
-                        g6B == InstrumentDifficulty.NOPART)
-                    {
-                        fileErrors.Add("Has Bass is marked for song but difficulty is set to no part");
-                    }*/
-
+                    CheckConPackage(pk, ref fileErrors, item);
+                   
                 }
             }
             catch (Exception ex)
@@ -1207,28 +1156,20 @@ namespace ProUpgradeEditor.UI
             return ret;
         }
 
-        List<string> VerifySongData(string proName, Sequence sq)
+        List<string> VerifySongData(string proName, Sequence sq, SongCacheItem item)
         {
 
             var fileErrors = new List<string>();
             try
             {
 
-                for (int x = 0; x < sq.Count; x++)
+                foreach(var track in sq)
                 {
-                    var sqt = sq[x];
-                    if (string.IsNullOrEmpty(sqt.Name))
+                    if (track.Name.IsEmpty())
                     {
                         fileErrors.Add("Null track name");
                     }
-                    else if (!GuitarTrack.TrackNames6.Contains(sqt.Name))
-                    {
-                        if (sqt.Tempo.Any() && x != 0)
-                        {
-                            fileErrors.Add("Tempo must be first track");
-                        }
-                    }
-                    else if (GuitarTrack.TrackNames6.Contains(sqt.Name) && x == 0)
+                    else if (track.Name.IsProTrackName() && sq.IndexOf(track) == 0)
                     {
                         fileErrors.Add("Tempo must be first track");
                     }
@@ -1244,27 +1185,27 @@ namespace ProUpgradeEditor.UI
                 foreach (Track t in sq)
                 {
                     var name = t.Name;
-                    if (GuitarTrack.GuitarTrackNames6.Contains(name))
+                    if(name.IsGuitarTrackName6())
                     {
                         foundGuitarTrack = true;
                     }
-                    if (GuitarTrack.BassTrackNames6.Contains(name))
+                    else if (name.IsBassTrackName6())
                     {
                         foundBassTrack = true;
                     }
-                    if (GuitarTrack.GuitarTrackName22 == name)
+                    if (name.IsGuitarTrackName22())
                     {
                         foundGuitar22 = true;
                     }
-                    if (GuitarTrack.BassTrackName22 == name)
+                    if(name.IsBassTrackName22())
                     {
                         foundBass22 = true;
                     }
-                    if (GuitarTrack.GuitarTrackName17 == name)
+                    if(name.IsGuitarTrackName17())
                     {
                         foundGuitar17 = true;
                     }
-                    if (GuitarTrack.BassTrackName17 == name)
+                    if(name.IsBassTrackName17())
                     {
                         foundBass17 = true;
                     }
@@ -1274,7 +1215,7 @@ namespace ProUpgradeEditor.UI
                 {
                     fileErrors.Add("No pro guitar track in midi file: " + proName);
                 }
-                if (foundBassTrack == false)
+                if (foundBassTrack == false && (item != null && item.HasBass==true))
                 {
                     fileErrors.Add("No pro bass track in midi file: " + proName);
                 }
@@ -1291,45 +1232,16 @@ namespace ProUpgradeEditor.UI
                 }
 
 
-                foreach (Track t in sq.Where(x => GuitarTrack.TrackNames6.Contains(x.Name)))
+                foreach (Track t in sq.Where(x => x.Name.IsProTrackName()))
                 {
                     var trackName = t.Name;
 
-                    SetEditorDifficulty(GuitarDifficulty.Expert);
+                    EditorPro.SetTrack6(sq, t, GuitarDifficulty.Expert);
+                    
 
-                    var nt = TrackEditor.GetTrack(sq, trackName);
+                    var h108 = ProGuitarTrack.Messages.HandPositions;
 
-                    if (nt == null || !EditorPro.SetTrack6(sq, nt, GetEditorDifficulty()))
-                    {
-                        fileErrors.Add("Cannot load track: " + (trackName ?? "(no name)"));
-                        continue;
-                    }
-
-                    if (EditorG5.IsLoaded)
-                    {
-                        if (GuitarTrack.IsGuitarTrackName(t.Name))
-                        {
-                            var t5 = EditorG5.GetTrack(GuitarTrack.GuitarTrackName5);
-                            if (t5 != null)
-                            {
-                                EditorG5.SetTrack5(t5, GetEditorDifficulty());
-                            }
-                        }
-                        else if (GuitarTrack.IsBassTrackName(t.Name))
-                        {
-                            var t5 = EditorG5.GetTrack(GuitarTrack.BassTrackName5);
-                            if (t5 != null)
-                            {
-                                EditorG5.SetTrack5(t5, GetEditorDifficulty());
-                            }
-                        }
-                    }
-                    ReloadTracks();
-
-                    var h108 = EditorPro.GuitarTrack.ChanEventsAll.Where(x =>
-                        Utility.HandPositionData1 == x.Data1);
-
-                    if (h108.Count() == 0)
+                    if (!h108.Any())
                     {
                         fileErrors.Add(trackName + " does not have hand position events (108)");
                     }
@@ -1337,7 +1249,7 @@ namespace ProUpgradeEditor.UI
                     {
                         var first = h108.First();
 
-                        if (EditorPro.Messages.Chords != null)
+                        if (EditorPro.Messages.Chords.Any())
                         {
                             if (first.AbsoluteTicks >= EditorPro.Messages.Chords[0].DownTick)
                             {
@@ -1371,19 +1283,12 @@ namespace ProUpgradeEditor.UI
 
                     for (int tx = 0; tx < 4; tx++)
                     {
-                        SetEditorDifficulty((GuitarDifficulty)(((int)GuitarDifficulty.Easy) << tx));
+                        EditorPro.CurrentDifficulty = (GuitarDifficulty)(((int)GuitarDifficulty.Easy) << tx);
+                        
 
-                        if (!EditorPro.SetTrack6(sq, t, GetEditorDifficulty()))
+                        if (!EditorPro.GuitarTrack.Messages.Chords.Any())
                         {
-                            fileErrors.Add(trackName + " Failed loading difficulty: " + GetEditorDifficulty().ToString());
-
-                            continue;
-                        }
-
-
-                        if (EditorPro.GuitarTrack.Messages.Chords.Count() == 0)
-                        {
-                            fileErrors.Add(trackName + " difficulty not created: " + GetEditorDifficulty().ToString());
+                            fileErrors.Add(trackName + " difficulty not created: " + EditorPro.CurrentDifficulty.ToString());
                         }
                         else
                         {
@@ -1460,11 +1365,11 @@ namespace ProUpgradeEditor.UI
 
                             if (overlappingChords > 0)
                             {
-                                fileErrors.Add(trackName + " " + overlappingChords.ToString() + " Overlapping notes found: " + GetEditorDifficulty().ToString());
+                                fileErrors.Add(trackName + " " + overlappingChords.ToString() + " Overlapping notes found: " + EditorPro.CurrentDifficulty.ToString());
                             }
                             if (nonSnappedNotes > 0)
                             {
-                                fileErrors.Add(trackName + " " + nonSnappedNotes.ToString() + " Note times not matching chord times: " + GetEditorDifficulty().ToString());
+                                fileErrors.Add(trackName + " " + nonSnappedNotes.ToString() + " Note times not matching chord times: " + EditorPro.CurrentDifficulty.ToString());
                             }
 
                             bool arpeggioMissingChords = false;
@@ -1472,25 +1377,16 @@ namespace ProUpgradeEditor.UI
                             foreach (var mod in EditorPro.GuitarTrack.Messages.Arpeggios)
                             {
                                 var chords = EditorPro.GuitarTrack.GetChordsAtTick(
-                                    mod.DownTick, mod.UpTick).ToList();
+                                    mod.DownTick, mod.UpTick);
 
-                                if (chords.Count == 0)
+                                if (!chords.Any())
                                 {
                                     arpeggioMissingChords = true;
                                 }
-
-                                if (chords.Count > 0)
+                                else
                                 {
-                                    bool hasHelper = false;
-                                    var firstChord = chords[0];
-                                    foreach (var n in firstChord.Notes.Where(x => x != null))
-                                    {
-                                        if (n.IsArpeggioNote)
-                                        {
-                                            hasHelper = true;
-                                            break;
-                                        }
-                                    }
+                                    bool hasHelper = chords.First().Notes.Any(x=> x.IsArpeggioNote);
+                                    
                                     if (hasHelper == false)
                                     {
                                         missingHelperNotes = true;
@@ -1500,75 +1396,38 @@ namespace ProUpgradeEditor.UI
 
                             if (arpeggioMissingChords)
                             {
-                                fileErrors.Add(trackName + " Arpeggio found with no chords: " + GetEditorDifficulty().ToString());
+                                fileErrors.Add(trackName + " Arpeggio found with no chords: " + EditorPro.CurrentDifficulty.ToString());
                             }
                             if (missingHelperNotes)
                             {
-                                fileErrors.Add(trackName + " Arpeggio missing helper notes: " + GetEditorDifficulty().ToString());
+                                fileErrors.Add(trackName + " Arpeggio missing helper notes: " + EditorPro.CurrentDifficulty.ToString());
                             }
 
-                            bool modWithNoNotes = false;
-                            foreach (var mod in EditorPro.GuitarTrack.Messages.SingleStringTremelos)
-                            {
-                                var chords = EditorPro.GuitarTrack.GetChordsAtTick(
-                                    mod.DownTick, mod.UpTick).ToList();
-
-                                if (chords.Count == 0)
-                                {
-                                    modWithNoNotes = true;
-                                }
-                                break;
-                            }
+                            bool modWithNoNotes =
+                                EditorPro.GuitarTrack.Messages.SingleStringTremelos.Any(x =>
+                                    !EditorPro.GuitarTrack.GetChordsAtTick(x.DownTick, x.UpTick).Any());
+                            
                             if (modWithNoNotes)
                             {
-                                fileErrors.Add(trackName + " Single string tremelo with no notes: " + GetEditorDifficulty().ToString());
+                                fileErrors.Add(trackName + " Single string tremelo with no notes: " + EditorPro.CurrentDifficulty.ToString());
                             }
 
-                            modWithNoNotes = false;
-                            foreach (var mod in EditorPro.GuitarTrack.Messages.MultiStringTremelos)
-                            {
-                                var chords = EditorPro.GuitarTrack.GetChordsAtTick(
-                                    mod.DownTick, mod.UpTick).ToList();
-
-                                if (chords.Count == 0)
-                                {
-                                    modWithNoNotes = true;
-                                }
-                                break;
-                            }
+                            modWithNoNotes = EditorPro.GuitarTrack.Messages.MultiStringTremelos.Any(x =>
+                                    !EditorPro.GuitarTrack.GetChordsAtTick(x.DownTick, x.UpTick).Any());
+                            
                             if (modWithNoNotes)
                             {
-                                fileErrors.Add(trackName + " Multi string tremelo with no notes: " + GetEditorDifficulty().ToString());
+                                fileErrors.Add(trackName + " Multi string tremelo with no notes: " + EditorPro.CurrentDifficulty.ToString());
                             }
 
-                            modWithNoNotes = false;
-                            foreach (var mod in EditorPro.GuitarTrack.Messages.Powerups)
-                            {
-                                var chords = EditorPro.GuitarTrack.GetChordsAtTick(
-                                    mod.DownTick, mod.UpTick).ToList();
-
-                                if (chords.Count == 0)
-                                {
-                                    modWithNoNotes = true;
-                                }
-                                break;
-                            }
+                            modWithNoNotes = 
+                                EditorPro.GuitarTrack.Messages.Powerups.Any(x =>
+                                    !EditorPro.GuitarTrack.GetChordsAtTick(x.DownTick, x.UpTick).Any());
+                            
                             if (modWithNoNotes)
                             {
-                                fileErrors.Add(trackName + " Powerup with no notes: " + GetEditorDifficulty().ToString());
+                                fileErrors.Add(trackName + " Powerup with no notes: " + EditorPro.CurrentDifficulty.ToString());
                             }
-
-                            var hammerons = EditorPro.GuitarTrack.ChanEvents.Where(x =>
-                                Utility.AllHammeronData1.Contains(x.Data1)).ToList();
-
-                            if (hammerons.Count > 0 &&
-                                (GetEditorDifficulty() == GuitarDifficulty.Easy ||
-                                    GetEditorDifficulty() == GuitarDifficulty.Medium))
-                            {
-                                fileErrors.Add(trackName + " " +
-                                    " Hammerons cannot be on easy or medium: " + GetEditorDifficulty().ToString());
-                            }
-
 
                             bool hasNotes = false;
                             int numNotes = 0;
@@ -1598,9 +1457,7 @@ namespace ProUpgradeEditor.UI
                                         {
                                             allZeroNotes = false;
                                         }
-                                        if (noteFret > 17 &&
-                                            (GuitarTrack.GuitarTrackName17.Contains(EditorPro.GuitarTrack.Name) ||
-                                            GuitarTrack.BassTrackName17.Contains(EditorPro.GuitarTrack.Name)))
+                                        if (noteFret > 17 && EditorPro.GuitarTrack.Name.IsProTrackName17())
                                         {
                                             hasOver17 = true;
                                         }
@@ -1622,7 +1479,7 @@ namespace ProUpgradeEditor.UI
                                 {
                                     hasMixedXNotes = true;
                                 }
-                                if (gc.UpTick - gc.DownTick < Utility.NoteCloseWidth)
+                                if (Utility.IsCloseTick( gc.UpTick, gc.DownTick))
                                 {
                                     hasShortChord = true;
                                 }
@@ -1643,16 +1500,16 @@ namespace ProUpgradeEditor.UI
                                 }
                             }
 
-                            if (!GuitarTrack.IsTrackName22(t.Name))
+                            if (!t.Name.IsProTrackName22())
                             {
                                 if (hasOver17)
                                 {
-                                    fileErrors.Add(trackName + " Notes above 17 on Mustang chart: " + GetEditorDifficulty().ToString());
+                                    fileErrors.Add(trackName + " Notes above 17 on Mustang chart: " + EditorPro.CurrentDifficulty.ToString());
                                 }
                             }
                             if (hasMixedXNotes)
                             {
-                                fileErrors.Add(trackName + " Chord(s) found with mixture of mute and non mute notes: " + GetEditorDifficulty().ToString());
+                                fileErrors.Add(trackName + " Chord(s) found with mixture of mute and non mute notes: " + EditorPro.CurrentDifficulty.ToString());
                             }
 
                             if (((numZeroInARow > numNotes / 2) ||
@@ -1660,61 +1517,76 @@ namespace ProUpgradeEditor.UI
                             {
                                 if (numZero == numNotes)
                                 {
-                                    fileErrors.Add(trackName + " All Zero notes for difficulty: " + GetEditorDifficulty().ToString());
+                                    fileErrors.Add(trackName + " All Zero notes for difficulty: " + EditorPro.CurrentDifficulty.ToString());
                                 }
                                 else
                                 {
-                                    fileErrors.Add(trackName + " A lot of missing notes for difficulty: " + GetEditorDifficulty().ToString());
+                                    fileErrors.Add(trackName + " A lot of missing notes for difficulty: " + EditorPro.CurrentDifficulty.ToString());
                                 }
                             }
                             else if (numNotes == 0)
                             {
-                                fileErrors.Add(trackName + " No notes set: " + GetEditorDifficulty().ToString());
+                                fileErrors.Add(trackName + " No notes set: " + EditorPro.CurrentDifficulty.ToString());
                             }
 
                             if (hasShortChord)
                             {
-                                fileErrors.Add(trackName + " invalid chord length found: " + GetEditorDifficulty().ToString());
+                                fileErrors.Add(trackName + " invalid chord length found: " + EditorPro.CurrentDifficulty.ToString());
                             }
 
                             if (EditorG5.IsLoaded)
                             {
-                                if (EditorG5.Messages.BigRockEndings.Count() > 0 &&
-                                    EditorPro.Messages.BigRockEndings.Count() == 0)
+
+                                if (GuitarTrack.IsBassTrackName(t.Name) && (item != null && item.HasBass == false))
                                 {
-                                    fileErrors.Add(trackName + " Big Rock Ending in 5 button but not pro");
+                                    EditorG5.SetTrack(GuitarTrack.GuitarTrackName5, EditorPro.CurrentDifficulty);
+                                }
+                                else
+                                {
+                                    EditorG5.SetTrack(t.Name.GetG5TrackNameFromPro(), EditorPro.CurrentDifficulty);
                                 }
 
-                                if (EditorG5.Messages.Solos.Count() >
-                                    EditorPro.Messages.Solos.Count())
+                                if (EditorG5.IsLoaded)
                                 {
-                                    fileErrors.Add(trackName + " Not all solos created for difficulty: " + GetEditorDifficulty().ToString());
+                                    if (EditorG5.Messages.BigRockEndings.Any() &&
+                                        !EditorPro.Messages.BigRockEndings.Any())
+                                    {
+                                        fileErrors.Add(trackName + " Big Rock Ending in 5 button but not pro");
+                                    }
+
+                                    if (EditorG5.Messages.Solos.Count() !=
+                                        EditorPro.Messages.Solos.Count())
+                                    {
+                                        fileErrors.Add(trackName + " Not all solos created for difficulty: " + EditorPro.CurrentDifficulty.ToString());
+                                    }
+                                    if (EditorG5.Messages.Powerups.Count() !=
+                                        EditorPro.Messages.Powerups.Count())
+                                    {
+                                        fileErrors.Add(trackName + " Not all powerups created for difficulty: " + EditorPro.CurrentDifficulty.ToString());
+                                    }
                                 }
                             }
+                            
                         }
 
                     }//end for each difficulty 
 
                     bool foundName = false;
                     string name = "";
-                    var metas = t.Meta;
+                    
                     MidiEvent nameEvent = null;
                     var extraNames = new List<MidiEvent>();
-                    foreach (var meta in metas)
+                    foreach (var meta in ProGuitarTrack.GetTrack().Meta.Where(x=> x.MetaType == MetaType.TrackName))
                     {
-                        var m = meta.MidiMessage as MetaMessage;
-                        if (m.MetaType == MetaType.TrackName)
+                        if (foundName)
                         {
-                            if (foundName)
-                            {
-                                extraNames.Add(meta);
-                            }
-                            else
-                            {
-                                foundName = true;
-                                nameEvent = meta;
-                                name = Encoding.ASCII.GetString(m.GetBytes());
-                            }
+                            extraNames.Add(meta);
+                        }
+                        else
+                        {
+                            foundName = true;
+                            nameEvent = meta;
+                            name = meta.MetaMessage.Text;
                         }
                     }
                     if (!foundName)
@@ -1723,12 +1595,12 @@ namespace ProUpgradeEditor.UI
                     }
                     else
                     {
-                        if (extraNames.Count > 0)
+                        if (extraNames.Any())
                         {
                             fileErrors.Add(name + " Contains Extra track names:");
                             foreach (var en in extraNames)
                             {
-                                fileErrors.Add("Extra Track Name: " + en);
+                                fileErrors.Add("Extra Track Name: " + en.MetaMessage.Text);
                             }
                         }
                     }
@@ -1736,65 +1608,57 @@ namespace ProUpgradeEditor.UI
 
                     for (int tx = 0; tx < 2; tx++)
                     {
-                        if (!EditorPro.SetTrack6(sq, t, tx == 0 ? GuitarDifficulty.Expert : GuitarDifficulty.Hard))
-                        {
-                            fileErrors.Add(trackName + " Failed loading Expert");
-                        }
-                        else
-                        {
+                        EditorPro.CurrentDifficulty = tx == 0 ? GuitarDifficulty.Expert : GuitarDifficulty.Hard;
 
-                            foreach (var gc in EditorPro.GuitarTrack.Messages.Chords)
+
+
+                        foreach (var gc in EditorPro.GuitarTrack.Messages.Chords)
+                        {
+                            string chordDesc = string.Empty;
+                            for (int x = 0; x < 6; x++)
                             {
-                                string chordDesc = string.Empty;
-                                for (int x = 0; x < 6; x++)
+                                if (gc.Notes[x] != null)
                                 {
-                                    if (gc.Notes[x] != null)
+                                    chordDesc += "'" + gc.Notes[x].NoteFretDown.ToString() + "',";
+                                }
+                                else
+                                {
+                                    chordDesc += "' ',";
+                                }
+                            }
+                            chordDesc = chordDesc.Trim(',');
+
+
+                            if (gc.HasStrum)
+                            {
+                                if ((gc.StrumMode & ChordStrum.High) > 0)
+                                {
+                                    if (gc.Notes[4] == null && gc.Notes[5] == null)
                                     {
-                                        chordDesc += "'" + gc.Notes[x].NoteFretDown.ToString() + "',";
-                                    }
-                                    else
-                                    {
-                                        chordDesc += "' ',";
+                                        fileErrors.Add(trackName + " High strum marker missing high notes : " + chordDesc);
                                     }
                                 }
-                                chordDesc = chordDesc.Trim(',');
-
-
-                                if (gc.HasStrum)
+                                if ((gc.StrumMode & ChordStrum.Mid) > 0)
                                 {
-                                    if ((gc.StrumMode & ChordStrum.High) > 0)
+                                    if (gc.Notes[2] == null && gc.Notes[3] == null)
                                     {
-                                        if (gc.Notes[4] == null && gc.Notes[5] == null)
-                                        {
-                                            fileErrors.Add(trackName + " High strum marker missing high notes : " + chordDesc);
-                                        }
+                                        fileErrors.Add(trackName + " Mid strum marker missing Mid notes : " + chordDesc);
                                     }
-                                    if ((gc.StrumMode & ChordStrum.Mid) > 0)
+                                }
+                                if ((gc.StrumMode & ChordStrum.Low) > 0)
+                                {
+                                    if (gc.Notes[0] == null && gc.Notes[1] == null)
                                     {
-                                        if (gc.Notes[2] == null && gc.Notes[3] == null)
-                                        {
-                                            fileErrors.Add(trackName + " Mid strum marker missing Mid notes : " + chordDesc);
-                                        }
-                                    }
-                                    if ((gc.StrumMode & ChordStrum.Low) > 0)
-                                    {
-                                        if (gc.Notes[0] == null && gc.Notes[1] == null)
-                                        {
-                                            fileErrors.Add(trackName + " Low strum marker missing low notes : " + chordDesc);
-                                        }
+                                        fileErrors.Add(trackName + " Low strum marker missing low notes : " + chordDesc);
                                     }
                                 }
                             }
+
                         }
                     }
                 }//end for each track
 
 
-
-                SetEditorDifficulty(GuitarDifficulty.Expert);
-                EditorPro.SetTrack6(EditorPro.GetGuitar6MidiTrack(), GetEditorDifficulty());
-                EditorG5.SetTrack5(EditorG5.GetGuitar5MidiTrack(), GetEditorDifficulty());
-                ReloadTracks();
             }
             catch (Exception ex)
             {

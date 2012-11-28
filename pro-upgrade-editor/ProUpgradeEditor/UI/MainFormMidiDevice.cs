@@ -682,7 +682,7 @@ namespace ProUpgradeEditor.UI
                     var cb = new ChannelMessageBuilder();
                     foreach (var gc in EditorPro.GuitarTrack.Messages.Chords)
                     {
-                        foreach(var cn in gc.Notes.Where(x=> x != null).ToList())
+                        foreach(var cn in gc.Notes)
                         {
                             var ut = gc.UpTick - 1 - Utility.ScollToSelectionOffset;
                             var dt = gc.DownTick - Utility.ScollToSelectionOffset;
@@ -885,9 +885,9 @@ namespace ProUpgradeEditor.UI
                     midiPlaybackDevice.IsDisposed)
                     return;
 
-                if (Utility.GetDifficulty(e.Message.Data1, true) == GetEditorDifficulty())
+                if (Utility.GetDifficulty(e.Message.Data1, true) == EditorPro.CurrentDifficulty)
                 {
-                    if (Utility.GetStringDifficulty6(e.Message.Data1) == GetEditorDifficulty())
+                    if (Utility.GetStringDifficulty6(e.Message.Data1) == EditorPro.CurrentDifficulty)
                     {
                         if (e.Message.MidiChannel == Utility.ChannelArpeggio)
                             return;

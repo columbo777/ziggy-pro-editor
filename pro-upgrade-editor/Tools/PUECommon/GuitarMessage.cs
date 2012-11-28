@@ -5,13 +5,61 @@ using System.Text;
 using Sanford.Multimedia.Midi;
 using ProUpgradeEditor.Common;
 using System.Collections;
+using System.Diagnostics;
 
 namespace ProUpgradeEditor.DataLayer
 {
-
+    public enum MessageType
+    {
+        Unknown,
+        GuitarHandPosition,
+        GuitarTextEvent,
+        GuitarTrainer,
+        GuitarChord,
+        GuitarPowerup,
+        GuitarSolo,
+        GuitarTempo,
+        GuitarTimeSignature,
+        GuitarArpeggio,
+        GuitarBigRockEnding,
+        GuitarSingleStringTremelo,
+        GuitarMultiStringTremelo,
+    }
 
     public class GMessage : DeletableEntity, IComparable<GMessage>
     {
+        public MessageType MessageType
+        {
+            get
+            {
+                if (this is GuitarHandPosition)
+                    return MessageType.GuitarHandPosition;
+                else if (this is GuitarTextEvent)
+                    return MessageType.GuitarTextEvent;
+                else if (this is GuitarTrainer)
+                    return MessageType.GuitarTrainer;
+                else if (this is GuitarChord)
+                    return MessageType.GuitarChord;
+                else if (this is GuitarPowerup)
+                    return MessageType.GuitarPowerup;
+                else if (this is GuitarSolo)
+                    return MessageType.GuitarSolo;
+                else if (this is GuitarTempo)
+                    return MessageType.GuitarTempo;
+                else if (this is GuitarTimeSignature)
+                    return MessageType.GuitarTimeSignature;
+                else if (this is GuitarArpeggio)
+                    return MessageType.GuitarArpeggio;
+                else if (this is GuitarBigRockEnding)
+                    return MessageType.GuitarBigRockEnding;
+                else if (this is GuitarSingleStringTremelo)
+                    return MessageType.GuitarSingleStringTremelo;
+                else if (this is GuitarMultiStringTremelo)
+                    return MessageType.GuitarMultiStringTremelo;
+                else
+                    return MessageType.Unknown;
+            }
+        }
         GuitarTrack ownerTrack;
         public GuitarTrack OwnerTrack
         {
@@ -20,9 +68,11 @@ namespace ProUpgradeEditor.DataLayer
 
         public GMessage(GuitarTrack track, MidiEvent downEvent)
         {
+            
             this.ownerTrack = track;
             
             this.downEvent = downEvent;
+            
             if (downEvent != null)
             {
                 this.downTick = downEvent.AbsoluteTicks;
@@ -56,6 +106,7 @@ namespace ProUpgradeEditor.DataLayer
             get { return DownEvent; }
             set { DownEvent = value; }
         }
+
         public int AbsoluteTicks
         {
             get { return DownTick; }
@@ -120,179 +171,23 @@ namespace ProUpgradeEditor.DataLayer
         }
     }
 
-    public class GMetaMessage : GMessage
+
+
+    public class GuitarMessage : GMessage
     {
         protected string text;
-        public string Text 
-        { 
-            get 
-            { 
-                return text; 
-            } 
-            set 
+        public virtual string Text
+        {
+            get
+            {
+                return ( MidiEvent == null ? text : MidiEvent.ToString()); 
+            }
+            set
             {
                 text = value;
                 this.IsUpdated = true;
-            } 
-        }
-
-        public GMetaMessage(GuitarTrack track, MidiEvent ev) : base(track, ev)
-        {
-            this.text = ev.MetaMessage.Text;
-        }
-
-    }
-
-    /*
-    public class GChannelMessage : GuitarMessage, IComparable<GChannelMessage>
-    {
-        protected int data1;
-        protected int data2;
-        protected int channel;
-        protected ChannelCommand command;
-
-        public virtual int Data1 { get { return data1; } set { data1 = value; } }
-        public virtual int Data2 { get { return data2; } set { data2 = value; } }
-        public virtual int Channel { get { return channel; } set { channel = value; } }
-        public virtual ChannelCommand Command { get { return command; } set { command = value; } }
-
-        protected GuitarDifficulty difficulty;
-        protected int noteString;
-
-        public virtual int NoteString { get { return noteString; } set { noteString = value; } }
-        public virtual GuitarDifficulty Difficulty { get { return difficulty; } set { difficulty = value; } }
-
-        public override int GetHashCode()
-        {
-            int ret = ((data1 << 8) | data2);
-            ret += (channel << 16);
-            ret ^=( (absoluteTicks << 3) + absoluteTicks);
-            
-            return ret;
-        }
-
-        public override string ToString()
-        {
-            return AbsoluteTicks.ToString() + " " + Command.ToString() + " Chan: " + channel.ToString() +
-                " Data1: " + Data1.ToString() + " Data2: " + Data2.ToString() + " Difficulty: " + Difficulty +
-                " String: " + NoteString;
-        }
-
-        public GChannelMessage(GuitarTrack track, MidiEvent downEvent) : base(track, downEvent)
-        {
-            if (downEvent != null)
-            {
-                var isPro = downEvent.Owner.FileType == FileType.Pro;
-
-                AbsoluteTicks = downEvent.AbsoluteTicks;
-
-                var cc = downEvent.ChannelMessage;
-                if (cc != null)
-                {
-                    Data1 = (cc.Data1 == Utility.SoloData1_G5 ? Utility.SoloData1 : cc.Data1);
-
-                    Command = (cc.Command == ChannelCommand.NoteOff || cc.Data2 == 0) ? ChannelCommand.NoteOff : ChannelCommand.NoteOn;
-
-                    Data2 = (Command == ChannelCommand.NoteOff || cc.Data2==0) ? 0 : cc.Data2;
-
-                    if (!track.IsPro && cc.MidiChannel == Utility.ChannelArpeggio)
-                    {
-                        channel = Utility.ChannelDefault;
-                    }
-                    else
-                    {
-                        channel = cc.MidiChannel;
-                    }
-                }
-
-                Difficulty = Utility.GetDifficulty(Data1, isPro);
-
-                NoteString = isPro ? Utility.GetNoteString(Data1) : Utility.GetNoteString5(Data1);
             }
         }
-
-
-        public int CompareTo(GChannelMessage other)
-        {
-            if (this.AbsoluteTicks < other.AbsoluteTicks)
-            {
-                return -1;
-            }
-            else if (this.AbsoluteTicks > other.AbsoluteTicks)
-            {
-                return 1;
-            }
-            else
-            {
-                if (this.Command == ChannelCommand.NoteOff && other.Command == ChannelCommand.NoteOn)
-                {
-                    return -1;
-                }
-                else if (this.Command == ChannelCommand.NoteOn && other.Command == ChannelCommand.NoteOff)
-                {
-                    return 1;
-                }
-                else
-                {
-                    if (this.Command == other.Command)
-                    {
-                        if (this.Data1 < other.Data1)
-                            return -1;
-                        if (this.Data1 > other.Data1)
-                            return 1;
-                        return 0;
-                    }
-                    return 0;
-                }
-            }
-        }
-
-        public static implicit operator GChannelMessage(MidiEvent ev)
-        {
-            return new GChannelMessage(null, ev);
-        }
-
-
-        public GChannelMessage ConvertDifficulty(GuitarDifficulty toDifficulty)
-        {
-            GChannelMessage ret = null;
-
-            var d1 = Utility.GetModifierData1ForDifficulty(Data1, Difficulty, toDifficulty);
-            if (d1 != -1)
-            {
-                ret = new GChannelMessage(OwnerTrack, null);
-                ret.Data1 = d1;
-                ret.Data2 = Data2;
-                ret.Channel = Channel;
-                ret.Command = Command;
-                ret.AbsoluteTicks = AbsoluteTicks;
-                ret.Difficulty = toDifficulty;
-            }
-            else
-            {
-                var ns = Utility.GetNoteString(Data1);
-                if (ns != -1)
-                {
-                    ret = new GChannelMessage(OwnerTrack, null);
-                    ret.Data1 = Utility.GetStringLowE(toDifficulty) + ns;
-                    ret.Data2 = Data2;
-                    ret.Channel = Channel;
-                    ret.Command = Command;
-                    ret.AbsoluteTicks = AbsoluteTicks;
-                    ret.Difficulty = toDifficulty;
-                }
-            }
-
-            return ret;
-        }
-    }
-    */
-
-
-
-    public class GuitarMessage : GMessage, IComparable<GuitarMessage>
-    {
-
         public virtual T Clone<T>(GuitarTrack destTrack, int minTick, int maxTick) where T : GuitarMessage, new()
         {
             var cb = new ChannelMessageBuilder(this.downEvent.ChannelMessage);
@@ -318,8 +213,11 @@ namespace ProUpgradeEditor.DataLayer
             SetUpEvent(upEvent);
         }
 
+        
         public GuitarMessage(GuitarTrack track, MidiEvent ev) : base(track, ev)
         {
+            this.upTick = int.MinValue;
+
             SetDownEvent(ev);
 
             if (ev != null && ev.ChannelMessage != null)
@@ -456,7 +354,6 @@ namespace ProUpgradeEditor.DataLayer
                     ret.Channel = Channel;
                     ret.Command = Command;
                     ret.DownTick = DownTick;
-                    
                 }
             }
 
@@ -504,6 +401,9 @@ namespace ProUpgradeEditor.DataLayer
         {
             get
             {
+                if (upTick.IsNull())
+                    upTick = DownTick+1;
+
                 return upTick;
             }
             set
@@ -548,21 +448,6 @@ namespace ProUpgradeEditor.DataLayer
             return ret;
         }
 
-        public int CompareTo(GuitarMessage obj)
-        {
-            if (DownTick < obj.DownTick)
-            {
-                return -1;
-            }
-            else if (DownTick > obj.DownTick)
-            {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
-        }
         public override string ToString()
         {
             return "Down: " + DownTick.ToString() + " Up: " + UpTick.ToString() + 
@@ -570,26 +455,15 @@ namespace ProUpgradeEditor.DataLayer
         }
 
 
-
-
-        
-
-
-
         public virtual ChannelMessage DownChannelMessage { get { return DownEvent.MidiMessage as ChannelMessage; } }
         public virtual ChannelMessage UpChannelMessage { get { return UpEvent.MidiMessage as ChannelMessage; } }
 
         public virtual int TickLength { get { return UpTick - DownTick; } }
 
-
-
         public virtual double TimeLength
         {
             get { return EndTime - StartTime; }
         }
-
-
-
 
         public virtual bool IsDownEventClose(GuitarMessage m2)
         {
@@ -616,6 +490,7 @@ namespace ProUpgradeEditor.DataLayer
             return (DownTick - obj.DownTick) > 0;
         }
 
+        
     }
 
 

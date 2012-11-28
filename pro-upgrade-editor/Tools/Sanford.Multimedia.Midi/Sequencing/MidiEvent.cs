@@ -19,9 +19,23 @@ namespace Sanford.Multimedia.Midi
         bool dirty;
         bool deleted;
 
+        public int Data1 { get { return this.ChannelMessage != null ? this.ChannelMessage.Data1 : int.MinValue; } }
+        public int Data2 { get { return this.ChannelMessage != null ? this.ChannelMessage.Data2 : int.MinValue; } }
+        public ChannelCommand Command { get { return this.ChannelMessage != null ? this.ChannelMessage.Command : 0; } }
+        public int Channel { get { return this.ChannelMessage != null ? this.ChannelMessage.MidiChannel : int.MinValue; } }
+
+        public MessageType MessageType
+        {
+            get { return message == null ? MessageType.Unknown : message.MessageType; }
+        }
+        public MetaType MetaType
+        {
+            get { return MetaMessage == null ? MetaType.Unknown : MetaMessage.MetaType; }
+        }
 
         public override string ToString()
         {
+            
             if (message != null)
             {
                 if (message.MessageType == MessageType.Meta)
@@ -51,6 +65,39 @@ namespace Sanford.Multimedia.Midi
             deleted = false;
         }
 
+        public IMidiMessage Clone()
+        {
+            IMidiMessage ret = null;
+
+            if (this.MessageType == MessageType.Channel)
+            {
+                var cb = new ChannelMessageBuilder(this.ChannelMessage);
+                cb.Build();
+                ret = cb.Result;
+            }
+            else if (this.MessageType == MessageType.Meta)
+            {
+                var mb = new MetaTextBuilder(this.MetaMessage);
+                mb.Build();
+                ret = mb.Result;
+            }
+            else if(this.MessageType == MessageType.SystemCommon)
+            {
+                var sb = new SysCommonMessageBuilder(this.MidiMessage as SysCommonMessage);
+                sb.Build();
+                ret = sb.Result;
+            }
+            else if(this.MessageType == MessageType.SystemExclusive) 
+            {
+                ret = new SysExMessage((this.MidiMessage as SysExMessage).GetBytes());
+            }
+            else if (this.MessageType == MessageType.SystemRealtime)
+            {
+                ret = (this.MidiMessage as SysRealtimeMessage);
+            }
+            return ret;
+        }
+
         internal void SetAbsoluteTicks(int absoluteTicks)
         {
             this.absoluteTicks = absoluteTicks;
@@ -71,7 +118,17 @@ namespace Sanford.Multimedia.Midi
             {
                 return absoluteTicks;
             }
-            internal set { absoluteTicks = value; }
+            set 
+            {
+                if (absoluteTicks != value)
+                {
+                    absoluteTicks = value;
+                    if (this.message != null && owner != null)
+                    {
+                        owner.Move(this, absoluteTicks);
+                    }
+                }
+            }
         }
 
         public int DeltaTicks
@@ -152,63 +209,65 @@ namespace Sanford.Multimedia.Midi
                 return this.MidiMessage as MetaMessage;
             }
         }
-        public int CompareTo(MidiEvent other)
+        public int CompareTo(MidiEvent b)
         {
-            if (AbsoluteTicks < other.AbsoluteTicks)
+            if (AbsoluteTicks < b.AbsoluteTicks)
             {
                 return -1;
             }
-            else if (AbsoluteTicks > other.AbsoluteTicks)
+            else if (AbsoluteTicks > b.AbsoluteTicks)
             {
                 return 1;
             }
             else
             {
-                if (this.MidiMessage.MessageType == MessageType.Meta &&
-                    other.MidiMessage.MessageType == MessageType.Meta)
+                if (this.MessageType == MessageType.Meta &&
+                    b.MessageType == MessageType.Meta)
                 {
-                    var cm = this.MidiMessage as MetaMessage;
-                    var om = other.MidiMessage as MetaMessage;
+                    var cm = this.MetaMessage;
+                    var bMessage = b.MetaMessage;
 
                     if (cm.MetaType == MetaType.TrackName)
                         return -1;
                     else if (cm.MetaType == MetaType.EndOfTrack)
                         return 1;
-                    else if (om.MetaType == MetaType.EndOfTrack)
+                    else if (bMessage.MetaType == MetaType.EndOfTrack)
                         return -1;
-                    else if (om.MetaType == MetaType.TrackName)
+                    else if (bMessage.MetaType == MetaType.TrackName)
                         return 1;
                     else
                     {
-                        if (this.absoluteTicks < other.absoluteTicks)
+                        if (this.absoluteTicks < b.absoluteTicks)
                             return -1;
-                        else if (this.absoluteTicks > other.absoluteTicks)
+                        else if (this.absoluteTicks > b.absoluteTicks)
                             return 1;
                         else return 0;
                     }
                 }
-                else if (this.MidiMessage.MessageType == MessageType.Channel && 
-                    other.MidiMessage.MessageType == MessageType.Channel)
+                else if (this.MessageType == MessageType.Channel && 
+                        b.MessageType == MessageType.Channel)
                 {
-                    var cm = this.MidiMessage as ChannelMessage;
-                    var om = other.MidiMessage as ChannelMessage;
+                    var cm = this.ChannelMessage;
+                    var bMessage = b.ChannelMessage;
 
-                    
-                    if (cm.Command == ChannelCommand.NoteOff && om.Command == ChannelCommand.NoteOn)
+                    var isOffA = cm.Command == ChannelCommand.NoteOff || (cm.Command == ChannelCommand.NoteOn && cm.Data2 == 0);
+                    var isOffB = bMessage.Command == ChannelCommand.NoteOff || (bMessage.Command == ChannelCommand.NoteOn && bMessage.Data2 == 0);
+
+                    if (isOffA && !isOffB)
                     {
                         return -1;
                     }
-                    else if (cm.Command == ChannelCommand.NoteOn && om.Command == ChannelCommand.NoteOff)
+                    else if (!isOffA && isOffB)
                     {
                         return 1;
                     }
                     else
                     {
-                        if (cm.Command == om.Command)
+                        if (isOffA == isOffB)
                         {
-                            if (cm.Data1 < om.Data1)
+                            if (cm.Data1 < bMessage.Data1)
                                 return -1;
-                            if (cm.Data1 > om.Data1)
+                            if (cm.Data1 > bMessage.Data1)
                                 return 1;
                             return 0;
                         }
@@ -217,11 +276,7 @@ namespace Sanford.Multimedia.Midi
                 }
                 else
                 {
-                    if (this.absoluteTicks < other.absoluteTicks)
-                        return -1;
-                    else if (this.absoluteTicks > other.absoluteTicks)
-                        return 1;
-                    else return 0;
+                   return 0;
                 }
             }
         }

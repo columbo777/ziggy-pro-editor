@@ -10,22 +10,107 @@ using System.Diagnostics;
 
 namespace ProUpgradeEditor.DataLayer
 {
+    public class GuitarChordNoteListSorter : IComparer<GuitarNote>
+    {
+        public int Compare(GuitarNote x, GuitarNote y)
+        {
+            return x.NoteString < y.NoteString ? -1 : x.NoteString > y.NoteString ? 1 : 0;
+        }
+    }
+    public class GuitarChordNoteList : IEnumerable<GuitarNote>
+    {
+        List<GuitarNote> notes;
+        GuitarTrack track;
 
+        public GuitarChordNoteList(GuitarTrack track)
+        {
+            notes = new List<GuitarNote>();
+            this.track = track;
+        }
 
+        public void Remove(GuitarNote note)
+        {
+            track.Remove(note);
+            notes.Remove(note);
+        }
+
+        public void SetNotes(IEnumerable<GuitarNote> notes)
+        {
+            Clear();
+            this.notes.AddRange(notes);
+        }
+        public void Clear()
+        {
+            track.Remove(notes);
+            notes.Clear();
+        }
+
+        public GuitarNote this[int noteString]
+        {
+            get { return notes.SingleOrDefault(x => x.NoteString == noteString); }
+            set
+            {
+                var existing = notes.SingleOrDefault(x => x.NoteString == noteString);
+                if (existing != null)
+                {
+                    notes.Remove(existing);
+                }
+                if (value != null)
+                {
+                    notes.Add(value);
+                }
+            }
+        }
+
+        public IEnumerator<GuitarNote> GetEnumerator()
+        {
+            return notes.GetEnumerator();
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
 
     public class GuitarChord : GuitarMessage
     {
-        public GuitarChord(GuitarTrack track, int downTick, int upTick)
-            : this(track)
+        public static GuitarChord GetChord(GuitarTrack track, GuitarDifficulty difficulty,
+            int downTick, int upTick,
+            int[] frets, int[] channels, bool isSlide, bool isSlideReverse, bool isHammeron, ChordStrum strumMode)
         {
 
+            var ret = new GuitarChord(track);
+            var lowE = Utility.GetStringLowE(difficulty);
+
+            for (int x = 0; x < frets.Length; x++)
+            {
+                var fret = frets[x];
+                var channel = channels[x];
+
+                if (!fret.IsNull())
+                {
+                    ret.Notes[x] = GuitarNote.GetNote(track, difficulty, downTick, upTick, x, fret,
+                        channel == Utility.ChannelTap, channel == Utility.ChannelArpeggio, channel == Utility.ChannelX);
+                }
+            }
+            if (ret.HasNotes)
+            {
+                ret.IsSlide = isSlide;
+                ret.IsSlideReversed = isSlideReverse;
+                ret.IsHammeron = isHammeron;
+                ret.StrumMode = strumMode;
+            }
+            else
+            {
+                ret = null;
+            }
+            return ret;
         }
-
-        
-        public GuitarChord(GuitarTrack track, MidiEvent downEvent, MidiEvent upEvent)
-            : base(track, downEvent, upEvent)
+        public GuitarChord(GuitarTrack track)
+            : base(track, null, null)
         {
-            Notes = new GuitarNote[6];
+            Notes = new GuitarChordNoteList(track);
             Modifiers = new List<GuitarModifier>();
 
             StrumMode = ChordStrum.Normal;
@@ -39,15 +124,14 @@ namespace ProUpgradeEditor.DataLayer
             {
                 var gn = new GuitarNote(track, downEvent, upEvent);
                 Notes[gn.NoteString] = gn;
+                downTick = downEvent.AbsoluteTicks;
+                upTick = upEvent.AbsoluteTicks;
             }
         }
 
-        public GuitarChord(GuitarTrack track)
-            : this(track, null, null)
-        {
-        }
 
-        public GuitarNote[] Notes;
+        public GuitarChordNoteList Notes;
+        
         public int[] NoteFrets
         {
             get
@@ -107,35 +191,30 @@ namespace ProUpgradeEditor.DataLayer
             {
                 if (downTick.IsNull())
                 {
-                    var n = Notes.Where(x => x != null);
-                    if (n.Any())
-                    {
-                        return n.Min(x => x.DownTick);
-                    }
-                    else
-                    {
-                        return Int32.MinValue;
-                    }
+                    downTick = Notes.GetMinTick();
                 }
-                else
-                {
-                    return downTick;
-                }
+                return downTick;
             }
             set
             {
-                if (DownTick != value)
+                if (downTick != value)
                 {
                     downTick = value;
                     IsUpdated = true;
 
-                    foreach (var n in Notes.Where(x => x != null))
+                    foreach (var n in Notes)
                     {
-                        n.DownTick = value;
+                        if (n.DownTick != value)
+                        {
+                            n.DownTick = value;
+                        }
                     }
                     foreach (var m in Modifiers)
                     {
-                        m.DownTick = value;
+                        if (m.DownTick != value)
+                        {
+                            m.DownTick = value;
+                        }
                     }
                 }
             }
@@ -147,10 +226,9 @@ namespace ProUpgradeEditor.DataLayer
             {
                 if (upTick.IsNull())
                 {
-                    var n = Notes.Where(x => x != null);
-                    if (n.Any())
+                    if (Notes.Any())
                     {
-                        return n.Max(x => x.UpTick);
+                        return Notes.Max(x => x.UpTick);
                     }
                     else
                     {
@@ -170,13 +248,19 @@ namespace ProUpgradeEditor.DataLayer
 
                     IsUpdated = true;
 
-                    foreach (var n in Notes.Where(x => x != null))
+                    foreach (var n in Notes)
                     {
-                        n.UpTick = value;
+                        if (n.UpTick != value)
+                        {
+                            n.UpTick = value;
+                        }
                     }
                     foreach (var m in Modifiers)
                     {
-                        m.UpTick = value;
+                        if (m.UpTick != value)
+                        {
+                            m.UpTick = value;
+                        }
                     }
                 }
             }
@@ -197,13 +281,12 @@ namespace ProUpgradeEditor.DataLayer
                 int ret = int.MaxValue;
                 foreach (var n in Notes)
                 {
-                    if (n != null)
+                   
+                    if (n.NoteFretDown < ret)
                     {
-                        if (n.NoteFretDown < ret)
-                        {
-                            ret = n.NoteFretDown;
-                        }
+                        ret = n.NoteFretDown;
                     }
+                    
                 }
                 if (ret == int.MaxValue)
                     ret = 0;
@@ -217,17 +300,16 @@ namespace ProUpgradeEditor.DataLayer
                 int ret = int.MaxValue;
                 foreach (var n in Notes)
                 {
-                    if (n != null)
+                    
+                    if (n.NoteFretDown != 0)
                     {
-                        if (n.NoteFretDown != 0)
+                        if (n.NoteFretDown < ret)
                         {
-                            if (n.NoteFretDown < ret)
-                            {
 
-                                ret = n.NoteFretDown;
-                            }
+                            ret = n.NoteFretDown;
                         }
                     }
+                    
                 }
                 if (ret == int.MaxValue)
                     ret = 0;
@@ -241,12 +323,9 @@ namespace ProUpgradeEditor.DataLayer
                 int ret = int.MinValue;
                 foreach (var n in Notes)
                 {
-                    if (n != null)
+                    if (n.NoteFretDown > ret)
                     {
-                        if (n.NoteFretDown > ret)
-                        {
-                            ret = n.NoteFretDown;
-                        }
+                        ret = n.NoteFretDown;
                     }
                 }
                 if (ret == int.MinValue)
@@ -261,7 +340,7 @@ namespace ProUpgradeEditor.DataLayer
             get
             {
                 var ret = GuitarDifficulty.Unknown;
-                var n = Notes.Where(x => x != null).FirstOrDefault();
+                var n = Notes.FirstOrDefault();
                 if (n != null)
                 {
                     ret = n.Data1.GetData1Difficulty(OwnerTrack.IsPro);
@@ -271,13 +350,14 @@ namespace ProUpgradeEditor.DataLayer
         }
 
         public GuitarChord CloneAtTime(
+            GuitarTrack track,
             int downTick, int upTick, int stringOffset=int.MinValue, int minDownTick=Int32.MinValue)
         {
             stringOffset = stringOffset.IsNull() ? 0 : stringOffset;
             var cb = new ChannelMessageBuilder();
 
-            RemoveChordsAtTick(ref downTick, ref upTick);
-
+            RemoveChordsAtTick(track, ref downTick, ref upTick, true);
+            
             if (downTick < minDownTick)
             {
                 downTick = minDownTick;
@@ -286,9 +366,9 @@ namespace ProUpgradeEditor.DataLayer
             if (upTick - downTick < Utility.NoteCloseWidth)
                 upTick = downTick + Utility.NoteCloseWidth;
 
-            var nc = new GuitarChord(OwnerTrack, downTick, upTick);
+            var nc = new GuitarChord(track);
 
-            for(int x=0;x<6;x++)
+            for (int x = 0; x < 6; x++)
             {
                 var note = Notes[x];
 
@@ -300,41 +380,45 @@ namespace ProUpgradeEditor.DataLayer
                     }
                     else
                     {
-                        nc.Notes[note.NoteString + stringOffset] = note.Clone(OwnerTrack, Difficulty, downTick, upTick, stringOffset);
+                        nc.Notes[note.NoteString + stringOffset] = note.Clone(track, track.CurrentDifficulty, downTick, upTick, stringOffset);
                     }
                 }
             }
 
-            if (IsSlide)
+            if (nc.HasNotes)
             {
-                nc.AddSlide(IsSlideReversed);
-            }
+                if (IsSlide)
+                {
+                    nc.AddSlide(IsSlideReversed);
+                }
 
-            if (IsHammeron)
-            {
-                nc.AddHammeron();
-            }
+                if (IsHammeron)
+                {
+                    nc.AddHammeron();
+                }
 
-            if (StrumMode != ChordStrum.Normal)
-            {
-                nc.AddStrum(this.StrumMode);
-            }
-            if (nc.Notes.Any(x => x != null))
-            {
+                if (StrumMode != ChordStrum.Normal)
+                {
+                    nc.AddStrum(this.StrumMode);
+                }
+                
                 OwnerTrack.Messages.Add(nc);
             }
             else
             {
                 nc = null;
             }
+            
             return nc;
         }
 
-        private void RemoveChordsAtTick(ref int downTick, ref int upTick)
+        private void RemoveChordsAtTick(GuitarTrack track, ref int downTick, ref int upTick, bool removeThis=true)
         {
-            foreach (var ncn in OwnerTrack.GetChordsAtTick(downTick,
+            foreach (var ncn in track.GetChordsAtTick(downTick,
                                     upTick).ToArray())
             {
+                if (removeThis == false && ncn == this)
+                    continue;
                 if (ncn.IsDeleted == false)
                 {
                     if (Utility.IsCloseTick(ncn.DownTick, upTick))
@@ -358,11 +442,6 @@ namespace ProUpgradeEditor.DataLayer
             }
         }
 
-        public GuitarChord CloneAtTime(GuitarChord atTimeChord)
-        {
-            return CloneAtTime(atTimeChord.DownTick, atTimeChord.UpTick);
-            
-        }
 
         public bool HasStrum
         {
@@ -463,34 +542,31 @@ namespace ProUpgradeEditor.DataLayer
                     upTick = UpTick;
                 }
 
+                RemoveChordsAtTick(OwnerTrack, ref downTick, ref upTick, false);
+
                 RemoveSubMessages();
 
-                var gn = new GuitarNote[6];
-
-                for (int x = 0; x < 6; x++)
+                if (Notes.Any())
                 {
-                    if (Notes[x] != null)
+                    Notes.SetNotes(Notes.Select(x => x.Clone(OwnerTrack, Difficulty, downTick, upTick)).ToList());
+
+                    if (IsHammeron)
                     {
-                        var n = Notes[x].Clone(OwnerTrack, Difficulty, downTick, upTick);
-                        gn[n.NoteString] = n;
+                        AddHammeron();
+                    }
+                    if (IsSlide)
+                    {
+                        AddSlide(IsSlideReversed);
+                    }
+                    if (StrumMode != ChordStrum.Normal)
+                    {
+                        AddStrum(StrumMode);
                     }
                 }
-
-                Notes = gn;
-
-                if (IsHammeron)
+                else
                 {
-                    AddHammeron();
+                    OwnerTrack.Remove(this);
                 }
-                if (IsSlide)
-                {
-                    AddSlide(IsSlideReversed);
-                }
-                if (StrumMode != ChordStrum.Normal)
-                {
-                    AddStrum(StrumMode);
-                }
-
             }
             catch { ret = false; }
             return ret;
@@ -550,16 +626,13 @@ namespace ProUpgradeEditor.DataLayer
 
         public void RemoveNotes()
         {
-            Notes.Where(n => n != null).ToList().ForEach(n => OwnerTrack.Remove(n));
+            Notes.ToList().ForEach(n => OwnerTrack.Remove(n));
         }
 
-        public void RemoveNote(int x)
+        public void RemoveNote(GuitarNote note)
         {
-            if (Notes[x] != null)
-            {
-                OwnerTrack.Remove(Notes[x]);
-                Notes[x] = null;
-            }
+            OwnerTrack.Remove(note);
+            Notes.Remove(note);
         }
         
 

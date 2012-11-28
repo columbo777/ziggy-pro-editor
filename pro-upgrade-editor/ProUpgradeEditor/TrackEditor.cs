@@ -435,12 +435,15 @@ namespace ProUpgradeEditor
         public static Track CopyTrack(Track track, string newName)
         {
             Track ret = null;
-            try
+            if (track != null)
             {
-                ret = new Track(track.FileType, newName);
-                ret.Merge(track);
+                try
+                {
+                    ret = new Track(track.FileType, newName);
+                    ret.Merge(track);
+                }
+                catch { ret = null; }
             }
-            catch { ret = null; }
             return ret;
         }
 
@@ -559,13 +562,14 @@ namespace ProUpgradeEditor
                     {
                         if (!silent)
                             MessageBox.Show("No Guitar Track Found");
-
+                        this.LoadedFileName = string.Empty;
                     }
                 }
                 catch
                 {
                     if (!silent)
                         MessageBox.Show("Cannot load file");
+                    this.LoadedFileName = string.Empty;
 
                 }
                 loading5 = false;
@@ -618,6 +622,10 @@ namespace ProUpgradeEditor
 
 
                         ret = SetTrack6(seq, t, CurrentDifficulty);
+                    }
+                    else
+                    {
+                        this.LoadedFileName = string.Empty;
                     }
                 }
                 catch
@@ -732,7 +740,8 @@ namespace ProUpgradeEditor
             settingTrack5 = true;
             try
             {
-                if (difficulty.IsAll() || difficulty.IsUnknown() || difficulty.IsNone())
+                if (difficulty.IsAll() || 
+                    difficulty.IsUnknown())
                 {
                     difficulty = GuitarDifficulty.Expert;
                 }
@@ -749,12 +758,13 @@ namespace ProUpgradeEditor
                 {
                     if (guitarTrack != null)
                     {
-                        if (guitarTrack.Sequence == null || guitarTrack.Sequence != seq)
+                        if (guitarTrack.Sequence == null || 
+                            guitarTrack.Sequence != seq)
                         {
                             guitarTrack.Sequence = seq;
                         }
-
-                        guitarTrack.SetTrack(t, difficulty, true);
+                        
+                        guitarTrack.SetTrack(t, difficulty);
                     }
                     else
                     {
@@ -802,7 +812,7 @@ namespace ProUpgradeEditor
             settingTrack6 = true;
             try
             {
-                if (difficulty.IsAll() || difficulty.IsUnknown() || difficulty.IsNone())
+                if (difficulty.IsAll() || difficulty.IsUnknown())
                 {
                     difficulty = GuitarDifficulty.Expert;
                 }
@@ -816,19 +826,17 @@ namespace ProUpgradeEditor
                 }
                 else
                 {
-                    if (guitarTrack != null)
-                    {
-                        if (guitarTrack.Sequence == null || guitarTrack.Sequence != seq)
-                        {
-                            guitarTrack.Sequence = seq;
-                        }
-
-                        guitarTrack.SetTrack(t, this.currentDifficulty, true);
-                    }
-                    else
+                    if (guitarTrack == null || 
+                        guitarTrack.Sequence == null || 
+                        guitarTrack.Sequence != seq)
                     {
                         guitarTrack = new GuitarTrack(seq, t, true, this.currentDifficulty);
                     }
+                    else
+                    {
+                        guitarTrack.SetTrack(t, this.currentDifficulty);
+                    }
+                    
                     ret = guitarTrack.Loaded;
                 }
             }
@@ -966,12 +974,12 @@ namespace ProUpgradeEditor
             }
         }
 
-        public List<GuitarChord> GetVisibleChords()
+        public IEnumerable<GuitarChord> GetVisibleChords()
         {
-            var ret = new List<GuitarChord>();
+            IEnumerable<GuitarChord> ret = null;
             if (IsLoaded)
             {
-                ret = guitarTrack.GetChordsAtTick(MinVisible, MaxVisible);
+                ret = guitarTrack.Messages.Chords.GetChordsAtTick(MinVisible, MaxVisible);
             }
             return ret;
         }
@@ -1378,14 +1386,11 @@ namespace ProUpgradeEditor
             if (guitarTrack == null || guitarTrack.Messages==null)
                 return ret;
 
-            var vis = guitarTrack.GetMessagesAtTick(MinVisible, MaxVisible);
+            var vis = guitarTrack.GetChordsAtTick(MinVisible, MaxVisible);
 
-            foreach (var gm in vis)
+            foreach (var c in vis)
             {
-                var c = gm as GuitarChord;
-                if (c == null)
-                    continue;
-
+                
                 int chordX = GetScreenPointFromTick(c.DownTick);
                 var chordWidth = GetScreenPointFromTick(c.UpTick) - GetScreenPointFromTick(c.DownTick);
                 
@@ -1416,12 +1421,12 @@ namespace ProUpgradeEditor
 
         public int GetChordMinYOffset(GuitarChord c)
         {
-            return c.Notes.Where(i => i != null).Min(n => GetNoteMinYOffset(n));
+            return c.Notes.Min(n => GetNoteMinYOffset(n));
         }
 
         public int GetChordMaxYOffset(GuitarChord c)
         {
-            return c.Notes.Where(i => i != null).Max(n => GetNoteMaxYOffset(n));
+            return c.Notes.Max(n => GetNoteMaxYOffset(n));
         }
 
         public int GetNoteMaxYOffset(GuitarNote n)
@@ -1605,7 +1610,6 @@ namespace ProUpgradeEditor
                     ret = guitarTrack.Messages.Chords.Where(x =>
                         x.Selected == true).Cast<GuitarChord>().ToList();
 
-                    ret.Sort((x, y) => x.DownTick > y.DownTick ? 1 : x.DownTick < y.DownTick ? -1 : 0);
                 }
 
                 return ret;
@@ -1783,7 +1787,7 @@ namespace ProUpgradeEditor
             {
                 foreach (var item in vis.Where(x=> x.Selected==drawSelected))
                 {
-                    Draw108Event(g, tabActive, drawSelected, item.DownTick, item.UpTick + 2, "Fret: " + item.NoteFretDown,
+                    Draw108Event(g, tabActive, drawSelected, item, item.DownTick, item.UpTick + 2, "Fret: " + item.NoteFretDown,
                         drawSelected ? Utility.SelectedTextEventBrush : Utility.TextEventBrush);
                 }
             }
@@ -2027,7 +2031,7 @@ namespace ProUpgradeEditor
         }
 
         public bool HasTextEventSelection { get { return SelectedTextEvent != null; } }
-
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public GuitarTextEvent SelectedTextEvent
         {
             get { return IsLoaded ? Messages.TextEvents.FirstOrDefault(x => x.Selected == true) : null; }
@@ -2151,6 +2155,7 @@ namespace ProUpgradeEditor
                         tl.X -= 1;
 
                         textRect.Location = tl;
+                        textRect.Width += 3;
 
                         g.DrawString(tr.Text, Utility.fretFont, fb, textRect, StringFormat.GenericDefault);
                     }
@@ -2159,7 +2164,8 @@ namespace ProUpgradeEditor
         }
 
 
-        private void Draw108Event(Graphics g, bool tabActive, bool drawSelected, int downTick, int upTick, string text, SolidBrush tb)
+        private void Draw108Event(Graphics g, bool tabActive, bool drawSelected,
+            GuitarHandPosition ev, int downTick, int upTick, string text, SolidBrush tb)
         {
 
             var st = GetScreenPointFromTick(downTick);
@@ -2196,7 +2202,7 @@ namespace ProUpgradeEditor
                         if (VisibleTextEvents.CountOverlapping(ntr) == 0)
                         {
                             textRect = ntr;
-                            VisibleTextEvents.Add(new GuitarTextEvent(GuitarTrack, downTick, text, null, GuitarTrainerMetaEventType.Unknown),
+                            VisibleTextEvents.Add(GuitarTextEvent.GetTextEvent(GuitarTrack, downTick, text),
                                 ntr);
                             break;
                         }
@@ -2219,6 +2225,7 @@ namespace ProUpgradeEditor
                         tl.X -= 1;
 
                         textRect.Location = tl;
+                        textRect.Width += 3;
                         g.DrawString(text,
                         Utility.fretFont,
                         fb,
@@ -2232,12 +2239,9 @@ namespace ProUpgradeEditor
         {
             try
             {
-
                 var pos = GuitarTrack.TickToTime(tick);
-
                 var i = (int)Math.Round(Utility.ScaleTimeUp(pos) - Utility.ScollToSelectionOffset);
                 HScrollValue = i;
-                
             }
             catch { }
         }
@@ -2682,6 +2686,7 @@ namespace ProUpgradeEditor
 
 
         EditorCreationState creationState = EditorCreationState.Idle;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public EditorCreationState CreationState
         {
             get { return creationState; }
@@ -2702,6 +2707,7 @@ namespace ProUpgradeEditor
         }
 
         EditorSelectionState _currentSelectionState = EditorSelectionState.Idle;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public EditorSelectionState CurrentSelectionState
         {
             get { return _currentSelectionState; }
@@ -2833,11 +2839,17 @@ namespace ProUpgradeEditor
                 CurrentSelectionState = EditorSelectionState.Idle;
             }
             SelectStartPointChord = null;
-
-            
         }
 
-       
+        public IEnumerable<Track> GetTracks(IEnumerable<string> trackNames)
+        {
+            var ret = new List<Track>();
+            if (Sequence != null && trackNames != null)
+            {
+                ret.AddRange(Sequence.Tracks.Where(x=> x.Name.IsEmpty()==false && trackNames.Contains(x.Name)));
+            }
+            return ret;
+        }
 
         public Track GetTrack(string name)
         {
@@ -2903,6 +2915,7 @@ namespace ProUpgradeEditor
         
         void TrackEditor_OnLoadTrack(TrackEditor editor, Sequence seq, Track t)
         {
+            editor.Refresh();
             //LogDebugEvent("onloadtrack " + (t == null ? "" : t.Name));
         }
 
@@ -2977,7 +2990,7 @@ namespace ProUpgradeEditor
                     ret = true;
                     try
                     {
-                        sel.Chord.CloneAtTime(downtick, uptick).Selected = true;
+                        sel.Chord.CloneAtTime(guitarTrack, downtick, uptick).Selected = true;
                     }
                     catch {  }
                 }
@@ -3262,15 +3275,17 @@ namespace ProUpgradeEditor
             catch { }
         }
 
+        Track GetTrack() { return GuitarTrack == null ? null : GuitarTrack.GetTrack(); }
+
         public void ReloadTrack()
         {
             if (EditorType == EEditorType.Guitar5)
             {
-                SetTrack5(GuitarTrack.GetTrack(), currentDifficulty);
+                SetTrack5(GetTrack(), currentDifficulty);
             }
             else
             {
-                SetTrack6(GuitarTrack.GetTrack(), currentDifficulty);
+                SetTrack6(GetTrack(), currentDifficulty);
             }
         }
         GuitarDifficulty currentDifficulty = GuitarDifficulty.Expert;
@@ -3355,7 +3370,7 @@ namespace ProUpgradeEditor
                             }
                         }
 
-                        var newChord = c.CloneAtTime(st, et, offset, testTick);
+                        var newChord = c.CloneAtTime(guitarTrack, st, et, offset, testTick);
                         if (newChord != null)
                         {
                             newChords.Add(newChord);
@@ -3370,8 +3385,57 @@ namespace ProUpgradeEditor
             }
             catch { RestoreBackup(); }
 
-            ReloadTrack();
+            
             return newChords;
+        }
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public Track SelectedTrack
+        {
+            get { return IsLoaded ? guitarTrack.GetTrack() : null; }
+        }
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public TrackDifficulty SelectedTrackDifficulty
+        {
+            get { return IsLoaded ? new TrackDifficulty(SelectedTrack, CurrentDifficulty) : null; }
+
+            set
+            {
+                if (value != null)
+                {
+                    SetTrack(value.Track, value.Difficulty);
+                }
+            }
+        }
+
+        public bool SetTrack(string name, GuitarDifficulty difficulty = GuitarDifficulty.Unknown)
+        {
+            var ret = false;
+            if (difficulty.IsUnknown())
+                difficulty = this.CurrentDifficulty;
+            var track = GetTrack(name);
+            if (track != null)
+            {
+                ret = SetTrack(track, difficulty);
+            }
+            return ret;
+        }
+        public bool SetTrack(Track track, GuitarDifficulty difficulty = GuitarDifficulty.Unknown)
+        {
+            var ret = false;
+            if (difficulty.IsUnknown())
+                difficulty = this.CurrentDifficulty;
+
+            if (track.IsFileTypePro())
+            {
+                ret = SetTrack6(track, difficulty);
+            }
+            else
+            {
+                ret = SetTrack5(track, difficulty);
+            }
+            return ret;
         }
 
         public void SetStatusIdle()
@@ -3635,12 +3699,10 @@ namespace ProUpgradeEditor
 
         void DrawChord(GuitarChord chord, Graphics g, bool drawSelected)
         {
-            
-            for (int i = 0; i < chord.Notes.Length; i++)
+
+            foreach(var note in chord.Notes)
             {
-                GuitarNote note = chord.Notes[i];
-                if (note == null)
-                    continue;
+                var i = note.NoteString;
 
                 var start = GetScreenPointFromTick(note.DownTick);
                 var end = GetScreenPointFromTick(note.UpTick);
@@ -3821,7 +3883,7 @@ namespace ProUpgradeEditor
                             g.DrawString(noteTxt,
                                 font,
                                 Utility.fretBrush,
-                                new RectangleF(new PointF(noteX, noteY), new SizeF(width, NoteHeight)),
+                                new RectangleF(new PointF(noteX, noteY), new SizeF(width+20, NoteHeight)),
                                  Utility.GetStringFormatNoWrap());
                         }
                     }
@@ -3834,7 +3896,7 @@ namespace ProUpgradeEditor
         {
             Font ret = Utility.fretFont;
 
-            var item = fontBuffer.Where(x => x.Key == rect);
+            var item = fontBuffer.Where(x => x.Key.Height == rect.Height);
 
             if (item.Any())
             {
@@ -3876,7 +3938,7 @@ namespace ProUpgradeEditor
 
                 var height = font.GetHeight(g);
 
-                var measure = g.MeasureString("8", font, rect.Width, fmt);
+                var measure = g.MeasureString("8", font, rect.Height, fmt);
 
 
                 var diff = Math.Abs(measure.Height - rect.Height);
@@ -3916,11 +3978,9 @@ namespace ProUpgradeEditor
         void DrawPasteChord(PastePointParam param, GuitarChord chord, Graphics g)
         {
             int alpha = 120;
-            for (int i = 0; i < chord.Notes.Length; i++)
+            foreach(var note in chord.Notes)
             {
-                GuitarNote note = chord.Notes[i];
-                if (note == null)
-                    continue;
+                var i = note.NoteString;
 
                 var start = GetScreenPointFromTick(note.DownTick);
                 var end = GetScreenPointFromTick(note.UpTick);

@@ -95,6 +95,10 @@
     <Reference Include="NAudio.WindowsMediaFormat">
       <HintPath>..\Tools\NAudio\NAudio.WindowsMediaFormat.dll</HintPath>
     </Reference>
+    <Reference Include="PUECommon, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\PUECommon.dll</HintPath>
+    </Reference>
     <Reference Include="Sanford.Multimedia, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Sanford.Multimedia.dll</HintPath>
@@ -212,6 +216,7 @@
       <DependentUpon>MainForm.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
+    <None Include="Resources\Thumbs.db" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -250,10 +255,123 @@
     <Folder Include="DataLayer\Guitar6\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Tools\PUECommon\PUECommon.csproj">
-      <Project>{7767D3DD-6E1C-419E-9092-F3F3DDDF3D87}</Project>
-      <Name>PUECommon</Name>
-    </ProjectReference>
+    <Content Include="Resources\1341680345_audio-midi.png" />
+    <Content Include="Resources\1341680384_folder_midi.png" />
+    <Content Include="Resources\Add.png" />
+    <Content Include="Resources\ark_extract.png" />
+    <Content Include="Resources\blue-document-music-playlist.png" />
+    <Content Include="Resources\blue-folder-open-document-music-playlist.png" />
+    <Content Include="Resources\blue-folder-open-document-music.png" />
+    <Content Include="Resources\CDRom.gif" />
+    <Content Include="Resources\clear-left.png" />
+    <Content Include="Resources\clipboard-sign-out.png" />
+    <Content Include="Resources\copy.png" />
+    <Content Include="Resources\disk.png" />
+    <Content Include="Resources\document-music-playlist.png" />
+    <Content Include="Resources\doc_music.png" />
+    <Content Include="Resources\edit-select-all.png" />
+    <Content Include="Resources\EditorIcon.ico" />
+    <Content Include="Resources\external.png" />
+    <Content Include="Resources\fenderguitar.bmp" />
+    <Content Include="Resources\file_extension_ace.png" />
+    <Content Include="Resources\file_extension_aif.png" />
+    <Content Include="Resources\file_extension_amr.png" />
+    <Content Include="Resources\file_extension_chm.png" />
+    <Content Include="Resources\file_extension_dll.png" />
+    <Content Include="Resources\file_extension_m4b.png" />
+    <Content Include="Resources\file_extension_m4v.png" />
+    <Content Include="Resources\file_extension_mid.png" />
+    <Content Include="Resources\file_extension_rtf.png" />
+    <Content Include="Resources\file_extension_txt.png" />
+    <Content Include="Resources\floppy_unmount3.png" />
+    <Content Include="Resources\folder-open-document-music.png" />
+    <Content Include="Resources\folder_classic_type_music.png" />
+    <Content Include="Resources\folder_explore.png" />
+    <Content Include="Resources\folder_modernist_type_music.png" />
+    <Content Include="Resources\gear yellow.png" />
+    <Content Include="Resources\gear--pencil.png" />
+    <Content Include="Resources\gear_16.png" />
+    <Content Include="Resources\gear__arrow.png" />
+    <Content Include="Resources\gear__exclamation.png" />
+    <Content Include="Resources\gear__minus.png" />
+    <Content Include="Resources\gear__plus.png" />
+    <Content Include="Resources\grayround.png" />
+    <Content Include="Resources\greenGrad1.bmp" />
+    <Content Include="Resources\gtk-refresh.ico" />
+    <Content Include="Resources\gtk-refresh.png" />
+    <Content Include="Resources\gtk-zoom-in.png" />
+    <Content Include="Resources\gtk-zoom-out.png" />
+    <Content Include="Resources\guitar.png" />
+    <Content Include="Resources\lightBlueFade.png" />
+    <Content Include="Resources\lightBlueFade2.png" />
+    <Content Include="Resources\lightGrayAlphaFade.png" />
+    <Content Include="Resources\lightGraySmall.png" />
+    <Content Include="Resources\lightGraySmall2.bmp" />
+    <Content Include="Resources\lightGraySmall2.png" />
+    <Content Include="Resources\lightGraySmall3.bmp" />
+    <Content Include="Resources\magnifier-zoom-in.png" />
+    <Content Include="Resources\magnifier-zoom-out.png" />
+    <Content Include="Resources\magnifier_zoom_in.png" />
+    <Content Include="Resources\media_controls_pause_small.png" />
+    <Content Include="Resources\media_controls_play_small.png" />
+    <Content Include="Resources\media_controls_stop_small.png" />
+    <Content Include="Resources\music %281%29.png" />
+    <Content Include="Resources\music--arrow.png" />
+    <Content Include="Resources\music--exclamation.png" />
+    <Content Include="Resources\music--minus.png" />
+    <Content Include="Resources\music--pencil.png" />
+    <Content Include="Resources\music--plus.png" />
+    <Content Include="Resources\music-beam-16.png" />
+    <Content Include="Resources\music.png" />
+    <Content Include="Resources\music_beam.png" />
+    <Content Include="Resources\music_green.png" />
+    <Content Include="Resources\music_grey.png" />
+    <Content Include="Resources\node-insert-next.png" />
+    <Content Include="Resources\node-select-all.png" />
+    <Content Include="Resources\node-tree.png" />
+    <Content Include="Resources\old-edit-find.png" />
+    <Content Include="Resources\OpenFolder.gif" />
+    <Content Include="Resources\page_white_zip.png" />
+    <Content Include="Resources\Partition.png" />
+    <Content Include="Resources\piano_exclamation.png" />
+    <Content Include="Resources\plug--arrow.png" />
+    <Content Include="Resources\plug--exclamation.png" />
+    <Content Include="Resources\plug--minus.png" />
+    <Content Include="Resources\plug_pencil.png" />
+    <Content Include="Resources\plug_plus.png" />
+    <Content Include="Resources\plus_16.png" />
+    <Content Include="Resources\Plus__Orange.png" />
+    <Content Include="Resources\rebuild.png" />
+    <Content Include="Resources\redx.png" />
+    <Content Include="Resources\remove_minus_sign_small.png" />
+    <Content Include="Resources\resultset_next.png" />
+    <Content Include="Resources\resultset_previous.png" />
+    <Content Include="Resources\slideIcon.gif" />
+    <Content Include="Resources\slideIcon.png" />
+    <Content Include="Resources\slideIcon.tif" />
+    <Content Include="Resources\special-offer %281%29.png" />
+    <Content Include="Resources\special-offer.png" />
+    <Content Include="Resources\Task.gif" />
+    <Content Include="Resources\tb3.png" />
+    <Content Include="Resources\textfield_rename.png" />
+    <Content Include="Resources\topbottom.png" />
+    <Content Include="Resources\topbottomblue.png" />
+    <Content Include="Resources\topbottomwhite.png" />
+    <Content Include="Resources\USBBlueArrow.png" />
+    <Content Include="Resources\USBExcl.png" />
+    <Content Include="Resources\USBFlash.png" />
+    <Content Include="Resources\USBGreenPlus.png" />
+    <Content Include="Resources\USBLogo.png" />
+    <Content Include="Resources\USBPencil.png" />
+    <Content Include="Resources\USBRedMinus.png" />
+    <Content Include="Resources\USBXTAFGUI_v36.exe" />
+    <Content Include="Resources\x.png" />
+    <Content Include="Resources\XBJoy.gif" />
+    <Content Include="Resources\xgif.gif" />
+    <Content Include="Resources\XPDrive.gif" />
+    <Content Include="Resources\XPFolder.gif" />
+    <Content Include="Resources\XPLens.gif" />
+    <Content Include="Resources\XPRecycle.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

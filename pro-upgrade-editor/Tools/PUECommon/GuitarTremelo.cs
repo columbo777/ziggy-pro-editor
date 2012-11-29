@@ -14,7 +14,9 @@ namespace ProUpgradeEditor.DataLayer
         public static GuitarMultiStringTremelo CreateMultiStringTremelo(GuitarTrack track, int downTick, int upTick)
         {
             MidiEvent downEvent, upEvent;
-            Utility.CreateMessage(track, Utility.MultiStringTremeloData1, 100, Utility.ChannelDefault, downTick, upTick, out downEvent, out upEvent);
+            Utility.CreateMessage(track, 
+                Utility.MultiStringTremeloData1, 100, 
+                Utility.ChannelDefault, downTick, upTick, out downEvent, out upEvent);
 
             var ret = new GuitarMultiStringTremelo(track, downEvent, upEvent);
 

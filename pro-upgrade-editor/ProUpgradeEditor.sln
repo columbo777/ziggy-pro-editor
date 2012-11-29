@@ -36,6 +36,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Local.testsettings = Local.testsettings
 		Performance4.psess = Performance4.psess
 		ProUpgradeEditor.vsmdi = ProUpgradeEditor.vsmdi
+		lib\Sanford.Collections.dll = lib\Sanford.Collections.dll
+		lib\Sanford.Multimedia.dll = lib\Sanford.Multimedia.dll
+		lib\Sanford.Multimedia.Timers.dll = lib\Sanford.Multimedia.Timers.dll
+		lib\Sanford.Threading.dll = lib\Sanford.Threading.dll
 		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
 EndProject

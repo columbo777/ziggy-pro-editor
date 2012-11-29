@@ -159,11 +159,9 @@ namespace ProUpgradeEditor
 
         public static IEnumerable<MidiEvent> GetChanMessagesByDifficulty(this Track t, GuitarDifficulty diff) 
         {
-            return t.ChanMessages.Where(x =>
-                {
-                    return x.Data1.GetData1Difficulty(
-                                t.FileType == FileType.Pro) == diff;
-                }).ToList();
+            return t.ChanMessages.Where(x => 
+                diff.HasFlag(x.Data1.GetData1Difficulty(t.IsFileTypePro()))
+                ).ToList();
         }
 
         public static bool HasDropObject<T>(this DragEventArgs args) where T : class
@@ -275,10 +273,7 @@ namespace ProUpgradeEditor
         }
         public static bool IsSoloEvent(this MidiEvent ev)
         {
-            if (ev.Owner.IsFileTypePro())
-                return Utility.SoloData1 == ev.Data1;
-            else
-                return Utility.SoloData1_G5.Contains(ev.Data1) || Utility.SoloData1 == ev.Data1;
+            return ev.Data1.IsSolo(ev.Owner.IsFileTypePro());
         }
         public static bool IsMultiStringTremeloEvent(this MidiEvent ev)
         {
@@ -359,29 +354,29 @@ namespace ProUpgradeEditor
             Track ret = null;
             if (preferGuitar17)
             {
-                ret = seq.FirstOrDefault(x => GuitarTrack.GuitarTrackName17.Contains(x.Name));
+                ret = seq.FirstOrDefault(x => x.Name.IsGuitarTrackName17());
                 if (ret == null)
-                    ret = seq.FirstOrDefault(x => GuitarTrack.GuitarTrackName22.Contains(x.Name));
+                    ret = seq.FirstOrDefault(x => x.Name.IsGuitarTrackName22());
                 if(ret == null)
-                    ret = seq.FirstOrDefault(x => GuitarTrack.BassTrackName17.Contains(x.Name));
+                    ret = seq.FirstOrDefault(x => x.Name.IsBassTrackName17());
                 if (ret == null)
-                    ret = seq.FirstOrDefault(x => GuitarTrack.BassTrackName22.Contains(x.Name));
+                    ret = seq.FirstOrDefault(x => x.Name.IsBassTrackName22());
             }
             else
             {
-                ret = seq.FirstOrDefault(x => GuitarTrack.GuitarTrackName22.Contains(x.Name));
+                ret = seq.FirstOrDefault(x => x.Name.IsGuitarTrackName22());
                 if (ret == null)
-                    ret = seq.FirstOrDefault(x => GuitarTrack.GuitarTrackName17.Contains(x.Name));
+                    ret = seq.FirstOrDefault(x => x.Name.IsGuitarTrackName17());
                 if (ret == null)
-                    ret = seq.FirstOrDefault(x => GuitarTrack.BassTrackName22.Contains(x.Name));
+                    ret = seq.FirstOrDefault(x => x.Name.IsBassTrackName22());
                 if (ret == null)
-                    ret = seq.FirstOrDefault(x => GuitarTrack.BassTrackName17.Contains(x.Name));
+                    ret = seq.FirstOrDefault(x => x.Name.IsBassTrackName17());
             }
 
             if (ret == null)
-                ret = seq.FirstOrDefault(x => GuitarTrack.GuitarTrackName5.Contains(x.Name));
+                ret = seq.FirstOrDefault(x => x.Name.IsGuitarTrackName5());
             if (ret == null)
-                ret = seq.FirstOrDefault(x => GuitarTrack.BassTrackName5.Contains(x.Name));
+                ret = seq.FirstOrDefault(x => x.Name.IsBassTrackName5());
             if (ret == null)
                 ret = seq.LastOrDefault();
             return ret;
@@ -392,10 +387,11 @@ namespace ProUpgradeEditor
             return list.Where(x => x.Name.IsGuitarTrackName() || x.Name.IsBassTrackName());
         }
 
-        public static IEnumerable<MidiEvent> RemoveDifficulty(this Track t6, GuitarDifficulty diff)
+        public static IEnumerable<MidiEvent> RemoveDifficulty(this Track track, GuitarDifficulty diff)
         {
-            var ret = t6.ChanMessages.Where(x => diff.HasFlag(x.ChannelMessage.Data1.GetData1Difficulty(true))).ToList();
-            ret.ForEach(x => t6.Remove(x));
+            var ret = track.ChanMessages.Where(x =>
+                diff.HasFlag(x.ChannelMessage.Data1.GetData1Difficulty(track.IsFileTypePro()))).ToList();
+            ret.ForEach(x => track.Remove(x));
             return ret;
         }
 
@@ -455,8 +451,8 @@ namespace ProUpgradeEditor
             {
                 if (!targetDifficulty.IsUnknown())
                 {
-                    
-                    t5.ChanMessages.Where(x => targetDifficulty.HasFlag(x.Data1.GetData1Difficulty(false))).ForEach(x =>
+
+                    t5.ChanMessages.Where(x => targetDifficulty.HasFlag(x.Data1.GetData1Difficulty(t5.IsFileTypePro()))).ForEach(x =>
                         {
                             var proCM = x.ChannelMessage.ConvertToPro(targetDifficulty);
                             if (proCM != null)
@@ -487,7 +483,7 @@ namespace ProUpgradeEditor
 
                     t5.Meta.Where(meta => meta.IsTextEvent()).ForEach(meta =>
                     {
-                        ret.Insert(meta.AbsoluteTicks, meta.MetaMessage.CloneMeta());
+                        ret.Insert(meta.AbsoluteTicks, meta.Clone());
                     });
                 }
             }
@@ -513,7 +509,8 @@ namespace ProUpgradeEditor
 
         public static IEnumerable<MidiEvent> GetChanMessagesNotInDifficulty(this Track t, GuitarDifficulty diff)
         {
-            return t.ChanMessages.Where(x => x.ChannelMessage.Data1.GetData1Difficulty(t.IsFileTypePro()) != diff);
+            return t.ChanMessages.Where(x => 
+                !diff.HasFlag(x.ChannelMessage.Data1.GetData1Difficulty(t.IsFileTypePro())));
         }
 
         public static Track CloneDifficulty(this Track t, GuitarDifficulty sourceDifficulty, GuitarDifficulty destDifficulty, FileType type = FileType.Unknown)
@@ -538,23 +535,17 @@ namespace ProUpgradeEditor
         {
             var ret = new Track(FileType.Guitar5, t6.Name);
 
-            if ((t6.Name.IsGuitarTrackName() || t6.Name.IsBassTrackName() && GuitarTrack.IsTrackName22(t6.Name)) && t6.ChanMessages.Any())
+            t6.ChanMessages.ForEach(cm=>
             {
-                t6.ChanMessages.ForEach(cm =>
-                {
-                    var proCM = cm.ChannelMessage.ConvertToPro(difficulty);
-                    if (proCM != null)
-                    {
-                        ret.Insert(cm.AbsoluteTicks, proCM);
-                    }
-                });
-                
-                t6.Meta.Where(meta => meta.IsTextEvent()).ForEach(meta =>
-                {
-                    ret.Insert(meta.AbsoluteTicks, meta.MetaMessage.CloneMeta());
-                });
-                
-            }
+                cm.ChannelMessage.ConvertToG5(difficulty).IfObjectNotNull(cm5 =>
+                    ret.Insert(cm.AbsoluteTicks, cm5));
+            });
+
+            t6.Meta.Where(meta => meta.IsTextEvent()).ForEach(meta =>
+            {
+                ret.Insert(meta.AbsoluteTicks, meta.Clone());
+            });
+
             return ret;
         }
         public static int GetStringLowEPro(this GuitarDifficulty difficulty)
@@ -616,7 +607,7 @@ namespace ProUpgradeEditor
                     if (targetDifficulty.IsUnknown() || 
                         targetDifficulty.IsAll())
                     {
-                        if (cm.Data1 == Utility.SoloData1)
+                        if (cm.Data1.IsSoloExpert(false))
                         {
                             cb.Data2 = cm.Data2;
                             cb.Data1 = Utility.SoloData1;
@@ -626,8 +617,7 @@ namespace ProUpgradeEditor
 
                             ret = cb.Result;
                         }
-                        else if (cm.Data1 == Utility.PowerupData1 || 
-                            Utility.BigRockEndingData1.Contains(cm.Data1))
+                        else if (cm.Data1.IsPowerup() || cm.Data1.IsBigRockEnding())
                         {
                             cb.Data2 = cm.Data2;
                             cb.Data1 = cm.Data1;
@@ -649,14 +639,13 @@ namespace ProUpgradeEditor
             ChannelMessage ret = null;
             var cb = new ChannelMessageBuilder(cm);
 
-
             var noteString = cm.Data1.GetNoteString5();
             if (noteString != -1)
             {
-                cb.Data2 = cm.Command == ChannelCommand.NoteOff || cm.Data2 == 0 ? 0 : 100;
-                cb.Command = cm.Command == ChannelCommand.NoteOff || cm.Data2 == 0 ? ChannelCommand.NoteOff : ChannelCommand.NoteOn;
+                cb.Data2 = cm.Command.GetData2();
+                cb.Command = cm.Command;
                 cb.Data1 = targetDifficulty.GetStringLowE5() + noteString;
-                cb.MidiChannel = 0;
+                cb.MidiChannel = Utility.ChannelDefault;
                 
                 cb.Build();
 
@@ -677,10 +666,10 @@ namespace ProUpgradeEditor
             var noteString = cm.Data1.GetNoteString5();
             if (noteString != -1)
             {
-                cb.Data2 = cm.Command == ChannelCommand.NoteOff || cm.Data2 == 0 ? 0 : 100;
-                cb.Command = cm.Command == ChannelCommand.NoteOff || cm.Data2 == 0 ? ChannelCommand.NoteOff : ChannelCommand.NoteOn;
+                cb.Data2 = cm.Command.GetData2();
+                cb.Command = cm.Command;
                 cb.Data1 = targetDifficulty.GetStringLowEPro() + noteString;
-                cb.MidiChannel = 0;
+                cb.MidiChannel = Utility.ChannelDefault;
                 
                 cb.Build();
 
@@ -692,10 +681,10 @@ namespace ProUpgradeEditor
                     cm.Data1.GetData1Difficulty(false), targetDifficulty);
                 if (modData1 != -1)
                 {
-                    cb.Data2 = cm.Command == ChannelCommand.NoteOff ? 0 : 100;
+                    cb.Data2 = cm.Command.GetData2();
                     cb.Command = cm.Command;
                     cb.Data1 = modData1;
-                    cb.MidiChannel = 0;
+                    cb.MidiChannel = Utility.ChannelDefault;
                     
                     cb.Build();
 
@@ -712,23 +701,23 @@ namespace ProUpgradeEditor
                 }
                 else if (targetDifficulty.IsUnknown() || targetDifficulty.IsAll())
                 {
-                    if (cm.Data1 == Utility.SoloData1 || cm.Data1 == Utility.ExpertSoloData1_G5)
+                    if (cm.Data1.IsSoloExpert(false))
                     {
-                        cb.Data2 = cm.Command == ChannelCommand.NoteOff || cm.Data2 == 0 ? 0 : 100;
-                        cb.Command = cm.Command == ChannelCommand.NoteOff || cm.Data2 == 0 ? ChannelCommand.NoteOff : ChannelCommand.NoteOn;
+                        cb.Data2 = cm.Command.GetData2();
+                        cb.Command = cm.Command;
                         cb.Data1 = Utility.SoloData1;
-                        cb.MidiChannel = 0;
+                        cb.MidiChannel = Utility.ChannelDefault;
 
                         cb.Build();
 
                         ret = cb.Result;
                     }
-                    else if (cm.Data1 == Utility.PowerupData1 || Utility.BigRockEndingData1.Contains(cm.Data1))
+                    else if (cm.Data1.IsPowerup() || cm.Data1.IsBigRockEnding())
                     {
-                        cb.Data2 = cm.Command == ChannelCommand.NoteOff || cm.Data2 == 0 ? 0 : 100;
-                        cb.Command = cm.Command == ChannelCommand.NoteOff || cm.Data2 == 0 ? ChannelCommand.NoteOff : ChannelCommand.NoteOn;
+                        cb.Data2 = cm.Command.GetData2();
+                        cb.Command = cm.Command;
                         cb.Data1 = cm.Data1;
-                        cb.MidiChannel = 0;
+                        cb.MidiChannel = Utility.ChannelDefault;
 
                         cb.Build();
 
@@ -738,7 +727,10 @@ namespace ProUpgradeEditor
             }
             return ret;
         }
-
+        public static bool IsBigRockEnding(this int data1)
+        {
+            return Utility.BigRockEndingData1.Contains(data1);
+        }
         public static ChannelMessage ConvertToG5(this ChannelMessage cm, GuitarDifficulty targetDifficulty = GuitarDifficulty.Unknown)
         {
             ChannelMessage ret = null;
@@ -747,15 +739,14 @@ namespace ProUpgradeEditor
             if (targetDifficulty.IsUnknown())
                 targetDifficulty = cm.Data1.GetData1Difficulty(true);
 
-            var noteString = cm.Data1.GetNoteString6();
-            if (noteString != -1)
+            if (cm.Data1.IsProStringData1())
             {
-                if (noteString == 5)
+                if (cm.Data1.GetNoteString6() == 5)
                     cb.MidiChannel = 1;
 
-                cb.Data2 = cm.Command == ChannelCommand.NoteOn ? 100 : 0;
-                cb.Data1 = targetDifficulty.GetStringLowE5() + noteString;
-                cb.MidiChannel = 0;
+                cb.Data2 = cm.Command.GetData2();
+                cb.Data1 = targetDifficulty.GetStringLowE5() + cm.Data1.GetNoteString6();
+                cb.MidiChannel = Utility.ChannelDefault;
                 cb.Command = cm.Command;
                 cb.Build();
 
@@ -765,28 +756,53 @@ namespace ProUpgradeEditor
             {
                 if (targetDifficulty != GuitarDifficulty.Unknown)
                 {
-                    if (cm.Data1 == Utility.SoloData1)
+                    if (cm.Data1.IsSoloExpert(true))
                     {
-                        cb.Data2 = cm.Command == ChannelCommand.NoteOn ? 100 : 0;
+                        cb.Data2 = cm.Command.GetData2();
                         cb.Data1 = Utility.GetSoloData1_G5(targetDifficulty);
-                        cb.MidiChannel = 0;
+                        cb.MidiChannel = Utility.ChannelDefault;
                         cb.Command = cm.Command;
                         cb.Build();
                         ret = cb.Result;
                     }
-                    else if (cm.Data1 == Utility.PowerupData1)
+                    else if (cm.Data1.IsPowerup())
                     {
-                        cb.Data2 = cm.Command == ChannelCommand.NoteOn ? 100 : 0;
+                        cb.Data2 = cm.Command.GetData2();
                         cb.Data1 = Utility.PowerupData1;
-                        cb.MidiChannel = 0;
+                        cb.MidiChannel = Utility.ChannelDefault;
                         cb.Command = cm.Command;
                         cb.Build();
                         ret = cb.Result;
                     }
-                    
                 }
             }
             return ret;
+        }
+
+
+
+        public static bool IsProStringData1(this int data1)
+        {
+            return Utility.IsData1String6(data1);
+        }
+
+        public static int GetData2(this ChannelCommand cm)
+        {
+            return cm == ChannelCommand.NoteOn ? 100 : 0;
+        }
+
+        public static bool IsPowerup(this int data1)
+        {
+            return Utility.PowerupData1 == data1;
+        } 
+
+        public static bool IsSolo(this int data1, bool isPro)
+        {
+            return isPro ? (Utility.SoloData1 == data1) : (Utility.SoloData1_G5.Contains(data1) || data1 == Utility.SoloData1);
+        }
+        public static bool IsSoloExpert(this int data1, bool isPro)
+        {
+            return isPro ? (Utility.SoloData1 == data1) : (Utility.ExpertSoloData1_G5==data1 || data1 == Utility.SoloData1);
         }
         public static int GetNoteString6(this int data1)
         {

@@ -887,6 +887,7 @@ namespace ProUpgradeEditor.UI
 
                 if (Utility.GetDifficulty(e.Message.Data1, true) == EditorPro.CurrentDifficulty)
                 {
+                    e.Message.ConvertToPro();
                     if (Utility.GetStringDifficulty6(e.Message.Data1) == EditorPro.CurrentDifficulty)
                     {
                         if (e.Message.MidiChannel == Utility.ChannelArpeggio)

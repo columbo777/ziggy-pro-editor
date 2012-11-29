@@ -1179,7 +1179,7 @@ namespace ProUpgradeEditor.DataLayer
 
         private void LoadBigRockEnding6(bool refreshing, MidiEvent ev)
         {
-            if (ev.ChannelMessage.Command == ChannelCommand.NoteOn && ev.ChannelMessage.Data2 != 0)
+            if (ev.ChannelMessage.Command == ChannelCommand.NoteOn)
             {
                 Messages.Add(new GuitarBigRockEnding(this, ev, null));
             }
@@ -1279,7 +1279,7 @@ namespace ProUpgradeEditor.DataLayer
         }
         private void LoadSingleStringTremelo6(bool refreshing, MidiEvent ev)
         {
-            if (ev.ChannelMessage.Command == ChannelCommand.NoteOn && ev.ChannelMessage.Data2 != 0)
+            if (ev.ChannelMessage.Command == ChannelCommand.NoteOn)
             {
                 Messages.Add(new GuitarSingleStringTremelo(this, ev, null));
             }
@@ -1296,7 +1296,7 @@ namespace ProUpgradeEditor.DataLayer
 
         private void LoadMultiStringTremelo(bool refreshing, MidiEvent ev)
         {
-            if (ev.ChannelMessage.Command == ChannelCommand.NoteOn && ev.ChannelMessage.Data2 != 0)
+            if (ev.ChannelMessage.Command == ChannelCommand.NoteOn)
             {
                 Messages.Add(new GuitarMultiStringTremelo(this, ev, null));
             }
@@ -1313,7 +1313,7 @@ namespace ProUpgradeEditor.DataLayer
 
         private void LoadSolo6(bool refreshing, MidiEvent ev)
         {
-            if (ev.ChannelMessage.Command == ChannelCommand.NoteOn && ev.ChannelMessage.Data2 != 0)
+            if (ev.ChannelMessage.Command == ChannelCommand.NoteOn)
             {
                 Messages.Add(new GuitarSolo(this, ev, null));
             }
@@ -1330,7 +1330,7 @@ namespace ProUpgradeEditor.DataLayer
 
         private void LoadPowerup6(bool refreshing, MidiEvent ev)
         {
-            if (ev.ChannelMessage.Command == ChannelCommand.NoteOn && ev.ChannelMessage.Data2 != 0)
+            if (ev.ChannelMessage.Command == ChannelCommand.NoteOn)
             {
                 Messages.Add(new GuitarPowerup(this, ev, null));
             }
@@ -1345,7 +1345,7 @@ namespace ProUpgradeEditor.DataLayer
 
         private void LoadArpeggio6(bool refreshing, MidiEvent ev)
         {
-            if (ev.ChannelMessage.Command == ChannelCommand.NoteOn && ev.ChannelMessage.Data2 != 0)
+            if (ev.ChannelMessage.Command == ChannelCommand.NoteOn)
             {
                 Messages.Add(new GuitarArpeggio(this, ev, null));
             }

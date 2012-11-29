@@ -127,6 +127,52 @@
   <ItemGroup>
     <None Include="Resources\Add.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\CDRom.gif" />
+    <Content Include="Resources\close.png" />
+    <Content Include="Resources\doc_music.png" />
+    <Content Include="Resources\folder_classic_type_music.png" />
+    <Content Include="Resources\folder_explore.png" />
+    <Content Include="Resources\folder_modernist_type_music.png" />
+    <Content Include="Resources\grayround.png" />
+    <Content Include="Resources\greenGrad1.bmp" />
+    <Content Include="Resources\lightBlueFade.png" />
+    <Content Include="Resources\lightBlueFade2.png" />
+    <Content Include="Resources\lightGrayAlphaFade.png" />
+    <Content Include="Resources\lightGraySmall.png" />
+    <Content Include="Resources\lightGraySmall2.bmp" />
+    <Content Include="Resources\lightGraySmall2.png" />
+    <Content Include="Resources\lightGraySmall3.bmp" />
+    <Content Include="Resources\music %281%29.png" />
+    <Content Include="Resources\music--exclamation.png" />
+    <Content Include="Resources\music--minus.png" />
+    <Content Include="Resources\music--pencil.png" />
+    <Content Include="Resources\music--plus.png" />
+    <Content Include="Resources\music-beam-16.png" />
+    <Content Include="Resources\music.png" />
+    <Content Include="Resources\music_beam.png" />
+    <Content Include="Resources\music_green.png" />
+    <Content Include="Resources\music_grey.png" />
+    <Content Include="Resources\OpenFolder.gif" />
+    <Content Include="Resources\Partition.png" />
+    <Content Include="Resources\Task.gif" />
+    <Content Include="Resources\tb3.png" />
+    <Content Include="Resources\topbottom.png" />
+    <Content Include="Resources\topbottomblue.png" />
+    <Content Include="Resources\topbottomwhite.png" />
+    <Content Include="Resources\USBBlueArrow.png" />
+    <Content Include="Resources\USBExcl.png" />
+    <Content Include="Resources\USBFlash.png" />
+    <Content Include="Resources\USBGreenPlus.png" />
+    <Content Include="Resources\USBLogo.png" />
+    <Content Include="Resources\USBPencil.png" />
+    <Content Include="Resources\USBRedMinus.png" />
+    <Content Include="Resources\XBJoy.gif" />
+    <Content Include="Resources\XPDrive.gif" />
+    <Content Include="Resources\XPFolder.gif" />
+    <Content Include="Resources\XPLens.gif" />
+    <Content Include="Resources\XPRecycle.gif" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

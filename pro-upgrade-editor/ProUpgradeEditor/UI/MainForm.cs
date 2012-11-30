@@ -187,23 +187,21 @@ namespace ProUpgradeEditor.UI
             var ret = new List<string>();
             try
             {
-                var midis = f.GetFilesByExtension(".mid|.midi");
-                if (midis != null && midis.Length > 0)
+                
+                foreach (var midi in f.GetFilesByExtension(".mid|.midi"))
                 {
-                    foreach (var midi in midis)
+                    try
                     {
-                        try
+                        var newFile = Path.Combine(outputDir, midi.Name);
+                        if (!File.Exists(newFile))
                         {
-                            var newFile = Path.Combine(outputDir, midi.Name);
-                            if (!File.Exists(newFile))
-                            {
-                                File.WriteAllBytes(newFile, midi.Data);
-                            }
-                            ret.Add(newFile);
+                            File.WriteAllBytes(newFile, midi.Data);
                         }
-                        catch { }
+                        ret.Add(newFile);
                     }
+                    catch { }
                 }
+                
             }
             catch { }
             return ret;
@@ -213,23 +211,19 @@ namespace ProUpgradeEditor.UI
         {
             var ret = new List<string>();
             try
-            {
-                var dtas = f.GetFilesByExtension(".dta");
-                if (dtas != null && dtas.Length > 0)
+            {   
+                foreach (var dta in f.GetFilesByExtension(".dta"))
                 {
-                    foreach (var dta in dtas)
+                    try
                     {
-                        try
+                        var newFile = Path.Combine(outputDir, dta.Name);
+                        if (!File.Exists(newFile))
                         {
-                            var newFile = Path.Combine(outputDir, dta.Name);
-                            if (!File.Exists(newFile))
-                            {
-                                File.WriteAllBytes(newFile, dta.Data);
-                            }
-                            ret.Add(newFile);
+                            File.WriteAllBytes(newFile, dta.Data);
                         }
-                        catch { }
+                        ret.Add(newFile);
                     }
+                    catch { }
                 }
             }
             catch { }
@@ -6024,38 +6018,13 @@ namespace ProUpgradeEditor.UI
                                 seq.Load(ms);
                             }
 
-                            foreach (var t in seq)
-                            {
-                                if ((openFileType & EditorFileType.Con6) != 0)
-                                {
-                                    if (track6 == null && GuitarTrack.TrackNames6.Contains(t.Name))
-                                    {
-                                        seq6 = seq;
-                                        track6 = t;
-                                    }
-                                }
-                                if ((openFileType & EditorFileType.Con5) != 0)
-                                {
-                                    if (track5 == null && GuitarTrack.TrackNames5.Contains(t.Name))
-                                    {
-                                        seq5 = seq;
-                                        track5 = t;
-                                    }
-                                }
-                            }
+                            FindSequenceFileType(seq, openFileType);
 
-                            if ((openFileType & EditorFileType.Any5) == 0)
+                            if (seq.FileType != FileType.Unknown)
                             {
-                                if(track6 != null)
-                                    break;
+                                track6 = seq.FirstOrDefault(x => x.Name.IsProTrackName());
+                                track5 = seq.FirstOrDefault(x => x.Name.IsGuitarTrackName5() || x.Name.IsBassTrackName5());
                             }
-                            else if ((openFileType & EditorFileType.Any6) == 0)
-                            {
-                                if(track5 != null)
-                                    break;
-                            }
-                            else if(track6 != null && track5 != null)
-                                break;
                             
                         }
                         catch
@@ -6076,28 +6045,23 @@ namespace ProUpgradeEditor.UI
                         seq.Load(ms);
                     }
 
-                    if ((openFileType & EditorFileType.Midi6) != 0)
+                    if (openFileType.HasFlag(EditorFileType.Midi6))
                     {
-                        foreach (var t in seq.Tracks)
-                        {
-                            if (GuitarTrack.TrackNames6.Contains(t.Name))
-                            {
-                                track6 = t;
-                                
-                                break;
-                            }
-                        }
+                        var g6 = seq.Tracks.Where(x => x.Name.IsGuitarTrackName6());
+                        var b6 = seq.Tracks.Where(x => x.Name.IsBassTrackName6());
+                        if (g6.Any())
+                            track6 = g6.FirstOrDefault();
+                        else if (b6.Any())
+                            track6 = b6.FirstOrDefault();
                     }
-                    if ((openFileType & EditorFileType.Midi5) != 0)
+                    if (openFileType.HasFlag(EditorFileType.Midi5))
                     {
-                        foreach (var t in seq.Tracks)
-                        {
-                            if (GuitarTrack.TrackNames5.Contains(t.Name))
-                            {
-                                track5 = t;
-                                break;
-                            }
-                        }
+                        var g5 = seq.Tracks.Where(x => x.Name.IsGuitarTrackName5());
+                        var b5 = seq.Tracks.Where(x => x.Name.IsBassTrackName5());
+                        if (g5.Any())
+                            track5 = g5.FirstOrDefault();
+                        else if (b5.Any())
+                            track5 = b5.FirstOrDefault();
                     }
 
                     opened = true;
@@ -6131,6 +6095,40 @@ namespace ProUpgradeEditor.UI
                 }
             }
             return ret;
+        }
+
+        public static FileType FindSequenceFileType(Sequence seq, EditorFileType openFileType)
+        {
+            if (openFileType.HasFlag(EditorFileType.Con6) || openFileType.HasFlag(EditorFileType.Midi6))
+            {
+                if (seq.Tracks.Any(x => x.Name.IsProTrackName()))
+                {
+                    seq.FileType = FileType.Pro;
+                }
+            }
+            if (seq.FileType == FileType.Unknown)
+            {
+                if (openFileType.HasFlag(EditorFileType.Con5) || openFileType.HasFlag(EditorFileType.Midi5))
+                {
+                    if (seq.Tracks.Any(x => x.Name.IsBassTrackName5() || x.Name.IsGuitarTrackName5()))
+                    {
+                        seq.FileType = FileType.Guitar5;
+                    }
+                }
+            }
+
+            if (seq.FileType == FileType.Unknown)
+            {
+                if (seq.Tracks.Any(x => x.Name.IsProTrackName()))
+                {
+                    seq.FileType = FileType.Pro;
+                }
+                else if (seq.Tracks.Any(x => x.Name.IsBassTrackName5() || x.Name.IsGuitarTrackName5()))
+                {
+                    seq.FileType = FileType.Guitar5;
+                }
+            }
+            return seq.FileType;
         }
 
         private void OnDragDropEditorPro(object sender, DragEventArgs e)

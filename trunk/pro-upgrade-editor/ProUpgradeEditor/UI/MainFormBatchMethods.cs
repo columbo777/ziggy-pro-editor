@@ -935,8 +935,7 @@ namespace ProUpgradeEditor.UI
                         }
 
 
-                        var mid = pk.GetFiles("songs_upgrades", ".mid|.midi");
-                        if (mid == null || mid.Length == 0)
+                        if (!pk.GetFiles("songs_upgrades", ".mid|.midi").Any())
                         {
                             fileErrors.Add("No \".mid\" file found in package");
                         }

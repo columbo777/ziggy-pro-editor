@@ -146,15 +146,27 @@ namespace XPackage
 
         }
 
-        public PackageFile[] GetFilesByExtension(string extension)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="extension">pass extension as ".ext|.ext2"</param>
+        /// <returns></returns>
+        public IEnumerable<PackageFile> GetFilesByExtension(string extension)
         {
-            List<PackageFile> ret = new List<PackageFile>();
+            var ret = new List<PackageFile>();
             GetSubFiles(rootFolder, extension, ref ret);
-            return ret.ToArray();
+            return ret;
         }
 
-        public PackageFile[] GetFiles(string folder, string extension)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="folder"></param>
+        /// <param name="extension">pass extension as ".ext|.ext2"</param>
+        /// <returns></returns>
+        public IEnumerable<PackageFile> GetFiles(string folder, string extension)
         {
+            var ret = new List<PackageFile>();
             if (folder == null)
             {
                 return GetFilesByExtension(extension);
@@ -164,24 +176,24 @@ namespace XPackage
                 var f = rootFolder.Folders.SingleOrDefault(x => string.Compare(x.Name, folder, StringComparison.OrdinalIgnoreCase) == 0);
                 if (f != null)
                 {
-                    var exs = extension.Split('|');
-                    foreach (var ex in exs)
+                    foreach (var ex in extension.Split(new[]{'|'},StringSplitOptions.RemoveEmptyEntries))
                     {
-                        return f.Files.Where(x => x.Name.EndsWith(ex, StringComparison.OrdinalIgnoreCase) == true).ToArray();
+                        ret.AddRange(f.Files.Where(x => x.Name.EndsWith(ex, StringComparison.OrdinalIgnoreCase)));
                     }
                 }
             }
-            return null;
+            return ret;
         }
 
-        public PackageFile[] GetFiles(string folder)
+        public IEnumerable<PackageFile> GetFiles(string folder)
         {
+            var ret = new List<PackageFile>();
             var f = rootFolder.Folders.SingleOrDefault(x => string.Compare(x.Name, folder, StringComparison.OrdinalIgnoreCase) == 0);
             if (f != null)
             {
-                return f.Files.ToArray();
+                ret.AddRange(f.Files);
             }
-            return null;
+            return ret;
         }
 
         public static byte[] ReadFileBytes(string fileName)
@@ -190,7 +202,6 @@ namespace XPackage
             if (File.Exists(fileName))
             {
                 buffer = File.ReadAllBytes(fileName);
-                
             }
             return buffer;
         }
@@ -397,7 +408,8 @@ namespace XPackage
                 {
                     foreach (var f in folder.GetSubFiles())
                     {
-                        if (f.Name.EndsWith(".mid", StringComparison.OrdinalIgnoreCase))
+                        if (f.Name.EndsWith(".mid", StringComparison.OrdinalIgnoreCase) ||
+                            f.Name.EndsWith(".midi", StringComparison.OrdinalIgnoreCase))
                         {
                             f.Name = proMidiFileName;
 

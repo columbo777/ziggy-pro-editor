@@ -6356,7 +6356,7 @@
             this.tabControl3.Location = new System.Drawing.Point(3, 3);
             this.tabControl3.Name = "tabControl3";
             this.tabControl3.SelectedIndex = 0;
-            this.tabControl3.Size = new System.Drawing.Size(1081, 517);
+            this.tabControl3.Size = new System.Drawing.Size(1081, 516);
             this.tabControl3.TabIndex = 23;
             // 
             // tabPage8
@@ -6366,7 +6366,7 @@
             this.tabPage8.Location = new System.Drawing.Point(4, 24);
             this.tabPage8.Name = "tabPage8";
             this.tabPage8.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage8.Size = new System.Drawing.Size(1073, 489);
+            this.tabPage8.Size = new System.Drawing.Size(1073, 488);
             this.tabPage8.TabIndex = 1;
             this.tabPage8.Text = "Package Viewer";
             // 
@@ -6387,7 +6387,7 @@
             this.groupBox32.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.groupBox32.Location = new System.Drawing.Point(3, 3);
             this.groupBox32.Name = "groupBox32";
-            this.groupBox32.Size = new System.Drawing.Size(1067, 485);
+            this.groupBox32.Size = new System.Drawing.Size(1067, 484);
             this.groupBox32.TabIndex = 0;
             this.groupBox32.TabStop = false;
             this.groupBox32.Text = "Package Viewer";
@@ -6449,7 +6449,7 @@
             this.textBoxPackageDTAText.Name = "textBoxPackageDTAText";
             this.textBoxPackageDTAText.ReadOnly = true;
             this.textBoxPackageDTAText.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBoxPackageDTAText.Size = new System.Drawing.Size(606, 345);
+            this.textBoxPackageDTAText.Size = new System.Drawing.Size(606, 344);
             this.textBoxPackageDTAText.TabIndex = 5;
             this.textBoxPackageDTAText.WordWrap = false;
             // 
@@ -6551,7 +6551,7 @@
             this.tabPage6.Location = new System.Drawing.Point(4, 24);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage6.Size = new System.Drawing.Size(1073, 489);
+            this.tabPage6.Size = new System.Drawing.Size(1073, 488);
             this.tabPage6.TabIndex = 0;
             this.tabPage6.Text = "Package Utility";
             // 

@@ -38,11 +38,17 @@ namespace Sanford.Multimedia.Midi
 
         private ISite site = null;
 
+        FileType fileType;
         public FileType FileType
         {
-            get;
-            set;
+            get { return fileType; }
+            set
+            {
+                fileType = value;
+                Tracks.ToList().ForEach(x => x.FileType = fileType);
+            }
         }
+
 
 
 

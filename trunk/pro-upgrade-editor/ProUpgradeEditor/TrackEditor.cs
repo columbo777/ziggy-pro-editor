@@ -944,7 +944,6 @@ namespace ProUpgradeEditor
                 if (InPlayback)
                 {
                     var pos = GetScreenPointFromTick(MidiPlaybackPosition);
-                        
 
                     if (pos >= 0 && pos < Width)
                     {

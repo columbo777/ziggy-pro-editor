@@ -398,15 +398,13 @@ namespace ProUpgradeEditor.UI
                 if (MidiPlaybackInProgress)
                 {
                     ipos = (int)MidiPlaybackPosition;
-                }
-
-
-                if (MidiPlaybackInProgress)
-                {
+                
                     var pos = ProGuitarTrack.TickToTime(ipos);
 
                     
                     EditorPro.PlaybackPosition = pos;
+                    EditorPro.MidiPlaybackPosition = MidiPlaybackPosition;
+
                     if (checkBoxMidiPlaybackScroll.Checked)
                     {
                         EditorPro.ScrollToTick(ipos);
@@ -790,7 +788,7 @@ namespace ProUpgradeEditor.UI
                         waitSecs = ((double)SelectedSong.SongMP3PlaybackOffset) / 1000.0;
                     }
                     
-                    currentMp3PlaybackTime = EditorPro.GuitarTrack.TickToTime( MidiPlaybackPosition - Utility.ScollToSelectionOffset);
+                    currentMp3PlaybackTime = EditorPro.GuitarTrack.TickToTime( MidiPlaybackPosition);
 
                     var d = currentMp3PlaybackTime + waitSecs;
 

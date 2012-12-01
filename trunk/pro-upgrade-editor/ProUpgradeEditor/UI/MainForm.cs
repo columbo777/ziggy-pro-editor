@@ -26,6 +26,7 @@ using X360.Other;
 using System.Runtime.Serialization;
 using EditorResources.Components;
 using NAudio.Wave;
+using ZipLib.SharpZipLib.Core;
 
 
 namespace ProUpgradeEditor.UI
@@ -95,7 +96,7 @@ namespace ProUpgradeEditor.UI
 
         void tabSongLibraryUtility_DragOver(object sender, DragEventArgs e)
         {
-            e.Effect = DragDropEffects.All;
+            HandlePackageDropDragOver(e);
         }
 
         
@@ -106,7 +107,7 @@ namespace ProUpgradeEditor.UI
 
         void tabSongLibSongProperties_DragOver(object sender, DragEventArgs e)
         {
-            e.Effect = DragDropEffects.All;
+            HandlePackageDropDragOver(e);
         }
 
         void tabPackageEditor_DragDrop(object sender, DragEventArgs e)
@@ -114,6 +115,16 @@ namespace ProUpgradeEditor.UI
             HandlePackageDrop(e);
         }
 
+        bool HandlePackageDropDragOver(DragEventArgs e)
+        {
+            return PUEExtensions.TryExec(delegate()
+            {
+                var ret = e.Data.GetDataPresent(DataFormats.FileDrop, false);
+                if (ret) { e.Effect = DragDropEffects.All; }
+                else { e.Effect = DragDropEffects.None; }
+                return ret;
+            });
+        }
         public void HandlePackageDrop(DragEventArgs e)
         {
             try
@@ -121,64 +132,137 @@ namespace ProUpgradeEditor.UI
                 if (e.Data.GetDataPresent(DataFormats.FileDrop, false) == true)
                 {
                     string[] packageFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
-
-                    ImportPackageFiles(packageFiles);
+                    foreach (var pk in packageFiles)
+                    {
+                        ImportFile(pk);
+                    }
                 }
             }
             catch { }
         }
 
-        public void ImportPackageFiles(string[] packageFiles)
+        public void ImportFile(string fileName)
         {
-
-            if (packageFiles != null && packageFiles.Length > 0)
+            try
             {
-                var outputFolder = DefaultMidiFileLocationPro;
-                if (string.IsNullOrEmpty(outputFolder) ||
-                    !Directory.Exists(outputFolder))
+                var proFolder = DefaultMidiFileLocationPro;
+                if (!proFolder.FolderExists())
                 {
                     MessageBox.Show("Default pro midi path not configured.");
                 }
-                else
+                else if (!fileName.IsEmpty())
                 {
-                    foreach (string packageFileName in packageFiles)
+
+                    var isZipFile = fileName.EndsWithEx(".zip");
+
+                    if (isZipFile)
+                    {
+                        var outputFolder = proFolder.PathCombine(
+                                fileName.GetFileNameWithoutExtension()).AppendSlashIfMissing();
+                        outputFolder.CreateFolderIfNotExists();
+
+                        if(ExtractZipFile(fileName, outputFolder, null, false))
+                        {
+                            var midiFiles = outputFolder.GetFilesInFolder(true, "*.mid|*.midi").ToList();
+                            var dtaFiles = outputFolder.GetFilesInFolder(true, "*.dta").ToList();
+                            var mp3Files = outputFolder.GetFilesInFolder(true, "*.mp3").ToList();
+
+                            importG5Midi(dtaFiles, midiFiles, mp3Files);
+                        }
+                    }
+                    else
+                    {
+                        var package = Package.Load(fileName);
+
+                        if (package != null)
+                        {
+                            var outputFolder = proFolder.PathCombine(
+                                fileName.GetFileNameWithoutExtension()).AppendSlashIfMissing();
+                            outputFolder.CreateFolderIfNotExists();
+
+                            try
+                            {
+                                var dtaFiles = ExtractDTAFiles(package, outputFolder);
+                                var midiFiles = ExtractMidiFiles(package, outputFolder);
+
+                                importG5Midi(dtaFiles, midiFiles, new List<string>());
+                            }
+                            catch { }
+                        }
+
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private void importG5Midi(List<string> dtaFiles, List<string> midiFiles, List<string> mp3Files)
+        {
+            if (dtaFiles.Any() && midiFiles.Any())
+            {
+                var midiFilesG5 = midiFiles.Where(x => x.GetMidiFileType() == FileType.Guitar5).ToList();
+
+                var midiFilesPro = midiFiles.Where(x => !midiFilesG5.Contains(x)).ToList()
+                    .Where(x => x.GetMidiFileType() == FileType.Pro).ToList();
+
+                foreach (var midiFileNameG5 in midiFilesG5)
+                {
+                    try
                     {
                         CloseSelectedSong();
-                        try
+                        if (OpenEditorFile(midiFileNameG5))
                         {
-                            var package = Package.Load(packageFileName);
-
-                            if (package != null)
+                            var fn = midiFileNameG5.GetFileNameWithoutExtension();
+                            var pro = midiFilesPro.Where(x => x.GetFileNameWithoutExtension().StartsWithEx(fn));
+                            if (!pro.Any())
                             {
-                                var dir = outputFolder;
-                                if (!string.IsNullOrEmpty(dir))
+                                pro = midiFilesPro.Where(x => x.GetFolderName().EqualsEx(midiFileNameG5.GetFolderName()));
+                            }
+                            if (!pro.Any())
+                            {
+                                var seq5 = midiFileNameG5.LoadSequenceFile();
+                                var tempo5 = seq5.GetTempoTrack();
+                                
+                                if(tempo5 != null)
                                 {
-                                    dir = Path.Combine(dir, Path.GetFileNameWithoutExtension(packageFileName));
+                                    var t5Event = tempo5.Tempo.FirstOrDefault();
 
-                                    if (!Directory.Exists(dir))
-                                    {
-                                        Directory.CreateDirectory(dir);
-                                    }
+                                    var cb5 = new TempoChangeBuilder(t5Event.MetaMessage);
+                                    MidiEvent tempo6 = null;
+                                    pro = 
+                                        midiFilesPro.Where(x=> (tempo6 = x.LoadSequenceFile().GetTempoTrack().Tempo.FirstOrDefault()) != null &&
+                                        (tempo6.AbsoluteTicks == t5Event.AbsoluteTicks && 
+                                        (new TempoChangeBuilder(tempo6.MetaMessage).Tempo == cb5.Tempo))).ToList();
+                                }
+                            }
+                            if (pro.Any())
+                            {
+                                pro.OrderByDescending(x =>
+                                    x.GetFileModifiedTime()).FirstOrDefault().
+                                    IfObjectNotNull(x =>
+                                {
+                                    var seq = x.LoadSequenceFile();
+                                    EditorPro.LoadedFileName = x;
+                                    EditorPro.SetTrack6(seq, seq.GetPrimaryTrack());
+                                });
+                            }
 
-                                    try
-                                    {
-                                        var dtaFiles = ExtractDTAFiles(package, dir);
-                                        var midiFiles = ExtractMidiFiles(package, dir);
+                            CreateSongFromOpenMidi();
 
-                                        if (dtaFiles.Any() && midiFiles.Any())
-                                        {
-                                            foreach (var midiFileName in midiFiles)
-                                            {
-                                                CreateSongFromFiles(packageFileName, midiFileName, dtaFiles);
-                                            }
-                                        }
-                                    }
-                                    catch { }
+                            if (mp3Files.Any())
+                            {
+                                textBoxSongPropertiesMP3Location.Text = mp3Files.First();
+                                textBoxSongPropertiesMP3StartOffset.Text = "0";
+                                
+                                if (SelectedSong != null)
+                                {
+                                    UpdateSongCacheItem(SelectedSong);
+                                    OpenSongCacheItem(SelectedSong);
                                 }
                             }
                         }
-                        catch { }
                     }
+                    catch { }
                 }
             }
         }
@@ -193,8 +277,8 @@ namespace ProUpgradeEditor.UI
                 {
                     try
                     {
-                        var newFile = Path.Combine(outputDir, midi.Name);
-                        if (!File.Exists(newFile))
+                        var newFile = outputDir.PathCombine(midi.Name);
+                        if (!newFile.FileExists())
                         {
                             File.WriteAllBytes(newFile, midi.Data);
                         }
@@ -231,59 +315,6 @@ namespace ProUpgradeEditor.UI
             return ret;
         }
 
-        public void CreateSongFromFiles(string packageFileName, string guitar5FileLocation, List<string> dtaFiles)
-        {
-
-            if (!string.IsNullOrEmpty(packageFileName) &&
-                !string.IsNullOrEmpty(guitar5FileLocation) &&
-                dtaFiles.Count>0)
-            {
-
-                try
-                {
-                    CloseSelectedSong();
-
-                    if (File.Exists(guitar5FileLocation))
-                    {
-                        string songID = string.Empty;
-                        foreach (var dtaFile in dtaFiles)
-                        {
-                            var dta = File.ReadAllBytes(dtaFile);
-                            if (dta != null)
-                            {
-                                songID = DTAGetSongID(dta);
-                                if (!string.IsNullOrEmpty(songID))
-                                {
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (!string.IsNullOrEmpty(songID))
-                        {
-                            var sngs = SongList.Where(x =>
-                                !string.IsNullOrEmpty(x.DTASongID) &&
-                                string.Compare(x.DTASongID, songID, true) == 0);
-
-                            if (!sngs.Any())
-                            {
-                                CloseSelectedSong();
-
-                                if (OpenEditorFile(guitar5FileLocation))
-                                {
-                                    CreateSongFromOpenMidi();
-                                }
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    WriteBatchResult("Error : " + guitar5FileLocation);
-                    WriteBatchResult(ex.Message);
-                }
-            }
-        }
 
         void tabPackageEditor_DragOver(object sender, DragEventArgs e)
         {
@@ -691,25 +722,57 @@ namespace ProUpgradeEditor.UI
             RegenDifficultiesClick();
         }
 
-        public DataPair<TrackDifficulty> GetSelectedTrackDifficulties()
+        public class EditorTrackDifficulty
         {
-            return new DataPair<TrackDifficulty>(EditorPro.SelectedTrackDifficulty, EditorG5.SelectedTrackDifficulty);
-        }
-        public void RestoreTrackDifficulty(DataPair<TrackDifficulty> diff)
-        {
-            if (diff != null)
+            public PEMidiTrackEditPanel TrackPanel;
+            public IEnumerable<TrackDifficulty> Difficulties;
+            public TrackDifficulty SelectedTrackDifficulty;
+            public EditorTrackDifficulty(PEMidiTrackEditPanel trackPanel)
             {
-                if (diff.A != null)
+                this.TrackPanel = trackPanel;
+                Difficulties = trackPanel.TrackDifficulties.Select(x => new TrackDifficulty(x.Track, x.Difficulty)).ToList();
+                if (trackPanel.SelectedTrack != null && (trackPanel.SelectedTrack.Track != null))
                 {
-                    EditorPro.SetTrack(diff.A.Track, diff.A.Difficulty);
+                    SelectedTrackDifficulty = new TrackDifficulty(trackPanel.SelectedTrack.Track, trackPanel.SelectedTrack.SelectedDifficulty);
                 }
-                if (diff.B != null)
+                else
                 {
-                    EditorG5.SetTrack(diff.B.Track, diff.B.Difficulty);
+                    SelectedTrackDifficulty = null;
                 }
             }
         }
+        public DataPair<EditorTrackDifficulty> GetSelectedTrackDifficulties()
+        {
+            return new DataPair<EditorTrackDifficulty>(new EditorTrackDifficulty( midiTrackEditorPro), new EditorTrackDifficulty(midiTrackEditorG5));
+        }
+        public void RestoreTrackDifficulty(DataPair<EditorTrackDifficulty> diff)
+        {
+            if (diff != null)
+            {
+                if (EditorPro.Sequence != null && diff.A != null && diff.A.SelectedTrackDifficulty != null && diff.A.SelectedTrackDifficulty.Track != null &&
+                    diff.A.SelectedTrackDifficulty.Track.Sequence != null && diff.A.SelectedTrackDifficulty.Track.Sequence == EditorPro.Sequence)
+                {
+                    
+                    foreach (var item in diff.A.Difficulties.Where(x=> midiTrackEditorPro.TrackDifficulties.Any(y=> y.Track == x.Track && y.Difficulty != x.Difficulty)))
+                    {
+                        EditorPro.SetTrack(item.Track, item.Difficulty);
+                    }
+                    
+                    EditorPro.SetTrack(diff.A.SelectedTrackDifficulty.Track, diff.A.SelectedTrackDifficulty.Difficulty);
+                }
+                if (EditorG5.Sequence != null && diff.B != null && diff.B.SelectedTrackDifficulty != null && diff.B.SelectedTrackDifficulty.Track != null &&
+                    diff.B.SelectedTrackDifficulty.Track.Sequence != null && diff.B.SelectedTrackDifficulty.Track.Sequence == EditorG5.Sequence)
+                {
 
+                    foreach (var item in diff.B.Difficulties.Where(x => midiTrackEditorG5.TrackDifficulties.Any(y => y.Track == x.Track && y.Difficulty != x.Difficulty)))
+                    {
+                        EditorG5.SetTrack(item.Track, item.Difficulty);
+                    }
+                    
+                    EditorG5.SetTrack(diff.B.SelectedTrackDifficulty.Track, diff.B.SelectedTrackDifficulty.Difficulty);
+                }
+            }
+        }
         public void ExecAndRestoreTrackDifficulty(Action func)
         {
             var td = GetSelectedTrackDifficulties();
@@ -722,7 +785,30 @@ namespace ProUpgradeEditor.UI
                 RestoreTrackDifficulty(td);
             }
         }
-
+        public void ExecAndRestoreTrackDifficulty<T>(Action<T> func, T param)
+        {
+            var td = GetSelectedTrackDifficulties();
+            try
+            {
+                func(param);
+            }
+            finally
+            {
+                RestoreTrackDifficulty(td);
+            }
+        }
+        public T ExecAndRestoreTrackDifficulty<T>(Func<T> func)
+        {
+            var td = GetSelectedTrackDifficulties();
+            try
+            {
+                return func();
+            }
+            finally
+            {
+                RestoreTrackDifficulty(td);
+            }
+        }
         private void RegenDifficultiesClick()
         {
             ExecAndRestoreTrackDifficulty(delegate()
@@ -756,7 +842,7 @@ namespace ProUpgradeEditor.UI
                     {
                         SavePro();
                     }
-                    if (!SaveProCONFile(SelectedSong, !File.Exists(SelectedSong.G6ConFile), true))
+                    if (!SaveProCONFile(SelectedSong,  true, false))
                     {
                         MessageBox.Show("Unable to rebuild package");
                     }
@@ -793,7 +879,7 @@ namespace ProUpgradeEditor.UI
             CheckCONPackageDTA(SelectedSong, false);
         }
 
-        private void button101_Click(object sender, EventArgs e)
+        private void buttonPackageEditorOpenPackage_Click(object sender, EventArgs e)
         {
             string selCon = string.Empty;
             if (SelectedSong != null && !string.IsNullOrEmpty(SelectedSong.G6ConFile))
@@ -835,27 +921,29 @@ namespace ProUpgradeEditor.UI
             bool ret = false;
             try
             {
-                if (SelectedSong == null)
+                if (EditorPro.IsLoaded || EditorG5.IsLoaded)
                 {
-                    if (string.IsNullOrEmpty(FileNamePro))
+                    if (SelectedSong == null)
                     {
-
-                        if (InitializeFrom5Tar())
+                        if (FileNamePro.IsEmpty())
                         {
-                            ReloadTracks();
-
-                            if (SelectedSong == null)
+                            if (InitializeFrom5Tar())
                             {
-                                AddNewSongToLibrary();
-                                ret = true;
+                                ReloadTracks();
+
+                                if (SelectedSong == null)
+                                {
+                                    AddNewSongToLibrary();
+                                    ret = true;
+                                }
+
                             }
-                           
                         }
-                    }
-                    else
-                    {
-                        AddNewSongToLibrary();
-                        ret = true;
+                        else
+                        {
+                            AddNewSongToLibrary();
+                            ret = true;
+                        }
                     }
                 }
             }
@@ -1965,6 +2053,7 @@ namespace ProUpgradeEditor.UI
                 if (SelectedSong != null)
                 {
                     UpdateSongCacheItem(SelectedSong);
+                    
                     OpenSongCacheItem(SelectedSong);
                 }
             }
@@ -1984,10 +2073,10 @@ namespace ProUpgradeEditor.UI
                 textBox22.Text = s;
                 textBox22.ScrollToEnd();
 
-                UpdateSongCacheItem(SelectedSong);
-
-                if (string.IsNullOrEmpty(FileNamePro))
+                if (SelectedSong != null)
                 {
+                    UpdateSongCacheItem(SelectedSong);
+
                     OpenSongCacheItem(SelectedSong);
                 }
             }
@@ -2032,15 +2121,35 @@ namespace ProUpgradeEditor.UI
 
         private void button71_Click(object sender, EventArgs e)
         {
-            var s = ShowOpenFileDlg("Select pro CON file",
-                DefaultConFileLocation,
-                textBoxSongLibConFile.Text);
-            if (!string.IsNullOrEmpty(s))
+            var fileName = textBoxSongLibConFile.Text;
+            var folder = DefaultConFileLocation;
+
+            if(fileName.IsEmpty())
             {
-                textBoxSongLibConFile.Text = s;
-                textBoxSongLibConFile.ScrollToEnd();
-                UpdateSongCacheItem(SelectedSong);
+                if(SelectedSong != null)
+                {
+                    var fn = (SelectedSong.G6FileName.GetIfEmpty(SelectedSong.G5FileName) ?? "").GetFileNameWithoutExtension();
+                    if (fn.EndsWithEx("_pro"))
+                        fn = fn.Replace("_pro", "");
+                    fileName = fn + Utility.DefaultCONFileExtension;
+                }
             }
+            else if(fileName.FileExists())
+            {
+                fileName = fileName.GetFileName();
+                folder = fileName.GetFolderName();
+            }
+            
+            ShowSaveFileDlg("Select pro CON file",
+                folder,
+                fileName).IfNotEmpty(newFileName =>
+            {
+                textBoxSongLibConFile.Text = newFileName;
+                textBoxSongLibConFile.ScrollToEnd();
+                
+                UpdateSongCacheItem(SelectedSong);
+                SaveProCONFile(SelectedSong, false, false);
+            });
         }
 
         private void listBox1_DoubleClick(object sender, EventArgs e)
@@ -2644,52 +2753,56 @@ namespace ProUpgradeEditor.UI
             {
                 var pkPath = textBox49.Text;
 
-                if (string.IsNullOrEmpty(pkPath) || !File.Exists(pkPath))
+                if (!pkPath.FileExists())
                 {
                     pkPath = ShowOpenFileDlg("Select CON Package To Extract",
                         DefaultConFileLocation, pkPath);
 
-                    if (!string.IsNullOrEmpty(pkPath))
+                    if (pkPath.IsNotEmpty())
                         textBox49.Text = pkPath;
                 }
-                if (!string.IsNullOrEmpty(pkPath) && File.Exists(pkPath))
+
+                if (pkPath.FileExists())
                 {
                     Package pk = null;
                     try
                     {
-                        pk = Package.Load(pkPath,false);
+                        pk = Package.Load(pkPath, false);
                     }
-                    catch { }
-
+                    catch { } 
+                    
                     if (pk == null)
                     {
                         MessageBox.Show("Cannot load package");
+                        return;
                     }
-                    else
+                    
+                    
+                    var targetPath = settings.GetValue("lastExtractConTargetFolder");
+                    if (targetPath.IsEmpty())
+                        targetPath = settings.GetValue("lastExtractConSourceFolder");
+
+                    var sel = ShowSelectFolderDlg("Select Package Output Path", DefaultConFileLocation, targetPath);
+                    if (sel.IsNotEmpty())
                     {
-                        var targetPath = settings.GetValue("lastExtractConTargetFolder");
-                        if (string.IsNullOrEmpty(targetPath))
-                            targetPath = settings.GetValue("lastExtractConSourceFolder");
+                        settings.SetValue("lastExtractConTargetFolder", targetPath);
 
-                        var sel = ShowSelectFolderDlg("Select Package Output Path", DefaultConFileLocation, targetPath);
-                        if (!string.IsNullOrEmpty(sel))
+                        string[] filters = null;
+                        if (checkBox11.Checked)
                         {
-                            settings.SetValue("lastExtractConTargetFolder", targetPath);
-
-                            string[] filters = null;
-                            if (checkBox11.Checked)
-                            {
-                                filters = new string[] { ".dta", ".mid", ".midi" };
-                            }
-                            ExtractPackageContents(sel, pk.RootFolder, filters);
-
+                            filters = new string[] { ".dta", ".mid", ".midi" };
+                        }
+                        if (ExtractPackageContents(sel, pk.RootFolder, filters))
+                        {
                             OpenExplorerFolder(sel);
                         }
                     }
+                
                 }
             }
             catch { }
         }
+
 
         private void button92_Click(object sender, EventArgs e)
         {
@@ -2808,94 +2921,175 @@ namespace ProUpgradeEditor.UI
         
         }
 
-        private void ShowSelectCompressAllZipFile()
+        private string ShowSelectCompressAllZipFile()
         {
-            var sel = ShowSaveFileDlg("Select Output Zip File", "", textBoxCompressAllZipFile.Text);
-            if (!string.IsNullOrEmpty(sel))
+            var ret = ShowSaveFileDlg("Select Output Zip File", "", textBoxCompressAllZipFile.Text);
+            if (!ret.IsEmpty())
             {
-                textBoxCompressAllZipFile.Text = sel;
+                textBoxCompressAllZipFile.Text = ret;
             }
+            else
+            {
+                ret = string.Empty;
+            }
+            return ret;
         }
 
         private void button118_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(textBoxCompressAllZipFile.Text))
+            var zipFileName = textBoxCompressAllZipFile.Text;
+            if (zipFileName.IsEmpty())
             {
-                ShowSelectCompressAllZipFile();
+                zipFileName = ShowSelectCompressAllZipFile();
             }
 
-            if (!string.IsNullOrEmpty(textBoxCompressAllZipFile.Text))
+            if(zipFileName.IsEmpty())
+                return;
+
+            
+            try
             {
-                try
+                var fileNames = new List<string>();
+
+                if (checkBoxCompressAllInDefaultCONFolder.Checked)
                 {
-                    string[] fileNames = null;
-
-                    if (checkBoxCompressAllInDefaultCONFolder.Checked)
+                    var folderToCompress = DefaultConFileLocation;
+                    if (folderToCompress.IsEmpty())
                     {
-                        string folderToCompress = DefaultConFileLocation;
-                        if (string.IsNullOrEmpty(folderToCompress))
-                        {
-                            folderToCompress =
-                                ShowSelectFolderDlg("Select folder to compress", "", "");
-                        }
-                        
-                        if (!string.IsNullOrEmpty(folderToCompress) &&
-                            Directory.Exists(folderToCompress))
-                        {
-                            fileNames = Directory.GetFiles(folderToCompress);
-                        }
-
-                    }
-                    else
-                    {
-                        List<string> files = new List<string>();
-                        foreach (var song in SongList)
-                        {
-                            if (song.IsComplete && !string.IsNullOrEmpty(song.G6ConFile) && File.Exists(song.G6ConFile))
-                            {
-                                files.Add(song.G6ConFile);
-                            }
-                        }
-
-                        fileNames = files.ToArray();
+                        folderToCompress = ShowSelectFolderDlg("Select folder to compress", "", "");
                     }
 
-
-                    if (fileNames != null && fileNames.Length > 0)
+                    if (folderToCompress.FolderExists())
                     {
-                        using (ZipOutputStream s = new ZipOutputStream(File.Create(textBoxCompressAllZipFile.Text)))
-                        {
-                            s.SetLevel(2);
-
-                            byte[] buffer = new byte[1024*20];
-                            foreach (string file in fileNames)
-                            {
-                                var entry = new ZipEntry(Path.GetFileName(file));
-
-                                entry.DateTime = File.GetLastWriteTime(file);
-                                
-                                entry.Size = File.OpenRead(file).Length;
-                                s.PutNextEntry(entry);
-                                using (FileStream fs = File.OpenRead(file))
-                                {
-                                    int sourceBytes;
-                                    do
-                                    {
-                                        sourceBytes = fs.Read(buffer, 0, buffer.Length);
-                                        s.Write(buffer, 0, sourceBytes);
-                                    } while (sourceBytes > 0);
-                                }
-                            }
-
-                            s.Finish();
-                            s.Close();
-                        }
-
-                        OpenExplorerFolder(Path.GetDirectoryName(textBoxCompressAllZipFile.Text));
+                        fileNames.AddRange(folderToCompress.GetFilesInFolder());
                     }
                 }
-                catch { MessageBox.Show("Error saving"); }
+                else
+                {
+                    foreach (var song in SongList)
+                    {
+                        if (song.IsComplete && 
+                            song.G6ConFile.FileExists())
+                        {
+                            fileNames.Add(song.G6ConFile);
+                        }
+                    }
+                }
+
+
+                if (fileNames.Any())
+                {
+                    if (CreateZipFile(zipFileName, fileNames))
+                    {
+                        OpenExplorerFolder(zipFileName.GetFolderName());
+                    }
+                }
             }
+            catch { MessageBox.Show("Error saving"); }
+            
+        }
+
+        public bool CreateZipFile(string zipFileName, IEnumerable<string> localFilePaths)
+        {
+            var ret = false;
+            ZipOutputStream zipStream = null;
+            try
+            {
+                using (zipStream = new ZipOutputStream(File.Create(zipFileName)))
+                {
+                    zipStream.SetLevel(3);
+
+                    foreach (var localFilePath in localFilePaths.Where(x=> x.FileExists()))
+                    {
+                        var entry = new ZipEntry(localFilePath.GetFileName());
+
+                        var fileBytes = localFilePath.ReadFileBytes();
+
+                        entry.DateTime = File.GetLastWriteTime(localFilePath);
+
+                        entry.Size = fileBytes.Length;
+
+                        zipStream.PutNextEntry(entry);
+                        
+                        zipStream.Write(fileBytes, 0, fileBytes.Length);
+                        
+                        zipStream.CloseEntry();
+                    }
+                }
+            }
+            finally 
+            {
+                if (zipStream != null)
+                {
+                    zipStream.Finish();
+                    zipStream.IsStreamOwner = true;
+                    zipStream.Close();
+                    zipStream = null;
+                }
+            }
+            return ret;
+        }
+        public bool ExtractZipFile(string zipFileName, 
+            string outputFolder, 
+            IEnumerable<string> extensions, bool overWriteExisting=false)
+        {
+            var ret = false;
+            ZipFile zip = null;
+            try
+            {
+                if (zipFileName.IsNotEmpty() && zipFileName.FileExists() && !outputFolder.IsEmpty())
+                {
+                    zip = new ZipFile(zipFileName);
+
+                    byte[] buffer = new byte[4096];
+                    try
+                    {
+                        foreach (var file in zip.ToEnumerable<ZipEntry>().Where(x => x.IsFile))
+                        {
+                            PUEExtensions.TryExec(delegate()
+                            {
+                                var entryName = ZipEntry.CleanName(file.Name);
+                                entryName = entryName.Replace('/', '\\').Trim();
+
+                                if (extensions == null || extensions.Any() == false ||
+                                    extensions.Any(x => entryName.EndsWithEx(x)))
+                                {
+                                    var outputFileName = outputFolder.PathCombine(entryName);
+
+                                    if (overWriteExisting || !outputFileName.FileExists())
+                                    {
+                                        outputFileName.GetFolderName().CreateFolderIfNotExists();
+
+                                        Stream zipStream = zip.GetInputStream(file);
+
+                                        using (FileStream streamWriter = File.Create(outputFileName))
+                                        {
+                                            StreamUtils.Copy(zipStream, streamWriter, buffer);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+
+                        ret = true;
+                    }
+                    finally
+                    {
+                        zip.Close();
+                        zip = null;
+                    }
+                }
+                
+            }
+            catch 
+            {
+                if (zip != null)
+                {
+                    zip.Close();
+                    zip = null;
+                }
+            }
+            return ret;
         }
 
         private void checkBoxRenderMouseSnap_CheckedChanged(object sender, EventArgs e)
@@ -5966,28 +6160,32 @@ namespace ProUpgradeEditor.UI
 
         private void OnDragEnterEditorPro(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop, false) == true)
+            try
             {
-                e.Effect = DragDropEffects.All;
-            }
-            else if (e.Data.GetDataPresent(DataFormats.Serializable, false) == true)
-            {
-                object o = e.Data.GetData(DataFormats.Serializable, false);
-                if (o != null)
+                if (e.Data.GetDataPresent(DataFormats.FileDrop, false) == true)
                 {
-                    ListViewItem item = o as ListViewItem;
-                    if (item != null && item.Tag != null &&
-                        item.Tag is SongCacheItem)
+                    e.Effect = DragDropEffects.All;
+                }
+                else if (e.Data.GetDataPresent(DataFormats.Serializable, false) == true)
+                {
+                    object o = e.Data.GetData(DataFormats.Serializable, false);
+                    if (o != null)
                     {
-                        e.Effect = DragDropEffects.All;
-                    }
-                    else if (item != null && item.Tag != null &&
-                        item.Tag is FATXFileEntry)
-                    {
-                        e.Effect = DragDropEffects.All;
+                        ListViewItem item = o as ListViewItem;
+                        if (item != null && item.Tag != null &&
+                            item.Tag is SongCacheItem)
+                        {
+                            e.Effect = DragDropEffects.All;
+                        }
+                        else if (item != null && item.Tag != null &&
+                            item.Tag is FATXFileEntry)
+                        {
+                            e.Effect = DragDropEffects.All;
+                        }
                     }
                 }
             }
+            catch { e.Effect = DragDropEffects.None; }
         }
 
         [Flags()]
@@ -6007,132 +6205,124 @@ namespace ProUpgradeEditor.UI
         public bool OpenEditorFile(string fileName, byte[] data=null, EditorFileType openFileType = EditorFileType.Any)
         {
             bool ret = false;
-
-            if (string.IsNullOrEmpty(fileName))
-                fileName = "Unknown";
-
-            bool fileExists = (!string.IsNullOrEmpty(fileName)) && File.Exists(fileName);
-
-            if (data == null && !fileExists)
-                return ret;
-
-            if (data == null && fileExists)
+            try
             {
-                data = ReadFileBytes(fileName);
-            }
+                if (fileName.IsEmpty())
+                    fileName = "Unknown";
 
-            if (data == null)
-                return ret;
+                
+                if (data == null && !fileName.FileExists())
+                    return ret;
 
-
-            CloseSelectedSong();
-            
-            
-            Sequence seq6 = null;
-            Sequence seq5 = null;
-            Track track6 = null;
-            Track track5 = null;
-
-            bool opened = false;
-            if ((openFileType & EditorFileType.AnyCon) != 0)
-            {
-                Package p = Package.Load(data);
-                if (p != null)
+                if (data == null && fileName.FileExists())
                 {
-                    opened = true;
+                    data = ReadFileBytes(fileName);
+                }
 
-                    var midiFiles = p.GetFilesByExtension(".mid|.midi");
+                if (data == null)
+                    return ret;
 
-                    foreach (var mid in midiFiles)
+
+                CloseSelectedSong();
+
+
+                Track track6 = null;
+                Track track5 = null;
+
+                bool opened = false;
+                if ((openFileType & EditorFileType.AnyCon) != 0)
+                {
+                    Package p = Package.Load(data);
+                    if (p != null)
                     {
-                        try
+                        opened = true;
+
+                        var midiFiles = p.GetFilesByExtension(".mid|.midi");
+
+                        foreach (var mid in midiFiles)
                         {
-                            var seq = new Sequence(FileType.Unknown);
-                            using (var ms = new MemoryStream(mid.Data))
+                            try
                             {
-                                seq.Load(ms);
+                                var seq = mid.Data.LoadSequence();
+                                
+                                if (seq.FileType != FileType.Unknown)
+                                {
+                                    track6 = seq.FirstOrDefault(x => x.Name.IsProTrackName());
+                                    track5 = seq.FirstOrDefault(x => x.Name.IsGuitarTrackName5() || x.Name.IsBassTrackName5());
+                                }
+
                             }
-
-                            FindSequenceFileType(seq, openFileType);
-
-                            if (seq.FileType != FileType.Unknown)
+                            catch
                             {
-                                track6 = seq.FirstOrDefault(x => x.Name.IsProTrackName());
-                                track5 = seq.FirstOrDefault(x => x.Name.IsGuitarTrackName5() || x.Name.IsBassTrackName5());
                             }
-                            
                         }
-                        catch
+
+                    }
+                }
+
+                if (!opened)
+                {
+                    try
+                    {
+                        var seq = data.LoadSequence();
+                        
+                        if (openFileType.HasFlag(EditorFileType.Midi6))
                         {
+                            var g6 = seq.Tracks.Where(x => x.Name.IsGuitarTrackName6());
+                            var b6 = seq.Tracks.Where(x => x.Name.IsBassTrackName6());
+                            if (g6.Any())
+                                track6 = g6.FirstOrDefault();
+                            else if (b6.Any())
+                                track6 = b6.FirstOrDefault();
+                        }
+                        if (openFileType.HasFlag(EditorFileType.Midi5))
+                        {
+                            var g5 = seq.Tracks.Where(x => x.Name.IsGuitarTrackName5());
+                            var b5 = seq.Tracks.Where(x => x.Name.IsBassTrackName5());
+                            if (g5.Any())
+                                track5 = g5.FirstOrDefault();
+                            else if (b5.Any())
+                                track5 = b5.FirstOrDefault();
+                        }
+
+                        opened = true;
+                    }
+                    catch
+                    {
+
+                    }
+                }
+
+                if (opened)
+                {
+                    if (track5 != null)
+                    {
+                        ret = EditorG5.SetTrack5(track5, GuitarDifficulty.Expert);
+                        if (ret)
+                        {
+                            FileNameG5 = fileName;
+                            RefreshTracks5();
                         }
                     }
 
-                }
-            }
-
-            if (!opened)
-            {
-                try
-                {
-                    var seq = new Sequence(FileType.Unknown);
-                    using (var ms = new MemoryStream(data))
+                    if (track6 != null)
                     {
-                        seq.Load(ms);
-                    }
-
-                    if (openFileType.HasFlag(EditorFileType.Midi6))
-                    {
-                        var g6 = seq.Tracks.Where(x => x.Name.IsGuitarTrackName6());
-                        var b6 = seq.Tracks.Where(x => x.Name.IsBassTrackName6());
-                        if (g6.Any())
-                            track6 = g6.FirstOrDefault();
-                        else if (b6.Any())
-                            track6 = b6.FirstOrDefault();
-                    }
-                    if (openFileType.HasFlag(EditorFileType.Midi5))
-                    {
-                        var g5 = seq.Tracks.Where(x => x.Name.IsGuitarTrackName5());
-                        var b5 = seq.Tracks.Where(x => x.Name.IsBassTrackName5());
-                        if (g5.Any())
-                            track5 = g5.FirstOrDefault();
-                        else if (b5.Any())
-                            track5 = b5.FirstOrDefault();
-                    }
-
-                    opened = true;
-                }
-                catch 
-                {
-                    
-                }
-            }
-
-            if (opened)
-            {
-                if (track5 != null)
-                {
-                    ret = EditorG5.SetTrack5(seq5, track5, GuitarDifficulty.Expert);
-                    if (ret)
-                    {
-                        FileNameG5 = fileName;
-                        RefreshTracks5();
-                    }
-                }
-
-                if (track6 != null)
-                {
-                    ret = EditorPro.SetTrack6(seq6, track6, GuitarDifficulty.Expert);
-                    if (ret)
-                    {
-                        FileNamePro = fileName;
-                        RefreshTracks6();
+                        ret = EditorPro.SetTrack6(track6, GuitarDifficulty.Expert);
+                        if (ret)
+                        {
+                            FileNamePro = fileName;
+                            RefreshTracks6();
+                        }
                     }
                 }
             }
+            catch { ret = false; }
             return ret;
         }
 
-        public static FileType FindSequenceFileType(Sequence seq, EditorFileType openFileType)
+
+
+        public static FileType FindSequenceFileType(Sequence seq, EditorFileType openFileType = EditorFileType.Any)
         {
             if (openFileType.HasFlag(EditorFileType.Con6) || openFileType.HasFlag(EditorFileType.Midi6))
             {
@@ -6419,15 +6609,10 @@ namespace ProUpgradeEditor.UI
                 {
                     try
                     {
-                        if (f.Name.EndsWith(".mid", StringComparison.OrdinalIgnoreCase) ||
-                            f.Name.EndsWith(".midi", StringComparison.OrdinalIgnoreCase))
+                        if (f.Name.IsMidiFileName())
                         {
-                            var seq = new Sequence(FileType.Unknown);
-                            using (var ms = new MemoryStream(f.Data))
-                            {
-                                seq.Load(ms);
-                            }
-
+                            var seq = f.Data.LoadSequence();
+                            
                             bool pro = false;
                             foreach (var t in seq)
                             {
@@ -6534,32 +6719,22 @@ namespace ProUpgradeEditor.UI
             if (e.Data.GetDataPresent(DataFormats.FileDrop, false) == true)
             {
                 trackEditorG5.Close();
+
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 foreach (string file in files)
                 {
                     try
                     {
-                        
-                        var seq = new Sequence(FileType.Guitar5, file);
-
-                        var t5 = seq.Tracks.FirstOrDefault(x=> 
-                            GuitarTrack.TrackNames5.Contains(x.Name));
-                        if(t5 == null && seq.Tracks.Length > 0)
+                        file.LoadSequenceFile().IfObjectNotNull(seq =>
                         {
-                            t5 = seq.Tracks[0];
-                        }
-                        if (t5 != null)
-                        {
-                            FileNameG5 = file;
-                            trackEditorG5.SetTrack5(seq, t5, GuitarDifficulty.Expert);
-                        }
-
-                        break;
+                            if (seq.IsFileTypeG5())
+                            {
+                                trackEditorG5.LoadedFileName = file;
+                                trackEditorG5.SetTrack5(seq, seq.GetPrimaryTrack(), GuitarDifficulty.Expert);
+                            }
+                        });
                     }
-                    catch 
-                    {
-
-                    }
+                    catch { }
                 }
                 
             }
@@ -8218,16 +8393,18 @@ namespace ProUpgradeEditor.UI
 
         private void buttonSongPropertiesChooseMP3Location_Click(object sender, EventArgs e)
         {
-            var s = ShowOpenFileDlg("Select MP3 file",
-                DefaultConFileLocation,
-                textBoxSongPropertiesMP3Location.Text);
-            if (!string.IsNullOrEmpty(s))
+            var location = textBoxSongPropertiesMP3Location.Text.GetFolderName();
+            if(location.IsEmpty() && SelectedSong != null)
+                location = SelectedSong.G6FileName.GetIfEmpty(SelectedSong.G5FileName);
+            
+            ShowOpenFileDlg("Select MP3 file",
+                DefaultMidiFileLocationPro,
+                location.GetFolderName()).IfNotEmpty(mp3File=>
             {
-                textBoxSongPropertiesMP3Location.Text = s;
+                textBoxSongPropertiesMP3Location.Text = mp3File;
                 textBoxSongPropertiesMP3Location.ScrollToEnd();
                 UpdateSongCacheItem(SelectedSong);
-            }
-
+            });
         }
 
         private void buttonSongPropertiesExploreMP3Location_Click(object sender, EventArgs e)
@@ -9154,6 +9331,18 @@ namespace ProUpgradeEditor.UI
                     PEWaveViewer.ShowWave(path);
                 }
             });
+        }
+
+        private void zipFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowOpenFileDlg("Select Zip File", DefaultMidiFileLocationPro, "").IfNotEmpty(x =>
+                ImportFile(x));
+        }
+
+        private void cONPackageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowOpenFileDlg("Select Con File", DefaultMidiFileLocationPro, "").IfNotEmpty(x =>
+                ImportFile(x));
         }
 
     }

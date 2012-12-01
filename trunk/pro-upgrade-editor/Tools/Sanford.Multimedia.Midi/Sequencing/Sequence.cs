@@ -179,6 +179,7 @@ namespace Sanford.Multimedia.Midi
                 properties = newProperties;
                 tracks = newTracks;
             }
+
         }
 
         public void LoadAsync(string fileName)

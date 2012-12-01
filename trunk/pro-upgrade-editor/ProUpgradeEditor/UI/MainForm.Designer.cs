@@ -489,7 +489,7 @@
             this.button67 = new System.Windows.Forms.Button();
             this.textBoxPackageDTAText = new System.Windows.Forms.TextBox();
             this.treePackageContents = new System.Windows.Forms.TreeView();
-            this.button101 = new System.Windows.Forms.Button();
+            this.buttonPackageEditorOpenPackage = new System.Windows.Forms.Button();
             this.label41 = new System.Windows.Forms.Label();
             this.button60 = new System.Windows.Forms.Button();
             this.label42 = new System.Windows.Forms.Label();
@@ -644,6 +644,10 @@
             this.saveCONPackageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveConfigurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveConfigurationAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cONPackageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.zipFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -6406,7 +6410,7 @@
             this.groupBox32.Controls.Add(this.button67);
             this.groupBox32.Controls.Add(this.textBoxPackageDTAText);
             this.groupBox32.Controls.Add(this.treePackageContents);
-            this.groupBox32.Controls.Add(this.button101);
+            this.groupBox32.Controls.Add(this.buttonPackageEditorOpenPackage);
             this.groupBox32.Controls.Add(this.label41);
             this.groupBox32.Controls.Add(this.button60);
             this.groupBox32.Controls.Add(this.label42);
@@ -6496,19 +6500,19 @@
             this.treePackageContents.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treePackageContents_AfterSelect);
             this.treePackageContents.DoubleClick += new System.EventHandler(this.treePackageContents_DoubleClick);
             // 
-            // button101
+            // buttonPackageEditorOpenPackage
             // 
-            this.button101.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button101.ImageIndex = 29;
-            this.button101.ImageList = this.imageList1;
-            this.button101.Location = new System.Drawing.Point(9, 19);
-            this.button101.Name = "button101";
-            this.button101.Size = new System.Drawing.Size(91, 24);
-            this.button101.TabIndex = 0;
-            this.button101.Text = "Open File";
-            this.button101.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.button101.UseVisualStyleBackColor = true;
-            this.button101.Click += new System.EventHandler(this.button101_Click);
+            this.buttonPackageEditorOpenPackage.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.buttonPackageEditorOpenPackage.ImageIndex = 29;
+            this.buttonPackageEditorOpenPackage.ImageList = this.imageList1;
+            this.buttonPackageEditorOpenPackage.Location = new System.Drawing.Point(9, 19);
+            this.buttonPackageEditorOpenPackage.Name = "buttonPackageEditorOpenPackage";
+            this.buttonPackageEditorOpenPackage.Size = new System.Drawing.Size(91, 24);
+            this.buttonPackageEditorOpenPackage.TabIndex = 0;
+            this.buttonPackageEditorOpenPackage.Text = "Open File";
+            this.buttonPackageEditorOpenPackage.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.buttonPackageEditorOpenPackage.UseVisualStyleBackColor = true;
+            this.buttonPackageEditorOpenPackage.Click += new System.EventHandler(this.buttonPackageEditorOpenPackage_Click);
             // 
             // label41
             // 
@@ -8269,6 +8273,8 @@
             this.closeToolStripMenuItem,
             this.openToolStripMenuItem1,
             this.saveToolStripMenuItem1,
+            this.importToolStripMenuItem,
+            this.toolStripSeparator1,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 22);
@@ -8277,14 +8283,14 @@
             // newToolStripMenuItem
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this.newToolStripMenuItem.Text = "&New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this.closeToolStripMenuItem.Text = "&Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
@@ -8295,7 +8301,7 @@
             this.openPro17ToolStripMenuItem,
             this.openConfigurationToolStripMenuItem});
             this.openToolStripMenuItem1.Name = "openToolStripMenuItem1";
-            this.openToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.openToolStripMenuItem1.Size = new System.Drawing.Size(110, 22);
             this.openToolStripMenuItem1.Text = "&Open";
             // 
             // openToolStripMenuItem
@@ -8329,7 +8335,7 @@
             this.saveConfigurationToolStripMenuItem,
             this.saveConfigurationAsToolStripMenuItem});
             this.saveToolStripMenuItem1.Name = "saveToolStripMenuItem1";
-            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(110, 22);
             this.saveToolStripMenuItem1.Text = "&Save";
             // 
             // saveToolStripMenuItem
@@ -8375,10 +8381,38 @@
             this.saveConfigurationAsToolStripMenuItem.Text = "Save Configuration As";
             this.saveConfigurationAsToolStripMenuItem.Click += new System.EventHandler(this.saveConfigurationAsToolStripMenuItem_Click);
             // 
+            // importToolStripMenuItem
+            // 
+            this.importToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cONPackageToolStripMenuItem,
+            this.zipFileToolStripMenuItem});
+            this.importToolStripMenuItem.Name = "importToolStripMenuItem";
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.importToolStripMenuItem.Text = "&Import";
+            // 
+            // cONPackageToolStripMenuItem
+            // 
+            this.cONPackageToolStripMenuItem.Name = "cONPackageToolStripMenuItem";
+            this.cONPackageToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.cONPackageToolStripMenuItem.Text = "CON Package";
+            this.cONPackageToolStripMenuItem.Click += new System.EventHandler(this.cONPackageToolStripMenuItem_Click);
+            // 
+            // zipFileToolStripMenuItem
+            // 
+            this.zipFileToolStripMenuItem.Name = "zipFileToolStripMenuItem";
+            this.zipFileToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.zipFileToolStripMenuItem.Text = "Zip File";
+            this.zipFileToolStripMenuItem.Click += new System.EventHandler(this.zipFileToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(107, 6);
+            // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -8935,7 +8969,7 @@
         private System.Windows.Forms.Timer timerMidiPlayback;
         private System.Windows.Forms.CheckBox checkBoxMidiPlaybackScroll;
         private System.Windows.Forms.Button buttonSongPropertiesCheckPackage;
-        private System.Windows.Forms.Button button101;
+        private System.Windows.Forms.Button buttonPackageEditorOpenPackage;
         public System.Windows.Forms.CheckBox checkBoxGridSnap;
         private System.Windows.Forms.Button buttonCreateSongFromOpenMidi;
         private System.Windows.Forms.Button button106;
@@ -9209,6 +9243,10 @@
         private System.Windows.Forms.CheckBox checkBoxBatchUtilExtractXMLPro;
         private System.Windows.Forms.CheckBox checkBoxBatchUtilExtractXMLG5;
         private System.Windows.Forms.Button buttonSongPropertiesViewMp3Preview;
+        private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem cONPackageToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem zipFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         
 
     }

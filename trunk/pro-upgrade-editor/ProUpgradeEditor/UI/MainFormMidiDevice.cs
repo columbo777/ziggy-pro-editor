@@ -657,27 +657,16 @@ namespace ProUpgradeEditor.UI
                     playbackSequencerAttached = true;
                 }
 
-
-
-
                 if (MidiPlaybackInProgress == true)
                 {
                     midiPlaybackSequencer.Stop();
                     MidiPlaybackInProgress = false;
-
                 }
-
-
-
 
                 midiPlaybackSequence = new Sequence(FileType.Pro, EditorPro.Sequence.Division);
                 midiPlaybackSequence.Format = EditorPro.Sequence.Format;
 
-
-
                 midiPlaybackSequencer.Sequence = midiPlaybackSequence;
-
-
 
                 int pos = 0;
                 if (SelectedChord != null)

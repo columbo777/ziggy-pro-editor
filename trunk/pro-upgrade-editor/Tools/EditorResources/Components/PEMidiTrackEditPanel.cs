@@ -126,9 +126,9 @@ namespace EditorResources.Components
                     {
                         for (int x = 0; x < seq.Count; x++)
                         {
-                            PEMidiTrack tr = TrackList[x];
-                            var trk = seq[x];
-                            if (trk != tr.Track || ((trk.Name??"") != (tr.Name??"")))
+                            var trackListTrack = TrackList[x].Track;
+                            var sequenceTrack = seq[x];
+                            if (sequenceTrack != trackListTrack || (trackListTrack.Name != sequenceTrack.Name))
                             {
                                 refresh = true;
                                 break;
@@ -506,6 +506,10 @@ namespace EditorResources.Components
             panelTracks.Invalidate();
         }
 
+        public IEnumerable<TrackDifficulty> TrackDifficulties
+        {
+            get { return panelTracks.Controls.ToEnumerable<PEMidiTrack>().Select(x=> new TrackDifficulty(x.Track, x.SelectedDifficulty)); }
+        }
 
         private void buttonRename_Click(object sender, EventArgs e)
         {

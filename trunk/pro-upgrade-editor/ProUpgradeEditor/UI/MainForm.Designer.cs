@@ -83,6 +83,7 @@
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabSongLibSongProperties = new System.Windows.Forms.TabPage();
             this.groupBox25 = new System.Windows.Forms.GroupBox();
+            this.buttonSongPropertiesViewMp3Preview = new System.Windows.Forms.Button();
             this.buttonFindMP3Offset = new System.Windows.Forms.Button();
             this.groupBox46 = new System.Windows.Forms.GroupBox();
             this.checkBoxAutoGenGuitarEasy = new System.Windows.Forms.CheckBox();
@@ -800,7 +801,7 @@
             groupBox15.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             groupBox15.Location = new System.Drawing.Point(487, 9);
             groupBox15.Name = "groupBox15";
-            groupBox15.Size = new System.Drawing.Size(165, 473);
+            groupBox15.Size = new System.Drawing.Size(312, 410);
             groupBox15.TabIndex = 2;
             groupBox15.TabStop = false;
             groupBox15.Text = "Tools";
@@ -814,9 +815,9 @@
             this.button102.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button102.ImageIndex = 14;
             this.button102.ImageList = this.imageList1;
-            this.button102.Location = new System.Drawing.Point(16, 415);
+            this.button102.Location = new System.Drawing.Point(153, 212);
             this.button102.Name = "button102";
-            this.button102.Size = new System.Drawing.Size(125, 24);
+            this.button102.Size = new System.Drawing.Size(133, 24);
             this.button102.TabIndex = 15;
             this.button102.Text = "Short To G5 Len";
             this.button102.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -931,9 +932,9 @@
             this.button136.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button136.ImageIndex = 14;
             this.button136.ImageList = this.imageList1;
-            this.button136.Location = new System.Drawing.Point(16, 391);
+            this.button136.Location = new System.Drawing.Point(153, 188);
             this.button136.Name = "button136";
-            this.button136.Size = new System.Drawing.Size(125, 24);
+            this.button136.Size = new System.Drawing.Size(133, 24);
             this.button136.TabIndex = 14;
             this.button136.Text = "Copy Text Events";
             this.button136.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -949,9 +950,9 @@
             this.button134.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button134.ImageIndex = 14;
             this.button134.ImageList = this.imageList1;
-            this.button134.Location = new System.Drawing.Point(16, 367);
+            this.button134.Location = new System.Drawing.Point(153, 164);
             this.button134.Name = "button134";
-            this.button134.Size = new System.Drawing.Size(125, 24);
+            this.button134.Size = new System.Drawing.Size(133, 24);
             this.button134.TabIndex = 13;
             this.button134.Text = "Shorten Notes";
             this.button134.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -963,11 +964,12 @@
             // 
             this.checkGenDiffCopyGuitarToBass.AutoSize = true;
             this.checkGenDiffCopyGuitarToBass.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkGenDiffCopyGuitarToBass.Location = new System.Drawing.Point(31, 131);
+            this.checkGenDiffCopyGuitarToBass.Location = new System.Drawing.Point(153, 22);
             this.checkGenDiffCopyGuitarToBass.Name = "checkGenDiffCopyGuitarToBass";
-            this.checkGenDiffCopyGuitarToBass.Size = new System.Drawing.Size(123, 17);
+            this.checkGenDiffCopyGuitarToBass.Size = new System.Drawing.Size(128, 18);
             this.checkGenDiffCopyGuitarToBass.TabIndex = 5;
             this.checkGenDiffCopyGuitarToBass.Text = "Copy Guitar To Bass";
+            this.checkGenDiffCopyGuitarToBass.UseCompatibleTextRendering = true;
             this.checkGenDiffCopyGuitarToBass.UseVisualStyleBackColor = true;
             // 
             // button128
@@ -977,9 +979,9 @@
             this.button128.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button128.ImageIndex = 14;
             this.button128.ImageList = this.imageList1;
-            this.button128.Location = new System.Drawing.Point(16, 320);
+            this.button128.Location = new System.Drawing.Point(153, 117);
             this.button128.Name = "button128";
-            this.button128.Size = new System.Drawing.Size(125, 24);
+            this.button128.Size = new System.Drawing.Size(133, 24);
             this.button128.TabIndex = 12;
             this.button128.Text = "Create Bass Track";
             this.button128.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -994,9 +996,9 @@
             this.button56.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button56.ImageIndex = 67;
             this.button56.ImageList = this.imageList1;
-            this.button56.Location = new System.Drawing.Point(16, 105);
+            this.button56.Location = new System.Drawing.Point(6, 69);
             this.button56.Name = "button56";
-            this.button56.Size = new System.Drawing.Size(125, 24);
+            this.button56.Size = new System.Drawing.Size(134, 24);
             this.button56.TabIndex = 4;
             this.button56.Text = "Gen Difficulties";
             this.button56.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -1011,9 +1013,9 @@
             this.button126.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button126.ImageIndex = 71;
             this.button126.ImageList = this.imageList1;
-            this.button126.Location = new System.Drawing.Point(16, 224);
+            this.button126.Location = new System.Drawing.Point(6, 165);
             this.button126.Name = "button126";
-            this.button126.Size = new System.Drawing.Size(125, 24);
+            this.button126.Size = new System.Drawing.Size(134, 24);
             this.button126.TabIndex = 11;
             this.button126.Text = "Copy Powerups";
             this.button126.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1029,9 +1031,9 @@
             this.button123.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button123.ImageIndex = 14;
             this.button123.ImageList = this.imageList1;
-            this.button123.Location = new System.Drawing.Point(16, 296);
+            this.button123.Location = new System.Drawing.Point(153, 93);
             this.button123.Name = "button123";
-            this.button123.Size = new System.Drawing.Size(125, 24);
+            this.button123.Size = new System.Drawing.Size(133, 24);
             this.button123.TabIndex = 10;
             this.button123.Text = "Create 22 Fret";
             this.button123.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1047,9 +1049,9 @@
             this.buttonInitFromG5.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.buttonInitFromG5.ImageIndex = 66;
             this.buttonInitFromG5.ImageList = this.imageList1;
-            this.buttonInitFromG5.Location = new System.Drawing.Point(16, 19);
+            this.buttonInitFromG5.Location = new System.Drawing.Point(153, 69);
             this.buttonInitFromG5.Name = "buttonInitFromG5";
-            this.buttonInitFromG5.Size = new System.Drawing.Size(136, 24);
+            this.buttonInitFromG5.Size = new System.Drawing.Size(133, 24);
             this.buttonInitFromG5.TabIndex = 0;
             this.buttonInitFromG5.Text = "Init From 5 Button";
             this.buttonInitFromG5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1065,9 +1067,9 @@
             this.button10.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button10.ImageIndex = 65;
             this.button10.ImageList = this.imageList1;
-            this.button10.Location = new System.Drawing.Point(16, 152);
+            this.button10.Location = new System.Drawing.Point(6, 93);
             this.button10.Name = "button10";
-            this.button10.Size = new System.Drawing.Size(125, 24);
+            this.button10.Size = new System.Drawing.Size(134, 24);
             this.button10.TabIndex = 4;
             this.button10.Text = "Set 108 Events";
             this.button10.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1082,9 +1084,9 @@
             this.button77.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button77.ImageIndex = 11;
             this.button77.ImageList = this.imageList1;
-            this.button77.Location = new System.Drawing.Point(16, 272);
+            this.button77.Location = new System.Drawing.Point(6, 213);
             this.button77.Name = "button77";
-            this.button77.Size = new System.Drawing.Size(125, 24);
+            this.button77.Size = new System.Drawing.Size(134, 24);
             this.button77.TabIndex = 9;
             this.button77.Text = "Replace Bass";
             this.button77.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1101,9 +1103,9 @@
             this.buttonInitTempo.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.buttonInitTempo.ImageIndex = 14;
             this.buttonInitTempo.ImageList = this.imageList1;
-            this.buttonInitTempo.Location = new System.Drawing.Point(16, 344);
+            this.buttonInitTempo.Location = new System.Drawing.Point(153, 141);
             this.buttonInitTempo.Name = "buttonInitTempo";
-            this.buttonInitTempo.Size = new System.Drawing.Size(125, 24);
+            this.buttonInitTempo.Size = new System.Drawing.Size(133, 24);
             this.buttonInitTempo.TabIndex = 11;
             this.buttonInitTempo.Text = "Copy Tempo";
             this.buttonInitTempo.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -1118,9 +1120,9 @@
             this.button59.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button59.ImageIndex = 66;
             this.button59.ImageList = this.imageList1;
-            this.button59.Location = new System.Drawing.Point(16, 248);
+            this.button59.Location = new System.Drawing.Point(6, 189);
             this.button59.Name = "button59";
-            this.button59.Size = new System.Drawing.Size(125, 24);
+            this.button59.Size = new System.Drawing.Size(134, 24);
             this.button59.TabIndex = 8;
             this.button59.Text = "Copy Difficulties";
             this.button59.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1133,24 +1135,26 @@
             // 
             this.checkBoxInitSelectedDifficultyOnly.AutoSize = true;
             this.checkBoxInitSelectedDifficultyOnly.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkBoxInitSelectedDifficultyOnly.Location = new System.Drawing.Point(31, 83);
+            this.checkBoxInitSelectedDifficultyOnly.Location = new System.Drawing.Point(153, 41);
             this.checkBoxInitSelectedDifficultyOnly.Name = "checkBoxInitSelectedDifficultyOnly";
-            this.checkBoxInitSelectedDifficultyOnly.Size = new System.Drawing.Size(111, 17);
+            this.checkBoxInitSelectedDifficultyOnly.Size = new System.Drawing.Size(140, 18);
             this.checkBoxInitSelectedDifficultyOnly.TabIndex = 3;
-            this.checkBoxInitSelectedDifficultyOnly.Text = "Selected Difficulty";
+            this.checkBoxInitSelectedDifficultyOnly.Text = "Selected Difficulty Only";
             this.toolTip1.SetToolTip(this.checkBoxInitSelectedDifficultyOnly, "Initialize only the selected difficulty");
+            this.checkBoxInitSelectedDifficultyOnly.UseCompatibleTextRendering = true;
             this.checkBoxInitSelectedDifficultyOnly.UseVisualStyleBackColor = true;
             // 
             // checkBoxInitSelectedTrackOnly
             // 
             this.checkBoxInitSelectedTrackOnly.AutoSize = true;
             this.checkBoxInitSelectedTrackOnly.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkBoxInitSelectedTrackOnly.Location = new System.Drawing.Point(31, 64);
+            this.checkBoxInitSelectedTrackOnly.Location = new System.Drawing.Point(16, 41);
             this.checkBoxInitSelectedTrackOnly.Name = "checkBoxInitSelectedTrackOnly";
-            this.checkBoxInitSelectedTrackOnly.Size = new System.Drawing.Size(99, 17);
+            this.checkBoxInitSelectedTrackOnly.Size = new System.Drawing.Size(125, 18);
             this.checkBoxInitSelectedTrackOnly.TabIndex = 2;
-            this.checkBoxInitSelectedTrackOnly.Text = "Selected Track";
+            this.checkBoxInitSelectedTrackOnly.Text = "Selected Track Only";
             this.toolTip1.SetToolTip(this.checkBoxInitSelectedTrackOnly, "Initialize only the selected track");
+            this.checkBoxInitSelectedTrackOnly.UseCompatibleTextRendering = true;
             this.checkBoxInitSelectedTrackOnly.UseVisualStyleBackColor = true;
             // 
             // button31
@@ -1160,9 +1164,9 @@
             this.button31.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button31.ImageIndex = 66;
             this.button31.ImageList = this.imageList1;
-            this.button31.Location = new System.Drawing.Point(16, 176);
+            this.button31.Location = new System.Drawing.Point(6, 117);
             this.button31.Name = "button31";
-            this.button31.Size = new System.Drawing.Size(125, 24);
+            this.button31.Size = new System.Drawing.Size(134, 24);
             this.button31.TabIndex = 6;
             this.button31.Text = "Copy B.R.E.";
             this.button31.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1178,9 +1182,9 @@
             this.button44.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button44.ImageIndex = 14;
             this.button44.ImageList = this.imageList1;
-            this.button44.Location = new System.Drawing.Point(16, 200);
+            this.button44.Location = new System.Drawing.Point(6, 141);
             this.button44.Name = "button44";
-            this.button44.Size = new System.Drawing.Size(125, 24);
+            this.button44.Size = new System.Drawing.Size(134, 24);
             this.button44.TabIndex = 7;
             this.button44.Text = "Copy Solos";
             this.button44.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1193,12 +1197,13 @@
             // 
             this.checkBoxIncludeGuitar22.AutoSize = true;
             this.checkBoxIncludeGuitar22.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkBoxIncludeGuitar22.Location = new System.Drawing.Point(31, 45);
+            this.checkBoxIncludeGuitar22.Location = new System.Drawing.Point(16, 22);
             this.checkBoxIncludeGuitar22.Name = "checkBoxIncludeGuitar22";
-            this.checkBoxIncludeGuitar22.Size = new System.Drawing.Size(76, 17);
+            this.checkBoxIncludeGuitar22.Size = new System.Drawing.Size(95, 18);
             this.checkBoxIncludeGuitar22.TabIndex = 1;
-            this.checkBoxIncludeGuitar22.Text = "Include 22";
+            this.checkBoxIncludeGuitar22.Text = "Include 22 fret";
             this.toolTip1.SetToolTip(this.checkBoxIncludeGuitar22, "Create the 22 fret tracks");
+            this.checkBoxIncludeGuitar22.UseCompatibleTextRendering = true;
             this.checkBoxIncludeGuitar22.UseVisualStyleBackColor = true;
             // 
             // groupBox3
@@ -1208,9 +1213,9 @@
             groupBox3.Controls.Add(this.radioDifficultyMedium);
             groupBox3.Controls.Add(this.radioDifficultyEasy);
             groupBox3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
-            groupBox3.Location = new System.Drawing.Point(659, 9);
+            groupBox3.Location = new System.Drawing.Point(805, 9);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new System.Drawing.Size(93, 102);
+            groupBox3.Size = new System.Drawing.Size(105, 102);
             groupBox3.TabIndex = 3;
             groupBox3.TabStop = false;
             groupBox3.Text = "Edit Difficulty";
@@ -1222,10 +1227,11 @@
             this.radioDifficultyExpert.ForeColor = System.Drawing.SystemColors.ControlText;
             this.radioDifficultyExpert.Location = new System.Drawing.Point(9, 76);
             this.radioDifficultyExpert.Name = "radioDifficultyExpert";
-            this.radioDifficultyExpert.Size = new System.Drawing.Size(55, 17);
+            this.radioDifficultyExpert.Size = new System.Drawing.Size(55, 18);
             this.radioDifficultyExpert.TabIndex = 3;
             this.radioDifficultyExpert.TabStop = true;
             this.radioDifficultyExpert.Text = "Expert";
+            this.radioDifficultyExpert.UseCompatibleTextRendering = true;
             this.radioDifficultyExpert.UseVisualStyleBackColor = true;
             this.radioDifficultyExpert.Click += new System.EventHandler(this.radioDifficultyExpert_Click);
             // 
@@ -1235,9 +1241,10 @@
             this.radioDifficultyHard.ForeColor = System.Drawing.SystemColors.ControlText;
             this.radioDifficultyHard.Location = new System.Drawing.Point(9, 56);
             this.radioDifficultyHard.Name = "radioDifficultyHard";
-            this.radioDifficultyHard.Size = new System.Drawing.Size(48, 17);
+            this.radioDifficultyHard.Size = new System.Drawing.Size(47, 18);
             this.radioDifficultyHard.TabIndex = 2;
             this.radioDifficultyHard.Text = "Hard";
+            this.radioDifficultyHard.UseCompatibleTextRendering = true;
             this.radioDifficultyHard.UseVisualStyleBackColor = true;
             this.radioDifficultyHard.Click += new System.EventHandler(this.radioDifficultyHard_Click);
             // 
@@ -1247,9 +1254,10 @@
             this.radioDifficultyMedium.ForeColor = System.Drawing.SystemColors.ControlText;
             this.radioDifficultyMedium.Location = new System.Drawing.Point(9, 36);
             this.radioDifficultyMedium.Name = "radioDifficultyMedium";
-            this.radioDifficultyMedium.Size = new System.Drawing.Size(62, 17);
+            this.radioDifficultyMedium.Size = new System.Drawing.Size(63, 18);
             this.radioDifficultyMedium.TabIndex = 1;
             this.radioDifficultyMedium.Text = "Medium";
+            this.radioDifficultyMedium.UseCompatibleTextRendering = true;
             this.radioDifficultyMedium.UseVisualStyleBackColor = true;
             this.radioDifficultyMedium.Click += new System.EventHandler(this.radioDifficultyMedium_Click);
             // 
@@ -1259,9 +1267,10 @@
             this.radioDifficultyEasy.ForeColor = System.Drawing.SystemColors.ControlText;
             this.radioDifficultyEasy.Location = new System.Drawing.Point(9, 16);
             this.radioDifficultyEasy.Name = "radioDifficultyEasy";
-            this.radioDifficultyEasy.Size = new System.Drawing.Size(48, 17);
+            this.radioDifficultyEasy.Size = new System.Drawing.Size(47, 18);
             this.radioDifficultyEasy.TabIndex = 0;
             this.radioDifficultyEasy.Text = "Easy";
+            this.radioDifficultyEasy.UseCompatibleTextRendering = true;
             this.radioDifficultyEasy.UseVisualStyleBackColor = true;
             this.radioDifficultyEasy.Click += new System.EventHandler(this.radioDifficultyEasy_Click);
             // 
@@ -1407,6 +1416,8 @@
             // 
             // groupBox39
             // 
+            this.groupBox39.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)));
             this.groupBox39.Controls.Add(this.listBoxSongLibrary);
             this.groupBox39.Controls.Add(this.buttonCreateSongFromOpenMidi);
             this.groupBox39.Controls.Add(this.button68);
@@ -1414,20 +1425,22 @@
             this.groupBox39.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.groupBox39.Location = new System.Drawing.Point(9, 6);
             this.groupBox39.Name = "groupBox39";
-            this.groupBox39.Size = new System.Drawing.Size(262, 403);
+            this.groupBox39.Size = new System.Drawing.Size(262, 510);
             this.groupBox39.TabIndex = 17;
             this.groupBox39.TabStop = false;
             this.groupBox39.Text = "Song Library";
             // 
             // listBoxSongLibrary
             // 
+            this.listBoxSongLibrary.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)));
             this.listBoxSongLibrary.ForeColor = System.Drawing.SystemColors.ControlText;
             this.listBoxSongLibrary.FormattingEnabled = true;
             this.listBoxSongLibrary.ItemHeight = 15;
             this.listBoxSongLibrary.Location = new System.Drawing.Point(6, 54);
             this.listBoxSongLibrary.Name = "listBoxSongLibrary";
             this.listBoxSongLibrary.ScrollAlwaysVisible = true;
-            this.listBoxSongLibrary.Size = new System.Drawing.Size(250, 289);
+            this.listBoxSongLibrary.Size = new System.Drawing.Size(250, 304);
             this.listBoxSongLibrary.TabIndex = 1;
             this.listBoxSongLibrary.SelectedIndexChanged += new System.EventHandler(this.listBoxSongLibrary_SelectedIndexChanged);
             this.listBoxSongLibrary.DoubleClick += new System.EventHandler(this.listBox1_DoubleClick);
@@ -1448,10 +1461,11 @@
             // 
             // button68
             // 
+            this.button68.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.button68.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.button68.ImageIndex = 49;
             this.button68.ImageList = this.imageList1;
-            this.button68.Location = new System.Drawing.Point(232, 355);
+            this.button68.Location = new System.Drawing.Point(232, 364);
             this.button68.Name = "button68";
             this.button68.Size = new System.Drawing.Size(24, 24);
             this.button68.TabIndex = 3;
@@ -1461,10 +1475,11 @@
             // 
             // button69
             // 
+            this.button69.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.button69.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button69.ImageIndex = 31;
             this.button69.ImageList = this.imageList1;
-            this.button69.Location = new System.Drawing.Point(6, 355);
+            this.button69.Location = new System.Drawing.Point(6, 364);
             this.button69.Name = "button69";
             this.button69.Size = new System.Drawing.Size(24, 24);
             this.button69.TabIndex = 2;
@@ -1503,6 +1518,7 @@
             // 
             this.groupBox25.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(248)))), ((int)(((byte)(248)))));
             this.groupBox25.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.groupBox25.Controls.Add(this.buttonSongPropertiesViewMp3Preview);
             this.groupBox25.Controls.Add(this.buttonFindMP3Offset);
             this.groupBox25.Controls.Add(this.groupBox46);
             this.groupBox25.Controls.Add(this.groupBox45);
@@ -1548,6 +1564,19 @@
             this.groupBox25.TabIndex = 0;
             this.groupBox25.TabStop = false;
             this.groupBox25.UseCompatibleTextRendering = true;
+            this.groupBox25.Enter += new System.EventHandler(this.groupBox25_Enter);
+            // 
+            // buttonSongPropertiesViewMp3Preview
+            // 
+            this.buttonSongPropertiesViewMp3Preview.ImageIndex = 49;
+            this.buttonSongPropertiesViewMp3Preview.ImageList = this.imageList1;
+            this.buttonSongPropertiesViewMp3Preview.Location = new System.Drawing.Point(362, 137);
+            this.buttonSongPropertiesViewMp3Preview.Name = "buttonSongPropertiesViewMp3Preview";
+            this.buttonSongPropertiesViewMp3Preview.Size = new System.Drawing.Size(25, 24);
+            this.buttonSongPropertiesViewMp3Preview.TabIndex = 35;
+            this.toolTip1.SetToolTip(this.buttonSongPropertiesViewMp3Preview, "View MP3 Preview");
+            this.buttonSongPropertiesViewMp3Preview.UseVisualStyleBackColor = true;
+            this.buttonSongPropertiesViewMp3Preview.Click += new System.EventHandler(this.buttonSongPropertiesViewMp3Preview_Click);
             // 
             // buttonFindMP3Offset
             // 
@@ -1809,7 +1838,7 @@
             // 
             this.checkBoxSongLibHasGuitar.AutoSize = true;
             this.checkBoxSongLibHasGuitar.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkBoxSongLibHasGuitar.Location = new System.Drawing.Point(111, 19);
+            this.checkBoxSongLibHasGuitar.Location = new System.Drawing.Point(109, 19);
             this.checkBoxSongLibHasGuitar.Name = "checkBoxSongLibHasGuitar";
             this.checkBoxSongLibHasGuitar.Size = new System.Drawing.Size(99, 17);
             this.checkBoxSongLibHasGuitar.TabIndex = 1;
@@ -1831,7 +1860,7 @@
             // checkBoxSongLibIsComplete
             // 
             this.checkBoxSongLibIsComplete.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkBoxSongLibIsComplete.Location = new System.Drawing.Point(236, 42);
+            this.checkBoxSongLibIsComplete.Location = new System.Drawing.Point(221, 42);
             this.checkBoxSongLibIsComplete.Name = "checkBoxSongLibIsComplete";
             this.checkBoxSongLibIsComplete.Size = new System.Drawing.Size(104, 19);
             this.checkBoxSongLibIsComplete.TabIndex = 4;
@@ -1843,7 +1872,7 @@
             // checkBoxSongLibIsFinalized
             // 
             this.checkBoxSongLibIsFinalized.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkBoxSongLibIsFinalized.Location = new System.Drawing.Point(236, 19);
+            this.checkBoxSongLibIsFinalized.Location = new System.Drawing.Point(221, 19);
             this.checkBoxSongLibIsFinalized.Name = "checkBoxSongLibIsFinalized";
             this.checkBoxSongLibIsFinalized.Size = new System.Drawing.Size(94, 19);
             this.checkBoxSongLibIsFinalized.TabIndex = 2;
@@ -2983,7 +3012,7 @@
             this.groupBox41.Controls.Add(this.label2);
             this.groupBox41.Controls.Add(this.button130);
             this.groupBox41.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
-            this.groupBox41.Location = new System.Drawing.Point(658, 117);
+            this.groupBox41.Location = new System.Drawing.Point(805, 117);
             this.groupBox41.Name = "groupBox41";
             this.groupBox41.Size = new System.Drawing.Size(219, 82);
             this.groupBox41.TabIndex = 11;
@@ -7307,9 +7336,10 @@
             this.checkView5Button.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkView5Button.Location = new System.Drawing.Point(10, 114);
             this.checkView5Button.Name = "checkView5Button";
-            this.checkView5Button.Size = new System.Drawing.Size(92, 17);
+            this.checkView5Button.Size = new System.Drawing.Size(93, 18);
             this.checkView5Button.TabIndex = 52;
             this.checkView5Button.Text = "View 5 Button";
+            this.checkView5Button.UseCompatibleTextRendering = true;
             this.checkView5Button.UseVisualStyleBackColor = true;
             this.checkView5Button.CheckedChanged += new System.EventHandler(this.checkView5Button_CheckedChanged);
             // 
@@ -7321,9 +7351,10 @@
             this.checkBoxMidiInputStartup.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkBoxMidiInputStartup.Location = new System.Drawing.Point(10, 68);
             this.checkBoxMidiInputStartup.Name = "checkBoxMidiInputStartup";
-            this.checkBoxMidiInputStartup.Size = new System.Drawing.Size(167, 17);
+            this.checkBoxMidiInputStartup.Size = new System.Drawing.Size(173, 18);
             this.checkBoxMidiInputStartup.TabIndex = 51;
             this.checkBoxMidiInputStartup.Text = "Connect Midi Input on Startup";
+            this.checkBoxMidiInputStartup.UseCompatibleTextRendering = true;
             this.checkBoxMidiInputStartup.UseVisualStyleBackColor = true;
             // 
             // checkBoxEnableMidiInput
@@ -7334,9 +7365,10 @@
             this.checkBoxEnableMidiInput.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkBoxEnableMidiInput.Location = new System.Drawing.Point(10, 45);
             this.checkBoxEnableMidiInput.Name = "checkBoxEnableMidiInput";
-            this.checkBoxEnableMidiInput.Size = new System.Drawing.Size(160, 17);
+            this.checkBoxEnableMidiInput.Size = new System.Drawing.Size(167, 18);
             this.checkBoxEnableMidiInput.TabIndex = 50;
             this.checkBoxEnableMidiInput.Text = "Enable Midi Input Instrument";
+            this.checkBoxEnableMidiInput.UseCompatibleTextRendering = true;
             this.checkBoxEnableMidiInput.UseVisualStyleBackColor = true;
             this.checkBoxEnableMidiInput.CheckedChanged += new System.EventHandler(this.checkBoxEnableMidiInput_CheckedChanged);
             // 
@@ -7403,9 +7435,10 @@
             this.checkBoxLoadLastSongStartup.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkBoxLoadLastSongStartup.Location = new System.Drawing.Point(10, 91);
             this.checkBoxLoadLastSongStartup.Name = "checkBoxLoadLastSongStartup";
-            this.checkBoxLoadLastSongStartup.Size = new System.Drawing.Size(153, 17);
+            this.checkBoxLoadLastSongStartup.Size = new System.Drawing.Size(157, 18);
             this.checkBoxLoadLastSongStartup.TabIndex = 2;
             this.checkBoxLoadLastSongStartup.Text = "Load Last Song on Startup";
+            this.checkBoxLoadLastSongStartup.UseCompatibleTextRendering = true;
             this.checkBoxLoadLastSongStartup.UseVisualStyleBackColor = true;
             // 
             // checkBoxMidiPlaybackScroll
@@ -7416,9 +7449,10 @@
             this.checkBoxMidiPlaybackScroll.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkBoxMidiPlaybackScroll.Location = new System.Drawing.Point(10, 23);
             this.checkBoxMidiPlaybackScroll.Name = "checkBoxMidiPlaybackScroll";
-            this.checkBoxMidiPlaybackScroll.Size = new System.Drawing.Size(121, 17);
+            this.checkBoxMidiPlaybackScroll.Size = new System.Drawing.Size(125, 18);
             this.checkBoxMidiPlaybackScroll.TabIndex = 3;
             this.checkBoxMidiPlaybackScroll.Text = "Midi Playback Scroll";
+            this.checkBoxMidiPlaybackScroll.UseCompatibleTextRendering = true;
             this.checkBoxMidiPlaybackScroll.UseVisualStyleBackColor = true;
             // 
             // button57
@@ -7480,9 +7514,10 @@
             this.checkBoxShowMidiChannelEdit.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkBoxShowMidiChannelEdit.Location = new System.Drawing.Point(10, 137);
             this.checkBoxShowMidiChannelEdit.Name = "checkBoxShowMidiChannelEdit";
-            this.checkBoxShowMidiChannelEdit.Size = new System.Drawing.Size(122, 17);
+            this.checkBoxShowMidiChannelEdit.Size = new System.Drawing.Size(126, 18);
             this.checkBoxShowMidiChannelEdit.TabIndex = 13;
             this.checkBoxShowMidiChannelEdit.Text = "View Note Channels";
+            this.checkBoxShowMidiChannelEdit.UseCompatibleTextRendering = true;
             this.checkBoxShowMidiChannelEdit.UseVisualStyleBackColor = true;
             this.checkBoxShowMidiChannelEdit.CheckedChanged += new System.EventHandler(this.checkBox4_CheckedChanged_1);
             // 
@@ -7559,9 +7594,10 @@
             this.checkUseDefaultFolders.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkUseDefaultFolders.Location = new System.Drawing.Point(166, 100);
             this.checkUseDefaultFolders.Name = "checkUseDefaultFolders";
-            this.checkUseDefaultFolders.Size = new System.Drawing.Size(119, 17);
+            this.checkUseDefaultFolders.Size = new System.Drawing.Size(123, 18);
             this.checkUseDefaultFolders.TabIndex = 6;
             this.checkUseDefaultFolders.Text = "Use Default Folders";
+            this.checkUseDefaultFolders.UseCompatibleTextRendering = true;
             this.checkUseDefaultFolders.UseVisualStyleBackColor = false;
             // 
             // label32
@@ -8241,14 +8277,14 @@
             // newToolStripMenuItem
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.newToolStripMenuItem.Text = "&New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.closeToolStripMenuItem.Text = "&Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
@@ -8259,7 +8295,7 @@
             this.openPro17ToolStripMenuItem,
             this.openConfigurationToolStripMenuItem});
             this.openToolStripMenuItem1.Name = "openToolStripMenuItem1";
-            this.openToolStripMenuItem1.Size = new System.Drawing.Size(103, 22);
+            this.openToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
             this.openToolStripMenuItem1.Text = "&Open";
             // 
             // openToolStripMenuItem
@@ -8293,7 +8329,7 @@
             this.saveConfigurationToolStripMenuItem,
             this.saveConfigurationAsToolStripMenuItem});
             this.saveToolStripMenuItem1.Name = "saveToolStripMenuItem1";
-            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(103, 22);
+            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
             this.saveToolStripMenuItem1.Text = "&Save";
             // 
             // saveToolStripMenuItem
@@ -8342,7 +8378,7 @@
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -9172,6 +9208,7 @@
         private System.Windows.Forms.Button button95;
         private System.Windows.Forms.CheckBox checkBoxBatchUtilExtractXMLPro;
         private System.Windows.Forms.CheckBox checkBoxBatchUtilExtractXMLG5;
+        private System.Windows.Forms.Button buttonSongPropertiesViewMp3Preview;
         
 
     }

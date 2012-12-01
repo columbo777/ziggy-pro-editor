@@ -128,7 +128,7 @@ namespace EditorResources.Components
                         {
                             PEMidiTrack tr = TrackList[x];
                             var trk = seq[x];
-                            if (trk != tr.Track)
+                            if (trk != tr.Track || ((trk.Name??"") != (tr.Name??"")))
                             {
                                 refresh = true;
                                 break;
@@ -533,13 +533,25 @@ namespace EditorResources.Components
 
         public void SetTrack(Track track, GuitarDifficulty difficulty)
         {
-            if (this.sequence == null || (track != null && this.sequence != null && !this.sequence.Contains(track)))
+            if (track != null)
             {
-                this.sequence = track != null ? track.Sequence : null;
-                this.CreatePanelTracks(this.sequence);
+                this.sequence = track.Sequence;
             }
-
-            SetSelectedItem(track, difficulty);
+            else
+            {
+                this.sequence = null;
+            }
+            if (this.sequence == null)
+            {
+                panelTracks.Controls.Clear();
+                SelectedTrack = null;
+                Invalidate();
+            }
+            else
+            {
+                this.CreatePanelTracks(this.sequence);
+                SetSelectedItem(track, difficulty);
+            }
         }
 
 

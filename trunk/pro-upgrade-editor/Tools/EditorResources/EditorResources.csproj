@@ -49,6 +49,12 @@
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NAudio">
+      <HintPath>..\NAudio\NAudio.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.WindowsMediaFormat">
+      <HintPath>..\NAudio\NAudio.WindowsMediaFormat.dll</HintPath>
+    </Reference>
     <Reference Include="PUECommon">
       <HintPath>..\..\lib\PUECommon.dll</HintPath>
     </Reference>
@@ -66,6 +72,12 @@
   <ItemGroup>
     <Compile Include="Components\Base\PUEControl.cs">
       <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Components\PEWaveViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Components\PEWaveViewer.Designer.cs">
+      <DependentUpon>PEWaveViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="Components\PEMidiTrack.cs">
       <SubType>UserControl</SubType>
@@ -91,6 +103,18 @@
     <Compile Include="Components\Base\PEPanel.Designer.cs">
       <DependentUpon>PEPanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Components\PEPopupWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Components\PEPopupWindow.Designer.cs">
+      <DependentUpon>PEPopupWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Components\PEWaveViewerControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Components\PEWaveViewerControl.Designer.cs">
+      <DependentUpon>PEWaveViewerControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Util\Util.cs" />
     <Compile Include="Resources.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -101,6 +125,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Components\PEWaveViewer.resx">
+      <DependentUpon>PEWaveViewer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Components\PEMidiTrack.resx">
       <DependentUpon>PEMidiTrack.cs</DependentUpon>
     </EmbeddedResource>
@@ -112,6 +139,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Components\Base\PEPanel.resx">
       <DependentUpon>PEPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Components\PEPopupWindow.resx">
+      <DependentUpon>PEPopupWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PEResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

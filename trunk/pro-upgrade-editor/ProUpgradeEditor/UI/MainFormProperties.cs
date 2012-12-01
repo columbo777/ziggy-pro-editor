@@ -33,10 +33,49 @@ namespace ProUpgradeEditor.UI
             Pen,
             Brush,
             String,
+            Bool,
         }
 
 
-        
+        public string DefaultConFileLocation
+        {
+            get 
+            { 
+                return textBoxDefaultCONFileLocation.Text.AppendSlashIfMissing(); 
+            }
+            set
+            {
+                var dir = (value ?? "").AppendSlashIfMissing();
+                dir.CreateFolderIfNotExists();
+                textBoxDefaultCONFileLocation.Text = dir;
+            }
+        }
+        public string DefaultMidiFileLocationPro
+        {
+            get
+            {
+                return textBoxDefaultMidiProFileLocation.Text.AppendSlashIfMissing();
+            }
+            set
+            {
+                var dir = (value ?? "").AppendSlashIfMissing();
+                dir.CreateFolderIfNotExists();
+                textBoxDefaultMidiProFileLocation.Text = dir;
+            }
+        }
+        public string DefaultMidiFileLocationG5
+        {
+            get
+            {
+                return textBoxDefaultMidi5FileLocation.Text.AppendSlashIfMissing();
+            }
+            set
+            {
+                var dir = (value ?? "").AppendSlashIfMissing();
+                dir.CreateFolderIfNotExists();
+                textBoxDefaultMidi5FileLocation.Text = dir;
+            }
+        }
 
         class SongCacheList : List<SongCacheItem>
         {
@@ -142,6 +181,12 @@ namespace ProUpgradeEditor.UI
                 this.Data = OriginalData = data;
                 this.Type = PropertyType.Integer;
             }
+            public UtilProperty(string desc, bool data)
+            {
+                this.Description = desc;
+                this.Data = OriginalData = data;
+                this.Type = PropertyType.Bool;
+            }
             public UtilProperty(string desc, string data)
             {
                 this.Description = desc;
@@ -172,6 +217,8 @@ namespace ProUpgradeEditor.UI
             {
                 return new UtilProperty[]{
                     
+                    new UtilProperty( "Keep Midi Playback Selection", false),
+                    new UtilProperty( "Keep Auto Gen Difficulty Selection", false),
 
                     new UtilProperty( "Max Backups", Utility.MaxBackups),
                     new UtilProperty( "Gap For 108 Note", Utility.LargestGapFor108Note),
@@ -327,6 +374,7 @@ namespace ProUpgradeEditor.UI
                 {
 
                     var tb = new TextBox();
+                    tb.TextAlign = HorizontalAlignment.Right;
                     tb.Location = new Point(tbX + 5, itemY);
                     tb.Name = "tb" + x;
                     tb.Size = new System.Drawing.Size(itemWidth - 60, itemHeight);
@@ -385,6 +433,47 @@ namespace ProUpgradeEditor.UI
                         var itm = tb.Tag as UtilProperty;
                         itm.Data = itm.OriginalData;
                         tb.Text = itm.Data.ToString();
+                        OnUtilPropertyChange(itm);
+                    });
+                }
+                if (item.Type == PropertyType.Bool)
+                {
+
+                    var tb = new CheckBox();
+                    lb.Width += 100;
+                    tb.Location = new Point(lb.Location.X +lb.Width+ itemPadding, itemY);
+                    tb.Name = "tb" + x;
+                    tb.Size = new System.Drawing.Size(20, itemHeight);
+                    tb.Checked = item.Data.ToString().ToBool();
+                    tb.Tag = item;
+                    tb.TabIndex = tabIndex++;
+                    tb.CheckedChanged += new EventHandler(delegate(object obj, EventArgs egs)
+                    {
+                        var itm = tb.Tag as UtilProperty;
+                        if (itm.Data.ToString().ToBool() != tb.Checked)
+                        {
+                            itm.Data = tb.Checked;
+                            
+                            OnUtilPropertyChange(itm);
+                        }
+                    });
+                    panel6.Controls.Add(tb);
+
+                    var bt = new Button();
+                    bt.Text = "X";
+                    bt.Location = new Point(tb.Right + 5, itemY);
+                    bt.Size = new Size(25, itemHeight);
+                    bt.Tag = item;
+                    bt.TabIndex = tabIndex++;
+                    panel6.Controls.Add(bt);
+                 
+                    bt.Click += new EventHandler(delegate(object ob, EventArgs eg)
+                    {
+                        var itm = tb.Tag as UtilProperty;
+                        itm.Data = itm.OriginalData;
+                        
+                        tb.Checked = itm.Data.ToString().ToBool();
+                        
                         OnUtilPropertyChange(itm);
                     });
                 }
@@ -454,6 +543,7 @@ namespace ProUpgradeEditor.UI
                     });
 
                     var tbw = new TextBox();
+                    tbw.TextAlign = HorizontalAlignment.Right;
                     if (item.Type == PropertyType.Pen)
                     {
                         var lb2 = new Label();
@@ -501,6 +591,7 @@ namespace ProUpgradeEditor.UI
                     bt.TabIndex = tabIndex++;
                     panel6.Controls.Add(bt);
                     var eb = new TextBox();
+                    eb.TextAlign = HorizontalAlignment.Right;
                     bt.Click += new EventHandler(delegate(object ob, EventArgs eg)
                     {
                         var itm = tb.Tag as UtilProperty;
@@ -660,8 +751,7 @@ namespace ProUpgradeEditor.UI
 
                 case "Arpeggio Helper Prefix": { Utility.ArpeggioHelperPrefix = (string)p.Data; } break; //("),
                 case "Arpeggio Helper Suffix": { Utility.ArpeggioHelperSuffix = (string)p.Data; } break; //)"),
-
-
+                
                 case "Max Backups": { Utility.MaxBackups = (int)p.Data; } break; //20"),
 
                 case "Default CON File Extension": { Utility.DefaultCONFileExtension = (string)p.Data; } break; // "pro"),
@@ -701,6 +791,22 @@ namespace ProUpgradeEditor.UI
                    case "ProG Trainer": { Utility.SongTrainerPGText = (string)p.Data; } break;
                    case "ProB Trainer": {  Utility.SongTrainerPBText = (string)p.Data; } break;
                    case "Trainer Norm Offset": { Utility.SongTrainerNormOffset = (double)p.Data; } break;
+                default:
+                    {
+                        switch(p.Type){
+                            case PropertyType.Integer:
+                                settings.SetValue("Util_" + p.Description, (int)p.Data);
+                                break;
+                            case PropertyType.Bool:
+                                settings.SetValue("Util_" + p.Description, (bool)p.Data);
+                                break;
+                            case PropertyType.String:
+                                settings.SetValue("Util_" + p.Description, (string)p.Data);
+                                break;
+                        }
+                        
+                    }
+                       break;
             }
             EditorG5.Invalidate();
             EditorPro.Invalidate();
@@ -750,15 +856,17 @@ namespace ProUpgradeEditor.UI
             }
             settings.LoadSettings();
 
+            
+
             checkBoxAutoSelectNext.Checked = settings.GetValueBool("checkBoxAutoSelectNext", true);
             checkBatchOpenWhenCompleted.Checked = settings.GetValueBool("checkBatchOpenWhenCompleted", true);
             checkBoxBatchCopyUSB.Checked = settings.GetValueBool("checkBoxBatchCopyUSB", false);
             checkBatchCopyTextEvents.Checked = settings.GetValueBool("checkBatchCopyTextEvents", true);
             checkBatchGenerateTrainersIfNone.Checked = settings.GetValueBool("checkBatchGenerateTrainersIfNone", true);
             textBoxUSBFolder.Text = settings.GetValue("textBoxUSBFolder");
-            textBoxDefaultCONFileLocation.Text = settings.GetValue("textBoxDefaultCONFileLocation");
-            textBoxDefaultMidi5FileLocation.Text = settings.GetValue("textBoxDefaultMidi5FileLocation");
-            textBoxDefaultMidiProFileLocation.Text = settings.GetValue("textBoxDefaultMidiProFileLocation");
+            DefaultConFileLocation = settings.GetValue("textBoxDefaultCONFileLocation");
+            DefaultMidiFileLocationG5 = settings.GetValue("textBoxDefaultMidi5FileLocation");
+            DefaultMidiFileLocationPro = settings.GetValue("textBoxDefaultMidiProFileLocation");
             checkBoxShow108.Checked = settings.GetValueBool("checkBoxShow108", false);
 
             textBoxZoom.Text = settings.GetValue("textBoxZoom", textBoxZoom.Text);
@@ -887,6 +995,16 @@ namespace ProUpgradeEditor.UI
                     if (d.ToString() != v)
                     {
                         prop.Data = (v).ToInt(0);
+                        OnUtilPropertyChange(prop);
+                    }
+                }
+                else if (prop.Type == PropertyType.Bool)
+                {
+                    var b = (bool)prop.Data;
+                    var v = settings.GetValue("Util_" + prop.Description, b.ToString());
+                    if (b.ToString() != v)
+                    {
+                        prop.Data = v.ToBool();
                         OnUtilPropertyChange(prop);
                     }
                 }
@@ -1075,6 +1193,7 @@ namespace ProUpgradeEditor.UI
 
         private void SaveSettingConfiguration()
         {
+            
             settings.SetValue("checkBoxAutoSelectNext", checkBoxAutoSelectNext.Checked);
             settings.SetValue("checkBatchOpenWhenCompleted", checkBatchOpenWhenCompleted.Checked);
             settings.SetValue("lastg5FileName", FileNameG5);
@@ -1082,10 +1201,10 @@ namespace ProUpgradeEditor.UI
             settings.SetValue("checkBatchGenerateTrainersIfNone", checkBatchGenerateTrainersIfNone.Checked);
             settings.SetValue("checkBatchCopyTextEvents", checkBatchCopyTextEvents.Checked);
             settings.SetValue("lastg6FileName", FileNamePro);
-            
-            settings.SetValue("textBoxDefaultCONFileLocation", textBoxDefaultCONFileLocation.Text);
-            settings.SetValue("textBoxDefaultMidi5FileLocation", textBoxDefaultMidi5FileLocation.Text);
-            settings.SetValue("textBoxDefaultMidiProFileLocation", textBoxDefaultMidiProFileLocation.Text);
+
+            settings.SetValue("textBoxDefaultCONFileLocation", DefaultConFileLocation);
+            settings.SetValue("textBoxDefaultMidi5FileLocation", DefaultMidiFileLocationG5);
+            settings.SetValue("textBoxDefaultMidiProFileLocation", DefaultMidiFileLocationPro);
 
             settings.SetValue("checkBoxShow108", checkBoxShow108.Checked);
 

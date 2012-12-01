@@ -10,9 +10,17 @@ using ProUpgradeEditor.Common;
 using System.Runtime.CompilerServices;
 using System.Globalization;
 using System.Collections;
+using System.IO;
 
 namespace ProUpgradeEditor
 {
+
+    public class DataPair<T>
+    {
+        public T A { get; set; }
+        public T B { get; set; }
+        public DataPair(T a, T b) { this.A = a; this.B = b; }
+    }
 
     public class DownUpPair<T>
     {
@@ -82,6 +90,132 @@ namespace ProUpgradeEditor
                 if (Else != null)
                     Else(o);
             }
+        }
+
+        public static T TryGetValue<T>(Func<T> func) where T : class
+        {
+            T ret = null;
+            try { ret = func(); }
+            catch { }
+            return ret;
+        }
+        public static bool TryExec(Func<bool> func)
+        {
+            var ret = false;
+            try { ret = func(); } catch { }
+            return ret;
+        }
+        public static void TryExec(Action func)
+        {
+            try { func(); } catch { }
+        }
+        public static bool FileExists(this string str)
+        {
+            return TryExec(delegate() { return !str.IsEmpty() && File.Exists(str); });
+        }
+        public static string AppendIfMissing(this string str, string strEnd)
+        {
+            if (!str.IsEmpty())
+            {
+                if (!str.EndsWith(strEnd))
+                    str += strEnd;
+            }
+            return str;
+        }
+        public static string AppendSlashIfMissing(this string str)
+        {
+            return str.AppendIfMissing("\\");
+        }
+        public static bool FolderExists(this string str)
+        {
+            return TryExec(delegate() 
+            {
+                if (!str.IsEmpty())
+                {
+                    var di = new DirectoryInfo(str.AppendSlashIfMissing());
+                    return di.Attributes.HasFlag(FileAttributes.Directory);
+                }
+                else
+                {
+                    return false;
+                }
+            });
+        }
+        public static DirectoryInfo GetDirectoryInfo(this string str)
+        {
+            return TryGetValue(delegate()
+            {
+                return new DirectoryInfo(str.AppendSlashIfMissing());
+            });
+        }
+        public static string GetFolderName(this string str)
+        {
+            return TryGetValue(delegate()
+            {
+                if (str.IsEmpty())
+                {
+                    return "";
+                }
+                else
+                {
+                    var di = str.GetDirectoryInfo();
+                    return di == null ? "" : di.Name;
+                }
+            });
+        }
+        public static void CreateFolderIfNotExists(this string str)
+        {
+            TryExec(delegate()
+            {
+                if (!str.IsEmpty() && !str.FolderExists())
+                {
+                    Directory.CreateDirectory(str.AppendSlashIfMissing());
+                }
+            });
+        }
+        public static bool IsFileNotFolder(this string str)
+        {
+            return TryExec(delegate() { return str.IsEmpty()==false && ( str.FolderExists() == false && str.FileExists() == true); });
+        }
+        public static bool IsFolderNotFile(this string str)
+        {
+            return TryExec(delegate() { return str.IsEmpty() == false && (str.FolderExists() == true && str.FileExists() == false); });
+        }
+        public static string GetFileNameWithoutExtension(this string str)
+        {
+            return TryGetValue(delegate() { return str.IsEmpty() ? "" : Path.GetFileNameWithoutExtension(str); });
+        }
+        public static string GetFileName(this string str)
+        {
+            return TryGetValue(delegate() { return str.IsEmpty() ? "" : Path.GetFileName(str); });
+        }
+        public static IEnumerable<string> GetFilesInFolder(this string folder, bool recursive = true, string searchPattern = "*")
+        {
+            var ret = new List<string>();
+            TryExec(delegate()
+            {
+                ret.AddRange(
+                    Directory.EnumerateFiles(folder.AppendSlashIfMissing(), 
+                    searchPattern, 
+                    recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).Where(x=> x.IsFileNotFolder()));
+            });
+            return ret;
+        }
+        public static IEnumerable<string> GetSubFolders(this string folder, bool recursive = true, string searchPattern = "*")
+        {
+            var ret = new List<string>();
+            TryExec(delegate()
+            {
+                ret.AddRange(
+                    Directory.EnumerateDirectories(folder.AppendSlashIfMissing(),
+                    searchPattern,
+                    recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).Where(x => x.IsFolderNotFile()));
+            });
+            return ret;
+        }
+        public static string PathCombine(this string path1, string path2)
+        {
+            return Path.Combine(path1 ?? "", path2 ?? "");
         }
 
         public static bool IsMetaEvent(this GuitarMessage ev)
@@ -215,7 +349,7 @@ namespace ProUpgradeEditor
                 ret = func(d);
             }
             else { if (Else != null) { ret = Else(d); } }
-            return ret;
+            return ret ?? "";
         }
 
         public static IEnumerable<GuitarMessage> ToGuitarMessage(this IEnumerable<MidiEvent> list, GuitarTrack track)
@@ -262,6 +396,8 @@ namespace ProUpgradeEditor
                     (ev.Data1 == Utility.GetStrumData1(difficulty));
             }
         }
+
+        
 
         public static bool IsArpeggioEvent(this MidiEvent ev)
         {

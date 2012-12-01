@@ -294,6 +294,10 @@ namespace ProUpgradeEditor
                 return XMLUtil.GetNodeValue(root, valuePath);
             }
         }
+        public bool HasSetting(string name)
+        {
+            return XMLUtil.NodeExists(root, name);
+        }
         public System.Drawing.Color GetValue(string name, System.Drawing.Color defaultColor)
         {
             var valuePath = getValuePath(name);

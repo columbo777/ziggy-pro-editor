@@ -25,6 +25,7 @@ using System.Collections;
 using X360.Other;
 using System.Runtime.Serialization;
 using EditorResources.Components;
+using NAudio.Wave;
 
 
 namespace ProUpgradeEditor.UI
@@ -132,7 +133,7 @@ namespace ProUpgradeEditor.UI
 
             if (packageFiles != null && packageFiles.Length > 0)
             {
-                var outputFolder = textBoxDefaultMidiProFileLocation.Text;
+                var outputFolder = DefaultMidiFileLocationPro;
                 if (string.IsNullOrEmpty(outputFolder) ||
                     !Directory.Exists(outputFolder))
                 {
@@ -690,59 +691,90 @@ namespace ProUpgradeEditor.UI
             RegenDifficultiesClick();
         }
 
+        public DataPair<TrackDifficulty> GetSelectedTrackDifficulties()
+        {
+            return new DataPair<TrackDifficulty>(EditorPro.SelectedTrackDifficulty, EditorG5.SelectedTrackDifficulty);
+        }
+        public void RestoreTrackDifficulty(DataPair<TrackDifficulty> diff)
+        {
+            if (diff != null)
+            {
+                if (diff.A != null)
+                {
+                    EditorPro.SetTrack(diff.A.Track, diff.A.Difficulty);
+                }
+                if (diff.B != null)
+                {
+                    EditorG5.SetTrack(diff.B.Track, diff.B.Difficulty);
+                }
+            }
+        }
+
+        public void ExecAndRestoreTrackDifficulty(Action func)
+        {
+            var td = GetSelectedTrackDifficulties();
+            try
+            {
+                func();
+            }
+            finally
+            {
+                RestoreTrackDifficulty(td);
+            }
+        }
 
         private void RegenDifficultiesClick()
         {
-            Debug.WriteLine("regen diff");
-            if (SelectedSong != null)
+            ExecAndRestoreTrackDifficulty(delegate()
             {
-                UpdateSongCacheItem(SelectedSong);
-
-                listBoxSongLibrary.SelectedItem = SelectedSong;
-
-                if (SelectedSong.IsDirty || EditorPro.GuitarTrack.Dirty)
+                if (SelectedSong != null)
                 {
-                    var result = AskToSave();
-                    if (result == System.Windows.Forms.DialogResult.Yes)
+                    UpdateSongCacheItem(SelectedSong);
+
+                    listBoxSongLibrary.SelectedItem = SelectedSong;
+
+                    if (SelectedSong.IsDirty || EditorPro.GuitarTrack.Dirty)
                     {
-                        SaveSongCacheItem(SelectedSong, false);
+                        var result = AskToSave();
+                        if (result == System.Windows.Forms.DialogResult.Yes)
+                        {
+                            SaveSongCacheItem(SelectedSong, false);
+                        }
+                        else if (result == System.Windows.Forms.DialogResult.Cancel)
+                        {
+                            return;
+                        }
                     }
-                    else if (result == System.Windows.Forms.DialogResult.Cancel)
-                    {
-                        return;
-                    }
-                }
 
-                var config = new GenDiffConfig(SelectedSong, true, SelectedSong.CopyGuitarToBass, false, false, true);
+                    var config = new GenDiffConfig(SelectedSong, true, SelectedSong.CopyGuitarToBass, false, false, true);
 
-                if (!GenerateDifficulties(false, config))
-                {
-                    MessageBox.Show("Failed generating difficulties");
-                }
-                else
-                {
-                    SavePro();
-                }
-                if (!SaveProCONFile(SelectedSong, !File.Exists(SelectedSong.G6ConFile), true))
-                {
-                    MessageBox.Show("Unable to rebuild package");
-                }
-                else
-                {
-                    if (CheckCONPackageDTA(SelectedSong, true) == false)
+                    if (!GenerateDifficulties(false, config))
                     {
-                        MessageBox.Show("Warnings during rebuild. Run Check.");
+                        MessageBox.Show("Failed generating difficulties");
                     }
                     else
                     {
-                        MessageBox.Show("Rebuild OK");
+                        SavePro();
                     }
-                }
+                    if (!SaveProCONFile(SelectedSong, !File.Exists(SelectedSong.G6ConFile), true))
+                    {
+                        MessageBox.Show("Unable to rebuild package");
+                    }
+                    else
+                    {
+                        if (CheckCONPackageDTA(SelectedSong, true) == false)
+                        {
+                            MessageBox.Show("Warnings during rebuild. Run Check.");
+                        }
+                        else
+                        {
+                            MessageBox.Show("Rebuild OK");
+                        }
+                    }
 
-                ReloadTracks();
-                    
-                
-            }
+                    ReloadTracks();
+                }
+            });
         }
 
         private void saveCONPackageToolStripMenuItem_Click(object sender, EventArgs e)
@@ -768,7 +800,7 @@ namespace ProUpgradeEditor.UI
             {
                 selCon = SelectedSong.G6ConFile;
             }
-            var selPack = ShowOpenFileDlg("Select Package", textBoxDefaultCONFileLocation.Text, selCon);
+            var selPack = ShowOpenFileDlg("Select Package", DefaultConFileLocation, selCon);
             if (!string.IsNullOrEmpty(selPack))
             {
                 try
@@ -925,11 +957,16 @@ namespace ProUpgradeEditor.UI
 
                 if (ShowOpenMidi5())
                 {
+                    ReloadTracks();
                     if (InitializeFrom5Tar())
                     {
                         ReloadTracks();
-                        
-                        if (SaveProFile(Path.GetFileNameWithoutExtension(FileNameG5)+Utility.DefaultPROFileExtension, false))
+
+                        var fileName = DefaultMidiFileLocationPro.PathCombine(
+                            FileNameG5.GetFileNameWithoutExtension().IfNotEmpty(x => 
+                                x.PathCombine(Utility.DefaultPROFileExtension)));
+
+                        if (SaveProFile(fileName, false))
                         {
                             var config = new GenDiffConfig(null, true, false, false, false, true);
                             if (GenerateDifficulties(false, config))
@@ -962,20 +999,23 @@ namespace ProUpgradeEditor.UI
 
         private void button111_Click(object sender, EventArgs e)
         {
-            int iDevice = comboBoxMidiInput.SelectedIndex;
-
-            if (iDevice != -1)
+            PUEExtensions.TryExec(delegate()
             {
-                if (inDevice != null)
+                int iDevice = comboBoxMidiInput.SelectedIndex;
+
+                if (iDevice != -1)
                 {
-                    DisconnectMidiDevice();
+                    if (inDevice != null)
+                    {
+                        DisconnectMidiDevice();
+                    }
+                    var item = comboBoxMidiInput.SelectedItem as MidiInputListItem;
+                    if (item != null)
+                    {
+                        ConnectMidiDevice(item.index, false);
+                    }
                 }
-                var item = comboBoxMidiInput.SelectedItem as MidiInputListItem;
-                if (item != null)
-                {
-                    ConnectMidiDevice(item.index, false);
-                }
-            }
+            });
         }
 
         private void button113_Click(object sender, EventArgs e)
@@ -991,26 +1031,32 @@ namespace ProUpgradeEditor.UI
 
         private void button114_Click(object sender, EventArgs e)
         {
-            if (inDevice != null && midiPlaybackDevice != null)
+            PUEExtensions.TryExec(delegate()
             {
-                try
+                if (inDevice != null && midiPlaybackDevice != null)
                 {
-                    MidiDevice.Connect(inDevice.Handle, midiPlaybackDevice.Handle);
+                    try
+                    {
+                        MidiDevice.Connect(inDevice.Handle, midiPlaybackDevice.Handle);
+                    }
+                    catch { MessageBox.Show("unable to hook"); }
                 }
-                catch { MessageBox.Show("unable to hook"); }
-            }
+            });
         }
 
         private void button115_Click(object sender, EventArgs e)
         {
-            if (inDevice != null && midiPlaybackDevice != null)
+            PUEExtensions.TryExec(delegate()
             {
-                try
+                if (inDevice != null && midiPlaybackDevice != null)
                 {
-                    MidiDevice.Disconnect(inDevice.Handle, midiPlaybackDevice.Handle);
+                    try
+                    {
+                        MidiDevice.Disconnect(inDevice.Handle, midiPlaybackDevice.Handle);
+                    }
+                    catch { }
                 }
-                catch { }
-            }
+            });
         }
 
         private void checkView5Button_CheckedChanged(object sender, EventArgs e)
@@ -1030,7 +1076,7 @@ namespace ProUpgradeEditor.UI
         {
             try
             {
-                EditorG5.SaveTrack(FileNameG5);
+                FileNameG5.IfNotEmpty(x=> EditorG5.SaveTrack(FileNameG5));
             }
             catch { }
         }
@@ -1040,10 +1086,8 @@ namespace ProUpgradeEditor.UI
         {
             try
             {
-
-                string file = ShowOpenFileDlg("Open Rock Band 3 Pro Midi File",
-                    textBoxDefaultMidiProFileLocation.Text, "");
-                if (!string.IsNullOrEmpty(file))
+                ShowOpenFileDlg("Open Rock Band 3 Pro Midi File",
+                    DefaultMidiFileLocationPro, "").IfNotEmpty(file =>
                 {
                     if (SelectedSong != null)
                     {
@@ -1054,7 +1098,9 @@ namespace ProUpgradeEditor.UI
                         MessageBox.Show("Cannot load file");
                     }
                     EditorPro.ClearBackups();
-                }
+                    ReloadTracks();
+                    RefreshTracks();
+                });
             }
             catch { }
         }
@@ -1238,7 +1284,6 @@ namespace ProUpgradeEditor.UI
             EditorPro.BackupSequence();
 
             RemoveSelectedModifier(GuitarModifierType.Solo);
-
         }
 
         private void button15_Click(object sender, EventArgs e)
@@ -1859,14 +1904,17 @@ namespace ProUpgradeEditor.UI
 
         private void button56_Click(object sender, EventArgs e)
         {
-            Debug.WriteLine("gen 56");
-            var genConfig = new GenDiffConfig(SelectedSong, true,
-                checkGenDiffCopyGuitarToBass.Checked, 
-                checkBoxInitSelectedDifficultyOnly.Checked, 
-                checkBoxInitSelectedTrackOnly.Checked, true);
-            genConfig.CopyGuitarToBass = checkGenDiffCopyGuitarToBass.Checked;
+            ExecAndRestoreTrackDifficulty(delegate()
+            {
+                var genConfig = new GenDiffConfig(SelectedSong, true,
+                    checkGenDiffCopyGuitarToBass.Checked,
+                    checkBoxInitSelectedDifficultyOnly.Checked,
+                    checkBoxInitSelectedTrackOnly.Checked, true);
 
-            GenerateDifficulties(false, genConfig);
+                genConfig.CopyGuitarToBass = checkGenDiffCopyGuitarToBass.Checked;
+
+                GenerateDifficulties(false, genConfig);
+            });
         }
         private void buttonCreatePackage_Click(object sender, EventArgs e)
         {
@@ -1875,28 +1923,28 @@ namespace ProUpgradeEditor.UI
         private void button62_Click(object sender, EventArgs e)
         {
             var s = ShowSelectFolderDlg("Select default CON folder",
-                textBoxDefaultCONFileLocation.Text, "");
+                DefaultConFileLocation, "");
             if (!string.IsNullOrEmpty(s))
             {
-                textBoxDefaultCONFileLocation.Text = s;
+                DefaultConFileLocation = s;
             }
         }
 
         private void button63_Click(object sender, EventArgs e)
         {
-            var s = ShowSelectFolderDlg("Select default Midi 5 folder", textBoxDefaultMidi5FileLocation.Text, "");
+            var s = ShowSelectFolderDlg("Select default Midi 5 folder", DefaultMidiFileLocationG5, "");
             if (s != string.Empty)
             {
-                textBoxDefaultMidi5FileLocation.Text = s;
+                DefaultMidiFileLocationG5 = s;
             }
         }
 
         private void button64_Click(object sender, EventArgs e)
         {
-            var s = ShowSelectFolderDlg("Select default Pro Midi folder", textBoxDefaultMidiProFileLocation.Text, "");
+            var s = ShowSelectFolderDlg("Select default Pro Midi folder", DefaultMidiFileLocationPro, "");
             if (s != string.Empty)
             {
-                textBoxDefaultMidiProFileLocation.Text = s;
+                DefaultMidiFileLocationPro = s;
             }
         }
 
@@ -1908,13 +1956,12 @@ namespace ProUpgradeEditor.UI
                 path = textBox22.Text;
 
             var s = ShowOpenFileDlg("Select midi file",
-                textBoxDefaultMidi5FileLocation.Text, path);
+                DefaultMidiFileLocationG5, path);
             if (!string.IsNullOrEmpty(s))
             {
                 textBox21.Text = s;
                 textBox21.ScrollToEnd();
                 
-
                 if (SelectedSong != null)
                 {
                     UpdateSongCacheItem(SelectedSong);
@@ -1931,7 +1978,7 @@ namespace ProUpgradeEditor.UI
                 path = textBox21.Text;
 
             var s = ShowOpenFileDlg("Select pro midi file",
-                textBoxDefaultMidiProFileLocation.Text, path);
+                DefaultMidiFileLocationPro, path);
             if (!string.IsNullOrEmpty(s))
             {
                 textBox22.Text = s;
@@ -1958,32 +2005,35 @@ namespace ProUpgradeEditor.UI
         }
         private void button69_Click(object sender, EventArgs e)
         {
-            var sng = listBoxSongLibrary.SelectedItem as SongCacheItem;
-            if (sng != null)
+            try
             {
-                if (MessageBox.Show("Confirm Song Removal: " + sng.Description, "Removing Song", MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.No)
-                    return;
-
-                var docLibRoot = XMLUtil.GetNode(settings.XMLRoot, "docLib");
-                if (docLibRoot != null)
+                var sng = listBoxSongLibrary.SelectedItem as SongCacheItem;
+                if (sng != null)
                 {
-                    string path = string.Format("song[@CacheSongID='{0}']", sng.CacheSongID);
-                    var node = XMLUtil.GetNode(docLibRoot, path);
-                    if (node != null)
-                    {
-                        docLibRoot.RemoveChild(node);
-                    }
-                }
+                    if (MessageBox.Show("Confirm Song Removal: " + sng.Description, "Removing Song", MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.No)
+                        return;
 
-                SongList.RemoveSong(sng);
+                    var docLibRoot = XMLUtil.GetNode(settings.XMLRoot, "docLib");
+                    if (docLibRoot != null)
+                    {
+                        string path = string.Format("song[@CacheSongID='{0}']", sng.CacheSongID);
+                        var node = XMLUtil.GetNode(docLibRoot, path);
+                        if (node != null)
+                        {
+                            docLibRoot.RemoveChild(node);
+                        }
+                    }
+
+                    SongList.RemoveSong(sng);
+                }
             }
-            
+            catch { }
         }
 
         private void button71_Click(object sender, EventArgs e)
         {
             var s = ShowOpenFileDlg("Select pro CON file",
-                textBoxDefaultCONFileLocation.Text,
+                DefaultConFileLocation,
                 textBoxSongLibConFile.Text);
             if (!string.IsNullOrEmpty(s))
             {
@@ -2077,12 +2127,12 @@ namespace ProUpgradeEditor.UI
         {
             try
             {
+                
                 CopyTrack(GuitarTrack.GuitarTrackName17, GuitarTrack.BassTrackName17);
+                
                 CopyTrack(GuitarTrack.GuitarTrackName22, GuitarTrack.BassTrackName22);
 
                 ReloadTracks();
-
-
             }
             catch { }
         }
@@ -2129,13 +2179,6 @@ namespace ProUpgradeEditor.UI
                     ReloadTracks();
                     ScrollToSelection();
 
-
-                    if (EditorG5.HScrollValue != EditorPro.HScrollValue &&
-                        EditorG5.IsLoaded && EditorPro.IsLoaded)
-                    {
-                        try { EditorG5.HScrollValue = EditorPro.HScrollValue; }
-                        catch { }
-                    }
                 }
             }
         }
@@ -2181,12 +2224,6 @@ namespace ProUpgradeEditor.UI
                 ReloadTracks();
                 ScrollToSelection();
 
-                if (EditorG5.HScrollValue != EditorPro.HScrollValue &&
-                    EditorG5.IsLoaded && EditorPro.IsLoaded)
-                {
-                    try { EditorG5.HScrollValue = EditorPro.HScrollValue; }
-                    catch { }
-                }
             }
         }
 
@@ -2524,7 +2561,7 @@ namespace ProUpgradeEditor.UI
         {
             try
             {
-                if (!string.IsNullOrEmpty(FileNamePro))
+                if (FileNamePro.IsEmpty())
                 {
                     SaveProFile(FileNamePro, true);
                     EditorPro.ClearBackups();
@@ -2610,7 +2647,7 @@ namespace ProUpgradeEditor.UI
                 if (string.IsNullOrEmpty(pkPath) || !File.Exists(pkPath))
                 {
                     pkPath = ShowOpenFileDlg("Select CON Package To Extract",
-                        textBoxDefaultCONFileLocation.Text, pkPath);
+                        DefaultConFileLocation, pkPath);
 
                     if (!string.IsNullOrEmpty(pkPath))
                         textBox49.Text = pkPath;
@@ -2634,7 +2671,7 @@ namespace ProUpgradeEditor.UI
                         if (string.IsNullOrEmpty(targetPath))
                             targetPath = settings.GetValue("lastExtractConSourceFolder");
 
-                        var sel = ShowSelectFolderDlg("Select Package Output Path", textBoxDefaultCONFileLocation.Text, targetPath);
+                        var sel = ShowSelectFolderDlg("Select Package Output Path", DefaultConFileLocation, targetPath);
                         if (!string.IsNullOrEmpty(sel))
                         {
                             settings.SetValue("lastExtractConTargetFolder", targetPath);
@@ -2795,7 +2832,7 @@ namespace ProUpgradeEditor.UI
 
                     if (checkBoxCompressAllInDefaultCONFolder.Checked)
                     {
-                        string folderToCompress = textBoxDefaultCONFileLocation.Text;
+                        string folderToCompress = DefaultConFileLocation;
                         if (string.IsNullOrEmpty(folderToCompress))
                         {
                             folderToCompress =
@@ -5408,53 +5445,51 @@ namespace ProUpgradeEditor.UI
         public bool CopyPowerupsFromG5(bool alltracks)
         {
             bool ret = true;
-            try
+            ExecAndRestoreTrackDifficulty(delegate()
             {
-                EditorPro.BackupSequence();
 
-                if (!alltracks)
+                try
                 {
-                    CopyPowerupDataForCurrentTrack();
-                }
-                else
-                {
-                    foreach (var trackname in GuitarTrack.TrackNames6)
+                    EditorPro.BackupSequence();
+
+                    if (!alltracks)
                     {
-                        Track g5, g6;
-                        if (GuitarTrack.IsBassTrackName(trackname))
-                        {
-                            g5 = EditorG5.GetTrack(GuitarTrack.BassTrackName5);
-                        }
-                        else
-                        {
-                            g5 = EditorG5.GetTrack(GuitarTrack.GuitarTrackName5);
-                        }
-                        g6 = EditorPro.GetTrack(trackname);
-
-                        if (g5 != null && g6 != null)
-                        {
-                            
-                            if (EditorG5.SetTrack5(g5, GuitarDifficulty.Expert) &&
-                                EditorPro.SetTrack6(g6, GuitarDifficulty.Expert))
-                            {
-                                CopyPowerupDataForCurrentTrack();
-                            }
-                        }
-                        
+                        CopyPowerupDataForCurrentTrack();
                     }
+                    else
+                    {
+                        foreach (var trackname in GuitarTrack.TrackNames6)
+                        {
+                            Track g5, g6;
+                            if (GuitarTrack.IsBassTrackName(trackname))
+                            {
+                                g5 = EditorG5.GetTrack(GuitarTrack.BassTrackName5);
+                            }
+                            else
+                            {
+                                g5 = EditorG5.GetTrack(GuitarTrack.GuitarTrackName5);
+                            }
+                            g6 = EditorPro.GetTrack(trackname);
+
+                            if (g5 != null && g6 != null)
+                            {
+
+                                if (EditorG5.SetTrack5(g5, GuitarDifficulty.Expert) &&
+                                    EditorPro.SetTrack6(g6, GuitarDifficulty.Expert))
+                                {
+                                    CopyPowerupDataForCurrentTrack();
+                                }
+                            }
+
+                        }
+                    }
+
                 }
-                
-                
-
-                EditorG5.SetTrack5(EditorG5.GetGuitar5MidiTrack(), GuitarDifficulty.Expert);
-                EditorPro.SetTrack6(EditorPro.GetGuitar6MidiTrack(), GuitarDifficulty.Expert);
-
-                ReloadTracks();
-            }
-            catch
-            {
-                ret = false;
-            }
+                catch
+                {
+                    ret = false;
+                }
+            });
             return ret;
         }
 
@@ -6407,7 +6442,6 @@ namespace ProUpgradeEditor.UI
                             {
                                 trackEditorG6.Close();
 
-                                
                                 trackEditorG6.SetTrack6(seq, trackEditorG6.GetProTrack(seq), GuitarDifficulty.Expert);
                                 FileNamePro = "Temp - " + f.Name;
                             }
@@ -7790,53 +7824,57 @@ namespace ProUpgradeEditor.UI
 
         private void button136_Click(object sender, EventArgs e)
         {
-            CopyTextEvents(true);
+            ExecAndRestoreTrackDifficulty(delegate()
+            {
+                CopyTextEvents(true);
+            });
         }
 
         
         public void GenerateTrainers(bool selectedTrackOnly)
         {
-            try
+            ExecAndRestoreTrackDifficulty(delegate()
             {
-                var ct = EditorPro.SelectedTrackDifficulty;
-                EditorPro.BackupSequence();
-                IEnumerable<Track> gtList;
-                if (selectedTrackOnly)
+                try
                 {
-                    var l = new List<Track>();
-                    l.Add(EditorPro.GuitarTrack.GetTrack());
-                    gtList = l;
-                }
-                else
-                {
-                    gtList = EditorPro.Tracks.Where(x => x.Name.IsProTrackName());
-                }
 
-                
-                if(!gtList.Any())
-                    return;
-
-
-                foreach (var tr in gtList)
-                {
-                    EditorPro.SetTrack(tr);
-                    
-                    if (!EditorPro.Messages.Trainers.Any() && EditorPro.Messages.Solos.Any())
+                    EditorPro.BackupSequence();
+                    IEnumerable<Track> gtList;
+                    if (selectedTrackOnly)
                     {
-                        foreach (var solo in EditorPro.Messages.Solos)
+                        var l = new List<Track>();
+                        l.Add(EditorPro.GuitarTrack.GetTrack());
+                        gtList = l;
+                    }
+                    else
+                    {
+                        gtList = EditorPro.Tracks.Where(x => x.Name.IsProTrackName());
+                    }
+
+
+                    if (!gtList.Any())
+                        return;
+
+
+                    foreach (var tr in gtList)
+                    {
+                        EditorPro.SetTrack(tr);
+
+                        if (!EditorPro.Messages.Trainers.Any() && EditorPro.Messages.Solos.Any())
                         {
-                            CreateTrainer(tr.Name.IsGuitarTrackName17() ?
-                                GuitarTrainerType.ProGuitar : GuitarTrainerType.ProBass,
-                                solo.DownTick, solo.UpTick, true);
+                            foreach (var solo in EditorPro.Messages.Solos)
+                            {
+                                CreateTrainer(tr.Name.IsGuitarTrackName17() ?
+                                    GuitarTrainerType.ProGuitar : GuitarTrainerType.ProBass,
+                                    solo.DownTick, solo.UpTick, true);
+                            }
                         }
                     }
+
+                    RefreshTrainers();
                 }
-
-                EditorPro.SelectedTrackDifficulty = ct;
-
-                RefreshTrainers();
-            }
-            catch { }
+                catch { }
+            });
         }
 
         public void CopyTextEvents(bool selectedTrackOnly)
@@ -8181,7 +8219,7 @@ namespace ProUpgradeEditor.UI
         private void buttonSongPropertiesChooseMP3Location_Click(object sender, EventArgs e)
         {
             var s = ShowOpenFileDlg("Select MP3 file",
-                textBoxDefaultCONFileLocation.Text,
+                DefaultConFileLocation,
                 textBoxSongPropertiesMP3Location.Text);
             if (!string.IsNullOrEmpty(s))
             {
@@ -8671,6 +8709,7 @@ namespace ProUpgradeEditor.UI
 
         private void buttonBatchUtilExtractXML_Click(object sender, EventArgs e)
         {
+            
             if (!Directory.Exists(textBoxBatchUtilExtractXML.Text))
             {
                 ShowBatchUtilExtractXMLSelectFolder();
@@ -9099,5 +9138,23 @@ namespace ProUpgradeEditor.UI
                 }
             }
         }
+
+        private void groupBox25_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void buttonSongPropertiesViewMp3Preview_Click(object sender, EventArgs e)
+        {
+            PUEExtensions.TryExec(delegate()
+            {
+                var path = textBoxSongPropertiesMP3Location.Text;
+                if (path.FileExists())
+                {
+                    PEWaveViewer.ShowWave(path);
+                }
+            });
+        }
+
     }
 }

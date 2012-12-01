@@ -508,6 +508,17 @@ namespace ProUpgradeEditor.UI
                 }
             }
 
+            public static WaveStream LoadMP3(string fileName)
+            {
+                WaveStream ret = null;
+                try
+                {
+                    ret = new Mp3FileReader(fileName);
+                }
+                catch { }
+                return ret;
+            }
+
             public void Load(string fileName, IntPtr handle)
             {
                 this.FileName = fileName;
@@ -537,7 +548,11 @@ namespace ProUpgradeEditor.UI
 
                     CloseCurrentFile();
                 }
+            }
 
+            void foo()
+            {
+                
             }
 
             public void Play(double startTime)

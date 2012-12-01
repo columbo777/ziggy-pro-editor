@@ -224,82 +224,99 @@ namespace ProUpgradeEditor.UI
         }
 
 
-        public string ShowOpenFileDlg(string caption, string defaultFolder, string startupFolder)
+        public string ShowOpenFileDlg(string caption, string defaultFolder, string startupFolder, bool mustExist = true)
         {
             if (!checkUseDefaultFolders.Checked && string.IsNullOrEmpty(startupFolder))
             {
                 var folder = settings.GetValue("OPEN_FILE_" + caption, "");
                 if (!string.IsNullOrEmpty(folder))
                 {
-                    startupFolder = folder;
+                    if (folder.IsFileNotFolder())
+                        folder = folder.GetFolderName();
+                    startupFolder = folder.AppendSlashIfMissing();
                 }
             }
 
             var dlg = new OpenFileDialog();
             dlg.Title = caption;
             dlg.AutoUpgradeEnabled = true;
-            if (checkUseDefaultFolders.Checked)
-                dlg.InitialDirectory = defaultFolder;
-            else if (!string.IsNullOrEmpty(startupFolder))
-                dlg.InitialDirectory = startupFolder;
-            dlg.CheckFileExists = true;
-
+            if (startupFolder.FileExists())
+            {
+                dlg.FileName = startupFolder.GetFileName();
+                startupFolder = startupFolder.GetFolderName();
+            }
+            if (startupFolder.IsEmpty() && checkUseDefaultFolders.Checked)
+            {
+                dlg.InitialDirectory = defaultFolder.AppendSlashIfMissing();
+            }
+            else if (!startupFolder.IsEmpty())
+            {
+                dlg.InitialDirectory = startupFolder.GetFolderName().AppendSlashIfMissing();
+            }
+            else
+            {
+                dlg.InitialDirectory = settings.GetValue("OPEN_FILE_" + caption, "").AppendSlashIfMissing();
+            }
+            dlg.CheckFileExists = mustExist;
+            dlg.CheckPathExists = mustExist;
+            
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                if (!checkUseDefaultFolders.Checked)
-                    settings.SetValue("OPEN_FILE_" + caption, dlg.FileName);
+                var fileName = dlg.FileName;
+                var folderName = fileName.GetFolderName();
+                if (mustExist == false && !folderName.FolderExists())
+                {
+                    folderName.CreateFolderIfNotExists();
+                }
+                settings.SetValue("OPEN_FILE_" + caption, folderName);
 
-                return dlg.FileName;
+                return fileName;
             }
             return string.Empty;
         }
 
         public string ShowSaveFileDlg(string caption, string startupFolder, string fileName)
         {
-            if (!checkUseDefaultFolders.Checked && string.IsNullOrEmpty(startupFolder))
+            if (!checkUseDefaultFolders.Checked && startupFolder.IsEmpty())
             {
                 var folder = settings.GetValue("SAVE_FILE_" + caption, "");
-                if (!string.IsNullOrEmpty(folder))
+                if (!folder.IsEmpty())
                 {
-                    startupFolder = folder;
+                    startupFolder = folder.AppendSlashIfMissing();
                 }
             }
             var dlg = new SaveFileDialog();
             dlg.Title = caption;
             dlg.AutoUpgradeEnabled = true;
             dlg.CheckFileExists = false;
-            dlg.CheckPathExists = true;
+            dlg.CheckPathExists = false;
             
-            dlg.ValidateNames = false;
+            dlg.ValidateNames = true;
+
             if (checkUseDefaultFolders.Checked && string.IsNullOrEmpty(startupFolder))
             {
-                dlg.InitialDirectory = startupFolder;
+                dlg.InitialDirectory = DefaultConFileLocation.AppendSlashIfMissing();
+                dlg.FileName = fileName.GetFileName();
             }
             else
             {
-                if (!string.IsNullOrEmpty(fileName) && File.Exists(fileName))
+                if (fileName.Any(x => x == '\\'))
                 {
-                    if (Directory.Exists(fileName))
-                    {
-                        dlg.InitialDirectory = fileName;
-                    }
-                    else
-                    {
-                        var folder = Path.GetDirectoryName(fileName);
-                        dlg.InitialDirectory = folder;
-                    }
+                    dlg.InitialDirectory = fileName.GetFolderName().CreateFolderIfNotExists();
+                    dlg.FileName = fileName.GetFileName();
+                }
+                else
+                {
+                    dlg.InitialDirectory = startupFolder.AppendSlashIfMissing();
+                    dlg.FileName = fileName.GetFileName();
                 }
             }
-            if (!string.IsNullOrEmpty(fileName))
-            {
-                dlg.FileName = Path.GetFileName(fileName);
-            }
-
-
+            
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                if (!checkUseDefaultFolders.Checked)
-                    settings.SetValue("SAVE_FILE_" + caption, dlg.FileName);
+                dlg.FileName.GetFolderName().CreateFolderIfNotExists();
+
+                settings.SetValue("SAVE_FILE_" + caption, dlg.FileName.GetFolderName());
 
                 return dlg.FileName;
             }
@@ -334,7 +351,7 @@ namespace ProUpgradeEditor.UI
 
             if (res == System.Windows.Forms.DialogResult.OK)
             {
-                ret = bf.SelectedPath;
+                ret = bf.SelectedPath.AppendSlashIfMissing();
                
                 settings.SetValue("SELECT_FOLDER_" + caption, ret);
             
@@ -3800,18 +3817,16 @@ namespace ProUpgradeEditor.UI
                     return true;
 
                 EditorPro.GuitarTrack.GetTrack().RemoveDifficulty(copyDiffs);
-
+                
                 if (copyDiffs.HasFlag(GuitarDifficulty.Hard))
                 {
                     ProGuitarTrack.GetDifficulty(GuitarDifficulty.Expert).ForEach(x =>
                         ProGuitarTrack.Insert(x.AbsoluteTicks, x.ConvertDifficultyPro(GuitarDifficulty.Hard)));
-                    
                 }
                 if (copyDiffs.HasFlag(GuitarDifficulty.Medium))
                 {
                     ProGuitarTrack.GetDifficulty(GuitarDifficulty.Hard).ForEach(x =>
                         ProGuitarTrack.Insert(x.AbsoluteTicks, x.ConvertDifficultyPro(GuitarDifficulty.Medium)));
-                    
                 }
                 if (copyDiffs.HasFlag(GuitarDifficulty.Easy))
                 {
@@ -4103,7 +4118,7 @@ namespace ProUpgradeEditor.UI
             }
         }
 
-        public bool SaveProCONFile(SongCacheItem sc, bool newPackage, bool silent)
+        public bool SaveProCONFile(SongCacheItem sc,  bool silent, bool batch, bool saveAs=false)
         {
             bool ret = false;
             if (sc == null)
@@ -4111,9 +4126,9 @@ namespace ProUpgradeEditor.UI
             try
             {
 
-                string fileName = sc.G6ConFile;
+                string fileName = saveAs ? "" : sc.G6ConFile;
 
-                if (string.IsNullOrEmpty(fileName) || newPackage == true)
+                if (string.IsNullOrEmpty(fileName))
                 {
                     var f = GetShortFileNameFromG5(sc);
                     if (!string.IsNullOrEmpty(f))
@@ -4170,7 +4185,7 @@ namespace ProUpgradeEditor.UI
 
                     if (con != null && con.Length > 0)
                     {
-                        if (!checkBoxSmokeTest.Checked)
+                        if (batch == false || (batch==true && !checkBoxSmokeTest.Checked))
                         {
                             if (!TryWriteFile(fileName, con))
                             {
@@ -4917,40 +4932,38 @@ namespace ProUpgradeEditor.UI
         {
             if (SelectedSong != null)
             {
-                SaveProCONFile(SelectedSong, true, false);
+                SaveProCONFile(SelectedSong, false, false);
             }
         }
 
 
-        public void ExtractPackageContents(string folder, PackageFolder f, string[] filters)
+        public bool ExtractPackageContents(string localDirectory, PackageFolder folder, IEnumerable<string> filters)
         {
+            var ret = true;
             try
             {
-                if (!Directory.Exists(folder))
+                localDirectory = localDirectory.AppendSlashIfMissing();
+
+                var files = folder.Files.Where(file => file.Data != null && 
+                    (filters == null || filters.Any(filter => file.Name.EndsWithEx(filter))));
+
+                if (files.Any())
                 {
-                    Directory.CreateDirectory(folder);
-                }
-                foreach (var file in f.Files)
-                {
-                    if (filters != null)
+                    localDirectory.AppendSlashIfMissing().CreateFolderIfNotExists();
+                    foreach (var file in files)
                     {
-                        if (filters.SingleOrDefault(x => file.Name.EndsWith(x, StringComparison.OrdinalIgnoreCase) == true) == null)
-                        {
-                            continue;
-                        }
+                        localDirectory.PathCombine(file.Name).WriteFileBytes(file.Data);
                     }
-                    var filePath = Path.Combine(folder, file.Name);
-                    
-                    File.WriteAllBytes(filePath, file.Data);
-                    
                 }
-                foreach (var dir in f.Folders)
+                foreach (var subFolder in folder.Folders)
                 {
-                    var folderPath = Path.Combine(folder, dir.Name);
-                    ExtractPackageContents(folderPath, dir, filters);
+                    ExtractPackageContents(localDirectory.PathCombine(subFolder.Name).AppendSlashIfMissing(),
+                        subFolder, filters);
                 }
+                
             }
-            catch { }
+            catch { ret = false; }
+            return ret;
         }
 
 
@@ -5059,19 +5072,15 @@ namespace ProUpgradeEditor.UI
                     {
                         try
                         {
-
-
-                            if (f.Name.EndsWith(".mid", StringComparison.OrdinalIgnoreCase) ||
-                                f.Name.EndsWith(".midi", StringComparison.OrdinalIgnoreCase))
+                            if (f.Name.IsMidiFileName())
                             {
-                                var mid = new Sequence(FileType.Unknown);
-                                mid.Load(new MemoryStream(f.Data));
-
+                                var mid = f.Data.LoadSequence();
 
                                 var sb = new StringBuilder();
 
                                 foreach (Track t in mid)
                                 {
+                                    sb.Append(t.Name.GetFileName() + " ");
                                     if (GuitarTrack.TrackNames6.Contains(t.Name))
                                     {
                                         sb.AppendLine("Pro Guitar Midi File");
@@ -5082,7 +5091,6 @@ namespace ProUpgradeEditor.UI
                                         sb.AppendLine("5 Button Guitar Midi File");
                                         break;
                                     }
-
                                 }
 
                                 if (sb.Length == 0)
@@ -5094,11 +5102,8 @@ namespace ProUpgradeEditor.UI
                                 sb.AppendLine("Tracks:");
                                 foreach (Track t in mid)
                                 {
-                                    var trackName = t.Name;
-                                    if (!string.IsNullOrEmpty(trackName))
-                                    {
-                                        sb.AppendLine("    " + trackName);
-                                    }
+                                    sb.Append("    ");
+                                    sb.AppendLine(t.Name);
                                 }
                                 textBoxPackageDTAText.Text = sb.ToString();
                             }
@@ -5513,7 +5518,7 @@ namespace ProUpgradeEditor.UI
         {
             if (sc != null)
             {
-                if (SaveProCONFile(sc, false, false))
+                if (SaveProCONFile(sc,  false, false))
                 {
                     OpenProCONFile(sc, true);
                 }
@@ -5545,7 +5550,7 @@ namespace ProUpgradeEditor.UI
                 {
                     SaveProMidi();
 
-                    if (SaveProCONFile(sc, File.Exists(sc.G6ConFile) == false, true))
+                    if (SaveProCONFile(sc,  true, false))
                     {
                         if (OpenProCONFile(sc, true) != null)
                         {

@@ -339,9 +339,19 @@ namespace ProUpgradeEditor
 
         public void Close()
         {
+            LoadedFileName = string.Empty;
             this.guitarTrack = null;
             this.backupSequences.Clear();
-
+            if (this.EditorType == EEditorType.ProGuitar)
+            {
+                SetTrack6(null);
+            }
+            else
+            {
+                SetTrack5(null);
+            }
+            ClearBackups();
+            
             if (OnClose != null)
             {
                 OnClose(this);
@@ -541,37 +551,30 @@ namespace ProUpgradeEditor
 
                 try
                 {
-                    var midiSequence5 = new Sequence(FileType.Guitar5);
+                    var midiSequence5 = bytes.LoadSequence();
 
-                    using (var ms = new MemoryStream(bytes))
-                    {
-                        midiSequence5.Load(ms);
-                    }
-
-                    Track t = TrackEditor.GetTrack(midiSequence5, GuitarTrack.GuitarTrackName5);
-                    if (t != null)
+                    var track = midiSequence5.GetPrimaryTrackG5();
+                    if (track != null)
                     {
                         this.LoadedFileName = fileName;
 
-                        SetTrack5(midiSequence5, t, CurrentDifficulty);
-
+                        SetTrack5(midiSequence5, track, CurrentDifficulty);
 
                         ret = true;
                     }
-                    else
-                    {
-                        if (!silent)
-                            MessageBox.Show("No Guitar Track Found");
-                        this.LoadedFileName = string.Empty;
-                    }
-                }
-                catch
-                {
-                    if (!silent)
-                        MessageBox.Show("Cannot load file");
-                    this.LoadedFileName = string.Empty;
 
                 }
+                catch { }
+
+                if (!ret)
+                {
+                    this.LoadedFileName = string.Empty;
+                    if (!silent)
+                    {
+                        MessageBox.Show("Cannot load file");
+                    }
+                }
+                
                 loading5 = false;
 
                 ClearBackups();
@@ -592,50 +595,45 @@ namespace ProUpgradeEditor
                 Track t = null;
                 try
                 {
-                    var seq = new Sequence(FileType.Pro);
-                    using (var ms = new MemoryStream(fileData))
-                    {
-                        seq.Load(ms);
-                    }
+                    if (fileData == null)
+                        fileData = fileName.ReadFileBytes();
+
+                    var seq = fileData.LoadSequence();
 
                     if (loadingBackup)
                     {
-                        var gt6 = EditorPro.GuitarTrack.GetTrack();
-                        if (gt6 != null && !string.IsNullOrEmpty(gt6.Name))
+                        try
                         {
-                            t = seq.GetTrack(gt6.Name);
+                            var gt6 = EditorPro.GuitarTrack.GetTrack();
+                            if (gt6 != null && !string.IsNullOrEmpty(gt6.Name))
+                            {
+                                t = seq.GetTrack(gt6.Name);
+                            }
                         }
+                        catch { }
                     }
 
                     if (t == null)
                     {
-                        t = GetProTrack(seq);
+                        t = seq.GetPrimaryTrack();
                     }
-                    if (t == null && seq.Tracks.Length > 0)
-                    {
-                        t = seq[0];
-                    }
-
+                    
                     if (t != null)
                     {
                         this.LoadedFileName = fileName;
 
-
                         ret = SetTrack6(seq, t, CurrentDifficulty);
                     }
-                    else
-                    {
-                        this.LoadedFileName = string.Empty;
-                    }
-                }
-                catch
-                {
-                    ret = false;
-                    this.LoadedFileName = "";
+                    
                 }
                 finally
                 {
                     loading17 = false;
+                    if (!ret)
+                    {
+                        this.LoadedFileName = "";
+                        Close();
+                    }
                 }
             }
 
@@ -726,7 +724,7 @@ namespace ProUpgradeEditor
 
         public bool SetTrack5(Track t, GuitarDifficulty difficulty = GuitarDifficulty.Unknown)
         {
-            return SetTrack5(this.Sequence, t, difficulty);
+            return SetTrack5(this.Sequence == null ? t != null ? t.Sequence : null : this.Sequence, t, difficulty);
         }
 
 
@@ -749,6 +747,10 @@ namespace ProUpgradeEditor
                 this.currentDifficulty = difficulty;
                 
                 this.EditorType = EEditorType.Guitar5;
+                if (seq == null && t != null)
+                {
+                    seq = t.Sequence;
+                }
 
                 if (seq == null || t == null)
                 {
@@ -798,7 +800,7 @@ namespace ProUpgradeEditor
 
         public bool SetTrack6(Track t, GuitarDifficulty difficulty=GuitarDifficulty.Unknown)
         {
-            return SetTrack6(this.Sequence, t, difficulty);
+            return SetTrack6(this.Sequence == null ? t != null ? t.Sequence : null : this.Sequence, t, difficulty);
         }
 
         bool settingTrack6 = false;
@@ -819,7 +821,10 @@ namespace ProUpgradeEditor
                 this.currentDifficulty = difficulty;
                  
                 this.EditorType = EEditorType.ProGuitar;
-
+                if (seq == null && t != null)
+                {
+                    seq = t.Sequence;
+                }
                 if (seq == null || t == null)
                 {
                     guitarTrack = null;

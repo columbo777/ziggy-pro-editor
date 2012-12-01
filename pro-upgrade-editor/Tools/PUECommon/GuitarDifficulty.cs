@@ -9,6 +9,7 @@ namespace ProUpgradeEditor
     [Flags()]
     public enum GuitarDifficulty
     {
+        None = 0,
         All = 1 << 0,
         Easy = 1 << 1,
         Medium = 1 << 2,

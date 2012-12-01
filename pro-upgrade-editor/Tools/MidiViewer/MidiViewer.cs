@@ -346,7 +346,8 @@ namespace MidiViewer
             {
                 try
                 {
-                    this.sequence = new Sequence(FileType.Unknown,f);
+                    this.sequence = f.LoadSequenceFile();
+                    
                     LoadSequence();
                 }
                 catch { }

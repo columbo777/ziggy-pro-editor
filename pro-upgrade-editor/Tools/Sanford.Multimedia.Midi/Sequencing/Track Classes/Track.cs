@@ -41,17 +41,17 @@ namespace Sanford.Multimedia.Midi
                     if (tn != null)
                     {
                         name = tn.ToString();
-                        return name;
+                        return name ?? "";
                     }
                 }
-                else { return name; }
+                else { return name ?? ""; }
                 return "(no name)";
             }
             set 
             {
                 if (!string.IsNullOrEmpty(value))
                 {
-                    name = value;
+                    name = value ?? "";
 
                     var tn = getNameEvent();
                     

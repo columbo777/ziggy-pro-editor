@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Globalization;
 using System.Collections;
 using System.IO;
+using System.Diagnostics;
 
 namespace ProUpgradeEditor
 {
@@ -77,6 +78,7 @@ namespace ProUpgradeEditor
     }
 
 
+    [DebuggerStepThrough]
     public static class PUEExtensions
     {
         public static void IfObjectNotNull<T>(this T o, Action<T> func, Action<T> Else = null)
@@ -99,9 +101,10 @@ namespace ProUpgradeEditor
             catch { }
             return ret;
         }
-        public static bool TryExec(Func<bool> func)
+        
+        public static T TryExec<T>(Func<T> func)
         {
-            var ret = false;
+            T ret = default(T);
             try { ret = func(); } catch { }
             return ret;
         }
@@ -109,9 +112,145 @@ namespace ProUpgradeEditor
         {
             try { func(); } catch { }
         }
+        public static bool EndsWithEx(this string str, string val, bool ignoreCase = true)
+        {
+            return (str ?? "").EndsWith(val ?? "", StringComparison.InvariantCultureIgnoreCase);
+        }
+        public static bool StartsWithEx(this string str, string val, bool ignoreCase = true)
+        {
+            return (str ?? "").StartsWith(val ?? "", StringComparison.InvariantCultureIgnoreCase);
+        }
+        public static FileType GetMidiFileType(this string localMidiFile)
+        {
+            var ret = FileType.Unknown;
+            try
+            {
+                var seq = new Sequence(FileType.Unknown, localMidiFile);
+                if (seq.Tracks.Any(x => x.Name.IsProTrackName()))
+                {
+                    ret = FileType.Pro;
+                }
+                else
+                {
+                    ret = FileType.Guitar5;
+                }
+            }
+            catch { }
+            return ret;
+        }
+
+        public static FileType FindFileType(this Sequence seq)
+        {
+            FileType ret = FileType.Unknown;
+            try
+            {
+                if (seq != null && seq.Tracks != null)
+                {
+                    ret = seq.Tracks.Any(x => x.Name.IsProTrackName()) ? FileType.Pro :
+                            seq.Tracks.Any(x => x.Name.IsGuitarTrackName5() || x.Name.IsBassTrackName5()) ? FileType.Guitar5 :
+                        FileType.Unknown;
+                }
+            }
+            catch { }
+            return ret;
+        }
+        public static Sequence LoadSequence(this byte[] data)
+        {
+            Sequence ret = null;
+            try
+            {
+                ret = new Sequence(FileType.Unknown);
+                using (var ms = new MemoryStream(data))
+                {
+                    ret.Load(ms);
+                }
+                ret.FileType = ret.FindFileType();
+            }
+            catch { }
+            return ret;
+        }
+        public static bool IsMidiFileName(this string fileName) { return fileName.EndsWithEx(".mid") || fileName.EndsWithEx(".midi"); }
+
+        public static Sequence LoadSequenceFile(this string localFileName)
+        {
+            Sequence ret = null;
+            try
+            {
+                if (localFileName.FileExists())
+                {
+                    ret = new Sequence(FileType.Unknown, localFileName);
+                    ret.FileType = ret.FindFileType();
+                }
+            }
+            catch { }
+            return ret;
+        }
+        public static DateTime GetFileModifiedTime(this string fileName)
+        {
+            return fileName.FileExists() ? fileName.GetFileInfo().LastWriteTime : DateTime.MinValue;
+        }
+        public static DateTime GetFileCreationTime(this string fileName)
+        {
+            return fileName.FileExists() ? fileName.GetFileInfo().CreationTime : DateTime.MinValue;
+        }
+        public static DateTime GetFileAccessedTime(this string fileName)
+        {
+            return fileName.FileExists() ? fileName.GetFileInfo().LastAccessTime : DateTime.MinValue;
+        }
         public static bool FileExists(this string str)
         {
             return TryExec(delegate() { return !str.IsEmpty() && File.Exists(str); });
+        }
+        public static FileInfo GetFileInfo(this string fileName)
+        {
+            return new FileInfo(fileName);
+        }
+        public static bool IsReadOnlyFile(this string fileName)
+        {
+            return TryExec(delegate() 
+            { 
+                return fileName.FileExists() && fileName.GetFileInfo().Attributes.HasFlag(FileAttributes.ReadOnly); 
+            });
+        }
+        public static void MakeWritableFile(this string fileName)
+        {
+            TryExec(delegate() 
+            {
+                if (fileName.IsReadOnlyFile())
+                    fileName.GetFileInfo().Attributes ^= FileAttributes.ReadOnly;
+            });
+        }
+        public static bool WriteFileBytes(this string fileName, byte[] contents)
+        {
+            if(!fileName.IsEmpty())
+            {
+                fileName.GetFolderName().CreateFolderIfNotExists();
+            }
+            return TryExec(delegate() 
+            { 
+                var ret = false; 
+                try 
+                {
+                    if (fileName.IsReadOnlyFile())
+                        fileName.MakeWritableFile();
+
+                    File.WriteAllBytes(fileName, contents); ret = true; 
+                } 
+                catch 
+                { 
+                } 
+                return ret; 
+            });
+        }
+        public static byte[] ReadFileBytes(this string fileName)
+        {
+            byte[] ret = null;
+            try
+            {
+                ret = File.ReadAllBytes(fileName);
+            }
+            catch { }
+            return ret;
         }
         public static string AppendIfMissing(this string str, string strEnd)
         {
@@ -133,7 +272,7 @@ namespace ProUpgradeEditor
                 if (!str.IsEmpty())
                 {
                     var di = new DirectoryInfo(str.AppendSlashIfMissing());
-                    return di.Attributes.HasFlag(FileAttributes.Directory);
+                    return di.Exists;
                 }
                 else
                 {
@@ -158,19 +297,29 @@ namespace ProUpgradeEditor
                 }
                 else
                 {
-                    var di = str.GetDirectoryInfo();
-                    return di == null ? "" : di.Name;
+                    return Path.GetDirectoryName(str).AppendSlashIfMissing();
                 }
             });
         }
-        public static void CreateFolderIfNotExists(this string str)
+        public static Track GetTempoTrack(this Sequence seq)
         {
-            TryExec(delegate()
+            Track ret = null;
+            if (seq != null)
             {
-                if (!str.IsEmpty() && !str.FolderExists())
+                ret = seq.Tracks.Where(x => x.IsTempo()).FirstOrDefault();
+            }
+            return ret;
+        }
+        public static string CreateFolderIfNotExists(this string str)
+        {
+            return TryExec(delegate()
+            {
+                str.AppendSlashIfMissing().IfNotEmpty(x =>
                 {
-                    Directory.CreateDirectory(str.AppendSlashIfMissing());
-                }
+                    if(!x.FolderExists()) Directory.CreateDirectory(x);
+                    str = x;
+                });
+                return str;
             });
         }
         public static bool IsFileNotFolder(this string str)
@@ -194,10 +343,14 @@ namespace ProUpgradeEditor
             var ret = new List<string>();
             TryExec(delegate()
             {
-                ret.AddRange(
-                    Directory.EnumerateFiles(folder.AppendSlashIfMissing(), 
-                    searchPattern, 
-                    recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).Where(x=> x.IsFileNotFolder()));
+
+                foreach (var str in searchPattern.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    ret.AddRange(
+                        Directory.EnumerateFiles(folder.AppendSlashIfMissing(),
+                        str,
+                        recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).Where(x => x.IsFileNotFolder()));
+                }
             });
             return ret;
         }
@@ -206,10 +359,13 @@ namespace ProUpgradeEditor
             var ret = new List<string>();
             TryExec(delegate()
             {
-                ret.AddRange(
-                    Directory.EnumerateDirectories(folder.AppendSlashIfMissing(),
-                    searchPattern,
-                    recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).Where(x => x.IsFolderNotFile()));
+                foreach (var str in searchPattern.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    ret.AddRange(
+                        Directory.EnumerateDirectories(folder.AppendSlashIfMissing(),
+                        str,
+                        recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).Where(x => x.IsFolderNotFile()));
+                }
             });
             return ret;
         }
@@ -290,6 +446,11 @@ namespace ProUpgradeEditor
         public static bool IsFileTypePro(this Sequence seq) { return seq.FileType == FileType.Pro; }
         public static bool IsFileTypePro(this Track t) { return t.FileType == FileType.Pro; }
 
+        public static bool IsFileTypeG5(this Sequence seq) { return seq.FileType == FileType.Guitar5; }
+        public static bool IsFileTypeG5(this Track t) { return t.FileType == FileType.Guitar5; }
+
+        public static bool IsFileTypeUnknown(this Sequence seq) { return seq.FileType == FileType.Unknown; }
+        public static bool IsFileTypeUnknown(this Track t) { return t.FileType == FileType.Unknown; }
 
         public static IEnumerable<MidiEvent> GetChanMessagesByDifficulty(this Track t, GuitarDifficulty diff) 
         {
@@ -314,6 +475,7 @@ namespace ProUpgradeEditor
         }
 
         public static bool IsEmpty(this string str) { return string.IsNullOrEmpty(str); }
+        public static bool IsNotEmpty(this string str) { return !str.IsEmpty(); }
 
         public static void IfNotNull(this double d, Action<double> func, Action<double> Else = null)
         {
@@ -333,6 +495,10 @@ namespace ProUpgradeEditor
             else { if (Else != null) { Else(d); } }
         }
         
+        public static bool EqualsEx(this string str, string str2, bool ignoreCase = true)
+        {
+            return string.Compare(str ?? "", str2 ?? "", ignoreCase) == 0;
+        }
         public static void IfNotEmpty(this string d, Action<string> func, Action<string> Else = null)
         {
             if (!string.IsNullOrEmpty(d))
@@ -460,6 +626,10 @@ namespace ProUpgradeEditor
             catch { }
             return ret;
         }
+        public static string GetIfEmpty(this string str, string other)
+        {
+            return str.IsEmpty() ? other : str;
+        }
         public static DateTime GetIfNull(this DateTime dt, Func<DateTime> other)
         {
             if (dt.IsNull())
@@ -517,7 +687,15 @@ namespace ProUpgradeEditor
                 ret = seq.LastOrDefault();
             return ret;
         }
-
+        public static Track GetPrimaryTrackG5(this Sequence seq)
+        {
+            Track ret = seq.FirstOrDefault(x => x.Name.IsGuitarTrackName5());
+            if (ret == null)
+                ret = seq.FirstOrDefault(x => x.Name.IsBassTrackName5());
+            if (ret == null)
+                ret = seq.LastOrDefault();
+            return ret;
+        }
         public static IEnumerable<Track> GetGuitarBassTracks(this IEnumerable<Track> list)
         {
             return list.Where(x => x.Name.IsGuitarTrackName() || x.Name.IsBassTrackName());

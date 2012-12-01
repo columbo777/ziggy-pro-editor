@@ -399,8 +399,8 @@ namespace ProUpgradeEditor.UI
                     }
 
 
-                    var guitarDifficulties = GuitarDifficulty.Unknown;
-                    var bassDifficulties = GuitarDifficulty.Unknown;
+                    var guitarDifficulties = GuitarDifficulty.None;
+                    var bassDifficulties = GuitarDifficulty.None;
 
                     if (config.SelectedDifficultyOnly)
                     {
@@ -462,7 +462,7 @@ namespace ProUpgradeEditor.UI
                     }
                     else
                     {
-                        if (genGuitar && guitarDifficulties.IsUnknown())
+                        if (genGuitar)
                         {
                             var gt5 = EditorG5.GetGuitar5MidiTrack();
                             var gt6 = EditorPro.GetTrackGuitar17();
@@ -479,7 +479,7 @@ namespace ProUpgradeEditor.UI
                             }
                         }
 
-                        if (genBass && bassDifficulties.IsUnknown())
+                        if (genBass)
                         {
                             var gt5 = EditorG5.GetGuitar5BassMidiTrack();
                             var gt6 = EditorPro.GetTrackBass17();
@@ -523,7 +523,7 @@ namespace ProUpgradeEditor.UI
                     {
                         Set108Events(config);
                     }
-
+                    ReloadTracks();
                 }
                 catch { ret = false; }
 
@@ -613,10 +613,8 @@ namespace ProUpgradeEditor.UI
                         {
                             if ((n.IsArpeggioNote && diff == GuitarDifficulty.Hard) || n.IsArpeggioNote == false)
                             {
-                                var x = sourceChord6.Notes.IndexOf(n);
-
-                                frets[x] = n.NoteFretDown;
-                                channels[x] = n.Channel;
+                                frets[n.NoteString] = n.NoteFretDown;
+                                channels[n.NoteString] = n.Channel;
 
                                 notesCreated++;
 
@@ -742,7 +740,7 @@ namespace ProUpgradeEditor.UI
                                 continue;
                             }
 
-                            if (!SaveProCONFile(item, false, true))
+                            if (!SaveProCONFile(item, true, true))
                             {
                                 WriteBatchResult("Failed Saving: " + item.ToString());
                                 continue;
@@ -968,28 +966,21 @@ namespace ProUpgradeEditor.UI
                                     }
                                     else
                                     {
-                                        var sq = new Sequence(FileType.Pro);
-                                        bool loaded = false;
-                                        try
+                                        var sq = proMid.Data.LoadSequence();
+                                        if (sq != null)
                                         {
-                                            sq.Load(new MemoryStream(proMid.Data));
-
-                                            loaded = sq.Tracks.Where(tn => tn.Name.IsProTrackName()).Any();
+                                            if (!sq.IsFileTypePro())
+                                            {
+                                                fileErrors.Add("Unable to open pro midi file from package");
+                                            }
+                                            else
+                                            {
+                                                ExecAndRestoreTrackDifficulty(delegate(List<string> fe)
+                                                {
+                                                    fe.AddRange(VerifySongData(proName, sq, item));
+                                                }, fileErrors);
+                                            }
                                         }
-                                        catch
-                                        {
-                                            fileErrors.Add("Unable to open pro midi file from package");
-                                        }
-
-                                        if (loaded)
-                                        {
-                                            var osel = EditorPro.SelectedTrackDifficulty;
-
-                                            fileErrors.AddRange(VerifySongData(proName, sq, item));
-
-                                            EditorPro.SelectedTrackDifficulty = osel;
-                                        }
-
                                     }
                                 }
                             }

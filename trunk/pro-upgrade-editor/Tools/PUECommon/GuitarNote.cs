@@ -86,8 +86,9 @@ namespace ProUpgradeEditor.DataLayer
             ret.SetDownEvent(downEvent);
             ret.SetUpEvent(upEvent);
 
-            
             ret.IsNew = true;
+           // track.Messages.Add(ret);
+            
             return ret;
         }
 

@@ -325,6 +325,9 @@ namespace ProUpgradeEditor.UI
         {
             if (!DesignMode)
             {
+                trackEditorG5.Initialize(false);
+                EditorPro.Initialize(true);
+
                 trackEditorG5.EditorPro = EditorPro;
                 
                 EditorPro.Editor5 = trackEditorG5;
@@ -749,8 +752,8 @@ namespace ProUpgradeEditor.UI
         {
             if (diff != null)
             {
-                if (EditorPro.Sequence != null && diff.A != null && diff.A.SelectedTrackDifficulty != null && diff.A.SelectedTrackDifficulty.Track != null &&
-                    diff.A.SelectedTrackDifficulty.Track.Sequence != null && diff.A.SelectedTrackDifficulty.Track.Sequence == EditorPro.Sequence)
+                if (diff.A != null && diff.A.SelectedTrackDifficulty != null && diff.A.SelectedTrackDifficulty.Track != null &&
+                    diff.A.SelectedTrackDifficulty.Track.Sequence != null)
                 {
                     
                     foreach (var item in diff.A.Difficulties.Where(x=> midiTrackEditorPro.TrackDifficulties.Any(y=> y.Track == x.Track && y.Difficulty != x.Difficulty)))
@@ -760,8 +763,8 @@ namespace ProUpgradeEditor.UI
                     
                     EditorPro.SetTrack(diff.A.SelectedTrackDifficulty.Track, diff.A.SelectedTrackDifficulty.Difficulty);
                 }
-                if (EditorG5.Sequence != null && diff.B != null && diff.B.SelectedTrackDifficulty != null && diff.B.SelectedTrackDifficulty.Track != null &&
-                    diff.B.SelectedTrackDifficulty.Track.Sequence != null && diff.B.SelectedTrackDifficulty.Track.Sequence == EditorG5.Sequence)
+                if (diff.B != null && diff.B.SelectedTrackDifficulty != null && diff.B.SelectedTrackDifficulty.Track != null &&
+                    diff.B.SelectedTrackDifficulty.Track.Sequence != null)
                 {
 
                     foreach (var item in diff.B.Difficulties.Where(x => midiTrackEditorG5.TrackDifficulties.Any(y => y.Track == x.Track && y.Difficulty != x.Difficulty)))
@@ -876,7 +879,10 @@ namespace ProUpgradeEditor.UI
 
         private void button100_Click(object sender, EventArgs e)
         {
-            CheckCONPackageDTA(SelectedSong, false);
+            ExecAndRestoreTrackDifficulty(delegate()
+            {
+                CheckCONPackageDTA(SelectedSong, false);
+            });
         }
 
         private void buttonPackageEditorOpenPackage_Click(object sender, EventArgs e)
@@ -966,13 +972,19 @@ namespace ProUpgradeEditor.UI
         private void button105_Click(object sender, EventArgs e)
         {
             ClearBatchResults();
-            ExecuteBatchRebuildCON();
+            ExecAndRestoreTrackDifficulty(delegate()
+            {
+                ExecuteBatchRebuildCON();
+            });
         }
 
         private void button106_Click(object sender, EventArgs e)
         {
             ClearBatchResults();
-            ExecuteBatchCheckCON();
+            ExecAndRestoreTrackDifficulty(delegate()
+            {
+                ExecuteBatchRebuildCON();
+            });
         }
 
         private void button107_Click(object sender, EventArgs e)
@@ -2667,6 +2679,14 @@ namespace ProUpgradeEditor.UI
         }
 
         private void button89_Click(object sender, EventArgs e)
+        {
+            ExecAndRestoreTrackDifficulty(delegate()
+            {
+                ExecuteBatch();
+            });
+        }
+
+        private void ExecuteBatch()
         {
             try
             {
@@ -7595,14 +7615,7 @@ namespace ProUpgradeEditor.UI
         {
             try
             {
-                SetSelectedChord(chord, false, true);
-                SetChordToScreen(chord, false, true);
-
-                int os = GetChordStartBox().Text.ToInt();
-                int oe = GetChordEndBox().Text.ToInt();
-                int gs = GetChordStartBox().Text.ToInt();
-                int ge = GetChordEndBox().Text.ToInt();
-
+                
                 var gc = EditorG5.GuitarTrack.GetChordsAtTick(chord.DownTick, chord.UpTick);
                 if (gc != null && gc.Any())
                 {
@@ -7618,24 +7631,13 @@ namespace ProUpgradeEditor.UI
                             }
                         }
                     }
-                    if (gc.Count() > 0)
+                    if (gc.Any())
                     {
-                        gs = EditorPro.GetTickGridSnap(gc.GetMinTick());
-                        ge = EditorPro.GetTickGridSnap(gc.GetMaxTick());
-
-                        GetChordStartBox().Text = gs.ToStringEx();
-                        GetChordEndBox().Text = ge.ToString();
-
-                        textBox19.Text = (ge - gs).ToStringEx();
-                        if (textBox19.Text.ToInt() >= Utility.MinimumNoteWidth)
-                        {
-                            if (os != gs || oe != ge)
-                            {
-                                
-                                UpdateSelectedChordProperties(SelectNextEnum.ForceKeepSelection);
-                                return true;
-                            }
-                        }
+                        var c = gc.First();
+                        chord.DownTick = c.DownTick;
+                        chord.UpTick = c.UpTick;
+                        chord.UpdateChordProperties();
+                        return true;
                     }
                 }
             }
@@ -8342,7 +8344,7 @@ namespace ProUpgradeEditor.UI
                 if (chords.Length == 0)
                     chords = EditorPro.Messages.Chords;
 
-                foreach (var c in chords)
+                foreach (var c in chords.ToList())
                 {
                     if (SetChordToG5Length(c))
                         numSnapped++;

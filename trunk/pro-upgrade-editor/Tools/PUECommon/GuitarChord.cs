@@ -37,7 +37,7 @@ namespace ProUpgradeEditor.DataLayer
         public void SetNotes(IEnumerable<GuitarNote> notes)
         {
             Clear();
-            this.notes.AddRange(notes);
+            notes.ForEach(x=> internalAddNote(x));
         }
         public void Clear()
         {
@@ -45,19 +45,31 @@ namespace ProUpgradeEditor.DataLayer
             notes.Clear();
         }
 
+        void internalAddNote(GuitarNote n)
+        {
+            if (notes.Any(x => x.IsXNote != n.IsXNote))
+            {
+                n.Channel = notes.First().Channel;
+            }
+            notes.Add(n);
+        }
         public GuitarNote this[int noteString]
         {
-            get { return notes.SingleOrDefault(x => x.NoteString == noteString); }
+            get 
+            {
+                return notes.SingleOrDefault(x => x.NoteString == noteString); 
+            }
             set
             {
                 var existing = notes.SingleOrDefault(x => x.NoteString == noteString);
                 if (existing != null)
                 {
-                    notes.Remove(existing);
+                    Remove(existing);
                 }
+
                 if (value != null)
                 {
-                    notes.Add(value);
+                    internalAddNote(value);
                 }
             }
         }
@@ -244,6 +256,9 @@ namespace ProUpgradeEditor.DataLayer
             {
                 if (upTick != value)
                 {
+                    if (!upTick.IsNull())
+                    {
+                    }
                     upTick = value;
 
                     IsUpdated = true;

@@ -679,7 +679,7 @@ namespace ProUpgradeEditor.UI
 
             try
             {
-
+                
                 buttonSongLibCancel.Enabled = true;
                 progressBarGenCompletedDifficulty.Value = 0;
 
@@ -734,10 +734,13 @@ namespace ProUpgradeEditor.UI
                                 continue;
                             }
 
-                            if (!SaveProFile(item.G6FileName, true))
+                            if (!checkBoxSmokeTest.Checked)
                             {
-                                WriteBatchResult("Failed saving pro file: " + item.ToString());
-                                continue;
+                                if (!SaveProFile(item.G6FileName, true))
+                                {
+                                    WriteBatchResult("Failed saving pro file: " + item.ToString());
+                                    continue;
+                                }
                             }
 
                             if (!SaveProCONFile(item, true, true))
@@ -1532,8 +1535,9 @@ namespace ProUpgradeEditor.UI
                                         fileErrors.Add(trackName + " Big Rock Ending in 5 button but not pro");
                                     }
 
-                                    if (EditorG5.Messages.Solos.Count() !=
-                                        EditorPro.Messages.Solos.Count())
+                                    if (EditorG5.CurrentDifficulty == GuitarDifficulty.Expert &&
+                                        (EditorG5.Messages.Solos.Count() !=
+                                        EditorPro.Messages.Solos.Count()))
                                     {
                                         fileErrors.Add(trackName + " Not all solos created for difficulty: " + EditorPro.CurrentDifficulty.ToString());
                                     }

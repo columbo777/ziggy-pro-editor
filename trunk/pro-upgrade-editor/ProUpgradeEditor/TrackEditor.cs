@@ -29,7 +29,7 @@ namespace ProUpgradeEditor
         }
         public bool IsLoaded
         {
-            get { return guitarTrack != null; }
+            get { return guitarTrack.IsLoaded; }
         }
         
         public void AddTrack(Track t)
@@ -85,6 +85,8 @@ namespace ProUpgradeEditor
                 HScroll.LargeChange = Utility.HScrollLargeChange;
 
                 this.Controls.Add(HScroll);
+
+                
             }
         }
 
@@ -191,8 +193,18 @@ namespace ProUpgradeEditor
             }
         }
 
-        
-        public EEditorType EditorType = EEditorType.None;
+        public void Initialize(bool isPro)
+        {
+            editorType = isPro ? EEditorType.ProGuitar : EEditorType.Guitar5;
+            guitarTrack = new GuitarTrack(isPro);
+        }
+
+        EEditorType editorType = EEditorType.None;
+        public EEditorType EditorType
+        {
+            get { return editorType; }
+            set { editorType = value; }
+        }
 
         
         public bool InPlayback
@@ -340,7 +352,7 @@ namespace ProUpgradeEditor
         public void Close()
         {
             LoadedFileName = string.Empty;
-            this.guitarTrack = null;
+            
             this.backupSequences.Clear();
             if (this.EditorType == EEditorType.ProGuitar)
             {
@@ -620,8 +632,10 @@ namespace ProUpgradeEditor
                     
                     if (t != null)
                     {
-                        this.LoadedFileName = fileName;
-
+                        if (!loadingBackup)
+                        {
+                            this.LoadedFileName = fileName;
+                        }
                         ret = SetTrack6(seq, t, CurrentDifficulty);
                     }
                     
@@ -736,45 +750,14 @@ namespace ProUpgradeEditor
                 return true;
 
             settingTrack5 = true;
+            if (!difficulty.IsEasyMediumHardExpert())
+            {
+                difficulty = GuitarDifficulty.Expert;
+            }
             try
             {
-                if (difficulty.IsAll() || 
-                    difficulty.IsUnknown())
-                {
-                    difficulty = GuitarDifficulty.Expert;
-                }
-                
-                this.currentDifficulty = difficulty;
-                
-                this.EditorType = EEditorType.Guitar5;
-                if (seq == null && t != null)
-                {
-                    seq = t.Sequence;
-                }
-
-                if (seq == null || t == null)
-                {
-                    guitarTrack = null;
-                }
-                else
-                {
-                    if (guitarTrack != null)
-                    {
-                        if (guitarTrack.Sequence == null || 
-                            guitarTrack.Sequence != seq)
-                        {
-                            guitarTrack.Sequence = seq;
-                        }
-                        
-                        guitarTrack.SetTrack(t, difficulty);
-                    }
-                    else
-                    {
-                        guitarTrack = new GuitarTrack(seq, t, false, difficulty);
-                    }
-
-                    ret = guitarTrack.Loaded;
-                }
+                guitarTrack.SetTrack(t, difficulty);
+                ret = guitarTrack.IsLoaded;
             }
             catch{}
 
@@ -814,36 +797,14 @@ namespace ProUpgradeEditor
             settingTrack6 = true;
             try
             {
-                if (difficulty.IsAll() || difficulty.IsUnknown())
+                if (!difficulty.IsEasyMediumHardExpert())
                 {
                     difficulty = GuitarDifficulty.Expert;
                 }
-                this.currentDifficulty = difficulty;
-                 
-                this.EditorType = EEditorType.ProGuitar;
-                if (seq == null && t != null)
-                {
-                    seq = t.Sequence;
-                }
-                if (seq == null || t == null)
-                {
-                    guitarTrack = null;
-                }
-                else
-                {
-                    if (guitarTrack == null || 
-                        guitarTrack.Sequence == null || 
-                        guitarTrack.Sequence != seq)
-                    {
-                        guitarTrack = new GuitarTrack(seq, t, true, this.currentDifficulty);
-                    }
-                    else
-                    {
-                        guitarTrack.SetTrack(t, this.currentDifficulty);
-                    }
+                guitarTrack.SetTrack(t, difficulty);
                     
-                    ret = guitarTrack.Loaded;
-                }
+                ret = guitarTrack.IsLoaded;
+                
             }
             catch { }
 
@@ -854,13 +815,17 @@ namespace ProUpgradeEditor
                     this.OnLoadTrack(this, this.Sequence, t);
                 }
             }
-            finally
+            catch { }
+            try
             {
-                settingTrack6 = false;
-            }
 
-            SetTrackMaximum();
+                SetTrackMaximum();
+            }
+            catch { }
+
+            settingTrack6 = false;
             
+
             return ret;
         }
 
@@ -2842,6 +2807,14 @@ namespace ProUpgradeEditor
             {
                 CurrentSelectionState = EditorSelectionState.Idle;
             }
+
+
+            if (OnReloadTrack != null)
+            {
+                OnReloadTrack(this, SelectNextEnum.ForceKeepSelection);
+            }
+                
+
             SelectStartPointChord = null;
         }
 
@@ -2999,6 +2972,12 @@ namespace ProUpgradeEditor
                     catch {  }
                 }
             }
+
+            if (OnReloadTrack != null)
+            {
+                OnReloadTrack(this, SelectNextEnum.ForceKeepSelection);
+            }
+                
             CurrentSelectionState = EditorSelectionState.Idle;
             return ret;
         }
@@ -3285,23 +3264,25 @@ namespace ProUpgradeEditor
         {
             if (EditorType == EEditorType.Guitar5)
             {
-                SetTrack5(GetTrack(), currentDifficulty);
+                SetTrack5(GetTrack(), CurrentDifficulty);
             }
             else
             {
-                SetTrack6(GetTrack(), currentDifficulty);
+                SetTrack6(GetTrack(), CurrentDifficulty);
             }
         }
-        GuitarDifficulty currentDifficulty = GuitarDifficulty.Expert;
+        
         public GuitarDifficulty CurrentDifficulty
         {
-            get { return currentDifficulty; }
+            get 
+            { 
+                return guitarTrack != null ? guitarTrack.CurrentDifficulty : GuitarDifficulty.Expert; 
+            }
             set
             {
-                if (currentDifficulty != value)
+                if (guitarTrack != null)
                 {
-                    currentDifficulty = value;
-                    ReloadTrack();
+                    guitarTrack.SetTrack(guitarTrack.GetTrack(), value);
                 }
             }
         }
@@ -3389,6 +3370,12 @@ namespace ProUpgradeEditor
             }
             catch { RestoreBackup(); }
 
+
+            if (OnReloadTrack != null)
+            {
+                OnReloadTrack(this, SelectNextEnum.ForceKeepSelection);
+            }
+                
             
             return newChords;
         }

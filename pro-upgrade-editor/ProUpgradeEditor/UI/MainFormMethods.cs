@@ -429,6 +429,8 @@ namespace ProUpgradeEditor.UI
             {
                 EditorG5.CurrentDifficulty = diff;
             }
+
+            RefreshTracks();
         }
         
 
@@ -493,7 +495,7 @@ namespace ProUpgradeEditor.UI
                 }
                 else
                 {
-                    if (!checkBoxSmokeTest.Checked && !string.IsNullOrEmpty(fileName))
+                    if (!string.IsNullOrEmpty(fileName))
                     {
                         EditorPro.SaveTrack(fileName);
                     }
@@ -1743,6 +1745,7 @@ namespace ProUpgradeEditor.UI
                 ret = gc.UpdateChordProperties();
 
                 HandleSelectNext(selectNextEnum);
+                ReloadTracks();
             }
             catch { ret = false; }
             return ret;
@@ -2636,6 +2639,7 @@ namespace ProUpgradeEditor.UI
                     currentTime = track6.TickToTime(minTime);
                 }
             }
+            ReloadTracks();
             return minTime;
         }
 
@@ -5461,7 +5465,6 @@ namespace ProUpgradeEditor.UI
                                 GenerateTrainers(false);
                             }
                         }
-
 
                         if (!SaveProFile(item.G6FileName, true))
                         {

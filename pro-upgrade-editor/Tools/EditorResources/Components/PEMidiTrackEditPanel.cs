@@ -373,7 +373,7 @@ namespace EditorResources.Components
                 });
 
             this.SelectedDifficulty = difficulty;
-
+            
             TrackClicked.IfObjectNotNull(x => x(this, track.Sequence, track, difficulty));
         }
 

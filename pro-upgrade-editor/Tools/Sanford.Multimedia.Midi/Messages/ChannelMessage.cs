@@ -45,6 +45,7 @@ namespace Sanford.Multimedia.Midi
     /// </summary>
     public enum ChannelCommand 
     {
+        Invalid = 0,
         /// <summary>
         /// Represents the note-off command type.
         /// </summary>
@@ -691,8 +692,13 @@ namespace Sanford.Multimedia.Midi
             get
             {
                 var ret = UnpackCommand(msg);
-                if (ret == ChannelCommand.NoteOn && Data2 == 0)
-                    ret = ChannelCommand.NoteOff;
+                if (Data2 == 0)
+                {
+                    if (ret != ChannelCommand.NoteOff)
+                    {
+                        ret = ChannelCommand.NoteOff;
+                    }
+                }
                 return ret;
             }
         }

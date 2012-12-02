@@ -248,8 +248,8 @@ namespace Sanford.Multimedia.Midi
                     var cm = this.ChannelMessage;
                     var bMessage = b.ChannelMessage;
 
-                    var isOffA = cm.Command == ChannelCommand.NoteOff || (cm.Command == ChannelCommand.NoteOn && cm.Data2 == 0);
-                    var isOffB = bMessage.Command == ChannelCommand.NoteOff || (bMessage.Command == ChannelCommand.NoteOn && bMessage.Data2 == 0);
+                    var isOffA = cm.Command == ChannelCommand.NoteOff;
+                    var isOffB = bMessage.Command == ChannelCommand.NoteOff;
 
                     if (isOffA && !isOffB)
                     {

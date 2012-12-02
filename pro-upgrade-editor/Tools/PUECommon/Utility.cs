@@ -584,6 +584,28 @@ namespace ProUpgradeEditor.Common
             return GetStringDifficulty5(data1) != GuitarDifficulty.Unknown;
         }
 
+        public static int[] GetStringsForDifficulty6(GuitarDifficulty diff)
+        {
+            var ret = new List<int>();
+            if (diff.HasFlag(GuitarDifficulty.Easy))
+            {
+                ret.AddRange(EasyData1Strings);
+            }
+            if (diff.HasFlag(GuitarDifficulty.Medium))
+            {
+                ret.AddRange(MediumData1Strings);
+            }
+            if (diff.HasFlag(GuitarDifficulty.Hard))
+            {
+                ret.AddRange(HardData1Strings);
+            }
+            if (diff.HasFlag(GuitarDifficulty.Expert))
+            {
+                ret.AddRange(ExpertData1Strings);
+            }
+            return ret.ToArray();
+        }
+
         public static int[] ExpertData1Strings = new int[] { ExpertData1LowE,
             ExpertData1A, ExpertData1D, ExpertData1G, ExpertData1B, ExpertData1HighE};
 

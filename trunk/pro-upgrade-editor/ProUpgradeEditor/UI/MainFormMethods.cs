@@ -1624,10 +1624,13 @@ namespace ProUpgradeEditor.UI
             noteStart = sc.DownTick;
             noteEnd = sc.UpTick;
             var ch = GetChordFromScreen();
-            var gc = ProGuitarTrack.CreateChord(ch.NoteFrets, ch.NoteChannels, ProGuitarTrack.CurrentDifficulty, noteStart, noteEnd, ch.IsSlide, ch.IsSlideReversed, ch.IsHammeron, ch.StrumMode);
-            if (gc != null)
+            if (ch != null)
             {
-                gc.Selected = true;
+                var gc = ProGuitarTrack.CreateChord(ch.NoteFrets, ch.NoteChannels, ProGuitarTrack.CurrentDifficulty, noteStart, noteEnd, ch.IsSlide, ch.IsSlideReversed, ch.IsHammeron, ch.StrumMode);
+                if (gc != null)
+                {
+                    gc.Selected = true;
+                }
             }
         }
 
@@ -2518,6 +2521,9 @@ namespace ProUpgradeEditor.UI
                     {
                         MessageBox.Show(string.Format("Replaced {0} Matches", numReplaced));
                     }
+
+                    EditorPro.ClearSelection();
+                    EditorPro.GuitarTrack.GetChordsAtTick(match.OriginalChords6.GetMinTick(), match.OriginalChords6.GetMaxTick()).ToList().ForEach(x => x.Selected = true);
                 }
                 
             }
@@ -2529,6 +2535,7 @@ namespace ProUpgradeEditor.UI
 
         void ReplaceMatch()
         {
+            
             if (!EditorsValid)
             {
                 EditorPro.SetStatusIdle();
@@ -2536,19 +2543,18 @@ namespace ProUpgradeEditor.UI
             }
             try
             {
-                
+
                 if (DoReplace())
                 {
                     HandleSelectNext();
                 }
-                
+
             }
             catch
             {
                 UndoLast();
             }
-
-
+            
             EditorPro.SetStatusIdle();
         }
 
@@ -4595,9 +4601,9 @@ namespace ProUpgradeEditor.UI
                 label37.Text = sc.SongName;
 
                 
-                textBox21.SetValueSuspend(sc.G5FileName).ScrollToEnd();
+                textBoxSongLibG5MidiFileName.SetValueSuspend(sc.G5FileName).ScrollToEnd();
                 
-                textBox22.SetValueSuspend(sc.G6FileName).ScrollToEnd();
+                textBoxSongLibProMidiFileName.SetValueSuspend(sc.G6FileName).ScrollToEnd();
                 textBoxSongLibConFile.SetValueSuspend(sc.G6ConFile).ScrollToEnd();
                 textBox24.SetValueSuspend(sc.Description).ScrollToEnd();
                 
@@ -4679,9 +4685,9 @@ namespace ProUpgradeEditor.UI
                 
                 
                 label37.Text = "None Selected";
-                textBox21.Text = "";
+                textBoxSongLibG5MidiFileName.Text = "";
 
-                textBox22.Text = "";
+                textBoxSongLibProMidiFileName.Text = "";
 
                 textBoxSongLibConFile.Text = "";
 
@@ -4791,8 +4797,8 @@ namespace ProUpgradeEditor.UI
         {
             if (sc != null)
             {
-                sc.G5FileName = textBox21.Text;
-                sc.G6FileName = textBox22.Text;
+                sc.G5FileName = textBoxSongLibG5MidiFileName.Text;
+                sc.G6FileName = textBoxSongLibProMidiFileName.Text;
                 sc.G6ConFile = textBoxSongLibConFile.Text;
 
                 sc.Description = textBox24.Text;

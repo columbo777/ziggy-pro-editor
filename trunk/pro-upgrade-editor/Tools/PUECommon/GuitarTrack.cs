@@ -734,21 +734,21 @@ namespace ProUpgradeEditor.DataLayer
         {
             bool ret = true;
 
-            if (gtrack == null ||
-                (gtrack != null && guitarTrack == null) ||
-                (gtrack != null && guitarTrack != null && gtrack != guitarTrack))
+            if (gtrack != guitarTrack)
             {
                 this.gtrack = guitarTrack;
                 this.dirtyItems |= DirtyItem.Track;
             }
 
-            if (guitarTrack != null && !Dirty)
+            if (gtrack != null && gtrack.Dirty)
             {
                 this.dirtyItems |= DirtyItem.Track;
             }
 
             if (this.CurrentDifficulty != difficulty)
             {
+                this.dirtyItems = DirtyItem.Difficulty;
+
                 this.CurrentDifficulty = difficulty;
             }
 
@@ -770,13 +770,14 @@ namespace ProUpgradeEditor.DataLayer
                     Messages = new GuitarMessageList(this);
                     return ret;
                 }
-                if (dirtyItems.HasFlag(DirtyItem.Track) || 
-                    dirtyItems.HasFlag(DirtyItem.Difficulty))
+                if (dirtyItems.HasFlag(DirtyItem.Track))
                 {
                     HasInvalidTempo = false;
                 }
 
                 ret = LoadEvents6();
+
+                
             }
             catch (Exception)
             {

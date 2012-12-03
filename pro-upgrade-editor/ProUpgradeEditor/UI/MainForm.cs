@@ -1169,14 +1169,18 @@ namespace ProUpgradeEditor.UI
             ShowOpenMidi5();
         }
 
-
-
-
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
             {
-                FileNameG5.IfNotEmpty(x=> EditorG5.SaveTrack(FileNameG5));
+                if (FileNameG5.IsEmpty())
+                {
+                    ShowG5MidiSaveAs();
+                }
+                else
+                {
+                    FileNameG5.IfNotEmpty(x => EditorG5.SaveTrack(FileNameG5));
+                }
             }
             catch { }
         }
@@ -2050,17 +2054,17 @@ namespace ProUpgradeEditor.UI
 
         private void button65_Click(object sender, EventArgs e)
         {
-            var path = textBox21.Text;
+            var path = textBoxSongLibG5MidiFileName.Text;
 
             if (string.IsNullOrEmpty(path))
-                path = textBox22.Text;
+                path = textBoxSongLibProMidiFileName.Text;
 
             var s = ShowOpenFileDlg("Select midi file",
                 DefaultMidiFileLocationG5, path);
             if (!string.IsNullOrEmpty(s))
             {
-                textBox21.Text = s;
-                textBox21.ScrollToEnd();
+                textBoxSongLibG5MidiFileName.Text = s;
+                textBoxSongLibG5MidiFileName.ScrollToEnd();
                 
                 if (SelectedSong != null)
                 {
@@ -2073,17 +2077,22 @@ namespace ProUpgradeEditor.UI
 
         private void button66_Click(object sender, EventArgs e)
         {
-            var path = textBox22.Text;
+            var path = textBoxSongLibProMidiFileName.Text;
 
             if (string.IsNullOrEmpty(path))
-                path = textBox21.Text;
+            {
+                if (textBoxSongLibG5MidiFileName.Text.IsNotEmpty())
+                {
+                    path = textBoxSongLibG5MidiFileName.Text + Utility.DefaultPROFileExtension;
+                }
+            }
 
             var s = ShowOpenFileDlg("Select pro midi file",
                 DefaultMidiFileLocationPro, path);
             if (!string.IsNullOrEmpty(s))
             {
-                textBox22.Text = s;
-                textBox22.ScrollToEnd();
+                textBoxSongLibProMidiFileName.Text = s;
+                textBoxSongLibProMidiFileName.ScrollToEnd();
 
                 if (SelectedSong != null)
                 {
@@ -2196,12 +2205,12 @@ namespace ProUpgradeEditor.UI
 
         private void button80_Click(object sender, EventArgs e)
         {
-            OpenExplorerFolder(textBox21.Text);
+            OpenExplorerFolder(textBoxSongLibG5MidiFileName.Text);
         }
 
         private void button79_Click(object sender, EventArgs e)
         {
-            OpenExplorerFolder(textBox22.Text);
+            OpenExplorerFolder(textBoxSongLibProMidiFileName.Text);
         }
 
         private void button78_Click(object sender, EventArgs e)
@@ -3330,9 +3339,10 @@ namespace ProUpgradeEditor.UI
                             }
                         }
                     }
-                    UpdateChordProperties(ch, false, SelectNextEnum.ForceKeepSelection);
+                    ch.UpdateChordProperties();
+                    //UpdateChordProperties(ch, false, SelectNextEnum.ForceKeepSelection);
                 }
-                ReloadTracks(SelectNextEnum.ForceKeepSelection);
+                EditorPro.Invalidate();
             }
             catch
             {
@@ -7003,9 +7013,9 @@ namespace ProUpgradeEditor.UI
                             }
                         }
                     }
-                    UpdateChordProperties(ch, false, SelectNextEnum.ForceKeepSelection);
+                    ch.UpdateChordProperties();
                 }
-                ReloadTracks(SelectNextEnum.ForceKeepSelection);
+                EditorPro.Invalidate();
             }
             catch
             {
@@ -7636,7 +7646,7 @@ namespace ProUpgradeEditor.UI
                         var c = gc.First();
                         chord.DownTick = c.DownTick;
                         chord.UpTick = c.UpTick;
-                        chord.UpdateChordProperties();
+                        
                         return true;
                     }
                 }
@@ -7695,7 +7705,8 @@ namespace ProUpgradeEditor.UI
                     {
                         chord.DownTick = chord.UpTick - 1;
                     }
-                    UpdateChordProperties(chord, false, SelectNextEnum.ForceKeepSelection);
+                    chord.UpdateChordProperties();
+                
                 }
                 ReloadTracks(SelectNextEnum.ForceKeepSelection);
             }
@@ -8122,21 +8133,75 @@ namespace ProUpgradeEditor.UI
         {
             if (track != null)
             {
+                var wasLoaded = EditorPro.IsLoaded;
+                
                 ReloadTracks();
 
-                EditorPro.SetTrack6(track, difficulty);
+                EditorPro.SetTrack6(track.Sequence, track, difficulty);
 
                 ReloadTracks();
                 RefreshTracks();
+
+                if (!wasLoaded)
+                {
+                    var folder = DefaultMidiFileLocationPro.AppendSlashIfMissing();
+                    if (SelectedSong != null)
+                        folder = SelectedSong.G5FileName.GetIfEmpty(SelectedSong.G6FileName).GetFolderName();
+
+                    ShowSaveFileDlg("Save Rock Band 3 Pro Midi File", folder, "").IfNotEmpty(fileName =>
+                    {
+                        FileNamePro = fileName;
+                        EditorPro.SaveTrack(fileName);
+                        
+                        if (SelectedSong != null)
+                        {
+                            SelectedSong.G6FileName = FileNamePro;
+                            textBoxSongLibProMidiFileName.Text = SelectedSong.G6FileName;
+                            UpdateSongCacheItem(SelectedSong);
+                        }
+                    });
+                }
             }
         }
 
         private void midiTrackEditorG5_TrackAdded(PEMidiTrackEditPanel sender, Sequence sequence, Track track, GuitarDifficulty difficulty)
         {
-            ReloadTracks();
-            EditorG5.SetTrack5(track, difficulty);
-            ReloadTracks();
-            RefreshTracks();
+            var wasLoaded = EditorG5.IsLoaded;
+            try
+            {
+                ReloadTracks();
+                EditorG5.SetTrack5(track.Sequence, track, difficulty);
+                ReloadTracks();
+                RefreshTracks();
+
+
+                if (!wasLoaded)
+                {
+                    ShowG5MidiSaveAs();
+                }
+            }
+            catch { }
+        }
+
+        private void ShowG5MidiSaveAs()
+        {
+            var folder = DefaultMidiFileLocationG5.AppendSlashIfMissing();
+            if (SelectedSong != null)
+                folder = SelectedSong.G6FileName.GetIfEmpty(SelectedSong.G5FileName).GetFolderName();
+
+            ShowSaveFileDlg("Save Midi 5", folder,
+                "").IfNotEmpty(fileName =>
+                {
+                    FileNameG5 = fileName;
+                    EditorG5.SaveTrack(fileName);
+
+                    if (SelectedSong != null)
+                    {
+                        SelectedSong.G5FileName = FileNameG5;
+                        textBoxSongLibG5MidiFileName.Text = SelectedSong.G5FileName;
+                        UpdateSongCacheItem(SelectedSong);
+                    }
+                });
         }
 
         private void buttonBatchBuildTextEvents_Click(object sender, EventArgs e)
@@ -9347,5 +9412,95 @@ namespace ProUpgradeEditor.UI
                 ImportFile(x));
         }
 
+        private void checkBoxBatchProcessIncomplete_CheckedChanged(object sender, EventArgs e)
+        {
+            refreshSongListSelection();
+        }
+
+        private void checkBoxBatchProcessIncomplete_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void checkBoxBatchProcessFinalized_CheckedChanged(object sender, EventArgs e)
+        {
+            refreshSongListSelection();
+        }
+
+        void refreshSongListSelection()
+        {
+            
+            
+        }
+
+        private void buttonSongUtilSearchFolderExplore_Click(object sender, EventArgs e)
+        {
+            OpenExplorerFolder(textBoxSongUtilSearchFolder.Text);
+        }
+
+        private void buttonSongUtilSearchForG5FromOpenPro_Click(object sender, EventArgs e)
+        {
+            FindMatchingG5ForPro();
+
+
+        }
+
+        private void FindMatchingG5ForPro()
+        {
+            var searchPaths = new List<string>();
+            if (textBoxSongUtilSearchFolder.Text.FolderExists())
+                searchPaths.Add(textBoxSongUtilSearchFolder.Text.AppendSlashIfMissing());
+
+            if (DefaultMidiFileLocationG5.FolderExists())
+                searchPaths.Add(DefaultMidiFileLocationG5.AppendSlashIfMissing());
+
+            if (DefaultMidiFileLocationPro.FolderExists())
+                searchPaths.Add(DefaultMidiFileLocationPro.AppendSlashIfMissing());
+
+            searchPaths = searchPaths.Distinct().Where(x=> x.IsNotEmpty()).ToList();
+
+            var resultFiles = new List<string>();
+
+            var selectedSongs = listBoxSongLibrary.SelectedItems.ToEnumerable<SongCacheItem>().ToList();
+            
+            searchPaths.ForEach(x =>
+            {
+                resultFiles.AddRange(x.GetFilesInFolder(true, "*.mid").Where(f=> !resultFiles.Contains(f)).ToList());
+            });
+
+            resultFiles = resultFiles.Where(x => SongList.Any(s => 
+                x.GetFileNameWithoutExtension().StartsWith(s.G6FileName.GetFileNameWithoutExtension().Substring(0,
+                Math.Min(6, s.G6FileName.GetFileNameWithoutExtension().Length))) && s.G5FileName.IsEmpty())).ToList();
+
+            resultFiles = resultFiles.OrderBy(x => x.GetFileModifiedTime()).ToList();
+
+            
+            var sb = new StringBuilder();
+            
+            var midiG5Files = new List<KeyValuePair<string, Sequence>>();
+            resultFiles.ForEach(res =>
+            {
+                try
+                {
+                    var seq = res.LoadSequenceFile();
+                    if (seq != null)
+                    {
+                        if (seq.Tracks.Any(x => x.Name.IsGuitarTrackName5() || x.Name.IsBassTrackName5()))
+                        {
+                            midiG5Files.Add(new KeyValuePair<string, Sequence>(res, seq));
+                        }
+                    }
+                }
+                catch { }
+            });
+
+            sb = new StringBuilder();
+            midiG5Files.ForEach(x => sb.AppendLine(x.Key));
+            if (sb.ToString().IsNotEmpty())
+            {
+                OpenNotepad(sb.ToString().GetBytes());
+            }
+
+        }
     }
 }

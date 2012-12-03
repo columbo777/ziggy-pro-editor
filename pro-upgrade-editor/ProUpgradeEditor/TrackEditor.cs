@@ -3283,6 +3283,7 @@ namespace ProUpgradeEditor
                 if (guitarTrack != null)
                 {
                     guitarTrack.SetTrack(guitarTrack.GetTrack(), value);
+                    Invalidate();
                 }
             }
         }

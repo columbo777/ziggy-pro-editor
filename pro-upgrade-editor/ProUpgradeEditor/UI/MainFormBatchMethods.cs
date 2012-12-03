@@ -253,15 +253,14 @@ namespace ProUpgradeEditor.UI
                         {
                             if (File.Exists(item.G6FileName))
                             {
-                                //if (Package.Load(item.G6FileName) != null)
-                                {
-                                    var destFile = Path.Combine(destFolder, Path.GetFileName(item.G6FileName));
+                                
+                                var destFile = Path.Combine(destFolder, Path.GetFileName(item.G6FileName));
 
-                                    if (!TryCopyFile(item.G6FileName, destFile))
-                                    {
-                                        WriteBatchResult("Unable to overwrite: " + item.ToString());
-                                    }
+                                if (!TryCopyFile(item.G6FileName, destFile))
+                                {
+                                    WriteBatchResult("Unable to overwrite: " + item.ToString());
                                 }
+                                
 
                             }
                         }
@@ -1518,7 +1517,7 @@ namespace ProUpgradeEditor.UI
                             if (EditorG5.IsLoaded)
                             {
 
-                                if (GuitarTrack.IsBassTrackName(t.Name) && (item != null && item.HasBass == false))
+                                if (t.Name.IsBassTrackName6() && (item != null && item.CopyGuitarToBass == false))
                                 {
                                     EditorG5.SetTrack(GuitarTrack.GuitarTrackName5, EditorPro.CurrentDifficulty);
                                 }

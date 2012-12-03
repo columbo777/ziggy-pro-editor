@@ -219,6 +219,12 @@ namespace ProUpgradeEditor.DataLayer
                         if (n.DownTick != value)
                         {
                             n.DownTick = value;
+
+                            if (n.DownEvent != null)
+                            {
+                                OwnerTrack.Remove(n.DownEvent);
+                                n.DownEvent = OwnerTrack.Insert(value, n.DownEvent.Clone());
+                            }
                         }
                     }
                     foreach (var m in Modifiers)
@@ -226,6 +232,11 @@ namespace ProUpgradeEditor.DataLayer
                         if (m.DownTick != value)
                         {
                             m.DownTick = value;
+                            if (m.DownEvent != null)
+                            {
+                                OwnerTrack.Remove(m.DownEvent);
+                                m.DownEvent = OwnerTrack.Insert(value, m.DownEvent.Clone());
+                            }
                         }
                     }
                 }
@@ -267,14 +278,30 @@ namespace ProUpgradeEditor.DataLayer
                     {
                         if (n.UpTick != value)
                         {
-                            n.UpTick = value;
+                            if (n.UpEvent != null)
+                            {
+                                OwnerTrack.Remove(n.UpEvent);
+                                n.UpEvent = OwnerTrack.Insert(value, n.UpEvent.Clone());
+                            }
+                            else
+                            {
+                                n.UpTick = value;
+                            }
                         }
                     }
                     foreach (var m in Modifiers)
                     {
                         if (m.UpTick != value)
                         {
-                            m.UpTick = value;
+                            if (m.UpEvent != null)
+                            {
+                                OwnerTrack.Remove(m.UpEvent);
+                                m.UpEvent = OwnerTrack.Insert(value, m.UpEvent.Clone());
+                            }
+                            else
+                            {
+                                m.UpTick = value;
+                            }
                         }
                     }
                 }

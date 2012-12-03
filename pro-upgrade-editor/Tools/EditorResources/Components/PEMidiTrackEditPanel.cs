@@ -110,11 +110,11 @@ namespace EditorResources.Components
         public event TrackEditPanelEventHandler TrackClicked;
 
 
-        void CreatePanelTracks(Sequence seq)
+        void CreatePanelTracks(Sequence seq, bool forceRefresh=false)
         {
 
             bool refresh = false;
-            if (seq != null)
+            if (forceRefresh == false && seq != null)
             {
                 if (seq != this.sequence)
                     refresh = true;
@@ -516,8 +516,9 @@ namespace EditorResources.Components
             if (SelectedTrack != null && textBoxTrackName.Text.Length > 0)
             {
                 DoRequestBackup();
+                
                 SelectedTrack.Track.Name = textBoxTrackName.Text;
-                CreatePanelTracks(this.sequence);
+                CreatePanelTracks(this.sequence,true);
             }
         }
 

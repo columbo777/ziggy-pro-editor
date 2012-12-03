@@ -1165,7 +1165,7 @@ namespace ProUpgradeEditor
         }
         public static bool IsGuitarTrackName5(this string str)
         {
-            return str.IsEmpty() ? false : GuitarTrack.IsGuitarTrackName(str) && GuitarTrack.IsTrackName22(str)==false;
+            return str.IsEmpty() ? false : GuitarTrack.GuitarTrackName5.Contains(str);
         }
         public static bool IsGuitarTrackName6(this string str)
         {
@@ -1177,7 +1177,7 @@ namespace ProUpgradeEditor
         }
         public static bool IsBassTrackName5(this string str)
         {
-            return str.IsEmpty() ? false : GuitarTrack.IsBassTrackName(str) && GuitarTrack.IsTrackName22(str) == false;
+            return str.IsEmpty() ? false : GuitarTrack.BassTrackName5.Contains(str);
         }
         public static bool IsGuitarTrackName(this string str)
         {

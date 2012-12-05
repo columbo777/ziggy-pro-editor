@@ -266,6 +266,7 @@
     <Content Include="Resources\clear-left.png" />
     <Content Include="Resources\clipboard-sign-out.png" />
     <Content Include="Resources\copy.png" />
+    <None Include="Resources\cross.png" />
     <Content Include="Resources\disk.png" />
     <Content Include="Resources\document-music-playlist.png" />
     <Content Include="Resources\doc_music.png" />
@@ -357,6 +358,7 @@
     <Content Include="Resources\topbottom.png" />
     <Content Include="Resources\topbottomblue.png" />
     <Content Include="Resources\topbottomwhite.png" />
+    <None Include="Resources\ui-text-field-clear.png" />
     <Content Include="Resources\USBBlueArrow.png" />
     <Content Include="Resources\USBExcl.png" />
     <Content Include="Resources\USBFlash.png" />

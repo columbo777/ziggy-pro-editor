@@ -1568,7 +1568,17 @@ namespace ProUpgradeEditor
                 return null;
             }
         }
-        
+
+        public void SelectAllChords()
+        {
+            if (IsLoaded)
+            {
+                ClearSelection();
+                Messages.Chords.All(x => x.Selected = true);
+                Invalidate();
+            }
+        }
+
         public List<GuitarChord> SelectedChords
         {
             get

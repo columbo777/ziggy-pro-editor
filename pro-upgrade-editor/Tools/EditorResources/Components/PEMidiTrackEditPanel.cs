@@ -571,15 +571,18 @@ namespace EditorResources.Components
         {
             if (MouseButtons == System.Windows.Forms.MouseButtons.Left)
             {
-                var insertPoint = GetInsertPoint();
-                if (insertPoint.IsNull() == false)
+                if (ClientRectangle.Contains(PointToClient(MousePosition)))
                 {
-                    e.Graphics.Flush();
-                    using (var p = new Pen(Color.FromArgb(200, Color.Red), 1.5f))
+                    var insertPoint = GetInsertPoint();
+                    if (insertPoint.IsNull() == false)
                     {
-                        e.Graphics.DrawLine(p, 0, (insertPoint ), panelTracks.Width, (insertPoint ));
+                        e.Graphics.Flush();
+                        using (var p = new Pen(Color.FromArgb(200, Color.Red), 1.5f))
+                        {
+                            e.Graphics.DrawLine(p, 0, (insertPoint), panelTracks.Width, (insertPoint));
+                        }
+                        e.Graphics.Flush();
                     }
-                    e.Graphics.Flush();
                 }
             }
         }

@@ -67,6 +67,13 @@ namespace ProUpgradeEditor {
             }
         }
         
+        internal static System.Drawing.Bitmap cross {
+            get {
+                object obj = ResourceManager.GetObject("cross", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap doc_music {
             get {
                 object obj = ResourceManager.GetObject("doc_music", resourceCulture);
@@ -287,6 +294,13 @@ namespace ProUpgradeEditor {
         internal static System.Drawing.Bitmap topbottomwhite {
             get {
                 object obj = ResourceManager.GetObject("topbottomwhite", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap ui_text_field_clear {
+            get {
+                object obj = ResourceManager.GetObject("ui_text_field_clear", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

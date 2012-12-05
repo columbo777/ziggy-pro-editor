@@ -34,9 +34,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             System.Windows.Forms.GroupBox groupBox3;
             System.Windows.Forms.GroupBox groupBox14;
-            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("File Name", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Size", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Date", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("File Name", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("Size", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("Date", System.Windows.Forms.HorizontalAlignment.Left);
             this.panel8 = new System.Windows.Forms.Panel();
             this.midiTrackEditorG5 = new EditorResources.Components.PEMidiTrackEditPanel();
             this.button102 = new System.Windows.Forms.Button();
@@ -76,6 +76,14 @@
             this.tabContainerMain = new System.Windows.Forms.TabControl();
             this.tabSongLibraryUtility = new System.Windows.Forms.TabPage();
             this.groupBox39 = new System.Windows.Forms.GroupBox();
+            this.groupBox48 = new System.Windows.Forms.GroupBox();
+            this.checkBoxSongLibSongListSortAscending = new System.Windows.Forms.CheckBox();
+            this.radioSongLibSongListSortCompleted = new System.Windows.Forms.RadioButton();
+            this.radioSongLibSongListSortID = new System.Windows.Forms.RadioButton();
+            this.radioSongLibSongListSortName = new System.Windows.Forms.RadioButton();
+            this.buttonSongLibListFilterReset = new System.Windows.Forms.Button();
+            this.label55 = new System.Windows.Forms.Label();
+            this.textBoxSongLibListFilter = new System.Windows.Forms.TextBox();
             this.listBoxSongLibrary = new System.Windows.Forms.ListBox();
             this.buttonCreateSongFromOpenMidi = new System.Windows.Forms.Button();
             this.button68 = new System.Windows.Forms.Button();
@@ -162,8 +170,6 @@
             this.checkBoxBatchUtilExtractXMLG5 = new System.Windows.Forms.CheckBox();
             this.button94 = new System.Windows.Forms.Button();
             this.textBoxBatchUtilExtractXML = new System.Windows.Forms.TextBox();
-            this.button95 = new System.Windows.Forms.Button();
-            this.buttonCopyAllConToUSB = new System.Windows.Forms.Button();
             this.checkBoxCompressAllInDefaultCONFolder = new System.Windows.Forms.CheckBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.groupBox23 = new System.Windows.Forms.GroupBox();
@@ -203,6 +209,8 @@
             this.textBoxCopyAllProFolder = new System.Windows.Forms.TextBox();
             this.textBoxCompressAllZipFile = new System.Windows.Forms.TextBox();
             this.textBoxCopyAllCONFolder = new System.Windows.Forms.TextBox();
+            this.button95 = new System.Windows.Forms.Button();
+            this.buttonCopyAllConToUSB = new System.Windows.Forms.Button();
             this.button82 = new System.Windows.Forms.Button();
             this.button72 = new System.Windows.Forms.Button();
             this.button117 = new System.Windows.Forms.Button();
@@ -306,6 +314,7 @@
             this.button52 = new System.Windows.Forms.Button();
             this.checkBoxSearchByNoteFret = new System.Windows.Forms.CheckBox();
             this.groupBox10 = new System.Windows.Forms.GroupBox();
+            this.buttonNoteUtilSelectAll = new System.Windows.Forms.Button();
             this.buttonUtilMethodSetToG5 = new System.Windows.Forms.Button();
             this.buttonUtilMethodFindNoteLenZero = new System.Windows.Forms.Button();
             this.buttonDownOctave = new System.Windows.Forms.Button();
@@ -518,31 +527,31 @@
             this.listUSBFileView = new System.Windows.Forms.ListView();
             this.treeUSBContents = new System.Windows.Forms.TreeView();
             this.progressUSBFiles = new System.Windows.Forms.ProgressBar();
-            this.buttonUSBRenameFile = new System.Windows.Forms.Button();
             this.textBoxUSBFileName = new System.Windows.Forms.TextBox();
-            this.buttonUSBViewPackage = new System.Windows.Forms.Button();
             this.buttonUSBAddFolder = new System.Windows.Forms.Button();
             this.progressUSBSongs = new System.Windows.Forms.ProgressBar();
+            this.label47 = new System.Windows.Forms.Label();
+            this.buttonUSBRestoreImage = new System.Windows.Forms.Button();
+            this.buttonUSBCreateImage = new System.Windows.Forms.Button();
+            this.textBoxUSBFolder = new System.Windows.Forms.TextBox();
+            this.label46 = new System.Windows.Forms.Label();
+            this.comboUSBList = new System.Windows.Forms.ComboBox();
+            this.label45 = new System.Windows.Forms.Label();
+            this.buttonUSBRenameFile = new System.Windows.Forms.Button();
+            this.buttonUSBViewPackage = new System.Windows.Forms.Button();
             this.buttonUSBSelectCompletedSongs = new System.Windows.Forms.Button();
             this.buttonUSBSelectAllSongs = new System.Windows.Forms.Button();
             this.buttonUSBAddFile = new System.Windows.Forms.Button();
             this.buttonUSBDeleteFile = new System.Windows.Forms.Button();
-            this.label47 = new System.Windows.Forms.Label();
-            this.buttonUSBRestoreImage = new System.Windows.Forms.Button();
-            this.buttonUSBCreateImage = new System.Windows.Forms.Button();
             this.buttonUSBSetDefaultFolder = new System.Windows.Forms.Button();
             this.buttonUSBRenameFolder = new System.Windows.Forms.Button();
             this.buttonUSBCreateFolder = new System.Windows.Forms.Button();
-            this.textBoxUSBFolder = new System.Windows.Forms.TextBox();
             this.buttonUSBRefresh = new System.Windows.Forms.Button();
             this.buttonUSBCopySelectedSongToUSB = new System.Windows.Forms.Button();
-            this.label46 = new System.Windows.Forms.Label();
             this.buttonUSBExtractSelectedFiles = new System.Windows.Forms.Button();
             this.buttonUSBExtractFolder = new System.Windows.Forms.Button();
             this.buttonUSBDeleteSelected = new System.Windows.Forms.Button();
-            this.comboUSBList = new System.Windows.Forms.ComboBox();
             this.button125 = new System.Windows.Forms.Button();
-            this.label45 = new System.Windows.Forms.Label();
             this.tabSettings = new System.Windows.Forms.TabPage();
             this.groupBox38 = new System.Windows.Forms.GroupBox();
             this.button115 = new System.Windows.Forms.Button();
@@ -633,6 +642,7 @@
             this.buttonMaximizeG6 = new System.Windows.Forms.Button();
             this.labelStatusIconEditor6 = new System.Windows.Forms.Label();
             this.labelCurrentLoadedG6 = new System.Windows.Forms.Label();
+            this.animationTimer = new System.Windows.Forms.Timer(this.components);
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -660,7 +670,7 @@
             this.xBoxUSBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.animationTimer = new System.Windows.Forms.Timer(this.components);
+            this.saveProXMLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             groupBox24 = new System.Windows.Forms.GroupBox();
             groupBox15 = new System.Windows.Forms.GroupBox();
             groupBox3 = new System.Windows.Forms.GroupBox();
@@ -675,6 +685,7 @@
             this.tabContainerMain.SuspendLayout();
             this.tabSongLibraryUtility.SuspendLayout();
             this.groupBox39.SuspendLayout();
+            this.groupBox48.SuspendLayout();
             this.tabControl2.SuspendLayout();
             this.tabSongLibSongProperties.SuspendLayout();
             this.groupBox25.SuspendLayout();
@@ -1423,6 +1434,10 @@
             // 
             this.groupBox39.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox39.Controls.Add(this.groupBox48);
+            this.groupBox39.Controls.Add(this.buttonSongLibListFilterReset);
+            this.groupBox39.Controls.Add(this.label55);
+            this.groupBox39.Controls.Add(this.textBoxSongLibListFilter);
             this.groupBox39.Controls.Add(this.listBoxSongLibrary);
             this.groupBox39.Controls.Add(this.buttonCreateSongFromOpenMidi);
             this.groupBox39.Controls.Add(this.button68);
@@ -1434,6 +1449,98 @@
             this.groupBox39.TabIndex = 17;
             this.groupBox39.TabStop = false;
             this.groupBox39.Text = "Song Library";
+            // 
+            // groupBox48
+            // 
+            this.groupBox48.Controls.Add(this.checkBoxSongLibSongListSortAscending);
+            this.groupBox48.Controls.Add(this.radioSongLibSongListSortCompleted);
+            this.groupBox48.Controls.Add(this.radioSongLibSongListSortID);
+            this.groupBox48.Controls.Add(this.radioSongLibSongListSortName);
+            this.groupBox48.Location = new System.Drawing.Point(6, 428);
+            this.groupBox48.Name = "groupBox48";
+            this.groupBox48.Size = new System.Drawing.Size(250, 76);
+            this.groupBox48.TabIndex = 7;
+            this.groupBox48.TabStop = false;
+            this.groupBox48.Text = "Sort";
+            // 
+            // checkBoxSongLibSongListSortAscending
+            // 
+            this.checkBoxSongLibSongListSortAscending.Checked = true;
+            this.checkBoxSongLibSongListSortAscending.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxSongLibSongListSortAscending.ForeColor = System.Drawing.Color.Black;
+            this.checkBoxSongLibSongListSortAscending.Location = new System.Drawing.Point(6, 47);
+            this.checkBoxSongLibSongListSortAscending.Name = "checkBoxSongLibSongListSortAscending";
+            this.checkBoxSongLibSongListSortAscending.Size = new System.Drawing.Size(82, 19);
+            this.checkBoxSongLibSongListSortAscending.TabIndex = 3;
+            this.checkBoxSongLibSongListSortAscending.Text = "Ascending";
+            this.checkBoxSongLibSongListSortAscending.UseVisualStyleBackColor = true;
+            this.checkBoxSongLibSongListSortAscending.CheckedChanged += new System.EventHandler(this.checkBoxSongLibSongListSortAscending_CheckedChanged);
+            // 
+            // radioSongLibSongListSortCompleted
+            // 
+            this.radioSongLibSongListSortCompleted.ForeColor = System.Drawing.Color.Black;
+            this.radioSongLibSongListSortCompleted.Location = new System.Drawing.Point(114, 22);
+            this.radioSongLibSongListSortCompleted.Name = "radioSongLibSongListSortCompleted";
+            this.radioSongLibSongListSortCompleted.Size = new System.Drawing.Size(84, 19);
+            this.radioSongLibSongListSortCompleted.TabIndex = 2;
+            this.radioSongLibSongListSortCompleted.Text = "Completed";
+            this.radioSongLibSongListSortCompleted.UseVisualStyleBackColor = true;
+            this.radioSongLibSongListSortCompleted.CheckedChanged += new System.EventHandler(this.radioSongLibSongListSortCompleted_CheckedChanged);
+            // 
+            // radioSongLibSongListSortID
+            // 
+            this.radioSongLibSongListSortID.ForeColor = System.Drawing.Color.Black;
+            this.radioSongLibSongListSortID.Location = new System.Drawing.Point(72, 22);
+            this.radioSongLibSongListSortID.Name = "radioSongLibSongListSortID";
+            this.radioSongLibSongListSortID.Size = new System.Drawing.Size(36, 19);
+            this.radioSongLibSongListSortID.TabIndex = 1;
+            this.radioSongLibSongListSortID.Text = "ID";
+            this.radioSongLibSongListSortID.UseVisualStyleBackColor = true;
+            this.radioSongLibSongListSortID.CheckedChanged += new System.EventHandler(this.radioSongLibSongListSortID_CheckedChanged);
+            // 
+            // radioSongLibSongListSortName
+            // 
+            this.radioSongLibSongListSortName.Checked = true;
+            this.radioSongLibSongListSortName.ForeColor = System.Drawing.Color.Black;
+            this.radioSongLibSongListSortName.Location = new System.Drawing.Point(6, 22);
+            this.radioSongLibSongListSortName.Name = "radioSongLibSongListSortName";
+            this.radioSongLibSongListSortName.Size = new System.Drawing.Size(57, 19);
+            this.radioSongLibSongListSortName.TabIndex = 0;
+            this.radioSongLibSongListSortName.TabStop = true;
+            this.radioSongLibSongListSortName.Text = "Name";
+            this.radioSongLibSongListSortName.UseVisualStyleBackColor = true;
+            this.radioSongLibSongListSortName.CheckedChanged += new System.EventHandler(this.radioSongLibSongListSortName_CheckedChanged);
+            // 
+            // buttonSongLibListFilterReset
+            // 
+            this.buttonSongLibListFilterReset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buttonSongLibListFilterReset.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.buttonSongLibListFilterReset.Image = global::ProUpgradeEditor.ProResources.ui_text_field_clear;
+            this.buttonSongLibListFilterReset.Location = new System.Drawing.Point(232, 399);
+            this.buttonSongLibListFilterReset.Name = "buttonSongLibListFilterReset";
+            this.buttonSongLibListFilterReset.Size = new System.Drawing.Size(24, 24);
+            this.buttonSongLibListFilterReset.TabIndex = 6;
+            this.toolTip1.SetToolTip(this.buttonSongLibListFilterReset, "Clear Filter");
+            this.buttonSongLibListFilterReset.UseVisualStyleBackColor = true;
+            this.buttonSongLibListFilterReset.Click += new System.EventHandler(this.buttonSongLibListFilterReset_Click);
+            // 
+            // label55
+            // 
+            this.label55.AutoSize = true;
+            this.label55.ForeColor = System.Drawing.Color.Black;
+            this.label55.Location = new System.Drawing.Point(42, 402);
+            this.label55.Name = "label55";
+            this.label55.Size = new System.Drawing.Size(36, 15);
+            this.label55.TabIndex = 5;
+            this.label55.Text = "Filter:";
+            // 
+            // textBoxSongLibListFilter
+            // 
+            this.textBoxSongLibListFilter.Location = new System.Drawing.Point(84, 399);
+            this.textBoxSongLibListFilter.Name = "textBoxSongLibListFilter";
+            this.textBoxSongLibListFilter.Size = new System.Drawing.Size(142, 23);
+            this.textBoxSongLibListFilter.TabIndex = 4;
+            this.textBoxSongLibListFilter.TextChanged += new System.EventHandler(this.textBoxSongLibListFilter_TextChanged);
             // 
             // listBoxSongLibrary
             // 
@@ -1455,7 +1562,7 @@
             this.buttonCreateSongFromOpenMidi.ForeColor = System.Drawing.SystemColors.ControlText;
             this.buttonCreateSongFromOpenMidi.ImageIndex = 14;
             this.buttonCreateSongFromOpenMidi.ImageList = this.imageList1;
-            this.buttonCreateSongFromOpenMidi.Location = new System.Drawing.Point(19, 24);
+            this.buttonCreateSongFromOpenMidi.Location = new System.Drawing.Point(6, 24);
             this.buttonCreateSongFromOpenMidi.Name = "buttonCreateSongFromOpenMidi";
             this.buttonCreateSongFromOpenMidi.Size = new System.Drawing.Size(167, 24);
             this.buttonCreateSongFromOpenMidi.TabIndex = 0;
@@ -1505,7 +1612,7 @@
             this.tabControl2.MinimumSize = new System.Drawing.Size(736, 403);
             this.tabControl2.Name = "tabControl2";
             this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(815, 516);
+            this.tabControl2.Size = new System.Drawing.Size(798, 516);
             this.tabControl2.TabIndex = 16;
             // 
             // tabSongLibSongProperties
@@ -1516,7 +1623,7 @@
             this.tabSongLibSongProperties.Location = new System.Drawing.Point(4, 24);
             this.tabSongLibSongProperties.Margin = new System.Windows.Forms.Padding(0);
             this.tabSongLibSongProperties.Name = "tabSongLibSongProperties";
-            this.tabSongLibSongProperties.Size = new System.Drawing.Size(807, 488);
+            this.tabSongLibSongProperties.Size = new System.Drawing.Size(790, 488);
             this.tabSongLibSongProperties.TabIndex = 0;
             this.tabSongLibSongProperties.Text = "Song Properties";
             // 
@@ -1566,7 +1673,7 @@
             this.groupBox25.ForeColor = System.Drawing.SystemColors.ControlText;
             this.groupBox25.Location = new System.Drawing.Point(0, 0);
             this.groupBox25.Name = "groupBox25";
-            this.groupBox25.Size = new System.Drawing.Size(807, 488);
+            this.groupBox25.Size = new System.Drawing.Size(790, 488);
             this.groupBox25.TabIndex = 0;
             this.groupBox25.TabStop = false;
             this.groupBox25.UseCompatibleTextRendering = true;
@@ -2385,8 +2492,6 @@
             this.tabSongLibUtility.Controls.Add(this.checkBoxBatchUtilExtractXMLG5);
             this.tabSongLibUtility.Controls.Add(this.button94);
             this.tabSongLibUtility.Controls.Add(this.textBoxBatchUtilExtractXML);
-            this.tabSongLibUtility.Controls.Add(this.button95);
-            this.tabSongLibUtility.Controls.Add(this.buttonCopyAllConToUSB);
             this.tabSongLibUtility.Controls.Add(this.checkBoxCompressAllInDefaultCONFolder);
             this.tabSongLibUtility.Controls.Add(this.groupBox4);
             this.tabSongLibUtility.Controls.Add(this.progressBarGenCompletedDifficulty);
@@ -2398,6 +2503,8 @@
             this.tabSongLibUtility.Controls.Add(this.textBoxCopyAllProFolder);
             this.tabSongLibUtility.Controls.Add(this.textBoxCompressAllZipFile);
             this.tabSongLibUtility.Controls.Add(this.textBoxCopyAllCONFolder);
+            this.tabSongLibUtility.Controls.Add(this.button95);
+            this.tabSongLibUtility.Controls.Add(this.buttonCopyAllConToUSB);
             this.tabSongLibUtility.Controls.Add(this.button82);
             this.tabSongLibUtility.Controls.Add(this.button72);
             this.tabSongLibUtility.Controls.Add(this.button117);
@@ -2406,7 +2513,7 @@
             this.tabSongLibUtility.Location = new System.Drawing.Point(4, 24);
             this.tabSongLibUtility.Name = "tabSongLibUtility";
             this.tabSongLibUtility.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSongLibUtility.Size = new System.Drawing.Size(807, 488);
+            this.tabSongLibUtility.Size = new System.Drawing.Size(790, 488);
             this.tabSongLibUtility.TabIndex = 1;
             this.tabSongLibUtility.Text = "Batch Utilities";
             // 
@@ -2453,33 +2560,6 @@
             this.textBoxBatchUtilExtractXML.Size = new System.Drawing.Size(311, 23);
             this.textBoxBatchUtilExtractXML.TabIndex = 18;
             // 
-            // button95
-            // 
-            this.button95.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button95.ImageIndex = 29;
-            this.button95.ImageList = this.imageList1;
-            this.button95.Location = new System.Drawing.Point(450, 369);
-            this.button95.Name = "button95";
-            this.button95.Size = new System.Drawing.Size(24, 24);
-            this.button95.TabIndex = 19;
-            this.toolTip1.SetToolTip(this.button95, "Select Location");
-            this.button95.UseVisualStyleBackColor = true;
-            this.button95.Click += new System.EventHandler(this.buttonBatchUtilExtractXMLBrowse_Click);
-            // 
-            // buttonCopyAllConToUSB
-            // 
-            this.buttonCopyAllConToUSB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonCopyAllConToUSB.ImageIndex = 21;
-            this.buttonCopyAllConToUSB.ImageList = this.imageList1;
-            this.buttonCopyAllConToUSB.Location = new System.Drawing.Point(478, 316);
-            this.buttonCopyAllConToUSB.Name = "buttonCopyAllConToUSB";
-            this.buttonCopyAllConToUSB.Size = new System.Drawing.Size(24, 24);
-            this.buttonCopyAllConToUSB.TabIndex = 16;
-            this.buttonCopyAllConToUSB.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip1.SetToolTip(this.buttonCopyAllConToUSB, "Copy Packages to USB");
-            this.buttonCopyAllConToUSB.UseVisualStyleBackColor = true;
-            this.buttonCopyAllConToUSB.Click += new System.EventHandler(this.buttonCopyAllConToUSB_Click);
-            // 
             // checkBoxCompressAllInDefaultCONFolder
             // 
             this.checkBoxCompressAllInDefaultCONFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -2500,7 +2580,7 @@
             this.groupBox4.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.groupBox4.Location = new System.Drawing.Point(3, 3);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(801, 259);
+            this.groupBox4.Size = new System.Drawing.Size(784, 259);
             this.groupBox4.TabIndex = 14;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Batch Processing";
@@ -2577,9 +2657,9 @@
             this.groupBox22.Controls.Add(this.checkBoxBatchGuitarBassCopy);
             this.groupBox22.Controls.Add(this.checkBoxBatchRebuildCON);
             this.groupBox22.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
-            this.groupBox22.Location = new System.Drawing.Point(173, 20);
+            this.groupBox22.Location = new System.Drawing.Point(183, 20);
             this.groupBox22.Name = "groupBox22";
-            this.groupBox22.Size = new System.Drawing.Size(275, 233);
+            this.groupBox22.Size = new System.Drawing.Size(265, 233);
             this.groupBox22.TabIndex = 1;
             this.groupBox22.TabStop = false;
             this.groupBox22.Text = "Commands";
@@ -2707,7 +2787,7 @@
             this.buttonSongLibCancel.ForeColor = System.Drawing.SystemColors.ControlText;
             this.buttonSongLibCancel.ImageIndex = 31;
             this.buttonSongLibCancel.ImageList = this.imageList1;
-            this.buttonSongLibCancel.Location = new System.Drawing.Point(202, 203);
+            this.buttonSongLibCancel.Location = new System.Drawing.Point(192, 202);
             this.buttonSongLibCancel.Name = "buttonSongLibCancel";
             this.buttonSongLibCancel.Size = new System.Drawing.Size(67, 24);
             this.buttonSongLibCancel.TabIndex = 11;
@@ -2721,7 +2801,7 @@
             this.button89.ForeColor = System.Drawing.SystemColors.ControlText;
             this.button89.ImageIndex = 68;
             this.button89.ImageList = this.imageList1;
-            this.button89.Location = new System.Drawing.Point(127, 203);
+            this.button89.Location = new System.Drawing.Point(117, 202);
             this.button89.Name = "button89";
             this.button89.Size = new System.Drawing.Size(74, 24);
             this.button89.TabIndex = 10;
@@ -2780,7 +2860,7 @@
             this.groupBox21.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.groupBox21.Location = new System.Drawing.Point(6, 20);
             this.groupBox21.Name = "groupBox21";
-            this.groupBox21.Size = new System.Drawing.Size(158, 233);
+            this.groupBox21.Size = new System.Drawing.Size(171, 233);
             this.groupBox21.TabIndex = 0;
             this.groupBox21.TabStop = false;
             this.groupBox21.Text = "Options";
@@ -2822,11 +2902,10 @@
             // 
             // checkBoxMultiSelectionSongList
             // 
-            this.checkBoxMultiSelectionSongList.AutoSize = true;
             this.checkBoxMultiSelectionSongList.ForeColor = System.Drawing.Color.Black;
             this.checkBoxMultiSelectionSongList.Location = new System.Drawing.Point(6, 55);
             this.checkBoxMultiSelectionSongList.Name = "checkBoxMultiSelectionSongList";
-            this.checkBoxMultiSelectionSongList.Size = new System.Drawing.Size(125, 17);
+            this.checkBoxMultiSelectionSongList.Size = new System.Drawing.Size(144, 19);
             this.checkBoxMultiSelectionSongList.TabIndex = 2;
             this.checkBoxMultiSelectionSongList.Text = "Selected Songs Only";
             this.checkBoxMultiSelectionSongList.UseVisualStyleBackColor = true;
@@ -2834,11 +2913,10 @@
             // 
             // checkBoxSmokeTest
             // 
-            this.checkBoxSmokeTest.AutoSize = true;
             this.checkBoxSmokeTest.ForeColor = System.Drawing.Color.Black;
-            this.checkBoxSmokeTest.Location = new System.Drawing.Point(6, 73);
+            this.checkBoxSmokeTest.Location = new System.Drawing.Point(6, 76);
             this.checkBoxSmokeTest.Name = "checkBoxSmokeTest";
-            this.checkBoxSmokeTest.Size = new System.Drawing.Size(139, 17);
+            this.checkBoxSmokeTest.Size = new System.Drawing.Size(159, 17);
             this.checkBoxSmokeTest.TabIndex = 3;
             this.checkBoxSmokeTest.Text = "Smoke Test (dont save)";
             this.checkBoxSmokeTest.UseVisualStyleBackColor = true;
@@ -2928,6 +3006,33 @@
             this.textBoxCopyAllCONFolder.Size = new System.Drawing.Size(311, 23);
             this.textBoxCopyAllCONFolder.TabIndex = 7;
             // 
+            // button95
+            // 
+            this.button95.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button95.ImageIndex = 29;
+            this.button95.ImageList = this.imageList1;
+            this.button95.Location = new System.Drawing.Point(450, 369);
+            this.button95.Name = "button95";
+            this.button95.Size = new System.Drawing.Size(24, 24);
+            this.button95.TabIndex = 19;
+            this.toolTip1.SetToolTip(this.button95, "Select Location");
+            this.button95.UseVisualStyleBackColor = true;
+            this.button95.Click += new System.EventHandler(this.buttonBatchUtilExtractXMLBrowse_Click);
+            // 
+            // buttonCopyAllConToUSB
+            // 
+            this.buttonCopyAllConToUSB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonCopyAllConToUSB.ImageIndex = 21;
+            this.buttonCopyAllConToUSB.ImageList = this.imageList1;
+            this.buttonCopyAllConToUSB.Location = new System.Drawing.Point(478, 316);
+            this.buttonCopyAllConToUSB.Name = "buttonCopyAllConToUSB";
+            this.buttonCopyAllConToUSB.Size = new System.Drawing.Size(24, 24);
+            this.buttonCopyAllConToUSB.TabIndex = 16;
+            this.buttonCopyAllConToUSB.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.toolTip1.SetToolTip(this.buttonCopyAllConToUSB, "Copy Packages to USB");
+            this.buttonCopyAllConToUSB.UseVisualStyleBackColor = true;
+            this.buttonCopyAllConToUSB.Click += new System.EventHandler(this.buttonCopyAllConToUSB_Click);
+            // 
             // button82
             // 
             this.button82.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -2985,7 +3090,7 @@
             this.tabSongLibSongUtility.Controls.Add(this.groupBox47);
             this.tabSongLibSongUtility.Location = new System.Drawing.Point(4, 24);
             this.tabSongLibSongUtility.Name = "tabSongLibSongUtility";
-            this.tabSongLibSongUtility.Size = new System.Drawing.Size(807, 488);
+            this.tabSongLibSongUtility.Size = new System.Drawing.Size(790, 488);
             this.tabSongLibSongUtility.TabIndex = 2;
             this.tabSongLibSongUtility.Text = "Song Utility";
             this.tabSongLibSongUtility.UseVisualStyleBackColor = true;
@@ -3000,7 +3105,7 @@
             this.groupBox47.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.groupBox47.Location = new System.Drawing.Point(0, 0);
             this.groupBox47.Name = "groupBox47";
-            this.groupBox47.Size = new System.Drawing.Size(807, 489);
+            this.groupBox47.Size = new System.Drawing.Size(790, 489);
             this.groupBox47.TabIndex = 0;
             this.groupBox47.TabStop = false;
             this.groupBox47.Text = "Song Utilities";
@@ -3066,7 +3171,7 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1095, 522);
+            this.panel2.Size = new System.Drawing.Size(1095, 523);
             this.panel2.TabIndex = 23;
             // 
             // groupBox41
@@ -3409,9 +3514,9 @@
             this.groupBox40.Controls.Add(this.radioNoteEditDifficultyMedium);
             this.groupBox40.Controls.Add(this.radioNoteEditDifficultyEasy);
             this.groupBox40.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
-            this.groupBox40.Location = new System.Drawing.Point(359, 152);
+            this.groupBox40.Location = new System.Drawing.Point(345, 152);
             this.groupBox40.Name = "groupBox40";
-            this.groupBox40.Size = new System.Drawing.Size(112, 115);
+            this.groupBox40.Size = new System.Drawing.Size(94, 115);
             this.groupBox40.TabIndex = 15;
             this.groupBox40.TabStop = false;
             this.groupBox40.Text = "Difficulty";
@@ -3422,7 +3527,7 @@
             this.radioNoteEditDifficultyExpert.ForeColor = System.Drawing.SystemColors.ControlText;
             this.radioNoteEditDifficultyExpert.Location = new System.Drawing.Point(6, 72);
             this.radioNoteEditDifficultyExpert.Name = "radioNoteEditDifficultyExpert";
-            this.radioNoteEditDifficultyExpert.Size = new System.Drawing.Size(88, 17);
+            this.radioNoteEditDifficultyExpert.Size = new System.Drawing.Size(81, 17);
             this.radioNoteEditDifficultyExpert.TabIndex = 7;
             this.radioNoteEditDifficultyExpert.TabStop = true;
             this.radioNoteEditDifficultyExpert.Text = "Expert";
@@ -3447,7 +3552,7 @@
             this.radioNoteEditDifficultyMedium.ForeColor = System.Drawing.SystemColors.ControlText;
             this.radioNoteEditDifficultyMedium.Location = new System.Drawing.Point(6, 34);
             this.radioNoteEditDifficultyMedium.Name = "radioNoteEditDifficultyMedium";
-            this.radioNoteEditDifficultyMedium.Size = new System.Drawing.Size(95, 17);
+            this.radioNoteEditDifficultyMedium.Size = new System.Drawing.Size(81, 17);
             this.radioNoteEditDifficultyMedium.TabIndex = 5;
             this.radioNoteEditDifficultyMedium.Text = "Medium";
             this.radioNoteEditDifficultyMedium.UseCompatibleTextRendering = true;
@@ -4218,6 +4323,7 @@
             // groupBox10
             // 
             this.groupBox10.BackColor = System.Drawing.Color.Transparent;
+            this.groupBox10.Controls.Add(this.buttonNoteUtilSelectAll);
             this.groupBox10.Controls.Add(this.buttonUtilMethodSetToG5);
             this.groupBox10.Controls.Add(this.buttonUtilMethodFindNoteLenZero);
             this.groupBox10.Controls.Add(this.buttonDownOctave);
@@ -4245,6 +4351,19 @@
             this.groupBox10.TabStop = false;
             this.groupBox10.Text = "Utility Methods";
             this.groupBox10.Enter += new System.EventHandler(this.groupBox10_Enter);
+            // 
+            // buttonNoteUtilSelectAll
+            // 
+            this.buttonNoteUtilSelectAll.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
+            this.buttonNoteUtilSelectAll.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.buttonNoteUtilSelectAll.Location = new System.Drawing.Point(154, 108);
+            this.buttonNoteUtilSelectAll.Name = "buttonNoteUtilSelectAll";
+            this.buttonNoteUtilSelectAll.Size = new System.Drawing.Size(88, 23);
+            this.buttonNoteUtilSelectAll.TabIndex = 19;
+            this.buttonNoteUtilSelectAll.Text = "Select All";
+            this.toolTip1.SetToolTip(this.buttonNoteUtilSelectAll, "Select All Chords");
+            this.buttonNoteUtilSelectAll.UseVisualStyleBackColor = true;
+            this.buttonNoteUtilSelectAll.Click += new System.EventHandler(this.buttonNoteUtilSelectAll_Click);
             // 
             // buttonUtilMethodSetToG5
             // 
@@ -4591,19 +4710,18 @@
             this.groupBox8.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.groupBox8.Location = new System.Drawing.Point(233, 9);
             this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Size = new System.Drawing.Size(120, 137);
+            this.groupBox8.Size = new System.Drawing.Size(106, 137);
             this.groupBox8.TabIndex = 5;
             this.groupBox8.TabStop = false;
             this.groupBox8.Text = "Note Type";
             // 
             // checkIsHammeron
             // 
-            this.checkIsHammeron.AutoSize = true;
             this.checkIsHammeron.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.checkIsHammeron.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkIsHammeron.Location = new System.Drawing.Point(6, 54);
             this.checkIsHammeron.Name = "checkIsHammeron";
-            this.checkIsHammeron.Size = new System.Drawing.Size(79, 17);
+            this.checkIsHammeron.Size = new System.Drawing.Size(92, 17);
             this.checkIsHammeron.TabIndex = 2;
             this.checkIsHammeron.Text = "HO/PO (H)";
             this.toolTip1.SetToolTip(this.checkIsHammeron, "Hammer-on or Pull-off note");
@@ -4612,11 +4730,10 @@
             // 
             // checkIsTap
             // 
-            this.checkIsTap.AutoSize = true;
             this.checkIsTap.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkIsTap.Location = new System.Drawing.Point(6, 72);
             this.checkIsTap.Name = "checkIsTap";
-            this.checkIsTap.Size = new System.Drawing.Size(72, 17);
+            this.checkIsTap.Size = new System.Drawing.Size(92, 18);
             this.checkIsTap.TabIndex = 3;
             this.checkIsTap.Text = "Is Tap (T)";
             this.checkIsTap.UseVisualStyleBackColor = true;
@@ -4624,11 +4741,10 @@
             // 
             // checkIsX
             // 
-            this.checkIsX.AutoSize = true;
             this.checkIsX.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkIsX.Location = new System.Drawing.Point(6, 91);
             this.checkIsX.Name = "checkIsX";
-            this.checkIsX.Size = new System.Drawing.Size(86, 17);
+            this.checkIsX.Size = new System.Drawing.Size(96, 19);
             this.checkIsX.TabIndex = 4;
             this.checkIsX.Text = "Is X Note (X)";
             this.checkIsX.UseVisualStyleBackColor = true;
@@ -4636,23 +4752,21 @@
             // 
             // checkIsSlideReversed
             // 
-            this.checkIsSlideReversed.AutoSize = true;
             this.checkIsSlideReversed.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.checkIsSlideReversed.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkIsSlideReversed.Location = new System.Drawing.Point(19, 36);
             this.checkIsSlideReversed.Name = "checkIsSlideReversed";
-            this.checkIsSlideReversed.Size = new System.Drawing.Size(75, 16);
+            this.checkIsSlideReversed.Size = new System.Drawing.Size(79, 16);
             this.checkIsSlideReversed.TabIndex = 1;
             this.checkIsSlideReversed.Text = "Reverse (R)";
             this.checkIsSlideReversed.UseVisualStyleBackColor = true;
             // 
             // checkIsSlide
             // 
-            this.checkIsSlide.AutoSize = true;
             this.checkIsSlide.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkIsSlide.Location = new System.Drawing.Point(6, 17);
             this.checkIsSlide.Name = "checkIsSlide";
-            this.checkIsSlide.Size = new System.Drawing.Size(76, 17);
+            this.checkIsSlide.Size = new System.Drawing.Size(92, 18);
             this.checkIsSlide.TabIndex = 0;
             this.checkIsSlide.Text = "Is Slide (S)";
             this.checkIsSlide.UseVisualStyleBackColor = true;
@@ -4667,7 +4781,7 @@
             this.groupBox7.Controls.Add(this.checkKBQuickEdit);
             this.groupBox7.Controls.Add(this.checkKeepSelection);
             this.groupBox7.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
-            this.groupBox7.Location = new System.Drawing.Point(359, 9);
+            this.groupBox7.Location = new System.Drawing.Point(345, 9);
             this.groupBox7.Name = "groupBox7";
             this.groupBox7.Size = new System.Drawing.Size(156, 137);
             this.groupBox7.TabIndex = 7;
@@ -4676,11 +4790,10 @@
             // 
             // checkBoxAutoSelectNext
             // 
-            this.checkBoxAutoSelectNext.AutoSize = true;
             this.checkBoxAutoSelectNext.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkBoxAutoSelectNext.Location = new System.Drawing.Point(6, 110);
             this.checkBoxAutoSelectNext.Name = "checkBoxAutoSelectNext";
-            this.checkBoxAutoSelectNext.Size = new System.Drawing.Size(106, 17);
+            this.checkBoxAutoSelectNext.Size = new System.Drawing.Size(126, 17);
             this.checkBoxAutoSelectNext.TabIndex = 5;
             this.checkBoxAutoSelectNext.Text = "Auto Select Next";
             this.toolTip1.SetToolTip(this.checkBoxAutoSelectNext, "Selects the next note automatically after placing a note");
@@ -4688,55 +4801,50 @@
             // 
             // checkBoxClearAfterNote
             // 
-            this.checkBoxClearAfterNote.AutoSize = true;
             this.checkBoxClearAfterNote.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkBoxClearAfterNote.Location = new System.Drawing.Point(6, 37);
             this.checkBoxClearAfterNote.Name = "checkBoxClearAfterNote";
-            this.checkBoxClearAfterNote.Size = new System.Drawing.Size(115, 17);
+            this.checkBoxClearAfterNote.Size = new System.Drawing.Size(135, 18);
             this.checkBoxClearAfterNote.TabIndex = 1;
             this.checkBoxClearAfterNote.Text = "Clear After Note (J)";
             this.checkBoxClearAfterNote.UseVisualStyleBackColor = true;
             // 
             // checkIndentBString
             // 
-            this.checkIndentBString.AutoSize = true;
             this.checkIndentBString.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkIndentBString.Location = new System.Drawing.Point(6, 91);
             this.checkIndentBString.Name = "checkIndentBString";
-            this.checkIndentBString.Size = new System.Drawing.Size(96, 17);
+            this.checkIndentBString.Size = new System.Drawing.Size(116, 19);
             this.checkIndentBString.TabIndex = 4;
             this.checkIndentBString.Text = "Indent B String";
             this.checkIndentBString.UseVisualStyleBackColor = true;
             // 
             // checkScrollToSelection
             // 
-            this.checkScrollToSelection.AutoSize = true;
             this.checkScrollToSelection.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkScrollToSelection.Location = new System.Drawing.Point(6, 55);
             this.checkScrollToSelection.Name = "checkScrollToSelection";
-            this.checkScrollToSelection.Size = new System.Drawing.Size(115, 17);
+            this.checkScrollToSelection.Size = new System.Drawing.Size(135, 17);
             this.checkScrollToSelection.TabIndex = 2;
             this.checkScrollToSelection.Text = "Scroll To Selection";
             this.checkScrollToSelection.UseVisualStyleBackColor = true;
             // 
             // checkKBQuickEdit
             // 
-            this.checkKBQuickEdit.AutoSize = true;
             this.checkKBQuickEdit.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkKBQuickEdit.Location = new System.Drawing.Point(6, 73);
             this.checkKBQuickEdit.Name = "checkKBQuickEdit";
-            this.checkKBQuickEdit.Size = new System.Drawing.Size(123, 17);
+            this.checkKBQuickEdit.Size = new System.Drawing.Size(135, 17);
             this.checkKBQuickEdit.TabIndex = 3;
             this.checkKBQuickEdit.Text = "Keyboard Quick Edit";
             this.checkKBQuickEdit.UseVisualStyleBackColor = true;
             // 
             // checkKeepSelection
             // 
-            this.checkKeepSelection.AutoSize = true;
             this.checkKeepSelection.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkKeepSelection.Location = new System.Drawing.Point(6, 19);
             this.checkKeepSelection.Name = "checkKeepSelection";
-            this.checkKeepSelection.Size = new System.Drawing.Size(114, 17);
+            this.checkKeepSelection.Size = new System.Drawing.Size(134, 18);
             this.checkKeepSelection.TabIndex = 0;
             this.checkKeepSelection.Text = "Keep Selection (K)";
             this.checkKeepSelection.UseVisualStyleBackColor = true;
@@ -5207,7 +5315,7 @@
             this.groupBoxStrumMarkers.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.groupBoxStrumMarkers.Location = new System.Drawing.Point(233, 152);
             this.groupBoxStrumMarkers.Name = "groupBoxStrumMarkers";
-            this.groupBoxStrumMarkers.Size = new System.Drawing.Size(120, 115);
+            this.groupBoxStrumMarkers.Size = new System.Drawing.Size(106, 115);
             this.groupBoxStrumMarkers.TabIndex = 6;
             this.groupBoxStrumMarkers.TabStop = false;
             this.groupBoxStrumMarkers.Text = "Strum";
@@ -5251,7 +5359,7 @@
             this.checkStrumHigh.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkStrumHigh.Location = new System.Drawing.Point(6, 22);
             this.checkStrumHigh.Name = "checkStrumHigh";
-            this.checkStrumHigh.Size = new System.Drawing.Size(65, 19);
+            this.checkStrumHigh.Size = new System.Drawing.Size(92, 19);
             this.checkStrumHigh.TabIndex = 1;
             this.checkStrumHigh.Text = "High (U)";
             this.checkStrumHigh.UseVisualStyleBackColor = true;
@@ -6655,11 +6763,10 @@
             // 
             // checkBox11
             // 
-            this.checkBox11.AutoSize = true;
             this.checkBox11.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkBox11.Location = new System.Drawing.Point(51, 53);
             this.checkBox11.Name = "checkBox11";
-            this.checkBox11.Size = new System.Drawing.Size(141, 17);
+            this.checkBox11.Size = new System.Drawing.Size(168, 17);
             this.checkBox11.TabIndex = 19;
             this.checkBox11.Text = "Only Songs.dta and .mid";
             this.checkBox11.UseVisualStyleBackColor = true;
@@ -6760,31 +6867,31 @@
             this.tabUSBDrive.Controls.Add(this.listUSBFileView);
             this.tabUSBDrive.Controls.Add(this.treeUSBContents);
             this.tabUSBDrive.Controls.Add(this.progressUSBFiles);
-            this.tabUSBDrive.Controls.Add(this.buttonUSBRenameFile);
             this.tabUSBDrive.Controls.Add(this.textBoxUSBFileName);
-            this.tabUSBDrive.Controls.Add(this.buttonUSBViewPackage);
             this.tabUSBDrive.Controls.Add(this.buttonUSBAddFolder);
             this.tabUSBDrive.Controls.Add(this.progressUSBSongs);
+            this.tabUSBDrive.Controls.Add(this.label47);
+            this.tabUSBDrive.Controls.Add(this.buttonUSBRestoreImage);
+            this.tabUSBDrive.Controls.Add(this.buttonUSBCreateImage);
+            this.tabUSBDrive.Controls.Add(this.textBoxUSBFolder);
+            this.tabUSBDrive.Controls.Add(this.label46);
+            this.tabUSBDrive.Controls.Add(this.comboUSBList);
+            this.tabUSBDrive.Controls.Add(this.label45);
+            this.tabUSBDrive.Controls.Add(this.buttonUSBRenameFile);
+            this.tabUSBDrive.Controls.Add(this.buttonUSBViewPackage);
             this.tabUSBDrive.Controls.Add(this.buttonUSBSelectCompletedSongs);
             this.tabUSBDrive.Controls.Add(this.buttonUSBSelectAllSongs);
             this.tabUSBDrive.Controls.Add(this.buttonUSBAddFile);
             this.tabUSBDrive.Controls.Add(this.buttonUSBDeleteFile);
-            this.tabUSBDrive.Controls.Add(this.label47);
-            this.tabUSBDrive.Controls.Add(this.buttonUSBRestoreImage);
-            this.tabUSBDrive.Controls.Add(this.buttonUSBCreateImage);
             this.tabUSBDrive.Controls.Add(this.buttonUSBSetDefaultFolder);
             this.tabUSBDrive.Controls.Add(this.buttonUSBRenameFolder);
             this.tabUSBDrive.Controls.Add(this.buttonUSBCreateFolder);
-            this.tabUSBDrive.Controls.Add(this.textBoxUSBFolder);
             this.tabUSBDrive.Controls.Add(this.buttonUSBRefresh);
             this.tabUSBDrive.Controls.Add(this.buttonUSBCopySelectedSongToUSB);
-            this.tabUSBDrive.Controls.Add(this.label46);
             this.tabUSBDrive.Controls.Add(this.buttonUSBExtractSelectedFiles);
             this.tabUSBDrive.Controls.Add(this.buttonUSBExtractFolder);
             this.tabUSBDrive.Controls.Add(this.buttonUSBDeleteSelected);
-            this.tabUSBDrive.Controls.Add(this.comboUSBList);
             this.tabUSBDrive.Controls.Add(this.button125);
-            this.tabUSBDrive.Controls.Add(this.label45);
             this.tabUSBDrive.ImageIndex = 22;
             this.tabUSBDrive.Location = new System.Drawing.Point(4, 24);
             this.tabUSBDrive.Name = "tabUSBDrive";
@@ -6826,16 +6933,16 @@
             this.listUSBFileView.AllowColumnReorder = true;
             this.listUSBFileView.AllowDrop = true;
             this.listUSBFileView.GridLines = true;
-            listViewGroup1.Header = "File Name";
-            listViewGroup1.Name = "FileName";
-            listViewGroup2.Header = "Size";
-            listViewGroup2.Name = "Size";
-            listViewGroup3.Header = "Date";
-            listViewGroup3.Name = "Date";
+            listViewGroup4.Header = "File Name";
+            listViewGroup4.Name = "FileName";
+            listViewGroup5.Header = "Size";
+            listViewGroup5.Name = "Size";
+            listViewGroup6.Header = "Date";
+            listViewGroup6.Name = "Date";
             this.listUSBFileView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1,
-            listViewGroup2,
-            listViewGroup3});
+            listViewGroup4,
+            listViewGroup5,
+            listViewGroup6});
             this.listUSBFileView.HideSelection = false;
             this.listUSBFileView.LabelEdit = true;
             this.listUSBFileView.LabelWrap = false;
@@ -6871,36 +6978,12 @@
             this.progressUSBFiles.Size = new System.Drawing.Size(439, 11);
             this.progressUSBFiles.TabIndex = 38;
             // 
-            // buttonUSBRenameFile
-            // 
-            this.buttonUSBRenameFile.ImageIndex = 79;
-            this.buttonUSBRenameFile.ImageList = this.imageList1;
-            this.buttonUSBRenameFile.Location = new System.Drawing.Point(536, 292);
-            this.buttonUSBRenameFile.Name = "buttonUSBRenameFile";
-            this.buttonUSBRenameFile.Size = new System.Drawing.Size(24, 24);
-            this.buttonUSBRenameFile.TabIndex = 37;
-            this.toolTip1.SetToolTip(this.buttonUSBRenameFile, "Rename");
-            this.buttonUSBRenameFile.UseVisualStyleBackColor = true;
-            this.buttonUSBRenameFile.Click += new System.EventHandler(this.buttonUSBRenameFile_Click);
-            // 
             // textBoxUSBFileName
             // 
             this.textBoxUSBFileName.Location = new System.Drawing.Point(315, 296);
             this.textBoxUSBFileName.Name = "textBoxUSBFileName";
             this.textBoxUSBFileName.Size = new System.Drawing.Size(215, 23);
             this.textBoxUSBFileName.TabIndex = 36;
-            // 
-            // buttonUSBViewPackage
-            // 
-            this.buttonUSBViewPackage.ImageIndex = 52;
-            this.buttonUSBViewPackage.ImageList = this.imageList1;
-            this.buttonUSBViewPackage.Location = new System.Drawing.Point(640, 292);
-            this.buttonUSBViewPackage.Name = "buttonUSBViewPackage";
-            this.buttonUSBViewPackage.Size = new System.Drawing.Size(24, 24);
-            this.buttonUSBViewPackage.TabIndex = 35;
-            this.toolTip1.SetToolTip(this.buttonUSBViewPackage, "View Package");
-            this.buttonUSBViewPackage.UseVisualStyleBackColor = true;
-            this.buttonUSBViewPackage.Click += new System.EventHandler(this.buttonUSBViewPackage_Click);
             // 
             // buttonUSBAddFolder
             // 
@@ -6921,6 +7004,96 @@
             this.progressUSBSongs.Name = "progressUSBSongs";
             this.progressUSBSongs.Size = new System.Drawing.Size(502, 11);
             this.progressUSBSongs.TabIndex = 33;
+            // 
+            // label47
+            // 
+            this.label47.AutoSize = true;
+            this.label47.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
+            this.label47.Location = new System.Drawing.Point(312, 36);
+            this.label47.Name = "label47";
+            this.label47.Size = new System.Drawing.Size(33, 15);
+            this.label47.TabIndex = 27;
+            this.label47.Text = "Files:";
+            // 
+            // buttonUSBRestoreImage
+            // 
+            this.buttonUSBRestoreImage.Location = new System.Drawing.Point(8, 382);
+            this.buttonUSBRestoreImage.Name = "buttonUSBRestoreImage";
+            this.buttonUSBRestoreImage.Size = new System.Drawing.Size(104, 22);
+            this.buttonUSBRestoreImage.TabIndex = 25;
+            this.buttonUSBRestoreImage.Text = "Restore Image";
+            this.buttonUSBRestoreImage.UseVisualStyleBackColor = true;
+            this.buttonUSBRestoreImage.Visible = false;
+            // 
+            // buttonUSBCreateImage
+            // 
+            this.buttonUSBCreateImage.Location = new System.Drawing.Point(8, 354);
+            this.buttonUSBCreateImage.Name = "buttonUSBCreateImage";
+            this.buttonUSBCreateImage.Size = new System.Drawing.Size(104, 22);
+            this.buttonUSBCreateImage.TabIndex = 24;
+            this.buttonUSBCreateImage.Text = "Create Image";
+            this.buttonUSBCreateImage.UseVisualStyleBackColor = true;
+            this.buttonUSBCreateImage.Visible = false;
+            // 
+            // textBoxUSBFolder
+            // 
+            this.textBoxUSBFolder.Location = new System.Drawing.Point(66, 283);
+            this.textBoxUSBFolder.Name = "textBoxUSBFolder";
+            this.textBoxUSBFolder.Size = new System.Drawing.Size(188, 23);
+            this.textBoxUSBFolder.TabIndex = 20;
+            // 
+            // label46
+            // 
+            this.label46.AutoSize = true;
+            this.label46.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
+            this.label46.Location = new System.Drawing.Point(757, 36);
+            this.label46.Name = "label46";
+            this.label46.Size = new System.Drawing.Size(39, 15);
+            this.label46.TabIndex = 16;
+            this.label46.Text = "Songs";
+            // 
+            // comboUSBList
+            // 
+            this.comboUSBList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboUSBList.FormattingEnabled = true;
+            this.comboUSBList.Location = new System.Drawing.Point(8, 9);
+            this.comboUSBList.Name = "comboUSBList";
+            this.comboUSBList.Size = new System.Drawing.Size(138, 23);
+            this.comboUSBList.TabIndex = 10;
+            // 
+            // label45
+            // 
+            this.label45.AutoSize = true;
+            this.label45.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
+            this.label45.Location = new System.Drawing.Point(8, 36);
+            this.label45.Name = "label45";
+            this.label45.Size = new System.Drawing.Size(48, 15);
+            this.label45.TabIndex = 9;
+            this.label45.Text = "Folders:";
+            // 
+            // buttonUSBRenameFile
+            // 
+            this.buttonUSBRenameFile.ImageIndex = 79;
+            this.buttonUSBRenameFile.ImageList = this.imageList1;
+            this.buttonUSBRenameFile.Location = new System.Drawing.Point(536, 292);
+            this.buttonUSBRenameFile.Name = "buttonUSBRenameFile";
+            this.buttonUSBRenameFile.Size = new System.Drawing.Size(24, 24);
+            this.buttonUSBRenameFile.TabIndex = 37;
+            this.toolTip1.SetToolTip(this.buttonUSBRenameFile, "Rename");
+            this.buttonUSBRenameFile.UseVisualStyleBackColor = true;
+            this.buttonUSBRenameFile.Click += new System.EventHandler(this.buttonUSBRenameFile_Click);
+            // 
+            // buttonUSBViewPackage
+            // 
+            this.buttonUSBViewPackage.ImageIndex = 52;
+            this.buttonUSBViewPackage.ImageList = this.imageList1;
+            this.buttonUSBViewPackage.Location = new System.Drawing.Point(640, 292);
+            this.buttonUSBViewPackage.Name = "buttonUSBViewPackage";
+            this.buttonUSBViewPackage.Size = new System.Drawing.Size(24, 24);
+            this.buttonUSBViewPackage.TabIndex = 35;
+            this.toolTip1.SetToolTip(this.buttonUSBViewPackage, "View Package");
+            this.buttonUSBViewPackage.UseVisualStyleBackColor = true;
+            this.buttonUSBViewPackage.Click += new System.EventHandler(this.buttonUSBViewPackage_Click);
             // 
             // buttonUSBSelectCompletedSongs
             // 
@@ -6967,36 +7140,6 @@
             this.toolTip1.SetToolTip(this.buttonUSBDeleteFile, "Delete Selected");
             this.buttonUSBDeleteFile.UseVisualStyleBackColor = true;
             // 
-            // label47
-            // 
-            this.label47.AutoSize = true;
-            this.label47.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
-            this.label47.Location = new System.Drawing.Point(312, 36);
-            this.label47.Name = "label47";
-            this.label47.Size = new System.Drawing.Size(33, 15);
-            this.label47.TabIndex = 27;
-            this.label47.Text = "Files:";
-            // 
-            // buttonUSBRestoreImage
-            // 
-            this.buttonUSBRestoreImage.Location = new System.Drawing.Point(8, 382);
-            this.buttonUSBRestoreImage.Name = "buttonUSBRestoreImage";
-            this.buttonUSBRestoreImage.Size = new System.Drawing.Size(104, 22);
-            this.buttonUSBRestoreImage.TabIndex = 25;
-            this.buttonUSBRestoreImage.Text = "Restore Image";
-            this.buttonUSBRestoreImage.UseVisualStyleBackColor = true;
-            this.buttonUSBRestoreImage.Visible = false;
-            // 
-            // buttonUSBCreateImage
-            // 
-            this.buttonUSBCreateImage.Location = new System.Drawing.Point(8, 354);
-            this.buttonUSBCreateImage.Name = "buttonUSBCreateImage";
-            this.buttonUSBCreateImage.Size = new System.Drawing.Size(104, 22);
-            this.buttonUSBCreateImage.TabIndex = 24;
-            this.buttonUSBCreateImage.Text = "Create Image";
-            this.buttonUSBCreateImage.UseVisualStyleBackColor = true;
-            this.buttonUSBCreateImage.Visible = false;
-            // 
             // buttonUSBSetDefaultFolder
             // 
             this.buttonUSBSetDefaultFolder.ImageIndex = 67;
@@ -7030,13 +7173,6 @@
             this.toolTip1.SetToolTip(this.buttonUSBCreateFolder, "Create Folder");
             this.buttonUSBCreateFolder.UseVisualStyleBackColor = true;
             // 
-            // textBoxUSBFolder
-            // 
-            this.textBoxUSBFolder.Location = new System.Drawing.Point(66, 283);
-            this.textBoxUSBFolder.Name = "textBoxUSBFolder";
-            this.textBoxUSBFolder.Size = new System.Drawing.Size(188, 23);
-            this.textBoxUSBFolder.TabIndex = 20;
-            // 
             // buttonUSBRefresh
             // 
             this.buttonUSBRefresh.ImageIndex = 36;
@@ -7060,16 +7196,6 @@
             this.buttonUSBCopySelectedSongToUSB.TabIndex = 17;
             this.toolTip1.SetToolTip(this.buttonUSBCopySelectedSongToUSB, "Copy to USB");
             this.buttonUSBCopySelectedSongToUSB.UseVisualStyleBackColor = true;
-            // 
-            // label46
-            // 
-            this.label46.AutoSize = true;
-            this.label46.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
-            this.label46.Location = new System.Drawing.Point(757, 36);
-            this.label46.Name = "label46";
-            this.label46.Size = new System.Drawing.Size(39, 15);
-            this.label46.TabIndex = 16;
-            this.label46.Text = "Songs";
             // 
             // buttonUSBExtractSelectedFiles
             // 
@@ -7104,15 +7230,6 @@
             this.toolTip1.SetToolTip(this.buttonUSBDeleteSelected, "Delete Selected");
             this.buttonUSBDeleteSelected.UseVisualStyleBackColor = true;
             // 
-            // comboUSBList
-            // 
-            this.comboUSBList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboUSBList.FormattingEnabled = true;
-            this.comboUSBList.Location = new System.Drawing.Point(8, 9);
-            this.comboUSBList.Name = "comboUSBList";
-            this.comboUSBList.Size = new System.Drawing.Size(138, 23);
-            this.comboUSBList.TabIndex = 10;
-            // 
             // button125
             // 
             this.button125.ImageIndex = 19;
@@ -7124,16 +7241,6 @@
             this.toolTip1.SetToolTip(this.button125, "Open USB");
             this.button125.UseVisualStyleBackColor = true;
             this.button125.Click += new System.EventHandler(this.button125_Click);
-            // 
-            // label45
-            // 
-            this.label45.AutoSize = true;
-            this.label45.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
-            this.label45.Location = new System.Drawing.Point(8, 36);
-            this.label45.Name = "label45";
-            this.label45.Size = new System.Drawing.Size(48, 15);
-            this.label45.TabIndex = 9;
-            this.label45.Text = "Folders:";
             // 
             // tabSettings
             // 
@@ -7163,7 +7270,7 @@
             this.groupBox38.Controls.Add(this.button111);
             this.groupBox38.Controls.Add(this.comboBoxMidiInput);
             this.groupBox38.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
-            this.groupBox38.Location = new System.Drawing.Point(524, 133);
+            this.groupBox38.Location = new System.Drawing.Point(449, 133);
             this.groupBox38.Name = "groupBox38";
             this.groupBox38.Size = new System.Drawing.Size(212, 108);
             this.groupBox38.TabIndex = 6;
@@ -7234,7 +7341,7 @@
             this.groupBox33.Controls.Add(this.comboMidiInstrument);
             this.groupBox33.Controls.Add(this.label12);
             this.groupBox33.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
-            this.groupBox33.Location = new System.Drawing.Point(524, 247);
+            this.groupBox33.Location = new System.Drawing.Point(449, 247);
             this.groupBox33.Name = "groupBox33";
             this.groupBox33.Size = new System.Drawing.Size(212, 111);
             this.groupBox33.TabIndex = 4;
@@ -7319,7 +7426,7 @@
             this.groupBox20.Controls.Add(this.vScrollBar1);
             this.groupBox20.Controls.Add(this.panel7);
             this.groupBox20.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
-            this.groupBox20.Location = new System.Drawing.Point(742, 133);
+            this.groupBox20.Location = new System.Drawing.Point(667, 136);
             this.groupBox20.Name = "groupBox20";
             this.groupBox20.Size = new System.Drawing.Size(397, 265);
             this.groupBox20.TabIndex = 5;
@@ -7378,7 +7485,7 @@
             this.groupBox18.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.groupBox18.Location = new System.Drawing.Point(6, 6);
             this.groupBox18.Name = "groupBox18";
-            this.groupBox18.Size = new System.Drawing.Size(512, 190);
+            this.groupBox18.Size = new System.Drawing.Size(437, 190);
             this.groupBox18.TabIndex = 0;
             this.groupBox18.TabStop = false;
             this.groupBox18.Text = "Editor Configuration";
@@ -7424,8 +7531,9 @@
             // 
             // textBoxNoteCloseDist
             // 
+            this.textBoxNoteCloseDist.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxNoteCloseDist.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.textBoxNoteCloseDist.Location = new System.Drawing.Point(454, 116);
+            this.textBoxNoteCloseDist.Location = new System.Drawing.Point(379, 123);
             this.textBoxNoteCloseDist.Name = "textBoxNoteCloseDist";
             this.textBoxNoteCloseDist.Size = new System.Drawing.Size(52, 23);
             this.textBoxNoteCloseDist.TabIndex = 48;
@@ -7433,9 +7541,10 @@
             // 
             // label44
             // 
+            this.label44.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label44.AutoSize = true;
             this.label44.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label44.Location = new System.Drawing.Point(357, 119);
+            this.label44.Location = new System.Drawing.Point(282, 126);
             this.label44.Name = "label44";
             this.label44.Size = new System.Drawing.Size(91, 15);
             this.label44.TabIndex = 49;
@@ -7443,8 +7552,9 @@
             // 
             // textClearHoldBox
             // 
+            this.textClearHoldBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.textClearHoldBox.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.textClearHoldBox.Location = new System.Drawing.Point(454, 90);
+            this.textClearHoldBox.Location = new System.Drawing.Point(379, 97);
             this.textClearHoldBox.Name = "textClearHoldBox";
             this.textClearHoldBox.Size = new System.Drawing.Size(52, 23);
             this.textClearHoldBox.TabIndex = 48;
@@ -7452,9 +7562,10 @@
             // 
             // label25
             // 
+            this.label25.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label25.AutoSize = true;
             this.label25.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label25.Location = new System.Drawing.Point(334, 94);
+            this.label25.Location = new System.Drawing.Point(259, 101);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(114, 15);
             this.label25.TabIndex = 49;
@@ -7462,8 +7573,9 @@
             // 
             // textBoxMidiScrollFreq
             // 
+            this.textBoxMidiScrollFreq.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxMidiScrollFreq.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.textBoxMidiScrollFreq.Location = new System.Drawing.Point(454, 64);
+            this.textBoxMidiScrollFreq.Location = new System.Drawing.Point(379, 71);
             this.textBoxMidiScrollFreq.Name = "textBoxMidiScrollFreq";
             this.textBoxMidiScrollFreq.Size = new System.Drawing.Size(52, 23);
             this.textBoxMidiScrollFreq.TabIndex = 4;
@@ -7471,9 +7583,10 @@
             // 
             // label22
             // 
+            this.label22.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label22.AutoSize = true;
             this.label22.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label22.Location = new System.Drawing.Point(321, 67);
+            this.label22.Location = new System.Drawing.Point(246, 74);
             this.label22.Name = "label22";
             this.label22.Size = new System.Drawing.Size(127, 15);
             this.label22.TabIndex = 47;
@@ -7505,10 +7618,11 @@
             // 
             // button57
             // 
+            this.button57.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.button57.ForeColor = System.Drawing.SystemColors.ControlText;
             this.button57.ImageIndex = 65;
             this.button57.ImageList = this.imageList1;
-            this.button57.Location = new System.Drawing.Point(482, 145);
+            this.button57.Location = new System.Drawing.Point(407, 152);
             this.button57.Name = "button57";
             this.button57.Size = new System.Drawing.Size(24, 24);
             this.button57.TabIndex = 5;
@@ -7518,9 +7632,10 @@
             // 
             // label5
             // 
+            this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label5.AutoSize = true;
             this.label5.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label5.Location = new System.Drawing.Point(321, 43);
+            this.label5.Location = new System.Drawing.Point(246, 50);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(127, 15);
             this.label5.TabIndex = 20;
@@ -7528,8 +7643,9 @@
             // 
             // textBoxMinimumNoteWidth
             // 
+            this.textBoxMinimumNoteWidth.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxMinimumNoteWidth.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.textBoxMinimumNoteWidth.Location = new System.Drawing.Point(454, 40);
+            this.textBoxMinimumNoteWidth.Location = new System.Drawing.Point(379, 47);
             this.textBoxMinimumNoteWidth.Name = "textBoxMinimumNoteWidth";
             this.textBoxMinimumNoteWidth.Size = new System.Drawing.Size(52, 23);
             this.textBoxMinimumNoteWidth.TabIndex = 1;
@@ -7537,9 +7653,10 @@
             // 
             // label23
             // 
+            this.label23.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label23.AutoSize = true;
             this.label23.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label23.Location = new System.Drawing.Point(306, 17);
+            this.label23.Location = new System.Drawing.Point(231, 24);
             this.label23.Name = "label23";
             this.label23.Size = new System.Drawing.Size(142, 15);
             this.label23.TabIndex = 14;
@@ -7547,8 +7664,9 @@
             // 
             // textBoxScrollToSelectionOffset
             // 
+            this.textBoxScrollToSelectionOffset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxScrollToSelectionOffset.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.textBoxScrollToSelectionOffset.Location = new System.Drawing.Point(454, 14);
+            this.textBoxScrollToSelectionOffset.Location = new System.Drawing.Point(379, 21);
             this.textBoxScrollToSelectionOffset.Name = "textBoxScrollToSelectionOffset";
             this.textBoxScrollToSelectionOffset.Size = new System.Drawing.Size(52, 23);
             this.textBoxScrollToSelectionOffset.TabIndex = 0;
@@ -7581,7 +7699,7 @@
             this.groupBox16.Controls.Add(this.button63);
             this.groupBox16.Controls.Add(this.label33);
             this.groupBox16.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
-            this.groupBox16.Location = new System.Drawing.Point(680, 6);
+            this.groupBox16.Location = new System.Drawing.Point(605, 6);
             this.groupBox16.Name = "groupBox16";
             this.groupBox16.Size = new System.Drawing.Size(455, 124);
             this.groupBox16.TabIndex = 1;
@@ -7700,7 +7818,7 @@
             this.groupBox17.Controls.Add(this.button84);
             this.groupBox17.Controls.Add(this.button83);
             this.groupBox17.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
-            this.groupBox17.Location = new System.Drawing.Point(524, 6);
+            this.groupBox17.Location = new System.Drawing.Point(449, 6);
             this.groupBox17.Name = "groupBox17";
             this.groupBox17.Size = new System.Drawing.Size(150, 85);
             this.groupBox17.TabIndex = 3;
@@ -7786,18 +7904,17 @@
             this.groupBox19.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.groupBox19.Location = new System.Drawing.Point(7, 202);
             this.groupBox19.Name = "groupBox19";
-            this.groupBox19.Size = new System.Drawing.Size(511, 194);
+            this.groupBox19.Size = new System.Drawing.Size(436, 194);
             this.groupBox19.TabIndex = 2;
             this.groupBox19.TabStop = false;
             this.groupBox19.Text = "Notes Grid";
             // 
             // checkSnapToCloseG5
             // 
-            this.checkSnapToCloseG5.AutoSize = true;
             this.checkSnapToCloseG5.Checked = true;
             this.checkSnapToCloseG5.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkSnapToCloseG5.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkSnapToCloseG5.Location = new System.Drawing.Point(205, 114);
+            this.checkSnapToCloseG5.Location = new System.Drawing.Point(159, 114);
             this.checkSnapToCloseG5.Name = "checkSnapToCloseG5";
             this.checkSnapToCloseG5.Size = new System.Drawing.Size(144, 17);
             this.checkSnapToCloseG5.TabIndex = 53;
@@ -7809,7 +7926,7 @@
             this.button119.ForeColor = System.Drawing.SystemColors.ControlText;
             this.button119.ImageIndex = 65;
             this.button119.ImageList = this.imageList1;
-            this.button119.Location = new System.Drawing.Point(350, 159);
+            this.button119.Location = new System.Drawing.Point(406, 161);
             this.button119.Name = "button119";
             this.button119.Size = new System.Drawing.Size(24, 24);
             this.button119.TabIndex = 52;
@@ -7857,11 +7974,10 @@
             // 
             // checkBoxRenderMouseSnap
             // 
-            this.checkBoxRenderMouseSnap.AutoSize = true;
             this.checkBoxRenderMouseSnap.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkBoxRenderMouseSnap.Location = new System.Drawing.Point(205, 53);
+            this.checkBoxRenderMouseSnap.Location = new System.Drawing.Point(159, 53);
             this.checkBoxRenderMouseSnap.Name = "checkBoxRenderMouseSnap";
-            this.checkBoxRenderMouseSnap.Size = new System.Drawing.Size(124, 17);
+            this.checkBoxRenderMouseSnap.Size = new System.Drawing.Size(144, 17);
             this.checkBoxRenderMouseSnap.TabIndex = 10;
             this.checkBoxRenderMouseSnap.Text = "Render Mouse Snap";
             this.checkBoxRenderMouseSnap.UseVisualStyleBackColor = true;
@@ -7869,24 +7985,22 @@
             // 
             // checkBoxSnapToCloseNotes
             // 
-            this.checkBoxSnapToCloseNotes.AutoSize = true;
             this.checkBoxSnapToCloseNotes.Checked = true;
             this.checkBoxSnapToCloseNotes.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxSnapToCloseNotes.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkBoxSnapToCloseNotes.Location = new System.Drawing.Point(205, 91);
+            this.checkBoxSnapToCloseNotes.Location = new System.Drawing.Point(159, 91);
             this.checkBoxSnapToCloseNotes.Name = "checkBoxSnapToCloseNotes";
-            this.checkBoxSnapToCloseNotes.Size = new System.Drawing.Size(127, 17);
+            this.checkBoxSnapToCloseNotes.Size = new System.Drawing.Size(144, 17);
             this.checkBoxSnapToCloseNotes.TabIndex = 9;
             this.checkBoxSnapToCloseNotes.Text = "Snap To Close Notes";
             this.checkBoxSnapToCloseNotes.UseVisualStyleBackColor = true;
             // 
             // radioGrid128thNote
             // 
-            this.radioGrid128thNote.AutoSize = true;
             this.radioGrid128thNote.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.radioGrid128thNote.Location = new System.Drawing.Point(8, 24);
+            this.radioGrid128thNote.Location = new System.Drawing.Point(24, 22);
             this.radioGrid128thNote.Name = "radioGrid128thNote";
-            this.radioGrid128thNote.Size = new System.Drawing.Size(52, 17);
+            this.radioGrid128thNote.Size = new System.Drawing.Size(60, 17);
             this.radioGrid128thNote.TabIndex = 2;
             this.radioGrid128thNote.Text = "128th";
             this.radioGrid128thNote.UseVisualStyleBackColor = true;
@@ -7894,24 +8008,22 @@
             // 
             // checkBoxGridSnap
             // 
-            this.checkBoxGridSnap.AutoSize = true;
             this.checkBoxGridSnap.Checked = true;
             this.checkBoxGridSnap.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxGridSnap.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkBoxGridSnap.Location = new System.Drawing.Point(8, 53);
             this.checkBoxGridSnap.Name = "checkBoxGridSnap";
-            this.checkBoxGridSnap.Size = new System.Drawing.Size(109, 17);
+            this.checkBoxGridSnap.Size = new System.Drawing.Size(145, 17);
             this.checkBoxGridSnap.TabIndex = 8;
             this.checkBoxGridSnap.Text = "Enable Grid Snap";
             this.checkBoxGridSnap.UseVisualStyleBackColor = true;
             // 
             // radioGrid32Note
             // 
-            this.radioGrid32Note.AutoSize = true;
             this.radioGrid32Note.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.radioGrid32Note.Location = new System.Drawing.Point(122, 24);
+            this.radioGrid32Note.Location = new System.Drawing.Point(147, 22);
             this.radioGrid32Note.Name = "radioGrid32Note";
-            this.radioGrid32Note.Size = new System.Drawing.Size(49, 17);
+            this.radioGrid32Note.Size = new System.Drawing.Size(66, 17);
             this.radioGrid32Note.TabIndex = 4;
             this.radioGrid32Note.Text = "32nd";
             this.radioGrid32Note.UseVisualStyleBackColor = true;
@@ -7919,7 +8031,6 @@
             // 
             // checkViewNotesGrid5Button
             // 
-            this.checkViewNotesGrid5Button.AutoSize = true;
             this.checkViewNotesGrid5Button.Checked = true;
             this.checkViewNotesGrid5Button.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkViewNotesGrid5Button.ForeColor = System.Drawing.SystemColors.ControlText;
@@ -7933,13 +8044,12 @@
             // 
             // checkViewNotesGridPro
             // 
-            this.checkViewNotesGridPro.AutoSize = true;
             this.checkViewNotesGridPro.Checked = true;
             this.checkViewNotesGridPro.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkViewNotesGridPro.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkViewNotesGridPro.Location = new System.Drawing.Point(8, 114);
             this.checkViewNotesGridPro.Name = "checkViewNotesGridPro";
-            this.checkViewNotesGridPro.Size = new System.Drawing.Size(121, 17);
+            this.checkViewNotesGridPro.Size = new System.Drawing.Size(145, 17);
             this.checkViewNotesGridPro.TabIndex = 1;
             this.checkViewNotesGridPro.Text = "View Notes Grid Pro";
             this.checkViewNotesGridPro.UseVisualStyleBackColor = true;
@@ -7947,11 +8057,10 @@
             // 
             // radioGrid16Note
             // 
-            this.radioGrid16Note.AutoSize = true;
             this.radioGrid16Note.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.radioGrid16Note.Location = new System.Drawing.Point(179, 24);
+            this.radioGrid16Note.Location = new System.Drawing.Point(219, 22);
             this.radioGrid16Note.Name = "radioGrid16Note";
-            this.radioGrid16Note.Size = new System.Drawing.Size(46, 17);
+            this.radioGrid16Note.Size = new System.Drawing.Size(53, 17);
             this.radioGrid16Note.TabIndex = 5;
             this.radioGrid16Note.Text = "16th";
             this.radioGrid16Note.UseVisualStyleBackColor = true;
@@ -7959,11 +8068,10 @@
             // 
             // radioGrid64thNote
             // 
-            this.radioGrid64thNote.AutoSize = true;
             this.radioGrid64thNote.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.radioGrid64thNote.Location = new System.Drawing.Point(68, 24);
+            this.radioGrid64thNote.Location = new System.Drawing.Point(90, 22);
             this.radioGrid64thNote.Name = "radioGrid64thNote";
-            this.radioGrid64thNote.Size = new System.Drawing.Size(46, 17);
+            this.radioGrid64thNote.Size = new System.Drawing.Size(51, 17);
             this.radioGrid64thNote.TabIndex = 3;
             this.radioGrid64thNote.Text = "64th";
             this.radioGrid64thNote.UseVisualStyleBackColor = true;
@@ -7971,11 +8079,10 @@
             // 
             // radioGrid8Note
             // 
-            this.radioGrid8Note.AutoSize = true;
             this.radioGrid8Note.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.radioGrid8Note.Location = new System.Drawing.Point(233, 24);
+            this.radioGrid8Note.Location = new System.Drawing.Point(278, 22);
             this.radioGrid8Note.Name = "radioGrid8Note";
-            this.radioGrid8Note.Size = new System.Drawing.Size(40, 17);
+            this.radioGrid8Note.Size = new System.Drawing.Size(51, 17);
             this.radioGrid8Note.TabIndex = 6;
             this.radioGrid8Note.Text = "8th";
             this.radioGrid8Note.UseVisualStyleBackColor = true;
@@ -7983,12 +8090,11 @@
             // 
             // radioGridQuarterNote
             // 
-            this.radioGridQuarterNote.AutoSize = true;
             this.radioGridQuarterNote.Checked = true;
             this.radioGridQuarterNote.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.radioGridQuarterNote.Location = new System.Drawing.Point(281, 24);
+            this.radioGridQuarterNote.Location = new System.Drawing.Point(335, 22);
             this.radioGridQuarterNote.Name = "radioGridQuarterNote";
-            this.radioGridQuarterNote.Size = new System.Drawing.Size(60, 17);
+            this.radioGridQuarterNote.Size = new System.Drawing.Size(72, 17);
             this.radioGridQuarterNote.TabIndex = 7;
             this.radioGridQuarterNote.TabStop = true;
             this.radioGridQuarterNote.Text = "Quarter";
@@ -8281,6 +8387,11 @@
             this.labelCurrentLoadedG6.TabIndex = 10;
             this.labelCurrentLoadedG6.Text = "No Pro Guitar File Loaded";
             // 
+            // animationTimer
+            // 
+            this.animationTimer.Enabled = true;
+            this.animationTimer.Tick += new System.EventHandler(this.animationTimer_Tick);
+            // 
             // statusStrip1
             // 
             this.statusStrip1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("statusStrip1.BackgroundImage")));
@@ -8377,9 +8488,10 @@
             this.saveProAsToolStripMenuItem,
             this.saveCONPackageToolStripMenuItem,
             this.saveConfigurationToolStripMenuItem,
-            this.saveConfigurationAsToolStripMenuItem});
+            this.saveConfigurationAsToolStripMenuItem,
+            this.saveProXMLToolStripMenuItem});
             this.saveToolStripMenuItem1.Name = "saveToolStripMenuItem1";
-            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(110, 22);
+            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
             this.saveToolStripMenuItem1.Text = "&Save";
             // 
             // saveToolStripMenuItem
@@ -8506,10 +8618,12 @@
             this.aboutToolStripMenuItem.Text = "&About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
-            // animationTimer
+            // saveProXMLToolStripMenuItem
             // 
-            this.animationTimer.Enabled = true;
-            this.animationTimer.Tick += new System.EventHandler(this.animationTimer_Tick);
+            this.saveProXMLToolStripMenuItem.Name = "saveProXMLToolStripMenuItem";
+            this.saveProXMLToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
+            this.saveProXMLToolStripMenuItem.Text = "Save Pro XML";
+            this.saveProXMLToolStripMenuItem.Click += new System.EventHandler(this.saveProXMLToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -8540,6 +8654,8 @@
             this.tabContainerMain.ResumeLayout(false);
             this.tabSongLibraryUtility.ResumeLayout(false);
             this.groupBox39.ResumeLayout(false);
+            this.groupBox39.PerformLayout();
+            this.groupBox48.ResumeLayout(false);
             this.tabControl2.ResumeLayout(false);
             this.tabSongLibSongProperties.ResumeLayout(false);
             this.groupBox25.ResumeLayout(false);
@@ -8564,7 +8680,6 @@
             this.groupBox23.PerformLayout();
             this.groupBox22.ResumeLayout(false);
             this.groupBox21.ResumeLayout(false);
-            this.groupBox21.PerformLayout();
             this.tabSongLibSongUtility.ResumeLayout(false);
             this.groupBox47.ResumeLayout(false);
             this.groupBox47.PerformLayout();
@@ -8594,9 +8709,7 @@
             this.groupBox9.ResumeLayout(false);
             this.groupBox9.PerformLayout();
             this.groupBox8.ResumeLayout(false);
-            this.groupBox8.PerformLayout();
             this.groupBox7.ResumeLayout(false);
-            this.groupBox7.PerformLayout();
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
             this.contextMenuStripChannels.ResumeLayout(false);
@@ -9297,6 +9410,16 @@
         private System.Windows.Forms.Button buttonSongUtilSearchFolderExplore;
         private System.Windows.Forms.TextBox textBoxSongUtilSearchFolder;
         private System.Windows.Forms.Button buttonSongUtilSearchForG5FromOpenPro;
+        private System.Windows.Forms.Button buttonNoteUtilSelectAll;
+        private System.Windows.Forms.Button buttonSongLibListFilterReset;
+        private System.Windows.Forms.Label label55;
+        private System.Windows.Forms.TextBox textBoxSongLibListFilter;
+        private System.Windows.Forms.GroupBox groupBox48;
+        private System.Windows.Forms.CheckBox checkBoxSongLibSongListSortAscending;
+        private System.Windows.Forms.RadioButton radioSongLibSongListSortCompleted;
+        private System.Windows.Forms.RadioButton radioSongLibSongListSortID;
+        private System.Windows.Forms.RadioButton radioSongLibSongListSortName;
+        private System.Windows.Forms.ToolStripMenuItem saveProXMLToolStripMenuItem;
         
 
     }

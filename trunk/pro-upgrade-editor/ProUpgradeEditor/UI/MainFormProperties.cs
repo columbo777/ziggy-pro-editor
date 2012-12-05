@@ -77,12 +77,26 @@ namespace ProUpgradeEditor.UI
             }
         }
 
+        public enum SongListSortMode
+        {
+            SortByName,
+            SortByID,
+            SortByCompleted,
+        }
+
         class SongCacheList : List<SongCacheItem>
         {
+            
+            public SongListSortMode SortMode {get;set;}
+            public bool SortAscending { get; set; }
+            public string SongListFilter { get; set; }
+
             ListBox listBoxSongList;
 
             public SongCacheList(ListBox lb)
             {
+                SortMode = SongListSortMode.SortByName;
+                SortAscending = true;
                 this.listBoxSongList = lb;
             }
 
@@ -148,20 +162,53 @@ namespace ProUpgradeEditor.UI
             
             public void PopulateList()
             {
-                if(this.Contains(SelectedSong)==false)
+                if (this.Contains(SelectedSong) == false)
                 {
                     SelectedSong = null;
                 }
 
-                listBoxSongList.Items.Clear();
-                foreach (var i in this)
+                List<SongCacheItem> songList = new List<SongCacheItem>();
+                if (SongListFilter.IsNotEmpty())
                 {
-                    listBoxSongList.Items.Add(i);
+                    songList.AddRange(this.ToList().Where(x =>
+                        x.Description.ToLower().Contains(SongListFilter.ToLower())).ToArray());
                 }
+                else
+                {
+                    songList.AddRange(this.ToArray());
+                }
+
+                if (SortMode == SongListSortMode.SortByName)
+                {
+                    songList = songList.OrderBy(x => x.Description).ToList();
+                }
+                else if (SortMode == SongListSortMode.SortByID)
+                {
+                    songList = songList.OrderBy(x => x.CacheSongID).ToList();
+                }
+                else if (SortMode == SongListSortMode.SortByCompleted)
+                {
+                    songList = songList.OrderBy(x => x.IsComplete).ToList();
+                }
+
+                if (SortAscending == false)
+                {
+                    songList.Reverse();
+                }
+
+
+                listBoxSongList.BeginUpdate();
+                listBoxSongList.Items.Clear();
+
+                listBoxSongList.Items.AddRange(songList.ToArray());
+
+                listBoxSongList.EndUpdate();
 
                 if (SelectedSong != null)
                 {
-                    listBoxSongList.SelectedItem = SelectedSong;
+                    var lbList = listBoxSongList.Items.ToEnumerable<SongCacheItem>().ToList();
+                    if (lbList.Contains(SelectedSong))
+                        listBoxSongList.SelectedItem = SelectedSong;
                 }
             }
         }

@@ -332,16 +332,13 @@ namespace ProUpgradeEditor.UI
                     else
                     {
                         WriteBatchResult("Processing: " + item.ToString());
-                        if (!string.IsNullOrEmpty(item.G5FileName))
+                        if (item.G5FileName.FileExists())
                         {
-                            if (File.Exists(item.G5FileName))
-                            {
-                                var destFile = Path.Combine(destFolder, Path.GetFileName(item.G5FileName));
+                            var destFile = destFolder.PathCombine(item.G5FileName.GetFileName());
 
-                                if (!TryCopyFile(item.G5FileName, destFile))
-                                {
-                                    WriteBatchResult("Unable to overwrite: " + item.ToString());
-                                }
+                            if (!TryCopyFile(item.G5FileName, destFile))
+                            {
+                                WriteBatchResult("Unable to overwrite: " + item.ToString());
                             }
                         }
                     }
@@ -651,26 +648,12 @@ namespace ProUpgradeEditor.UI
         }
 
 
-        private static GuitarMessage GetNextOffNote(List<GuitarMessage> g6HardNotes, GuitarMessage g5Down)
-        {
-            var g6hn = g6HardNotes.FirstOrDefault(o =>
-                o.Command == ChannelCommand.NoteOff &&
-                o.AbsoluteTicks > g5Down.DownTick);
-            return g6hn;
-        }
-
-        private static IEnumerable<GuitarMessage> GetOffNotes(List<GuitarMessage> g6HardNotes, GuitarMessage g6Up)
-        {
-            var g6hn = g6HardNotes.Where(o => o.Command == ChannelCommand.NoteOff &&
-                o.AbsoluteTicks == g6Up.AbsoluteTicks);
-            return g6hn;
-        }
-
         public void RefreshTracks()
         {
             RefreshTracks5();
             RefreshTracks6();
-            
+            EditorPro.Invalidate();
+            EditorG5.Invalidate();
         }
 
         private bool ExecuteBatchRebuildCON()

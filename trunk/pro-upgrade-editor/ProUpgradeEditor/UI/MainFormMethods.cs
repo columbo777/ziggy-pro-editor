@@ -3171,10 +3171,7 @@ namespace ProUpgradeEditor.UI
                 }
                 else if (e.KeyCode == Keys.A && e.Control)
                 {
-                    
-                    EditorPro.ClearSelection();
-                    EditorPro.Messages.Chords.All(x => x.Selected = true);
-                    EditorPro.Invalidate();
+                    EditorPro.SelectAllChords();
                     return true;
                 }
                 else if (e.KeyCode == Keys.W)
@@ -3316,9 +3313,9 @@ namespace ProUpgradeEditor.UI
                 if (e.KeyCode == Keys.Right)
                 {
                     if (e.Shift == true)
-                        button35_Click(null, null);
+                        MoveHoldBoxChordsUpWholeStep();
                     else
-                        button37_Click(null, null);
+                        MoveHoldBoxChordsUpHalfStep();
                     var hb = GetHoldBoxes();
                     for (int x = 0; x < hb.Length; x++)
                     {
@@ -3334,9 +3331,9 @@ namespace ProUpgradeEditor.UI
                 if (e.KeyCode == Keys.Left)
                 {
                     if (e.Shift == true)
-                        button36_Click(null, null);
+                        MoveHoldBoxChordsDownWholeStep();
                     else
-                        button38_Click(null, null);
+                        MoveHoldBoxChordDownHalfStep();
                     var hb = GetHoldBoxes();
                     for (int x = 0; x < hb.Length; x++)
                     {
@@ -3382,7 +3379,7 @@ namespace ProUpgradeEditor.UI
                     }
                     if (!e.Control)
                     {
-                        button33_Click(null, null);
+                        MoveHoldBoxChordUpString();
                     }
 
                     for (int x = 0; x < hb.Length; x++)
@@ -3431,7 +3428,7 @@ namespace ProUpgradeEditor.UI
                     }
                     if (!e.Control)
                     {
-                        button34_Click(null, null);
+                        MoveHoldBoxChordDownString();
                     }
 
                     for (int x = 0; x < hb.Length; x++)

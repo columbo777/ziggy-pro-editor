@@ -819,9 +819,11 @@ namespace ProUpgradeEditor.UI
                 if (SelectedSong != null)
                 {
                     UpdateSongCacheItem(SelectedSong);
-
-                    listBoxSongLibrary.SelectedItem = SelectedSong;
-
+                    try
+                    {
+                        listBoxSongLibrary.SelectedItem = SelectedSong;
+                    }
+                    catch { }
                     if (SelectedSong.IsDirty || EditorPro.GuitarTrack.Dirty)
                     {
                         var result = AskToSave();
@@ -1612,6 +1614,11 @@ namespace ProUpgradeEditor.UI
 
         private void button33_Click(object sender, EventArgs e)
         {
+            MoveHoldBoxChordUpString();
+        }
+
+        public void MoveHoldBoxChordUpString()
+        {
             try
             {
                 var hb = GetHoldBoxes();
@@ -1634,6 +1641,11 @@ namespace ProUpgradeEditor.UI
         }
 
         private void button34_Click(object sender, EventArgs e)
+        {
+            MoveHoldBoxChordDownString();
+        }
+
+        public void MoveHoldBoxChordDownString()
         {
             try
             {
@@ -1660,6 +1672,11 @@ namespace ProUpgradeEditor.UI
 
         private void button35_Click(object sender, EventArgs e)
         {
+            MoveHoldBoxChordsUpWholeStep();
+        }
+
+        public void MoveHoldBoxChordsUpWholeStep()
+        {
             var hb = GetHoldBoxes();
             for (int x = 0; x < 6; x++)
             {
@@ -1675,6 +1692,11 @@ namespace ProUpgradeEditor.UI
         }
 
         private void button36_Click(object sender, EventArgs e)
+        {
+            MoveHoldBoxChordsDownWholeStep();
+        }
+
+        public void MoveHoldBoxChordsDownWholeStep()
         {
             var hb = GetHoldBoxes();
             for (int x = 0; x < 6; x++)
@@ -1692,6 +1714,11 @@ namespace ProUpgradeEditor.UI
 
         private void button37_Click(object sender, EventArgs e)
         {
+            MoveHoldBoxChordsUpHalfStep();
+        }
+
+        public void MoveHoldBoxChordsUpHalfStep()
+        {
             var hb = GetHoldBoxes();
             for (int x = 0; x < 6; x++)
             {
@@ -1707,6 +1734,11 @@ namespace ProUpgradeEditor.UI
         }
 
         private void button38_Click(object sender, EventArgs e)
+        {
+            MoveHoldBoxChordDownHalfStep();
+        }
+
+        public void MoveHoldBoxChordDownHalfStep()
         {
             var hb = GetHoldBoxes();
             for (int x = 0; x < 6; x++)
@@ -2106,8 +2138,12 @@ namespace ProUpgradeEditor.UI
 
         private void button68_Click(object sender, EventArgs e)
         {
-            SongList.SelectedSong = listBoxSongLibrary.SelectedItem as SongCacheItem;
-            OpenSongCacheItem(SongList.SelectedSong);
+            try
+            {
+                SongList.SelectedSong = listBoxSongLibrary.SelectedItem as SongCacheItem;
+                OpenSongCacheItem(SongList.SelectedSong);
+            }
+            catch { }
         }
         private void button67_Click(object sender, EventArgs e)
         {
@@ -2175,8 +2211,12 @@ namespace ProUpgradeEditor.UI
 
         private void listBox1_DoubleClick(object sender, EventArgs e)
         {
-            SongList.SelectedSong = listBoxSongLibrary.SelectedItem as SongCacheItem;
-            OpenSongCacheItem(SongList.SelectedSong);
+            try
+            {
+                SongList.SelectedSong = listBoxSongLibrary.SelectedItem as SongCacheItem;
+                OpenSongCacheItem(SongList.SelectedSong);
+            }
+            catch { }
         }
         private void saveCONPackageAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -9501,6 +9541,96 @@ namespace ProUpgradeEditor.UI
                 OpenNotepad(sb.ToString().GetBytes());
             }
 
+        }
+
+        private void buttonNoteUtilSelectAll_Click(object sender, EventArgs e)
+        {
+            EditorPro.SelectAllChords();
+        }
+
+        private void textBoxSongLibListFilter_TextChanged(object sender, EventArgs e)
+        {
+            ApplySongFilter(textBoxSongLibListFilter.Text);
+        }
+
+        
+
+        public void ApplySongFilter(string filter)
+        {
+            SongList.SongListFilter = filter;
+            SongList.PopulateList();
+        }
+
+        private void buttonSongLibListFilterReset_Click(object sender, EventArgs e)
+        {
+            textBoxSongLibListFilter.Text = "";
+            ApplySongFilter("");
+        }
+
+
+        private void radioSongLibSongListSortName_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioSongLibSongListSortName.Checked)
+            {
+                if (SongList.SortMode != SongListSortMode.SortByName)
+                {
+                    SongList.SortMode = SongListSortMode.SortByName;
+                    SongList.PopulateList();
+                }
+            }
+        }
+
+        private void radioSongLibSongListSortID_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioSongLibSongListSortID.Checked)
+            {
+                if (SongList.SortMode != SongListSortMode.SortByID)
+                {
+                    SongList.SortMode = SongListSortMode.SortByID;
+                    SongList.PopulateList();
+                }
+            }
+        }
+
+        private void radioSongLibSongListSortCompleted_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioSongLibSongListSortCompleted.Checked)
+            {
+                if (SongList.SortMode != SongListSortMode.SortByCompleted)
+                {
+                    SongList.SortMode = SongListSortMode.SortByCompleted;
+                    SongList.PopulateList();
+                }
+            }
+        }
+
+        private void checkBoxSongLibSongListSortAscending_CheckedChanged(object sender, EventArgs e)
+        {
+            if (SongList.SortAscending != checkBoxSongLibSongListSortAscending.Checked)
+            {
+                SongList.SortAscending = checkBoxSongLibSongListSortAscending.Checked;
+                SongList.PopulateList();
+            }
+        }
+
+        private void saveProXMLToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (SelectedSong == null)
+            {
+                MessageBox.Show("No Song Loaded");
+            }
+            else
+            {
+                ShowSaveFileDlg("Save Pro XML", "", "").IfNotEmpty(fileName =>
+                {
+                    try
+                    {
+                        var doc = GenerateXml(SelectedSong);
+                        doc.Save(fileName);
+                    }
+                    catch { }
+                });
+            }
         }
     }
 }

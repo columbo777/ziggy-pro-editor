@@ -20,6 +20,12 @@ namespace EditorResources.Components
             InitializeComponent();
         }
 
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            Invalidate();
+        }
         public static bool ShowWave(string fileName)
         {
             bool ret = false;
@@ -60,6 +66,7 @@ namespace EditorResources.Components
                 
                 var left = Math.Min(mouseDownPoint.X, e.Location.X);
                 var right = Math.Max(mouseDownPoint.X, e.Location.X);
+
                 if (Math.Abs(left - right) > 2)
                 {
                     peWaveViewerControl1.Zoom(
@@ -76,7 +83,7 @@ namespace EditorResources.Components
 
         private void peWaveViewerControl1_Load(object sender, EventArgs e)
         {
-            
+            Invalidate();
         }
         
     }

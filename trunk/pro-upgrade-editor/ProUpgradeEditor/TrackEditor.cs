@@ -2977,6 +2977,7 @@ namespace ProUpgradeEditor
                     ret = true;
                     try
                     {
+                        EditorPro.BackupSequence();
                         sel.Chord.CloneAtTime(guitarTrack, downtick, uptick).Selected = true;
                     }
                     catch {  }

@@ -321,25 +321,32 @@ namespace XPackage
             return Resources.song_ids;
         }
 
-        public static byte[] CreateRB3Pro(
-            string description,
-            string guitarDifficulty,
-            string bassDifficulty,
-            string song_id,
-            string songShortName,
-            string proMidiFileName, byte[] midFileContents,
-            byte[] existingCONFile)
+        static byte[] GetBytes(char[] str)
         {
-
-
+            return str.Select(x => (byte)x).ToArray();
+        }
+        
+        public class CreateProConfig
+        {
+            public string displayTitle;
+            public string description;
+            public string guitarDifficulty;
+            public string bassDifficulty;
+            public string song_id;
+            public string songShortName;
+            public string proMidiFileName;
+            public byte[] midFileContents;
+            public byte[] existingCONFile;
+        }
+        public static byte[] CreateRB3Pro(CreateProConfig config)
+        {
             STFSPackage pk = null;
             bool loadedExisting = false;
-            if(existingCONFile != null)
+            if(config.existingCONFile != null)
             {
                 try
                 {
-                    
-                    pk = LoadSTFS(existingCONFile);
+                    pk = LoadSTFS(config.existingCONFile);
                 }
                 catch { }
                 if (pk == null)
@@ -361,8 +368,10 @@ namespace XPackage
                 
                 //pk.Header.ContentImage = Resources.rockband;
                 //pk.Header.PackageImage = Resources.rockband2;
-
-                pk.Header.Description = description;
+                
+                pk.Header.Description = config.description;
+                pk.Header.Title_Display = config.displayTitle;
+    
                 var folder = pk.GetFolder("songs_upgrades");
                 if (loadedExisting)
                 {
@@ -380,18 +389,18 @@ namespace XPackage
 
                             string upgradeFile = Encoding.ASCII.GetString(Resources.upgrades);
 
-                            upgradeFile = upgradeFile.Replace("##songshortname##", songShortName);
-                            upgradeFile = upgradeFile.Replace("##profilename##", proMidiFileName);
-                            upgradeFile = upgradeFile.Replace("##songid##", song_id);
-                            upgradeFile = upgradeFile.Replace("##guitardifficulty##", guitarDifficulty);
-                            upgradeFile = upgradeFile.Replace("##bassdifficulty##", bassDifficulty);
+                            upgradeFile = upgradeFile.Replace("##songshortname##", config.songShortName);
+                            upgradeFile = upgradeFile.Replace("##profilename##", config.proMidiFileName);
+                            upgradeFile = upgradeFile.Replace("##songid##", config.song_id);
+                            upgradeFile = upgradeFile.Replace("##guitardifficulty##", config.guitarDifficulty);
+                            upgradeFile = upgradeFile.Replace("##bassdifficulty##", config.bassDifficulty);
                             
                             f.Replace(Encoding.ASCII.GetBytes(upgradeFile));
                             foundDTA = true;
                         }
-                        else if (string.Compare(f.Name, proMidiFileName, StringComparison.OrdinalIgnoreCase) == 0)
+                        else if (string.Compare(f.Name, config.proMidiFileName, StringComparison.OrdinalIgnoreCase) == 0)
                         {
-                            f.Replace(midFileContents);
+                            f.Replace(config.midFileContents);
                             foundMID = true;
                         }
                     }
@@ -400,8 +409,8 @@ namespace XPackage
                     if (!loadedOK)
                     {
                         pk.CloseIO();
-                        return CreateRB3Pro(description, guitarDifficulty, bassDifficulty, song_id, songShortName, proMidiFileName,
-                            midFileContents, null);
+                        config.existingCONFile = null;
+                        return CreateRB3Pro(config);
                     }
                 }
                 else
@@ -411,23 +420,23 @@ namespace XPackage
                         if (f.Name.EndsWith(".mid", StringComparison.OrdinalIgnoreCase) ||
                             f.Name.EndsWith(".midi", StringComparison.OrdinalIgnoreCase))
                         {
-                            f.Name = proMidiFileName;
+                            f.Name = config.proMidiFileName;
 
-                            f.Replace(midFileContents);
+                            f.Replace(config.midFileContents);
                         }
                         else if (f.Name.EndsWith(".dta", StringComparison.OrdinalIgnoreCase))
                         {
-                            string upgradeFile = Encoding.UTF8.GetString(Resources.upgrades);
+                            string upgradeFile = Encoding.ASCII.GetString(Resources.upgrades);
 
                             f.Name = "upgrades.dta";
 
-                            upgradeFile = upgradeFile.Replace("##songshortname##", songShortName);
-                            upgradeFile = upgradeFile.Replace("##profilename##", proMidiFileName);
-                            upgradeFile = upgradeFile.Replace("##songid##", song_id);
-                            upgradeFile = upgradeFile.Replace("##guitardifficulty##", guitarDifficulty);
-                            upgradeFile = upgradeFile.Replace("##bassdifficulty##", bassDifficulty);
+                            upgradeFile = upgradeFile.Replace("##songshortname##", config.songShortName);
+                            upgradeFile = upgradeFile.Replace("##profilename##", config.proMidiFileName);
+                            upgradeFile = upgradeFile.Replace("##songid##", config.song_id);
+                            upgradeFile = upgradeFile.Replace("##guitardifficulty##", config.guitarDifficulty);
+                            upgradeFile = upgradeFile.Replace("##bassdifficulty##", config.bassDifficulty);
 
-                            f.Replace(Encoding.UTF8.GetBytes(upgradeFile));
+                            f.Replace(Encoding.ASCII.GetBytes(upgradeFile));
                         }
                     }
                 }

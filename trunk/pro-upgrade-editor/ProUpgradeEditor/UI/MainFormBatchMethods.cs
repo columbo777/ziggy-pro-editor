@@ -1497,7 +1497,8 @@ namespace ProUpgradeEditor.UI
                                 fileErrors.Add(trackName + " invalid chord length found: " + EditorPro.CurrentDifficulty.ToString());
                             }
 
-                            if (EditorG5.IsLoaded)
+                            if (EditorG5.IsLoaded &&
+                                EditorPro.CurrentDifficulty == GuitarDifficulty.Expert)
                             {
 
                                 if (t.Name.IsBassTrackName6() && (item != null && item.CopyGuitarToBass == false))
@@ -1509,7 +1510,7 @@ namespace ProUpgradeEditor.UI
                                     EditorG5.SetTrack(t.Name.GetG5TrackNameFromPro(), EditorPro.CurrentDifficulty);
                                 }
 
-                                if (EditorG5.IsLoaded)
+                                if (EditorPro.CurrentDifficulty == GuitarDifficulty.Expert)
                                 {
                                     if (EditorG5.Messages.BigRockEndings.Any() &&
                                         !EditorPro.Messages.BigRockEndings.Any())
@@ -1517,16 +1518,15 @@ namespace ProUpgradeEditor.UI
                                         fileErrors.Add(trackName + " Big Rock Ending in 5 button but not pro");
                                     }
 
-                                    if (EditorG5.CurrentDifficulty == GuitarDifficulty.Expert &&
-                                        (EditorG5.Messages.Solos.Count() !=
-                                        EditorPro.Messages.Solos.Count()))
+                                    if (EditorG5.Messages.Solos.Count() !=
+                                        EditorPro.Messages.Solos.Count())
                                     {
-                                        fileErrors.Add(trackName + " Not all solos created for difficulty: " + EditorPro.CurrentDifficulty.ToString());
+                                        fileErrors.Add(trackName + " Not all solos created");
                                     }
                                     if (EditorG5.Messages.Powerups.Count() !=
                                         EditorPro.Messages.Powerups.Count())
                                     {
-                                        fileErrors.Add(trackName + " Not all powerups created for difficulty: " + EditorPro.CurrentDifficulty.ToString());
+                                        fileErrors.Add(trackName + " Not all powerups created");
                                     }
                                 }
                             }

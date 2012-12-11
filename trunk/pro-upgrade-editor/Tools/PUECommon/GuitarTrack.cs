@@ -1070,39 +1070,43 @@ namespace ProUpgradeEditor.DataLayer
                             Messages.Add(currentChord);
 
                             var chordModifiers = modifiers.GetBetweenTick(currentChord.DownTick, currentChord.DownTick + Utility.NoteCloseWidth);
-
-                            foreach (var mod in chordModifiers)
+                            if (chordModifiers.Any())
                             {
-                                if (Utility.AllSlideData1.Contains(mod.Data1))
-                                {
-                                    currentChord.IsSlide = true;
-                                    if (mod.Channel == Utility.ChannelSlideReversed)
-                                        currentChord.IsSlideReversed = true;
-                                }
-                                else if (Utility.AllHammeronData1.Contains(mod.Data1))
-                                {
-                                    currentChord.IsHammeron = true;
-                                }
-                                else if (Utility.AllStrumData1.Contains(mod.Data1))
-                                {
-                                    currentChord.StrumMode = ChordStrum.Normal;
+                                currentChord.Modifiers.AddRange(chordModifiers.Cast<GuitarModifier>().ToArray());
 
-                                    var strumMode = ChordStrum.Normal;
+                                foreach (var mod in chordModifiers)
+                                {
+                                    if (Utility.AllSlideData1.Contains(mod.Data1))
+                                    {
+                                        currentChord.IsSlide = true;
+                                        if (mod.Channel == Utility.ChannelSlideReversed)
+                                            currentChord.IsSlideReversed = true;
+                                    }
+                                    else if (Utility.AllHammeronData1.Contains(mod.Data1))
+                                    {
+                                        currentChord.IsHammeron = true;
+                                    }
+                                    else if (Utility.AllStrumData1.Contains(mod.Data1))
+                                    {
+                                        currentChord.StrumMode = ChordStrum.Normal;
 
-                                    if (mod.Channel == Utility.ChannelStrumHigh)
-                                    {
-                                        strumMode |= ChordStrum.High;
-                                    }
-                                    else if (mod.Channel == Utility.ChannelStrumMid)
-                                    {
-                                        strumMode |= ChordStrum.Mid;
-                                    }
-                                    else if (mod.Channel == Utility.ChannelStrumLow)
-                                    {
-                                        strumMode |= ChordStrum.Low;
-                                    }
+                                        var strumMode = ChordStrum.Normal;
 
-                                    currentChord.StrumMode = strumMode;
+                                        if (mod.Channel == Utility.ChannelStrumHigh)
+                                        {
+                                            strumMode |= ChordStrum.High;
+                                        }
+                                        else if (mod.Channel == Utility.ChannelStrumMid)
+                                        {
+                                            strumMode |= ChordStrum.Mid;
+                                        }
+                                        else if (mod.Channel == Utility.ChannelStrumLow)
+                                        {
+                                            strumMode |= ChordStrum.Low;
+                                        }
+
+                                        currentChord.StrumMode = strumMode;
+                                    }
                                 }
                             }
                         }

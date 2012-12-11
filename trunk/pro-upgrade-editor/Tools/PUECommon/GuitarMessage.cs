@@ -97,6 +97,10 @@ namespace ProUpgradeEditor.DataLayer
             set
             {
                 downEvent = value;
+                if (value != null)
+                {
+                    downTick = value.AbsoluteTicks;
+                }
                 this.IsUpdated = true;
             }
         }
@@ -104,7 +108,10 @@ namespace ProUpgradeEditor.DataLayer
         public MidiEvent MidiEvent
         {
             get { return DownEvent; }
-            set { DownEvent = value; }
+            set 
+            { 
+                DownEvent = value; 
+            }
         }
 
         public int AbsoluteTicks
@@ -126,6 +133,7 @@ namespace ProUpgradeEditor.DataLayer
                 this.IsUpdated = true;
             }
         }
+
         public void SetDownEvent(MidiEvent ev)
         {
             this.downEvent = ev;
@@ -393,6 +401,10 @@ namespace ProUpgradeEditor.DataLayer
             set
             {
                 upEvent = value;
+                if (value != null)
+                {
+                    upTick = value.AbsoluteTicks;
+                }
                 this.IsUpdated = true;
             }
         }

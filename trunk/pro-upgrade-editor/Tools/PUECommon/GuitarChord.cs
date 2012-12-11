@@ -634,7 +634,7 @@ namespace ProUpgradeEditor.DataLayer
 
         void RemoveModifiers(int[] modifierData1)
         {
-            foreach (var m in Modifiers.Where(x => Utility.AllHammeronData1.Contains(x.Data1)).ToList())
+            foreach (var m in Modifiers.Where(x => modifierData1.Contains(x.Data1)).ToList())
             {
                 OwnerTrack.Remove(m);
                 Modifiers.Remove(m);

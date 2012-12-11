@@ -4176,19 +4176,26 @@ namespace ProUpgradeEditor.UI
 
 
                     byte[] existingCON = null;
-                    if (File.Exists(fileName))
+                    
+                    if (fileName.FileExists())
                     {
                         existingCON = ReadFileBytes(fileName);
                     }
 
-                    string proName = Path.GetFileName(sc.G6FileName);
+                    var config = new Package.CreateProConfig()
+                    {
+                        existingCONFile = existingCON,
+                        proMidiFileName = sc.G6FileName.GetFileName(),
+                        midFileContents = proTrack,
+                        displayTitle = sc.Description,
+                        description = sc.Description,
+                        songShortName = sc.DTASongShortName,
+                        song_id = sc.DTASongID,
+                        guitarDifficulty=InstrumentDifficultyUtil.MapDifficulty((InstrumentDifficulty)sc.DTAGuitarDifficulty),
+                        bassDifficulty=InstrumentDifficultyUtil.MapDifficulty((InstrumentDifficulty)sc.DTABassDifficulty),
+                    };
 
-                    var con = Package.CreateRB3Pro(sc.DTASongShortName,
-                       InstrumentDifficultyUtil.MapDifficulty((InstrumentDifficulty)sc.DTAGuitarDifficulty),
-                        InstrumentDifficultyUtil.MapDifficulty((InstrumentDifficulty)sc.DTABassDifficulty),
-                        sc.DTASongID,
-                        sc.DTASongShortName,
-                        proName, proTrack, existingCON);
+                    var con = Package.CreateRB3Pro(config);
 
                     if (con != null && con.Length > 0)
                     {
@@ -4202,6 +4209,7 @@ namespace ProUpgradeEditor.UI
                         }
 
                         var pk = Package.Load(fileName);
+                        
                         if (pk == null)
                         {
                             if (!silent)
@@ -5141,6 +5149,7 @@ namespace ProUpgradeEditor.UI
 
                             if (string.Compare(ext, ".mogg", StringComparison.OrdinalIgnoreCase) == 0)
                             {
+                                
                                 //textBoxPackageDTAText.Text = Encoding.ASCII.GetString(f.Data);
                             }
 

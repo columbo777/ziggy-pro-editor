@@ -2113,9 +2113,12 @@ namespace ProUpgradeEditor.UI
 
             if (string.IsNullOrEmpty(path))
             {
-                if (textBoxSongLibG5MidiFileName.Text.IsNotEmpty())
+                var name5 = textBoxSongLibG5MidiFileName.Text.Trim();
+                if (name5.IsNotEmpty())
                 {
-                    path = textBoxSongLibG5MidiFileName.Text + Utility.DefaultPROFileExtension;
+                    var folder = name5.GetFolderName();
+
+                    path = folder.PathCombine(name5.GetFileNameWithoutExtension() + Utility.DefaultPROFileExtension);
                 }
             }
 
@@ -3356,6 +3359,8 @@ namespace ProUpgradeEditor.UI
         {
             if (DesignMode)
                 return;
+
+            EditorPro.BackupSequence();
             MoveSelectedDown12Frets();
         }
 
@@ -5690,7 +5695,7 @@ namespace ProUpgradeEditor.UI
             }
             else
             {
-                foreach (ListViewItem s in listBoxUSBSongs.SelectedItems) s.Selected = true;
+                foreach (ListViewItem s in listBoxUSBSongs.Items) s.Selected = true;
                 
             }
             listBoxUSBSongs.EndUpdate();
@@ -7030,6 +7035,7 @@ namespace ProUpgradeEditor.UI
 
         private void buttonUp12_Click(object sender, EventArgs e)
         {
+            EditorPro.BackupSequence();
             MoveSelectedUp12Frets();
         }
 

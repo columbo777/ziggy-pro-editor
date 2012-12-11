@@ -130,9 +130,9 @@ namespace EditorResources {
             }
         }
         
-        public static System.Drawing.Bitmap gtk_refresh {
+        public static System.Drawing.Bitmap gtkrefresh {
             get {
-                object obj = ResourceManager.GetObject("gtk-refresh", resourceCulture);
+                object obj = ResourceManager.GetObject("gtkrefresh", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -110,7 +110,7 @@
             // refreshToolStripMenuItem
             // 
             this.refreshToolStripMenuItem.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.refreshToolStripMenuItem.Image = global::EditorResources.PEResources.gtk_refresh;
+            this.refreshToolStripMenuItem.Image = global::EditorResources.PEResources.gtkrefresh;
             this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
             this.refreshToolStripMenuItem.Size = new System.Drawing.Size(28, 20);
             this.refreshToolStripMenuItem.ToolTipText = "Refresh";

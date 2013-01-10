@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ProUpgradeEditor.Common;
 using System.IO;
 
-namespace ProUpgradeEditor
+namespace ProUpgradeEditor.Common
 {
 
     public enum InstrumentDifficulty

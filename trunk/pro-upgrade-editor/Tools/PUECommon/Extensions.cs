@@ -5,15 +5,14 @@ using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 using Sanford.Multimedia.Midi;
-using ProUpgradeEditor.DataLayer;
-using ProUpgradeEditor.Common;
+
 using System.Runtime.CompilerServices;
 using System.Globalization;
 using System.Collections;
 using System.IO;
 using System.Diagnostics;
 
-namespace ProUpgradeEditor
+namespace ProUpgradeEditor.Common
 {
 
     public class DataPair<T>
@@ -23,33 +22,389 @@ namespace ProUpgradeEditor
         public DataPair(T a, T b) { this.A = a; this.B = b; }
     }
 
-    public class DownUpPair<T>
+
+    public class Data1ChannelPairEqualityComparer : IEqualityComparer<Data1ChannelPair>
     {
-        public T Down { get; set; }
-        public T Up { get;set;}
-        public DownUpPair(T down, T up)
+        public bool Equals(Data1ChannelPair x, Data1ChannelPair y)
         {
-            this.Down = down;
-            this.Up = up;
+            return x.Data1 == y.Data1 && x.Channel == y.Channel;
+        }
+
+        public int GetHashCode(Data1ChannelPair obj)
+        {
+            return obj.Data1 << 16 | obj.Channel;
         }
     }
 
-    public class GuitarMessagePair : DownUpPair<GuitarMessage> 
+    public class MidiEventTickCommandComparer : IComparer<MidiEvent>
     {
-        public GuitarMessagePair() : this(null,null) { }
-        public GuitarMessagePair(GuitarMessage down) : this(down, null){ }
-        public GuitarMessagePair(GuitarMessage down, GuitarMessage up) : base(down,up) { }
+        public int Compare(MidiEvent x, MidiEvent y)
+        {
+            if (x.AbsoluteTicks < y.AbsoluteTicks)
+                return -1;
+            if (x.AbsoluteTicks > y.AbsoluteTicks)
+                return 1;
+            if (x.Command == ChannelCommand.NoteOn && y.Command == ChannelCommand.NoteOff)
+                return 1;
+            if (x.Command == ChannelCommand.NoteOff && y.Command == ChannelCommand.NoteOn)
+                return -1;
+            return 0;
+        }
     }
-    public class MidiEventPair : DownUpPair<MidiEvent>
+    public class Data1ChannelPair : IComparable<Data1ChannelPair>, IEquatable<Data1ChannelPair>
     {
-        public MidiEventPair() : this(null, null) { }
-        public MidiEventPair(MidiEvent down) : this(down, null) { }
-        public MidiEventPair(MidiEvent down, MidiEvent up) : base(down, up) { }
+        public int Data1 { get; set; }
+        public int Channel { get; set; }
+
+        public static Data1ChannelPair NullValue { get { return new Data1ChannelPair(Int32.MinValue, Int32.MinValue); } }
+
+        public Data1ChannelPair(int data1, int channel) 
+        {
+            this.Data1 = data1;
+            this.Channel = channel;
+        }
+
+        public int CompareTo(Data1ChannelPair other)
+        {
+            if (Data1 < other.Data1)
+                return -1;
+            else if (Data1 > other.Data1)
+                return 1;
+            else if (Channel < other.Channel)
+                return -1;
+            else if (Channel > other.Channel)
+                return 1;
+            else
+                return 0;
+        }
+
+
+        public bool Equals(Data1ChannelPair other)
+        {
+            return CompareTo(other) == 0;
+        }
     }
 
-    
+    public interface DownUpPair<T>
+    {
+        T Down { get; set; }
+        T Up { get;set;}
+
+        bool IsNull { get; }
+    }
+
+    public struct TimePair : DownUpPair<double>
+    {
+        double down;
+        double up;
+
+        public static TimePair NullValue { get { return new TimePair(double.MinValue, double.MinValue); } }
+
+        public TimePair(double downTime, double upTime)
+        {
+            this.down = downTime;
+            this.up = upTime;
+        }
+        public TimePair(TimePair times) : this(times.Down, times.Up) { }
+
+        public bool IsCloseBoth(TimePair ticks)
+        {
+            return IsCloseDownDown(ticks) && IsCloseUpUp(ticks);
+        }
+
+        public static bool IsClose(double a, double b)
+        {
+            return Math.Abs(a - b) < 0.0001;
+        }
+
+        public bool IsCloseDownDown(TimePair times)
+        {
+            return IsClose(Down, times.Down);
+        }
+
+        public bool IsCloseUpUp(TimePair times)
+        {
+            return IsClose(Up, times.Up);
+        }
+
+        public bool IsCloseUpDown(TimePair times)
+        {
+            return IsClose(Up, times.Down);
+        }
+
+        public bool IsCloseDownUp(TimePair times)
+        {
+            return IsClose(Down, times.Up);
+        }
+
+        public double TimeLength 
+        { 
+            get 
+            { 
+                return Up - Down; 
+            }
+            set
+            {
+                Up = Down + value;
+            }
+        }
+
+        public bool IsShort { get { return HasNull || IsClose(Up, Down); } }
+
+        public bool IsZeroLength { get { return HasNull || TimeLength <= 0.0; } }
+        public bool NotZeroLength { get { return NotNull && TimeLength > 0.0; } }
+
+        public bool IsInvalid { get { return HasNull || Up < Down; } }
+        public bool IsValid { get { return !IsInvalid; } }
+
+         
+        public bool IsNull { get { return Up == double.MinValue && Down == double.MinValue; } }
+
+        public bool HasNull { get { return Up == double.MinValue || Down == double.MinValue; } }
+
+        public bool NotNull { get { return !HasNull; } }
+
+        public bool HasLength { get { return !HasNull && (Up > Down); } }
+
+        public static TimePair operator -(TimePair pair, double i)
+        {
+            return new TimePair(pair.Down - i, pair.Up - i);
+        }
+        public static TimePair operator +(TimePair pair, double i)
+        {
+            return new TimePair(pair.Down + i, pair.Up + i);
+        }
+
+        public override string ToString()
+        {
+            return "Down: " + Down.ToStringEx() + " - Up: " + Up.ToStringEx() + " Length: " + TimeLength.ToStringEx();
+        }
+
+        public double Down
+        {
+            get { return this.down; }
+            set { this.down = value; }
+        }
+
+        public double Up
+        {
+            get { return this.up; }
+            set { this.up = value; }
+        }
+    }
+
+    public struct TickPair : IComparable<TickPair>
+    {
+        public int Down;
+        public int Up;
+
+        public static TickPair NullValue { get { return new TickPair(Int32.MinValue, Int32.MinValue); } }
+
+        public TickPair(int downTick, int upTick) 
+        {
+            Down = downTick;
+            Up = upTick;
+        }
+
+        public TickPair(TickPair ticks) : this(ticks.Down, ticks.Up) { }
+
+        public bool IsCloseBoth(TickPair ticks)
+        {
+            return IsCloseDownDown(ticks) && IsCloseUpUp(ticks);
+        }
+
+        public bool IsCloseDownDown(TickPair ticks)
+        {
+            return Utility.IsCloseTick(Down, ticks.Down);
+        }
+
+        public bool IsCloseUpUp(TickPair ticks)
+        {
+            return Utility.IsCloseTick(Up, ticks.Up);
+        }
+
+        public bool IsCloseUpDown(TickPair ticks)
+        {
+            return Utility.IsCloseTick(Up, ticks.Down);
+        }
+
+        public bool IsCloseDownUp(TickPair ticks)
+        {
+            return Utility.IsCloseTick(Down, ticks.Up);
+        }
+
+        public int TickLength { get { return Up - Down; } }
+
+        public bool IsShort { get { return HasNull || Utility.IsCloseTick(Up, Down); } }
+
+        public bool IsZeroLength { get { return HasNull || TickLength <= 0; } }
+        public bool NotZeroLength { get { return NotNull && TickLength > 0; } }
+
+        public bool IsInvalid { get { return HasNull || Up < Down; } }
+        public bool IsValid { get { return !IsInvalid; } }
+
+        public bool IsNull { get { return Up == Int32.MinValue && Down == Int32.MinValue; } }
+
+        public bool HasNull { get { return Up == Int32.MinValue || Down == Int32.MinValue; } }
+
+        public bool NotNull { get { return !HasNull; } }
+
+        public bool HasLength { get { return !HasNull && (Up > Down); } }
+
+        public static TickPair operator -(TickPair pair, int i)
+        {
+            return new TickPair(pair.Down - i, pair.Up - i);
+        }
+        public static TickPair operator +(TickPair pair,int i)
+        {
+            return new TickPair(pair.Down + i, pair.Up + i);
+        }
+        public TickPair Expand(int amount)
+        {
+            return new TickPair(Down - amount, Up + amount);
+        }
+        public TickPair ExtendTo(int up)
+        {
+            return new TickPair(Down, up);
+        }
+        public override string ToString()
+        {
+            return "Down: " + Down.ToStringEx() + " - Up: " + Up.ToStringEx() + " Length: " + TickLength.ToStringEx();
+        }
+
+        public int CompareTo(TickPair other)
+        {
+            if (Down < other.Down)
+                return -1;
+            
+            if (Down > other.Down)
+                return 1;
+            
+            if (Up < other.Up)
+                return -1;
+            
+            if (Up > other.Up)
+                return 1;
+
+            return 0;
+        }
+    }
+
+    public struct GuitarMessagePair : DownUpPair<GuitarMessage> 
+    {
+        GuitarMessage down;
+        GuitarMessage up;
+        public GuitarMessagePair(GuitarMessage down)
+        {
+            this.down = down;
+            this.up = null;
+        }
+        public GuitarMessagePair(GuitarMessage down, GuitarMessage up) 
+        {
+            this.down = down;
+            this.up = up;
+        }
+
+        public GuitarMessage Down
+        {
+            get { return this.down; }
+            set { this.down = value; }
+        }
+
+        public GuitarMessage Up
+        {
+            get { return this.up; }
+            set { this.up = value; }
+        }
+
+
+        public bool IsNull
+        {
+            get { return (up==null && down==null); }
+        }
+    }
+    public struct MidiEventPair : DownUpPair<MidiEvent>
+    {
+        GuitarTrack ownerTrack;
+        MidiEvent down;
+        MidiEvent up;
+        Data1ChannelPair dPair;
+
+        public MidiEventPair(MidiEventPair pair) : this(pair.ownerTrack, pair.down, pair.up) { }
+        public MidiEventPair(GuitarTrack owner) : this(owner, null, null) { }
+        public MidiEventPair(GuitarTrack owner, MidiEvent down) : this(owner, down, null) { }
+        public MidiEventPair(GuitarTrack owner, MidiEvent down, MidiEvent up) 
+        { 
+            this.ownerTrack = owner;
+            this.down = down;
+            this.up = up;
+            if (down == null)
+            {
+                dPair = Data1ChannelPair.NullValue;
+            }
+            else
+            {
+                dPair = new Data1ChannelPair(down.Data1, down.Channel);
+            }
+        }
+
+        public GuitarTrack OwnerTrack { get { return ownerTrack; } set { ownerTrack = value; } }
+
+        public int Data1 { get { return Down != null ? Down.Data1 : Int32.MinValue; } }
+        public int Data2 { get { return Down != null ? Down.Data2 : Int32.MinValue; } }
+
+        public int Channel { get { return Down != null ? Down.Channel : Int32.MinValue; } }
+
+        public Data1ChannelPair Data1ChannelPair { get { return dPair; } }
+
+        public bool HasDown { get { return Down != null; } }
+        public bool HasUp { get { return Up != null; } }
+
+        public bool IsValid { get { return (HasUp || HasDown) && !IsDeleted; } }
+
+        public bool IsDeleted { get { return IsDownDeleted || IsUpDeleted; } }
+
+        public bool IsUpDeleted { get { return HasUp ? Up.Deleted : false; } }
+        public bool IsDownDeleted { get { return HasDown ? Down.Deleted : false; } }
+
+        public MidiEventPair GetInsertedClone(GuitarTrack owner)
+        {
+            return new MidiEventPair(owner,
+                HasDown ? Down.GetInsertedClone(owner) : null,
+                HasUp ? Up.GetInsertedClone(owner) : null);
+        }
+
+        public MidiEventPair CloneToMemory(GuitarTrack owner)
+        {
+            return new MidiEventPair(owner,
+                HasDown ? new MidiEvent(null, Down.AbsoluteTicks, Down.Clone()) : null,
+                HasUp ? new MidiEvent(null, Up.AbsoluteTicks, Up.Clone()) : null);
+        }
+
+        public MidiEvent Down
+        {
+            get { return this.down; }
+            set { this.down = value; }
+        }
+
+        public MidiEvent Up
+        {
+            get { return this.up; }
+            set { this.up = value; }
+        }
+
+
+        public bool IsNull
+        {
+            get { return !(HasUp || HasDown); }
+        }
+    }
+
+
+
     public class GuitarMessageSorter : IComparer<GuitarMessage>
     {
+
         public int Compare(GuitarMessage x, GuitarMessage y)
         {
             var ret = 0;
@@ -72,26 +427,102 @@ namespace ProUpgradeEditor
                         return 1;
                 }
             }
-            
             return ret;
         }
     }
 
 
-    [DebuggerStepThrough]
+    public class MidiEventPairInterlacingSorter : IComparer<MidiEventPair>
+    {
+        public int Compare(MidiEventPair a, MidiEventPair b)
+        {
+            if (a.Down.AbsoluteTicks < b.Down.AbsoluteTicks)
+                return -1;
+            else if (a.Down.AbsoluteTicks > b.Down.AbsoluteTicks)
+                return 1;
+            else
+                return 0;
+        }
+    }
+    public class MidiEventChannelMessageSorter : IComparer<MidiEvent>
+    {
+        public int Compare(MidiEvent x, MidiEvent y)
+        {
+            if (x.AbsoluteTicks == y.AbsoluteTicks &&
+                x.Data1 == y.Data1 &&
+                x.Channel == y.Channel &&
+                x.Command != y.Command)
+            {
+                if (x.Command == ChannelCommand.NoteOff)
+                    return -1;
+                else
+                    return 1;
+            }
+            else
+            {
+                if (x.AbsoluteTicks < y.AbsoluteTicks)
+                    return -1;
+                else if (x.AbsoluteTicks > y.AbsoluteTicks)
+                    return 1;
+                else if (x.Data1 < y.Data1)
+                    return -1;
+                else if (x.Data1 > y.Data1)
+                    return 1;
+                else if (x.Channel < y.Channel)
+                    return -1;
+                else if (x.Channel > y.Channel)
+                    return 1;
+                else
+                    return 0;
+            }
+        }
+    }
+
     public static class PUEExtensions
     {
-        public static void IfObjectNotNull<T>(this T o, Action<T> func, Action<T> Else = null)
+
+        public static MidiEvent GetInsertedClone(this MidiEvent ev, GuitarTrack owner)
         {
-            if (o != null)
+            return owner.Insert(ev.AbsoluteTicks, ev.Clone());
+        }
+
+        public static void IfAny<T>(this T o, Action<T> func, Action<T> elseFunc = null)
+            where T : IEnumerable<MidiEvent>
+        {
+            if (o != null && o.Any())
             {
                 func(o);
             }
             else
             {
-                if (Else != null)
-                    Else(o);
+                elseFunc(o);
             }
+        }
+
+        
+
+        public static IEnumerable<T> MakeEnumerable<T>(this T o)
+        {
+            return new[] { o };
+        }
+        public static void IfIsType<T2>(this object o, Action<T2> func) where T2 : class
+        {
+            if(o is T2)
+                func(o as T2);
+        }
+
+        public static void IfObjectNotNull<T>(this T o, Action<T> func, Action<T> elseFunc = null)
+        {
+            if (o != null)
+                func(o);
+            else
+                if(elseFunc != null)
+                    elseFunc(o);
+        }
+        public static TRet GetIfNotNull<T, TRet>(this T o, Func<T, TRet> func, Func<T, TRet> elseFunc = null)
+            where TRet : class
+        {
+            return o != null ? func(o) : elseFunc != null ? elseFunc(o) : null;
         }
 
         public static T TryGetValue<T>(Func<T> func) where T : class
@@ -101,6 +532,8 @@ namespace ProUpgradeEditor
             catch { }
             return ret;
         }
+
+        
         
         public static T TryExec<T>(Func<T> func)
         {
@@ -338,6 +771,7 @@ namespace ProUpgradeEditor
         {
             return TryGetValue(delegate() { return str.IsEmpty() ? "" : Path.GetFileName(str); });
         }
+        public static void OutputDebug(this string str) { Debug.WriteLine(str??""); }
         public static IEnumerable<string> GetFilesInFolder(this string folder, bool recursive = true, string searchPattern = "*")
         {
             var ret = new List<string>();
@@ -354,6 +788,80 @@ namespace ProUpgradeEditor
             });
             return ret;
         }
+
+
+        public static T2 CastObject<T2>(this object o)
+        {
+            try
+            {
+                if (o.IsType<T2>())
+                {
+                    return (T2)(dynamic)o;
+                }
+                else if (o.IsType<IConvertible>())
+                {
+                    try
+                    {
+                        return (T2)((dynamic)(IConvertible)o).ToType(typeof(T2), CultureInfo.CurrentCulture);
+                    }
+                    catch { }
+                }
+            }
+            catch { }
+            return default(T2);
+        }
+
+        public static bool IsType<T2>(this Type type)
+        {
+            return type == typeof(T2);
+        }
+
+        public static bool IsType<T2>(this object o)
+        {
+            return o is T2;
+        }
+
+        public static T2 ConvertTo<T2>(this object o)
+        {
+            return ConvertTo<T2>(o, default(T2));
+        }
+
+        public static T2 ConvertTo<T2>(this object o, T2 nullValue)
+        {
+            T2 ret = default(T2);
+
+            if (o != null)
+            {
+                try
+                {
+                    var t2type = typeof(T2);
+
+                    if (o.IsType<T2>())
+                    {
+                        ret = o.CastObject<T2>();
+                    }
+                    else if (o.IsType<IConvertible>())
+                    {
+                        ret = o.CastObject<IConvertible>().ToType(t2type, CultureInfo.CurrentCulture).CastObject<T2>();
+                    }
+                    else if (t2type.IsType<string>())
+                    {
+                        ret = o.ToString().CastObject<T2>();
+                    }
+                    else
+                    {
+                        ("Unknown Type: " + typeof(T2).Name).OutputDebug();
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+
+            return ret;
+        }
+
         public static IEnumerable<string> GetSubFolders(this string folder, bool recursive = true, string searchPattern = "*")
         {
             var ret = new List<string>();
@@ -372,6 +880,11 @@ namespace ProUpgradeEditor
         public static string PathCombine(this string path1, string path2)
         {
             return Path.Combine(path1 ?? "", path2 ?? "");
+        }
+
+        public static Data1ChannelPair GetData1ChannelPair(this MidiEvent ev)
+        {
+            return new Data1ChannelPair(ev.Data1, ev.Channel);
         }
 
         public static bool IsMetaEvent(this GuitarMessage ev)
@@ -518,14 +1031,21 @@ namespace ProUpgradeEditor
             return ret ?? "";
         }
 
-        public static IEnumerable<GuitarMessage> ToGuitarMessage(this IEnumerable<MidiEvent> list, GuitarTrack track)
-        {
-            return list.Select(x => new GuitarMessage(track, x)).ToList();
-        }
         public static GuitarMessage ToGuitarMessage(this MidiEvent ev, GuitarTrack track)
         {
-            return new GuitarMessage(track, ev);
+            return new GuitarMessage(track, ev, null, GuitarMessageType.Unknown);
         }
+
+        public static bool IsCloseScreenPoint(this int i, int x)
+        {
+            return (int)Math.Abs(i - x) <= Utility.GridSnapDistance;
+        }
+
+        public static int DistSq(this int i, int x)
+        {
+            return (int)Math.Abs(i - x);
+        }
+
         public static bool IsBetween(this int i, int lowValue, int highValue, bool includingValue = true)
         {
             if (lowValue > highValue)
@@ -543,7 +1063,7 @@ namespace ProUpgradeEditor
                 return i > lowValue && i < highValue;
             }
         }
-
+        
         public static bool IsProNoteModifier(this MidiEvent ev, GuitarDifficulty difficulty = GuitarDifficulty.Unknown)
         {
             if (ev.Data1.IsNull())
@@ -653,6 +1173,21 @@ namespace ProUpgradeEditor
         public static int GetIfNull(this int i, int value, int nullValue = int.MinValue) 
         {
             return i.IsNull(nullValue) ? value : i;
+        }
+
+        public static bool IsVocalTrackName5(this string str)
+        {
+            return str.EqualsEx(GuitarTrack.VocalTrackName5);
+        }
+
+        public static bool HasVocalTrack(this Sequence seq)
+        {
+            return seq.GetVocalTrack() != null;
+        }
+
+        public static Track GetVocalTrack(this Sequence seq)
+        {
+            return seq.FirstOrDefault(x => x.Name.IsVocalTrackName5());
         }
 
         public static Track GetPrimaryTrack(this Sequence seq, bool preferGuitar17=true)
@@ -871,7 +1406,19 @@ namespace ProUpgradeEditor
         {
             return Utility.GetStringLowE5(difficulty);
         }
-
+        public static IEnumerable<GuitarDifficulty> GetDifficulties(this GuitarDifficulty difficulty)
+        {
+            if (difficulty.IsAll())
+                yield return GuitarDifficulty.All;
+            if (difficulty.IsExpert())
+                yield return GuitarDifficulty.Expert;
+            if (difficulty.IsHard())
+                yield return GuitarDifficulty.Hard;
+            if (difficulty.IsMedium())
+                yield return GuitarDifficulty.Medium;
+            if (difficulty.IsEasy())
+                yield return GuitarDifficulty.Easy;
+        }
         public static MetaMessage CloneMeta(this MetaMessage mess)
         {
             var mb = new MetaTextBuilder(mess.MetaType);
@@ -967,6 +1514,16 @@ namespace ProUpgradeEditor
             }
             
             return ret;
+        }
+
+        public static bool IsGuitarChord(this GuitarMessage x)
+        {
+            return x is GuitarChord;
+        }
+
+        public static bool IsChordSubItem(this GuitarMessage x)
+        {
+            return x is GuitarNote || x is GuitarSlide || x is GuitarHammeron || x is GuitarChordStrum;
         }
 
         public static ChannelMessage ConvertToPro(this ChannelMessage cm, GuitarDifficulty targetDifficulty = GuitarDifficulty.Unknown)
@@ -1093,7 +1650,7 @@ namespace ProUpgradeEditor
             return ret;
         }
 
-
+        
 
         public static bool IsProStringData1(this int data1)
         {
@@ -1247,18 +1804,46 @@ namespace ProUpgradeEditor
         }
         public static bool IsUnknown(this GuitarDifficulty diff)
         {
-            return diff == GuitarDifficulty.Unknown;
+            return diff.HasFlag(GuitarDifficulty.Unknown) || (diff.IsEasyMediumHardExpert() == false && diff.IsAll()==false);
+        }
+        public static bool IsUnknownOrNone(this GuitarDifficulty diff)
+        {
+            return diff.IsNone() || diff.IsUnknown();
+        }
+        public static bool IsNone(this GuitarDifficulty diff)
+        {
+            return diff == GuitarDifficulty.None;
+        }
+        public static GuitarMessageType GetGuitarMessageType(this ChordModifierType type)
+        {
+            var ret = GuitarMessageType.Unknown;
+            switch (type)
+            {
+                case ChordModifierType.ChordStrumHigh:
+                case ChordModifierType.ChordStrumMed:
+                case ChordModifierType.ChordStrumLow:
+                    ret = GuitarMessageType.GuitarChordStrum;
+                    break;
+                case ChordModifierType.Hammeron:
+                    ret = GuitarMessageType.GuitarHammeron;
+                    break;
+                case ChordModifierType.Slide:
+                case ChordModifierType.SlideReverse:
+                    ret = GuitarMessageType.GuitarSlide;
+                    break;
+            }
+            return ret;
         }
 
-        public static GuitarModifierType GetModifierType(this ChordStrum strum)
+        public static ChordModifierType GetModifierType(this ChordStrum strum)
         {
-            var ret = GuitarModifierType.NoteModifier;
+            var ret = ChordModifierType.Invalid;
             if (strum == ChordStrum.High)
-                ret = GuitarModifierType.ChordStrumHigh;
+                ret = ChordModifierType.ChordStrumHigh;
             if (strum == ChordStrum.Mid)
-                ret = GuitarModifierType.ChordStrumMed;
+                ret = ChordModifierType.ChordStrumMed;
             if (strum == ChordStrum.Low)
-                ret = GuitarModifierType.ChordStrumLow;
+                ret = ChordModifierType.ChordStrumLow;
             return ret;
         }
 
@@ -1309,164 +1894,374 @@ namespace ProUpgradeEditor
             return Utility.GetDifficulty(i, isPro);
         }
 
-        public static GuitarTempo GetAtDownTick(this IEnumerable<GuitarTempo> list, int downTick)
-        {
-            var ret = list.LastOrDefault(x => x.DownTick <= downTick);
-            if (ret == null)
-            {
-                if (list.First().DownTick > downTick)
-                {
-                    ret = list.First();
-                }
-                else
-                {
-                    ret = list.Last();
-                }
-            }
-            return ret;
-        }
 
         public static IEnumerable<MidiEvent> GetEvents(this GuitarTrack tr)
         {
             return tr.GetTrack().Events;
         }
+        
 
         public static IEnumerable<MidiEvent> GetDifficulty(this GuitarTrack track, GuitarDifficulty diff)
         {
-            return track.GetEvents().GetDifficulty(track.IsPro, diff);
+            return track.GetEvents().GetDifficulty(track.IsPro, diff).ToList();
         }
 
         public static IEnumerable<MidiEvent> GetDifficulty(this IEnumerable<MidiEvent> list, bool isPro, GuitarDifficulty diff)
         {
-            return list.Where(x => diff.HasFlag(x.Data1.GetData1Difficulty(isPro)));
+            return list.Where(x => diff.HasFlag(x.Data1.GetData1Difficulty(isPro))).ToList();
         }
-        public static IEnumerable<MidiEvent> GetBetweenTick(this IEnumerable<MidiEvent> list, int downTick, int upTick)
+
+        public static IEnumerable<T> GetBetweenTick<T>(this IEnumerable<T> list, TickPair ticks) where T : GuitarMessage
         {
-            return list.Where(x => x.AbsoluteTicks < upTick && x.AbsoluteTicks >= downTick);
+            return list.Where(x => x.DownTick < ticks.Up && x.UpTick > ticks.Down);
         }
-        public static IEnumerable<GMessage> GetBetweenTick(this IEnumerable<GMessage> list, int downTick, int upTick)
+
+        public static IEnumerable<T> GetBetweenTime<T>(this IEnumerable<T> list, TimePair time) where T : GuitarMessage
         {
-            return list.Where(x => x.DownTick < upTick && x.DownTick >= downTick && x.IsDeleted == false);
+            return list.Where(x => x.StartTime < time.Up && x.EndTime > time.Down);
         }
-        public static IEnumerable<GuitarMessage> GetBetweenTick(this IEnumerable<GuitarMessage> list, int downTick, int upTick)
+
+        public static bool AnyBetweenTick<T>(this IEnumerable<T> list, TickPair ticks) where T : GuitarMessage
         {
-            return list.Where(x => x.DownTick < upTick && x.UpTick > downTick && x.IsDeleted == false);
+            return list.Any(x => x.DownTick < ticks.Up && x.UpTick > ticks.Down);
         }
-        public static IEnumerable<GuitarMessage> GetMessagesByDownTick(this IEnumerable<GuitarMessage> list, int downTick)
+        public static int CountBetweenTick<T>(this IEnumerable<T> list, TickPair ticks) where T : GuitarMessage
         {
-            return list.Where(x => x.DownTick == downTick && x.IsDeleted == false);
+            return list.Count(x => x.DownTick < ticks.Up && x.UpTick > ticks.Down);
+        }
+        public static TickPair GetTickPair<T>(this IEnumerable<T> list) where T : GuitarMessage
+        {
+            return new TickPair(list.GetMinTick(), list.GetMaxTick());
+        }
+
+        public static bool AnyBetweenTick(this IEnumerable<MidiEvent> list, TickPair ticks)
+        {
+            return list.Any(x => x.AbsoluteTicks < ticks.Up && x.AbsoluteTicks > ticks.Down);
+        }
+
+        public static bool HasDownTickAtTick(this IEnumerable<GuitarChord> list, int tick)
+        {
+            return list.Any(x => x.DownTick == tick);
+        }
+
+        public static int GetMinTick<T>(this IEnumerable<T> list, int valueIfNull = Int32.MinValue) where T : GuitarMessage
+        {
+            if (list.Any())
+            {
+                return list.Min(x => x.DownTick);
+            }
+            else
+            {
+                return valueIfNull;
+            }
         }
         
-        public static IEnumerable<GuitarMessage> GetBetweenTime(this IEnumerable<GuitarMessage> list, double start, double end)
+        public static int GetMaxTick<T>(this IEnumerable<T> list, int valueIfNull=Int32.MinValue) where T : GuitarMessage
         {
-            return list.Where(x => x.StartTime < end && x.EndTime > start && x.IsDeleted == false);
-        }
-
-        public static IEnumerable<GuitarChord> GetChordsAtTime(this IEnumerable<GuitarChord> list, double start, double end)
-        {
-            return list.Where(x => x.StartTime < end && x.EndTime > start && x.IsDeleted == false);
-        }
-
-        public static IEnumerable<GuitarChord> GetChordsByDownTick(this IEnumerable<GuitarChord> list, int downTick)
-        {
-            return list.Where(x => x.DownTick == downTick && x.IsDeleted == false);
-        }
-
-        public static IEnumerable<GuitarChord> GetChordsAtTick(this IEnumerable<GuitarChord> list, int downTick, int upTick)
-        {
-            return list.Where(x => x.DownTick < upTick && x.UpTick > downTick && x.IsDeleted == false);
-        }
-
-        public static int GetMinTick(this IEnumerable<GuitarMessage> list)
-        {
-            var items = list.Where(x => x != null);
-            if (items.Any())
+            if (list.Any())
             {
-                return items.Min(x => x.DownTick);
+                return list.Max(x => x.UpTick);
             }
             else
             {
-                return Int32.MinValue;
+                return valueIfNull;
             }
         }
-
-        public static int GetMaxTick(this IEnumerable<GuitarMessage> list)
+        public static int GetMaxDownTick<T>(this IEnumerable<T> list, int valueIfNull = Int32.MinValue) where T : GuitarMessage
         {
-            var items = list.Where(x => x != null);
-            if (items.Any())
+            if (list.Any())
             {
-                return items.Max(x => x.UpTick);
+                return list.Max(x => x.DownTick);
             }
             else
             {
-                return Int32.MinValue;
+                return valueIfNull;
             }
         }
-
         [CompilerGenerated()]
         public static void ForEach<T>(this IEnumerable<T> tlist, Action<T> func) 
         {
             foreach (var l in tlist) { func(l); }
         }
-        
-        public static IEnumerable<T> GetMessages<T>(this IEnumerable<GuitarMessage> list)
+        [CompilerGenerated()]
+        public static void ForEach<T>(this IEnumerable<T> tlist, Action<T,int> func)
         {
-            return list.Where(x => x is T).Cast<T>();
-        }
-
-        
-
-        public static IEnumerable<GuitarMessage> GetEventsByData1(this IEnumerable<GuitarMessage> list, int data1, bool sort=true)
-        {
-            return list.Where(x => x.Data1 == data1).SortTicks();
-        }
-
-        public static IEnumerable<GuitarMessagePair> GetMessagePairs(this IEnumerable<GuitarMessage> list)
-        {
-            var ret = new List<GuitarMessagePair>();
-            
-            for (int x = 0; x < list.Count()-1; x += 2)
+            var arr = tlist.ToArray();
+            for (int x = 0; x < arr.Length; x++)
             {
-                ret.Add(new GuitarMessagePair(list.ElementAt(x), list.ElementAt(x + 1)));
+                func(arr[x], x);
             }
+        }
+        [CompilerGenerated()]
+        public static void For<T>(this IEnumerable<T> tlist, Action<T,int> func)
+        {
+            for (int x = 0; x < tlist.Count(); x++)
+            {
+                func(tlist.ElementAt(x), x);
+            }
+        }
+        
+        public static IEnumerable<T> GetMessages<T>(this IEnumerable<T> list, GuitarMessageType type) where T : GuitarMessage
+        {
+            return list.Where(x => x.MessageType == type).ToList();
+        }
+
+        
+
+        public static IEnumerable<GuitarMessage> GetEventsByData1(this IEnumerable<GuitarMessage> list, int data1)
+        {
+            return list.Where(x => x.Data1 == data1).ToList();
+        }
+
+        public static IEnumerable<MidiEvent> GetEventsByData1(this IEnumerable<MidiEvent> list, int data1)
+        {
+            return list.Where(x => x.Data1 == data1).ToList();
+        }
+
+        public static IEnumerable<KeyValuePair<Data1ChannelPair, IEnumerable<MidiEvent>>> GroupByData1Channel(
+            this IEnumerable<MidiEvent> list, IEnumerable<int> data1)
+        {
+            var comparer = new Data1ChannelPairEqualityComparer();
+
+            var full = list.Where(x=> data1.Contains(x.Data1)).ToList();
+
+            var keys = full.Select(x => x.GetData1ChannelPair()).Distinct(comparer).ToList();
+            
+            var ret = new List<KeyValuePair<Data1ChannelPair, List<MidiEvent>>>();
+
+            foreach (var item in full)
+            {
+                var p = item.GetData1ChannelPair();
+                var cntList = ret.Where(x => x.Key.CompareTo(p) == 0);
+                if (!cntList.Any())
+                {
+                    var cnt = new KeyValuePair<Data1ChannelPair, List<MidiEvent>>(p, new List<MidiEvent>());
+                    cnt.Value.Add(item);
+                    ret.Add(cnt);
+                }
+                else
+                {
+                    cntList.Single().Value.Add(item);
+                }
+            }
+
+            return ret.Select(x => 
+                new KeyValuePair<Data1ChannelPair,IEnumerable<MidiEvent>>(x.Key, 
+                    x.Value.OrderBy(i => i, new MidiEventTickCommandComparer()).ToList())).ToList();
+
+        }
+
+        public static IEnumerable<IEnumerable<T>> GroupByCloseTick<T>(this IEnumerable<T> list) where T : GuitarMessage
+        {
+            return list.GroupBy(x => x.DownTick, x => x, (t, x) => x.Where(y => Utility.IsCloseTick(t, y.DownTick)).ToArray()).ToList();
+        }
+
+        public static IEnumerable<IEnumerable<T>> GroupByCloseTick<T>(this SpecializedMessageList<T> list) where T : GuitarMessage
+        {
+            return list.GroupBy(x => x.DownTick, x => x, (t, x) => x.Where(y => Utility.IsCloseTick(t, y.DownTick)).ToArray()).ToList();
+        }
+        public static IEnumerable<MidiEvent> GetEventsByData1(this IDictionary<Data1ChannelPair, IEnumerable<MidiEvent>> dic, IEnumerable<int> data1)
+        {
+            var ret = new List<MidiEvent>();
+
+            foreach (var k in dic.Keys.Where(x => data1.Contains(x.Data1)))
+            {
+                ret.AddRange(dic[k]);
+            }
+
             return ret;
         }
-        public static IEnumerable<MidiEventPair> GetMidiEventPairs(this IEnumerable<MidiEvent> list)
+
+        public static IEnumerable<MidiEventPair> GetEventPairs(this IEnumerable<KeyValuePair<Data1ChannelPair, IEnumerable<MidiEvent>>> dic,
+            GuitarTrack owner, int data1)
+        {
+            var ret = new List<MidiEventPair>();
+            foreach (var k in dic.Where(k=> data1 == k.Key.Data1))
+            {
+                ret.AddRange(k.Value.GetEventPairsFromData1List(owner));
+            }
+
+            ret.Sort(new MidiEventPairInterlacingSorter());
+            return ret.ToList();
+        }
+
+
+        public static IEnumerable<MidiEventPair> GetEventPairs(this IEnumerable<KeyValuePair<Data1ChannelPair, IEnumerable<MidiEvent>>> dic,
+            GuitarTrack owner, IEnumerable<int> data1)
+        {
+            var ret = new List<MidiEventPair>();
+            foreach (var k in dic.Where(k => data1.Contains(k.Key.Data1)))
+            {
+                ret.AddRange(k.Value.GetEventPairsFromData1List(owner));
+            }
+
+            ret.Sort(new MidiEventPairInterlacingSorter());
+            return ret.ToList();
+        }
+
+        static MidiEvent ReplaceEvent(GuitarTrack owner, MidiEvent ev, int tick, ChannelCommand cmd)
+        {
+            var ticks = ev.AbsoluteTicks;
+            var cb = new ChannelMessageBuilder(ev.ChannelMessage);
+            cb.Command = cmd;
+            if (cmd == ChannelCommand.NoteOn)
+            {
+                if (cb.Data2 < 100)
+                    cb.Data2 = 100;
+            }
+            else
+            {
+                cb.Data2 = 0;
+            }
+
+            cb.Build();
+            owner.Remove(ev);
+            return owner.Insert(tick, cb.Result);
+        }
+
+        public static IEnumerable<MidiEventPair> GetEventPairsFromData1List(this IEnumerable<MidiEvent> items, GuitarTrack owner)
         {
             var ret = new List<MidiEventPair>();
 
-            foreach (var data1 in list.GroupBy(x => x.Data1))
+            var sorted = items.ToArray();
+
+            int i;
+            
+            for (i = 0; i < sorted.Length - 1; )
             {
-                for (int x = 0; x < data1.Count() - 1; x += 2)
+                var p1 = sorted[i];
+                var p2 = sorted[i + 1];
+
+                if (p2.Command == ChannelCommand.NoteOn && 
+                    sorted[i+2].Command == ChannelCommand.NoteOff &&
+                    sorted[i+1].AbsoluteTicks == sorted[i+2].AbsoluteTicks)
                 {
-                    ret.Add(new MidiEventPair(data1.ElementAt(x), data1.ElementAt(x + 1)));
+                    swapEvents(ref sorted[i + 1], ref sorted[i + 2]);
+                    p2 = sorted[i + 1];
                 }
+
+                if (p2.AbsoluteTicks == p1.AbsoluteTicks && p2.Command == p1.Command)
+                {
+                    owner.Remove(p2);
+                    sorted[i + 1] = sorted[i];
+                    i++;
+                    continue;
+                }
+                else if (sorted.Count(x => x.Command == ChannelCommand.NoteOn) == 1)
+                {
+                    var noteOn = sorted.FirstOrDefault(x=> x.Command == ChannelCommand.NoteOn);
+                    var noteOff = sorted.LastOrDefault(x=> x.Command == ChannelCommand.NoteOff && x.AbsoluteTicks > noteOn.AbsoluteTicks);
+
+                    var min = sorted.Min(x => x.AbsoluteTicks);
+                    var max = sorted.Max(x => x.AbsoluteTicks);
+                    if (max != min)
+                    {
+                        sorted.Where(x => x != noteOn && x != noteOff).ToList().ForEach(x=> owner.Remove(x));
+                        ret.Clear();
+                        ret.Add(new MidiEventPair(owner, noteOn, noteOff));
+                        
+                        return ret;
+                    }
+                }
+
+                if (p1.Command == ChannelCommand.NoteOn && 
+                    p2.Command == ChannelCommand.NoteOff &&
+                    p2.AbsoluteTicks > p1.AbsoluteTicks)
+                {
+                    ret.Add(new MidiEventPair(owner, p1, p2));
+                }
+                
+                i += 2;
+            }
+
+            while (i < sorted.Length - 1)
+            {
+                owner.Remove(sorted[i]);
+                i++;
+            }
+
+            return ret;
+        }
+        public static IEnumerable<MidiEventPair> GetEventPairsByData1(this GuitarTrack owner,
+            IDictionary<Data1ChannelPair, IEnumerable<MidiEvent>> input,
+            IEnumerable<int> data1)
+        {
+            var ret = new List<MidiEventPair>();
+            foreach (var pair in input)
+            {
+                var sorted = pair.Value.ToArray();
+                
+                int numOn = sorted.Count(x => x.Command == ChannelCommand.NoteOn);
+                int numOff = sorted.Count(x => x.Command == ChannelCommand.NoteOff);
+
+                if (numOn == 1 && numOff > 1)
+                {
+                    var eventOn = sorted.Single(x => x.Command == ChannelCommand.NoteOn);
+                    var eventOff = sorted.First(x => x.Command == ChannelCommand.NoteOff);
+                    sorted.Where(x => x != eventOn && x != eventOff).ForEach(x => owner.Remove(x));
+                    sorted = sorted.Where(x => x.Deleted == false).ToArray();
+                }
+
+                int i;
+                for (i = 0; i < sorted.Length - 1; i += 2)
+                {
+                    var p1 = sorted[i];
+                    var p2 = sorted[i + 1];
+
+                    while (p1.Command == p2.Command && (i < sorted.Length - 2))
+                    {
+                        owner.Remove(p1);
+                        swapEvents(ref p1, ref p2);
+                        i++;
+                        p2 = sorted[i + 1];
+                    }
+                    if (p1.Command == ChannelCommand.NoteOff)
+                    {
+                        swapEvents(ref p1, ref p2);
+                    }
+                    if (p1.Command == ChannelCommand.NoteOn && p2.Command == ChannelCommand.NoteOff)
+                    {
+                        ret.Add(new MidiEventPair(owner, p1, p2));
+                    }
+                    else
+                    {
+                        if (i >= sorted.Length - 2)
+                        {
+                            owner.Remove(sorted[i]);
+                            i++;
+                            owner.Remove(sorted[i]);
+                            i++;
+                        }
+                    }
+                }
+
+                while (i < sorted.Length - 1)
+                {
+                    owner.Remove(sorted[i]);
+                    i++;
+                }
+                
+                
             }
             return ret;
         }
-        public static IEnumerable<GuitarHandPosition> SortTicks(this IEnumerable<GuitarHandPosition> list, bool ascending = true)
+
+        private static void swapEvents(ref MidiEvent p1, ref MidiEvent p2)
         {
-            if (ascending)
-            {
-                return list.OrderBy(x=> x, new GuitarMessageSorter());
-            }
-            else
-            {
-                return list.OrderByDescending(x => x, new GuitarMessageSorter());
-            }
+            var v = p1;
+            p1 = p2;
+            p2 = v;
         }
-        public static IEnumerable<GuitarChord> SortTicks(this IEnumerable<GuitarChord> list, bool ascending = true)
+
+
+        public static IEnumerable<MidiEventPair> GetBetweenTicks(this IEnumerable<MidiEventPair> list, TickPair ticks)
         {
-            if (ascending)
-            {
-                return list.OrderBy(x => x, new GuitarMessageSorter());
-            }
-            else
-            {   
-                return list.OrderByDescending(x => x, new GuitarMessageSorter());
-            }
+            return list.Where(x => 
+                x.Down.AbsoluteTicks < ticks.Up && 
+                x.Up.AbsoluteTicks > ticks.Down).ToList();
         }
-        public static IEnumerable<GuitarMessage> SortTicks(this IEnumerable<GuitarMessage> list, bool ascending = true)
+
+        public static IEnumerable<T> SortTicks<T>(this IEnumerable<T> list, bool ascending = true) where T : GuitarMessage
         {
             if (ascending)
             {
@@ -1478,18 +2273,6 @@ namespace ProUpgradeEditor
             }
         }
 
-        public static IEnumerable<GMessage> SortTicks(this IEnumerable<GMessage> list, bool ascending = true)
-        {
-            if (ascending)
-            {
-                return list.OrderBy(x => x.DownTick);
-
-            }
-            else
-            {
-                return list.OrderByDescending(x => x.DownTick);
-            }
-        }
         
         public static int Max(this int value, int value2)
         {
@@ -1738,8 +2521,8 @@ namespace ProUpgradeEditor
                 return nullValue;
 
             var ret = d.ToString(USCulture);
-            if(ret != "0")
-                ret = ret.TrimEnd(new[] { '.', '0' });
+            if(ret.Contains('.'))
+                ret = ret.TrimEnd('0').TrimEnd('.');
             return ret;
         }
 

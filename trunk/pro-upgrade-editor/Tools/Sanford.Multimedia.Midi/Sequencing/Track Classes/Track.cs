@@ -71,8 +71,6 @@ namespace Sanford.Multimedia.Midi
 
         public void ReplaceEvent(MidiEvent evOld, MidiEvent evNew)
         {
-            evOld.Dirty = true;
-            evNew.Dirty = true;
             if (evOld.Previous != null)
             {
                 evNew.Previous = evOld.Previous;
@@ -160,7 +158,7 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                return Events.Where(x => x.MessageType == MessageType.Meta);
+                return Events.Where(x => x.MessageType == MessageType.Meta).ToList();
             }
         }
 
@@ -169,7 +167,7 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                return Meta.Where(x => x.MetaMessage.MetaType == MetaType.TimeSignature);
+                return Meta.Where(x => x.MetaMessage.MetaType == MetaType.TimeSignature).ToList();
             }
         }
 
@@ -178,7 +176,7 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                return Meta.Where(x => x.MetaMessage.MetaType == MetaType.Tempo);
+                return Meta.Where(x => x.MetaMessage.MetaType == MetaType.Tempo).ToList();
             }
         }
 
@@ -189,7 +187,7 @@ namespace Sanford.Multimedia.Midi
             {
                 return Events.Where(x =>
                     x.MessageType == MessageType.Channel &&
-                    (x.ChannelMessage.Command == ChannelCommand.NoteOn || x.ChannelMessage.Command == ChannelCommand.NoteOff));
+                    (x.ChannelMessage.Command == ChannelCommand.NoteOn || x.ChannelMessage.Command == ChannelCommand.NoteOff)).ToList();
             }
         }
 
@@ -248,17 +246,11 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                return this.dirty || Events.Any(x => x.Dirty == true);
+                return this.dirty;
             }
             set
             {
                 this.dirty = value;
-
-                if (value == false)
-                {
-                    Events.Where(x =>x.Dirty).All(x => (x.Dirty=false) == false);
-                }
-                
             }
         }
 
@@ -279,7 +271,7 @@ namespace Sanford.Multimedia.Midi
             this.dirty = true;
 
             ev.Deleted = true;
-            ev.Dirty = true;
+            
             
 
             if (ev.Previous != null)
@@ -312,8 +304,6 @@ namespace Sanford.Multimedia.Midi
         {
             if (e == null)
                 return;
-
-            e.Dirty = true;
 
             MidiEvent previous = e.Previous;
             MidiEvent next = e.Next;
@@ -434,12 +424,12 @@ namespace Sanford.Multimedia.Midi
             MidiEvent b = v[i];
             if (a != null && a.AbsoluteTicks <= b.AbsoluteTicks)
             {
-                current = new MidiEvent(this, a.AbsoluteTicks, a.MidiMessage, b.Dirty);
+                current = new MidiEvent(this, a.AbsoluteTicks, a.MidiMessage);
                 a = a.Next;
             }
             else
             {
-                current = new MidiEvent(this, b.AbsoluteTicks, b.MidiMessage, b.Dirty);
+                current = new MidiEvent(this, b.AbsoluteTicks, b.MidiMessage);
                 if (i < v.Length - 1)
                 {
                     b = v[++i];
@@ -453,7 +443,7 @@ namespace Sanford.Multimedia.Midi
             {
                 while (a != null && a.AbsoluteTicks <= b.AbsoluteTicks)
                 {
-                    current.Next = new MidiEvent(this, a.AbsoluteTicks, a.MidiMessage, b.Dirty);
+                    current.Next = new MidiEvent(this, a.AbsoluteTicks, a.MidiMessage);
                     current.Next.Previous = current;
                     current = current.Next;
                     a = a.Next;
@@ -463,7 +453,7 @@ namespace Sanford.Multimedia.Midi
                 {
                     while (b != null && b.AbsoluteTicks <= a.AbsoluteTicks)
                     {
-                        current.Next = new MidiEvent(this, b.AbsoluteTicks, b.MidiMessage, b.Dirty);
+                        current.Next = new MidiEvent(this, b.AbsoluteTicks, b.MidiMessage);
                         current.Next.Previous = current;
                         current = current.Next;
                         if (i < v.Length - 1)
@@ -477,7 +467,7 @@ namespace Sanford.Multimedia.Midi
 
             while (a != null)
             {
-                current.Next = new MidiEvent(this, a.AbsoluteTicks, a.MidiMessage, b.Dirty);
+                current.Next = new MidiEvent(this, a.AbsoluteTicks, a.MidiMessage);
                 current.Next.Previous = current;
                 current = current.Next;
                 a = a.Next;
@@ -485,7 +475,7 @@ namespace Sanford.Multimedia.Midi
 
             while (b != null)
             {
-                current.Next = new MidiEvent(this, b.AbsoluteTicks, b.MidiMessage, b.Dirty);
+                current.Next = new MidiEvent(this, b.AbsoluteTicks, b.MidiMessage);
                 current.Next.Previous = current;
                 current = current.Next;
                 if (i < v.Length - 1)
@@ -609,25 +599,4 @@ namespace Sanford.Multimedia.Midi
 
     }
 
-    public static class Extensions
-    {
-
-
-        public static IEnumerable<MidiEvent> SortEvents(this IEnumerable<MidiEvent> list, bool ascending = true)
-        {
-            if (ascending)
-            {
-                var l = list.ToList();
-                l.Sort();
-                return l.ToList();
-            }
-            else
-            {
-                var l = list.ToList();
-                l.Sort();
-                l.Reverse();
-                return l;
-            }
-        }
-    }
 }

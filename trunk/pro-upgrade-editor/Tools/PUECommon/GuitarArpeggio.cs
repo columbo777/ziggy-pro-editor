@@ -3,28 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sanford.Multimedia.Midi;
-using ProUpgradeEditor.Common;
 
-namespace ProUpgradeEditor.DataLayer
+namespace ProUpgradeEditor.Common
 {
     public class GuitarArpeggio : GuitarModifier
     {
-        public GuitarArpeggio(GuitarTrack track, MidiEvent downEvent, MidiEvent upEvent) : base(track, downEvent, upEvent, GuitarModifierType.Arpeggio) { }
+        public GuitarArpeggio(GuitarTrack track, MidiEvent downEvent, MidiEvent upEvent) : 
+            base(track, downEvent, upEvent, GuitarModifierType.Arpeggio, GuitarMessageType.GuitarArpeggio) { }
 
 
-        public static GuitarArpeggio CreateArpeggio(GuitarTrack track, GuitarDifficulty difficulty, int downTick, int upTick)
+        public static GuitarArpeggio CreateArpeggio(GuitarTrack track, GuitarDifficulty difficulty, TickPair ticks)
         {
             GuitarArpeggio ret = null;
             var d1 = Utility.GetArpeggioData1(difficulty);
 
             if(!d1.IsNull())
             {
-                MidiEvent downEvent, upEvent;
-                Utility.CreateMessage(track, d1, 100, 0, downTick, upTick, out downEvent, out upEvent);
-
-                ret = new GuitarArpeggio(track, downEvent, upEvent);
-
-                track.Messages.Add(ret);
+                var ev = track.Insert(d1, 100, 0, ticks);
+                
+                if (ev.IsNull==false)
+                {
+                    ret = new GuitarArpeggio(track, ev.Down, ev.Up);
+                    track.Messages.Add(ret);
+                }
             }
             return ret;
         }

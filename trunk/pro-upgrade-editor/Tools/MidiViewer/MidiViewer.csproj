@@ -36,7 +36,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -52,7 +52,7 @@
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -69,20 +69,11 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EditorResources">
-      <HintPath>..\..\lib\EditorResources.dll</HintPath>
-    </Reference>
-    <Reference Include="PUECommon">
-      <HintPath>..\..\lib\PUECommon.dll</HintPath>
-    </Reference>
     <Reference Include="Sanford.Collections">
       <HintPath>..\..\lib\Sanford.Collections.dll</HintPath>
     </Reference>
     <Reference Include="Sanford.Multimedia">
       <HintPath>..\..\lib\Sanford.Multimedia.dll</HintPath>
-    </Reference>
-    <Reference Include="Sanford.Multimedia.Midi">
-      <HintPath>..\..\lib\Sanford.Multimedia.Midi.dll</HintPath>
     </Reference>
     <Reference Include="Sanford.Multimedia.Timers">
       <HintPath>..\..\lib\Sanford.Multimedia.Timers.dll</HintPath>
@@ -139,6 +130,20 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EditorResources\EditorResources.csproj">
+      <Project>{F0F523DA-3085-4BE5-AC09-5F680F0E392E}</Project>
+      <Name>EditorResources</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PUECommon\PUECommon.csproj">
+      <Project>{7767D3DD-6E1C-419E-9092-F3F3DDDF3D87}</Project>
+      <Name>PUECommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sanford.Multimedia.Midi\Sanford.Multimedia.Midi.csproj">
+      <Project>{4269C72A-8D3A-4737-8F89-72EAA33EA9E1}</Project>
+      <Name>Sanford.Multimedia.Midi</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

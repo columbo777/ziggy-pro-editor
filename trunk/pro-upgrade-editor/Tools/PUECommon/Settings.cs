@@ -6,11 +6,10 @@ using System.IO;
 using System.Reflection;
 using System.Xml;
 using System.Windows.Forms;
-using ProUpgradeEditor.Common;
 
-namespace ProUpgradeEditor
+
+namespace ProUpgradeEditor.Common
 {
-
 
     public class SettingMgr
     {

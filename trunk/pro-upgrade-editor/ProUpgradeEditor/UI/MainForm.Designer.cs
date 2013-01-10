@@ -34,9 +34,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             System.Windows.Forms.GroupBox groupBox3;
             System.Windows.Forms.GroupBox groupBox14;
-            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("File Name", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Size", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Date", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("File Name", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("Size", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("Date", System.Windows.Forms.HorizontalAlignment.Left);
             this.panel8 = new System.Windows.Forms.Panel();
             this.midiTrackEditorG5 = new EditorResources.Components.PEMidiTrackEditPanel();
             this.button102 = new System.Windows.Forms.Button();
@@ -330,8 +330,6 @@
             this.button85 = new System.Windows.Forms.Button();
             this.buttonAddSlideHammeron = new System.Windows.Forms.Button();
             this.button32 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
-            this.button8 = new System.Windows.Forms.Button();
             this.button53 = new System.Windows.Forms.Button();
             this.button54 = new System.Windows.Forms.Button();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
@@ -607,6 +605,8 @@
             this.button84 = new System.Windows.Forms.Button();
             this.button83 = new System.Windows.Forms.Button();
             this.groupBox19 = new System.Windows.Forms.GroupBox();
+            this.radioGridHalfNote = new System.Windows.Forms.RadioButton();
+            this.radioGridWholeNote = new System.Windows.Forms.RadioButton();
             this.checkSnapToCloseG5 = new System.Windows.Forms.CheckBox();
             this.button119 = new System.Windows.Forms.Button();
             this.textBoxNoteSnapDistance = new System.Windows.Forms.TextBox();
@@ -629,14 +629,14 @@
             this.buttonCloseG5Track = new System.Windows.Forms.Button();
             this.timerMidiPlayback = new System.Windows.Forms.Timer(this.components);
             this.panel5ButtonEditor = new System.Windows.Forms.Panel();
-            this.trackEditorG5 = new ProUpgradeEditor.TrackEditor();
+            this.trackEditorG5 = new ProUpgradeEditor.Common.TrackEditor();
             this.panelTrackEditorG5TitleBar = new System.Windows.Forms.Panel();
             this.buttonMinimizeG5 = new System.Windows.Forms.Button();
             this.buttonMaximizeG5 = new System.Windows.Forms.Button();
             this.labelStatusIconEditor5 = new System.Windows.Forms.Label();
             this.labelCurrentLoadedG5 = new System.Windows.Forms.Label();
             this.panelProEditor = new System.Windows.Forms.Panel();
-            this.trackEditorG6 = new ProUpgradeEditor.TrackEditor();
+            this.trackEditorG6 = new ProUpgradeEditor.Common.TrackEditor();
             this.panelTrackEditorG6TitleBar = new System.Windows.Forms.Panel();
             this.buttonMinimizeG6 = new System.Windows.Forms.Button();
             this.buttonMaximizeG6 = new System.Windows.Forms.Button();
@@ -962,7 +962,7 @@
             this.button136.Text = "Copy Text Events";
             this.button136.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button136.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip1.SetToolTip(this.button136, "Copy the tempo track from the 5 button midi file");
+            this.toolTip1.SetToolTip(this.button136, "Copy the Text Events from the 5 button midi file");
             this.button136.UseVisualStyleBackColor = true;
             this.button136.Click += new System.EventHandler(this.button136_Click);
             // 
@@ -981,7 +981,7 @@
             this.button134.Text = "Shorten Notes";
             this.button134.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button134.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip1.SetToolTip(this.button134, "Copy the tempo track from the 5 button midi file");
+            this.toolTip1.SetToolTip(this.button134, "Shorten All notes by one");
             this.button134.UseVisualStyleBackColor = true;
             this.button134.Click += new System.EventHandler(this.button134_Click);
             // 
@@ -4353,8 +4353,6 @@
             this.groupBox10.Controls.Add(this.button85);
             this.groupBox10.Controls.Add(this.buttonAddSlideHammeron);
             this.groupBox10.Controls.Add(this.button32);
-            this.groupBox10.Controls.Add(this.button5);
-            this.groupBox10.Controls.Add(this.button8);
             this.groupBox10.Controls.Add(this.button53);
             this.groupBox10.Controls.Add(this.button54);
             this.groupBox10.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
@@ -4370,9 +4368,9 @@
             // 
             this.buttonNoteUtilSelectAll.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.buttonNoteUtilSelectAll.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.buttonNoteUtilSelectAll.Location = new System.Drawing.Point(154, 108);
+            this.buttonNoteUtilSelectAll.Location = new System.Drawing.Point(94, 39);
             this.buttonNoteUtilSelectAll.Name = "buttonNoteUtilSelectAll";
-            this.buttonNoteUtilSelectAll.Size = new System.Drawing.Size(88, 23);
+            this.buttonNoteUtilSelectAll.Size = new System.Drawing.Size(67, 23);
             this.buttonNoteUtilSelectAll.TabIndex = 19;
             this.buttonNoteUtilSelectAll.Text = "Select All";
             this.toolTip1.SetToolTip(this.buttonNoteUtilSelectAll, "Select All Chords");
@@ -4383,7 +4381,7 @@
             // 
             this.buttonUtilMethodSetToG5.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.buttonUtilMethodSetToG5.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.buttonUtilMethodSetToG5.Location = new System.Drawing.Point(243, 62);
+            this.buttonUtilMethodSetToG5.Location = new System.Drawing.Point(252, 62);
             this.buttonUtilMethodSetToG5.Name = "buttonUtilMethodSetToG5";
             this.buttonUtilMethodSetToG5.Size = new System.Drawing.Size(54, 23);
             this.buttonUtilMethodSetToG5.TabIndex = 18;
@@ -4396,7 +4394,7 @@
             // 
             this.buttonUtilMethodFindNoteLenZero.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.buttonUtilMethodFindNoteLenZero.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.buttonUtilMethodFindNoteLenZero.Location = new System.Drawing.Point(154, 16);
+            this.buttonUtilMethodFindNoteLenZero.Location = new System.Drawing.Point(163, 16);
             this.buttonUtilMethodFindNoteLenZero.Name = "buttonUtilMethodFindNoteLenZero";
             this.buttonUtilMethodFindNoteLenZero.Size = new System.Drawing.Size(143, 23);
             this.buttonUtilMethodFindNoteLenZero.TabIndex = 17;
@@ -4409,9 +4407,9 @@
             // 
             this.buttonDownOctave.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.buttonDownOctave.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.buttonDownOctave.Location = new System.Drawing.Point(86, 154);
+            this.buttonDownOctave.Location = new System.Drawing.Point(95, 154);
             this.buttonDownOctave.Name = "buttonDownOctave";
-            this.buttonDownOctave.Size = new System.Drawing.Size(62, 23);
+            this.buttonDownOctave.Size = new System.Drawing.Size(66, 23);
             this.buttonDownOctave.TabIndex = 16;
             this.buttonDownOctave.Text = "Down";
             this.toolTip1.SetToolTip(this.buttonDownOctave, "Move Selected Notes Down One Octave");
@@ -4424,7 +4422,7 @@
             this.buttonUpOctave.ForeColor = System.Drawing.SystemColors.ControlText;
             this.buttonUpOctave.Location = new System.Drawing.Point(5, 154);
             this.buttonUpOctave.Name = "buttonUpOctave";
-            this.buttonUpOctave.Size = new System.Drawing.Size(81, 23);
+            this.buttonUpOctave.Size = new System.Drawing.Size(88, 23);
             this.buttonUpOctave.TabIndex = 15;
             this.buttonUpOctave.Text = "Up Octave";
             this.toolTip1.SetToolTip(this.buttonUpOctave, "Move Selected Notes Up One Octave");
@@ -4435,7 +4433,7 @@
             // 
             this.button133.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.button133.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button133.Location = new System.Drawing.Point(154, 62);
+            this.button133.Location = new System.Drawing.Point(163, 62);
             this.button133.Name = "button133";
             this.button133.Size = new System.Drawing.Size(88, 23);
             this.button133.TabIndex = 14;
@@ -4448,7 +4446,7 @@
             // 
             this.button132.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.button132.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button132.Location = new System.Drawing.Point(154, 39);
+            this.button132.Location = new System.Drawing.Point(163, 39);
             this.button132.Name = "button132";
             this.button132.Size = new System.Drawing.Size(143, 23);
             this.button132.TabIndex = 13;
@@ -4463,7 +4461,7 @@
             this.buttonUp12.ForeColor = System.Drawing.SystemColors.ControlText;
             this.buttonUp12.Location = new System.Drawing.Point(5, 108);
             this.buttonUp12.Name = "buttonUp12";
-            this.buttonUp12.Size = new System.Drawing.Size(81, 23);
+            this.buttonUp12.Size = new System.Drawing.Size(88, 23);
             this.buttonUp12.TabIndex = 12;
             this.buttonUp12.Text = "Up 12";
             this.toolTip1.SetToolTip(this.buttonUp12, "Move Selected Notes Up 12 Frets");
@@ -4474,9 +4472,9 @@
             // 
             this.buttonDownString.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.buttonDownString.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.buttonDownString.Location = new System.Drawing.Point(86, 131);
+            this.buttonDownString.Location = new System.Drawing.Point(95, 131);
             this.buttonDownString.Name = "buttonDownString";
-            this.buttonDownString.Size = new System.Drawing.Size(62, 23);
+            this.buttonDownString.Size = new System.Drawing.Size(66, 23);
             this.buttonDownString.TabIndex = 11;
             this.buttonDownString.Text = "Down";
             this.toolTip1.SetToolTip(this.buttonDownString, "Move Selected Notes Down One String and Up Five Frets");
@@ -4487,7 +4485,7 @@
             // 
             this.button76.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.button76.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button76.Location = new System.Drawing.Point(154, 85);
+            this.button76.Location = new System.Drawing.Point(163, 85);
             this.button76.Name = "button76";
             this.button76.Size = new System.Drawing.Size(143, 23);
             this.button76.TabIndex = 10;
@@ -4502,7 +4500,7 @@
             this.button124.ForeColor = System.Drawing.SystemColors.ControlText;
             this.button124.Location = new System.Drawing.Point(5, 131);
             this.button124.Name = "button124";
-            this.button124.Size = new System.Drawing.Size(81, 23);
+            this.button124.Size = new System.Drawing.Size(88, 23);
             this.button124.TabIndex = 9;
             this.button124.Text = "Up String";
             this.toolTip1.SetToolTip(this.button124, "Move Selected Notes Up One String and Down Five Frets");
@@ -4513,9 +4511,9 @@
             // 
             this.button122.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.button122.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button122.Location = new System.Drawing.Point(86, 108);
+            this.button122.Location = new System.Drawing.Point(95, 108);
             this.button122.Name = "button122";
-            this.button122.Size = new System.Drawing.Size(62, 23);
+            this.button122.Size = new System.Drawing.Size(66, 23);
             this.button122.TabIndex = 8;
             this.button122.Text = "Down";
             this.toolTip1.SetToolTip(this.button122, "Move Selected Notes Down 12 Frets");
@@ -4565,9 +4563,9 @@
             // 
             this.button32.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.button32.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button32.Location = new System.Drawing.Point(86, 85);
+            this.button32.Location = new System.Drawing.Point(95, 85);
             this.button32.Name = "button32";
-            this.button32.Size = new System.Drawing.Size(62, 23);
+            this.button32.Size = new System.Drawing.Size(66, 23);
             this.button32.TabIndex = 3;
             this.button32.Text = "Combine";
             this.toolTip1.SetToolTip(this.button32, "Combine the currently selected note with the next note, extending the end of the " +
@@ -4575,39 +4573,13 @@
             this.button32.UseVisualStyleBackColor = true;
             this.button32.Click += new System.EventHandler(this.button32_Click);
             // 
-            // button5
-            // 
-            this.button5.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
-            this.button5.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button5.Location = new System.Drawing.Point(94, 16);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(54, 23);
-            this.button5.TabIndex = 6;
-            this.button5.Text = "Start";
-            this.toolTip1.SetToolTip(this.button5, "Select Start Offset From Mouse Point");
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.button5_Click_1);
-            // 
-            // button8
-            // 
-            this.button8.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
-            this.button8.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button8.Location = new System.Drawing.Point(94, 39);
-            this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(54, 23);
-            this.button8.TabIndex = 7;
-            this.button8.Text = "End";
-            this.toolTip1.SetToolTip(this.button8, "Select End Offset From Mouse Point");
-            this.button8.UseVisualStyleBackColor = true;
-            this.button8.Click += new System.EventHandler(this.button8_Click);
-            // 
             // button53
             // 
             this.button53.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.button53.ForeColor = System.Drawing.SystemColors.ControlText;
             this.button53.Location = new System.Drawing.Point(5, 85);
             this.button53.Name = "button53";
-            this.button53.Size = new System.Drawing.Size(81, 23);
+            this.button53.Size = new System.Drawing.Size(88, 23);
             this.button53.TabIndex = 4;
             this.button53.Text = "Extend";
             this.toolTip1.SetToolTip(this.button53, "Extend the end of the selected note to the beginning of the next note");
@@ -4618,9 +4590,9 @@
             // 
             this.button54.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.button54.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button54.Location = new System.Drawing.Point(94, 62);
+            this.button54.Location = new System.Drawing.Point(94, 16);
             this.button54.Name = "button54";
-            this.button54.Size = new System.Drawing.Size(54, 23);
+            this.button54.Size = new System.Drawing.Size(67, 23);
             this.button54.TabIndex = 5;
             this.button54.Text = "Split";
             this.button54.UseVisualStyleBackColor = true;
@@ -6942,16 +6914,16 @@
             this.listUSBFileView.AllowColumnReorder = true;
             this.listUSBFileView.AllowDrop = true;
             this.listUSBFileView.GridLines = true;
-            listViewGroup1.Header = "File Name";
-            listViewGroup1.Name = "FileName";
-            listViewGroup2.Header = "Size";
-            listViewGroup2.Name = "Size";
-            listViewGroup3.Header = "Date";
-            listViewGroup3.Name = "Date";
+            listViewGroup4.Header = "File Name";
+            listViewGroup4.Name = "FileName";
+            listViewGroup5.Header = "Size";
+            listViewGroup5.Name = "Size";
+            listViewGroup6.Header = "Date";
+            listViewGroup6.Name = "Date";
             this.listUSBFileView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1,
-            listViewGroup2,
-            listViewGroup3});
+            listViewGroup4,
+            listViewGroup5,
+            listViewGroup6});
             this.listUSBFileView.HideSelection = false;
             this.listUSBFileView.LabelEdit = true;
             this.listUSBFileView.LabelWrap = false;
@@ -7893,6 +7865,8 @@
             // 
             // groupBox19
             // 
+            this.groupBox19.Controls.Add(this.radioGridHalfNote);
+            this.groupBox19.Controls.Add(this.radioGridWholeNote);
             this.groupBox19.Controls.Add(this.checkSnapToCloseG5);
             this.groupBox19.Controls.Add(this.button119);
             this.groupBox19.Controls.Add(this.textBoxNoteSnapDistance);
@@ -7913,17 +7887,39 @@
             this.groupBox19.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.groupBox19.Location = new System.Drawing.Point(7, 202);
             this.groupBox19.Name = "groupBox19";
-            this.groupBox19.Size = new System.Drawing.Size(436, 194);
+            this.groupBox19.Size = new System.Drawing.Size(436, 217);
             this.groupBox19.TabIndex = 2;
             this.groupBox19.TabStop = false;
             this.groupBox19.Text = "Notes Grid";
+            // 
+            // radioGridHalfNote
+            // 
+            this.radioGridHalfNote.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.radioGridHalfNote.Location = new System.Drawing.Point(24, 45);
+            this.radioGridHalfNote.Name = "radioGridHalfNote";
+            this.radioGridHalfNote.Size = new System.Drawing.Size(51, 17);
+            this.radioGridHalfNote.TabIndex = 54;
+            this.radioGridHalfNote.Text = "Half";
+            this.radioGridHalfNote.UseVisualStyleBackColor = true;
+            this.radioGridHalfNote.CheckedChanged += new System.EventHandler(this.radioGridHalfNote_CheckedChanged);
+            // 
+            // radioGridWholeNote
+            // 
+            this.radioGridWholeNote.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.radioGridWholeNote.Location = new System.Drawing.Point(90, 45);
+            this.radioGridWholeNote.Name = "radioGridWholeNote";
+            this.radioGridWholeNote.Size = new System.Drawing.Size(72, 19);
+            this.radioGridWholeNote.TabIndex = 55;
+            this.radioGridWholeNote.Text = "Whole";
+            this.radioGridWholeNote.UseVisualStyleBackColor = true;
+            this.radioGridWholeNote.CheckedChanged += new System.EventHandler(this.radioGridWholeNote_CheckedChanged);
             // 
             // checkSnapToCloseG5
             // 
             this.checkSnapToCloseG5.Checked = true;
             this.checkSnapToCloseG5.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkSnapToCloseG5.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkSnapToCloseG5.Location = new System.Drawing.Point(159, 114);
+            this.checkSnapToCloseG5.Location = new System.Drawing.Point(159, 132);
             this.checkSnapToCloseG5.Name = "checkSnapToCloseG5";
             this.checkSnapToCloseG5.Size = new System.Drawing.Size(144, 19);
             this.checkSnapToCloseG5.TabIndex = 53;
@@ -7935,7 +7931,7 @@
             this.button119.ForeColor = System.Drawing.SystemColors.ControlText;
             this.button119.ImageIndex = 65;
             this.button119.ImageList = this.imageList1;
-            this.button119.Location = new System.Drawing.Point(406, 161);
+            this.button119.Location = new System.Drawing.Point(406, 179);
             this.button119.Name = "button119";
             this.button119.Size = new System.Drawing.Size(24, 24);
             this.button119.TabIndex = 52;
@@ -7946,7 +7942,7 @@
             // textBoxNoteSnapDistance
             // 
             this.textBoxNoteSnapDistance.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.textBoxNoteSnapDistance.Location = new System.Drawing.Point(120, 163);
+            this.textBoxNoteSnapDistance.Location = new System.Drawing.Point(120, 181);
             this.textBoxNoteSnapDistance.Name = "textBoxNoteSnapDistance";
             this.textBoxNoteSnapDistance.Size = new System.Drawing.Size(52, 23);
             this.textBoxNoteSnapDistance.TabIndex = 50;
@@ -7956,7 +7952,7 @@
             // 
             this.label43.AutoSize = true;
             this.label43.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label43.Location = new System.Drawing.Point(6, 166);
+            this.label43.Location = new System.Drawing.Point(6, 184);
             this.label43.Name = "label43";
             this.label43.Size = new System.Drawing.Size(113, 15);
             this.label43.TabIndex = 51;
@@ -7965,7 +7961,7 @@
             // textBoxGridSnapDistance
             // 
             this.textBoxGridSnapDistance.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.textBoxGridSnapDistance.Location = new System.Drawing.Point(120, 137);
+            this.textBoxGridSnapDistance.Location = new System.Drawing.Point(120, 155);
             this.textBoxGridSnapDistance.Name = "textBoxGridSnapDistance";
             this.textBoxGridSnapDistance.Size = new System.Drawing.Size(52, 23);
             this.textBoxGridSnapDistance.TabIndex = 50;
@@ -7975,7 +7971,7 @@
             // 
             this.label26.AutoSize = true;
             this.label26.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.label26.Location = new System.Drawing.Point(10, 141);
+            this.label26.Location = new System.Drawing.Point(10, 159);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(109, 15);
             this.label26.TabIndex = 51;
@@ -7984,7 +7980,7 @@
             // checkBoxRenderMouseSnap
             // 
             this.checkBoxRenderMouseSnap.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkBoxRenderMouseSnap.Location = new System.Drawing.Point(159, 53);
+            this.checkBoxRenderMouseSnap.Location = new System.Drawing.Point(159, 71);
             this.checkBoxRenderMouseSnap.Name = "checkBoxRenderMouseSnap";
             this.checkBoxRenderMouseSnap.Size = new System.Drawing.Size(144, 19);
             this.checkBoxRenderMouseSnap.TabIndex = 10;
@@ -7997,7 +7993,7 @@
             this.checkBoxSnapToCloseNotes.Checked = true;
             this.checkBoxSnapToCloseNotes.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxSnapToCloseNotes.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkBoxSnapToCloseNotes.Location = new System.Drawing.Point(159, 91);
+            this.checkBoxSnapToCloseNotes.Location = new System.Drawing.Point(159, 109);
             this.checkBoxSnapToCloseNotes.Name = "checkBoxSnapToCloseNotes";
             this.checkBoxSnapToCloseNotes.Size = new System.Drawing.Size(144, 19);
             this.checkBoxSnapToCloseNotes.TabIndex = 9;
@@ -8020,7 +8016,7 @@
             this.checkBoxGridSnap.Checked = true;
             this.checkBoxGridSnap.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxGridSnap.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkBoxGridSnap.Location = new System.Drawing.Point(8, 53);
+            this.checkBoxGridSnap.Location = new System.Drawing.Point(8, 71);
             this.checkBoxGridSnap.Name = "checkBoxGridSnap";
             this.checkBoxGridSnap.Size = new System.Drawing.Size(145, 17);
             this.checkBoxGridSnap.TabIndex = 8;
@@ -8043,7 +8039,7 @@
             this.checkViewNotesGrid5Button.Checked = true;
             this.checkViewNotesGrid5Button.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkViewNotesGrid5Button.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkViewNotesGrid5Button.Location = new System.Drawing.Point(8, 91);
+            this.checkViewNotesGrid5Button.Location = new System.Drawing.Point(8, 109);
             this.checkViewNotesGrid5Button.Name = "checkViewNotesGrid5Button";
             this.checkViewNotesGrid5Button.Size = new System.Drawing.Size(145, 17);
             this.checkViewNotesGrid5Button.TabIndex = 0;
@@ -8056,7 +8052,7 @@
             this.checkViewNotesGridPro.Checked = true;
             this.checkViewNotesGridPro.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkViewNotesGridPro.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkViewNotesGridPro.Location = new System.Drawing.Point(8, 114);
+            this.checkViewNotesGridPro.Location = new System.Drawing.Point(8, 132);
             this.checkViewNotesGridPro.Name = "checkViewNotesGridPro";
             this.checkViewNotesGridPro.Size = new System.Drawing.Size(145, 17);
             this.checkViewNotesGridPro.TabIndex = 1;
@@ -8164,13 +8160,12 @@
             this.trackEditorG5.CurrentDifficulty = ProUpgradeEditor.GuitarDifficulty.Expert;
             this.trackEditorG5.Cursor = System.Windows.Forms.Cursors.Default;
             this.trackEditorG5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.trackEditorG5.EditMode = ProUpgradeEditor.TrackEditor.EEditMode.Chords;
+            this.trackEditorG5.EditMode = ProUpgradeEditor.Common.TrackEditor.EEditMode.Chords;
             this.trackEditorG5.Editor5 = null;
             this.trackEditorG5.EditorPro = null;
-            this.trackEditorG5.EditorType = ProUpgradeEditor.TrackEditor.EEditorType.None;
+            this.trackEditorG5.EditorType = ProUpgradeEditor.Common.TrackEditor.EEditorType.None;
             this.trackEditorG5.GridScalar = 0.25D;
             this.trackEditorG5.GridSnap = true;
-            this.trackEditorG5.HScrollValue = 0;
             this.trackEditorG5.InPlayback = false;
             this.trackEditorG5.IsMouseOver = false;
             this.trackEditorG5.IsSelecting = false;
@@ -8185,11 +8180,12 @@
             this.trackEditorG5.ScrollToSelectionEnabled = false;
             this.trackEditorG5.SelectCurrentPoint = new System.Drawing.Point(0, 0);
             this.trackEditorG5.SelectStartPoint = new System.Drawing.Point(0, 0);
-            this.trackEditorG5.SelectStartPointChord = null;
+            
             this.trackEditorG5.Show108Events = false;
             this.trackEditorG5.ShowNotesGrid = false;
             this.trackEditorG5.Size = new System.Drawing.Size(1101, 117);
             this.trackEditorG5.TabIndex = 8;
+            this.trackEditorG5.ViewLyrics = false;
             this.trackEditorG5.DragDrop += new System.Windows.Forms.DragEventHandler(this.trackEditorG5_DragDrop);
             this.trackEditorG5.DragEnter += new System.Windows.Forms.DragEventHandler(this.trackEditorG5_DragEnter);
             this.trackEditorG5.Enter += new System.EventHandler(this.trackEditorG5_Enter);
@@ -8291,13 +8287,12 @@
             this.trackEditorG6.CurrentDifficulty = ProUpgradeEditor.GuitarDifficulty.Expert;
             this.trackEditorG6.Cursor = System.Windows.Forms.Cursors.Default;
             this.trackEditorG6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.trackEditorG6.EditMode = ProUpgradeEditor.TrackEditor.EEditMode.Chords;
+            this.trackEditorG6.EditMode = ProUpgradeEditor.Common.TrackEditor.EEditMode.Chords;
             this.trackEditorG6.Editor5 = null;
             this.trackEditorG6.EditorPro = null;
-            this.trackEditorG6.EditorType = ProUpgradeEditor.TrackEditor.EEditorType.None;
+            this.trackEditorG6.EditorType = ProUpgradeEditor.Common.TrackEditor.EEditorType.None;
             this.trackEditorG6.GridScalar = 0.25D;
             this.trackEditorG6.GridSnap = true;
-            this.trackEditorG6.HScrollValue = 0;
             this.trackEditorG6.InPlayback = false;
             this.trackEditorG6.IsMouseOver = false;
             this.trackEditorG6.IsSelecting = false;
@@ -8312,11 +8307,12 @@
             this.trackEditorG6.ScrollToSelectionEnabled = false;
             this.trackEditorG6.SelectCurrentPoint = new System.Drawing.Point(0, 0);
             this.trackEditorG6.SelectStartPoint = new System.Drawing.Point(0, 0);
-            this.trackEditorG6.SelectStartPointChord = null;
+            
             this.trackEditorG6.Show108Events = false;
             this.trackEditorG6.ShowNotesGrid = false;
             this.trackEditorG6.Size = new System.Drawing.Size(1101, 117);
             this.trackEditorG6.TabIndex = 9;
+            this.trackEditorG6.ViewLyrics = false;
             this.trackEditorG6.Load += new System.EventHandler(this.trackEditorG6_Load);
             this.trackEditorG6.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDropEditorPro);
             this.trackEditorG6.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnterEditorPro);
@@ -8882,8 +8878,6 @@
         private System.Windows.Forms.TextBox textBox35;
         private System.Windows.Forms.TextBox textBox36;
         private System.Windows.Forms.Button buttonAddSlideHammeron;
-        private System.Windows.Forms.Button button8;
-        private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button35;
         private System.Windows.Forms.Button button34;
         private System.Windows.Forms.Button button33;
@@ -9245,8 +9239,8 @@
         private System.Windows.Forms.ProgressBar progressUSBFiles;
         private System.Windows.Forms.Button buttonBatchOpenResult;
         private System.Windows.Forms.CheckBox checkBatchOpenWhenCompleted;
-        private TrackEditor trackEditorG6;
-        private TrackEditor trackEditorG5;
+        private ProUpgradeEditor.Common.TrackEditor trackEditorG6;
+        private ProUpgradeEditor.Common.TrackEditor trackEditorG5;
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.ListView listBoxUSBSongs;
         private System.Windows.Forms.ContextMenuStrip contextStripMidiTracks;
@@ -9426,6 +9420,8 @@
         private System.Windows.Forms.RadioButton radioSongLibSongListSortID;
         private System.Windows.Forms.RadioButton radioSongLibSongListSortName;
         private System.Windows.Forms.ToolStripMenuItem saveProXMLToolStripMenuItem;
+        private System.Windows.Forms.RadioButton radioGridHalfNote;
+        private System.Windows.Forms.RadioButton radioGridWholeNote;
         
 
     }

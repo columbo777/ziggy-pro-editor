@@ -5,7 +5,7 @@ using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 using Sanford.Multimedia.Midi;
-using ProUpgradeEditor.DataLayer;
+
 
 namespace ProUpgradeEditor.Common
 {
@@ -23,6 +23,7 @@ namespace ProUpgradeEditor.Common
     {
         public static int ScollToSelectionOffset = 300;
 
+        public static int[] Null6 { get { return new int[]{ Int32.MinValue, Int32.MinValue, Int32.MinValue, Int32.MinValue, Int32.MinValue, Int32.MinValue }; } }
         
         public const int ChannelStrumLow = 15;
         public const int ChannelStrumMid = 14;
@@ -46,6 +47,8 @@ namespace ProUpgradeEditor.Common
         public const int HardSoloData1_G5 = 91;
         public const int MediumSoloData1_G5 = 79;
         public const int EasySoloData1_G5 = 67;
+
+        
 
         public static readonly int[] SoloData1_G5 = new int[] { EasySoloData1_G5, MediumSoloData1_G5, HardSoloData1_G5, ExpertSoloData1_G5 };
 
@@ -129,8 +132,16 @@ namespace ProUpgradeEditor.Common
         public static int[] AllArpeggioData1 = { ExpertArpeggioData1, HardArpeggioData1 };
         public static int[] AllHammeronData1 = { ExpertHammeronData1, HardHammeronData1, MediumHammeronData1, EasyHammeronData1 };
 
+        public static int[] AllChordModifierData1 =
+        {
+            ExpertSlideData1, HardSlideData1, MediumSlideData1, EasySlideData1,
+            ExpertStrumData1, HardStrumData1,
+            ExpertArpeggioData1, HardArpeggioData1,
+            ExpertHammeronData1, HardHammeronData1, MediumHammeronData1, EasyHammeronData1,
+        };
 
-        public static GuitarDifficulty[] EasyMediumHardExpert = new GuitarDifficulty[] { GuitarDifficulty.Easy, GuitarDifficulty.Medium, GuitarDifficulty.Hard, GuitarDifficulty.Expert };
+        public static GuitarDifficulty[] EasyMediumHardExpert = 
+        { GuitarDifficulty.Easy, GuitarDifficulty.Medium, GuitarDifficulty.Hard, GuitarDifficulty.Expert };
 
 
         public static int MinimumNoteWidth = 0;
@@ -149,11 +160,6 @@ namespace ProUpgradeEditor.Common
         public static int NoteShadowOffsetUp = 0;
         public static int NoteShadowOffsetRight = 2;
         public static int NoteShadowOffsetDown = 2;
-
-        public static int NoteSelectionOffsetLeft = -1;
-        public static int NoteSelectionOffsetUp = -1;
-        public static int NoteSelectionOffsetRight = 3;
-        public static int NoteSelectionOffsetDown = 3;
 
         public static int BarLineWidth = 1;
         public static int DrawBeat = 1;
@@ -458,6 +464,13 @@ namespace ProUpgradeEditor.Common
             return GuitarDifficulty.Unknown;
         }
 
+        public static int[] GetKnownData1ForDifficulty(bool isPro, GuitarDifficulty diff)
+        {
+            var d1list = new int[128];
+            d1list.For((x, i) => d1list[i] = i);
+            return d1list.Where(x => (diff).HasFlag(x.GetData1Difficulty(isPro))).ToArray();
+        }
+
         public static int GetSoloData1_G5(GuitarDifficulty difficulty)
         {
             if (difficulty.IsUnknown() || difficulty.IsAll() || difficulty.IsExpert())
@@ -584,7 +597,7 @@ namespace ProUpgradeEditor.Common
             return GetStringDifficulty5(data1) != GuitarDifficulty.Unknown;
         }
 
-        public static int[] GetStringsForDifficulty6(GuitarDifficulty diff)
+        public static IEnumerable<int> GetStringsForDifficulty6(GuitarDifficulty diff)
         {
             var ret = new List<int>();
             if (diff.HasFlag(GuitarDifficulty.Easy))
@@ -603,32 +616,70 @@ namespace ProUpgradeEditor.Common
             {
                 ret.AddRange(ExpertData1Strings);
             }
-            return ret.ToArray();
+            return ret;
         }
 
-        public static int[] ExpertData1Strings = new int[] { ExpertData1LowE,
+        public static IEnumerable<int> GetStringsForDifficulty5(GuitarDifficulty diff)
+        {
+            var ret = new List<int>();
+            if (diff.HasFlag(GuitarDifficulty.Easy))
+            {
+                ret.AddRange(EasyData1StringsG5);
+            }
+            if (diff.HasFlag(GuitarDifficulty.Medium))
+            {
+                ret.AddRange(MediumData1StringsG5);
+            }
+            if (diff.HasFlag(GuitarDifficulty.Hard))
+            {
+                ret.AddRange(HardData1StringsG5);
+            }
+            if (diff.HasFlag(GuitarDifficulty.Expert))
+            {
+                ret.AddRange(ExpertData1StringsG5);
+            }
+            return ret;
+        }
+
+        public static int[] ExpertData1Strings =  { ExpertData1LowE,
             ExpertData1A, ExpertData1D, ExpertData1G, ExpertData1B, ExpertData1HighE};
 
-        public static int[] ExpertData1StringsG5 = new int[] { ExpertData1LowE,
+        public static int[] ExpertData1StringsG5 =  { ExpertData1LowE,
             ExpertData1A, ExpertData1D, ExpertData1G, ExpertData1B};
 
-        public static int[] HardData1Strings = new int[] { HardData1LowE,
+        public static int[] HardData1Strings =  { HardData1LowE,
             HardData1A, HardData1D, HardData1G, HardData1B, HardData1HighE};
 
-        public static int[] HardData1StringsG5 = new int[] { HardData1LowE5,
+        public static int[] HardData1StringsG5 =  { HardData1LowE5,
             HardData1A5, HardData1D5, HardData1G5, HardData1B5};
 
-        public static int[] MediumData1Strings = new int[] { MediumData1LowE,
+        public static int[] MediumData1Strings =  { MediumData1LowE,
             MediumData1A, MediumData1D, MediumData1G, MediumData1B, MediumData1HighE};
 
-        public static int[] MediumData1StringsG5 = new int[] { MediumData1LowE5,
+        public static int[] MediumData1StringsG5 =  { MediumData1LowE5,
             MediumData1A5, MediumData1D5, MediumData1G5};
 
-        public static int[] EasyData1Strings = new int[] { EasyData1LowE,
+        public static int[] EasyData1Strings =  { EasyData1LowE,
             EasyData1A, EasyData1D, EasyData1G, EasyData1B, EasyData1HighE};
 
-        public static int[] EasyData1StringsG5 = new int[] { EasyData1LowE5,
+        public static int[] EasyData1StringsG5 =  { EasyData1LowE5,
             EasyData1A5, EasyData1D5};
+
+        public static int[] AllData1Strings6 = 
+        { 
+            ExpertData1LowE, ExpertData1A, ExpertData1D, ExpertData1G, ExpertData1B, ExpertData1HighE, 
+            HardData1LowE, HardData1A, HardData1D, HardData1G, HardData1B, HardData1HighE,
+            MediumData1LowE, MediumData1A, MediumData1D, MediumData1G, MediumData1B, MediumData1HighE,
+            EasyData1LowE, EasyData1A, EasyData1D, EasyData1G, EasyData1B, EasyData1HighE,
+        };
+
+        public static int[] AllData1Strings5 = 
+        { 
+            ExpertData1LowE, ExpertData1A, ExpertData1D, ExpertData1G, ExpertData1B, 
+            HardData1LowE5, HardData1A5, HardData1D5, HardData1G5, HardData1B5,
+            MediumData1LowE5, MediumData1A5, MediumData1D5, MediumData1G5,
+            EasyData1LowE5, EasyData1A5, EasyData1D5,
+        };
 
         public static int GetNoteString(int data1)
         {
@@ -726,48 +777,6 @@ namespace ProUpgradeEditor.Common
             return -1;
         }
 
-        public static bool CreateMessage2(Track t, int data1, int data2, int channel, int downTick, int upTick, out MidiEvent downEvent, out MidiEvent upEvent)
-        {
-            
-            var cb = new ChannelMessageBuilder();
-            cb.Data1 = data1;
-            cb.Data2 = data2;
-            cb.MidiChannel = channel;
-
-            cb.Command = ChannelCommand.NoteOn;
-            cb.Build();
-
-            downEvent = t.Insert(downTick, cb.Result);
-            cb.Data2 = 0;
-            cb.Command = ChannelCommand.NoteOff;
-            cb.Build();
-            
-            upEvent = t.Insert(upTick, cb.Result);
-            return true;
-        }
-
-        public static bool CreateMessage(GuitarTrack t, int data1, int data2, int channel, int downTick, int upTick, out MidiEvent downEvent, out MidiEvent upEvent)
-        {
-            /*if (t.IsPro && t.Editor.CreatedBackup == false)
-            {
-                t.Editor.BackupSequence();
-            }*/
-            var cb = new ChannelMessageBuilder();
-            cb.Data1 = data1;
-            cb.Data2 = data2;
-            cb.MidiChannel = channel;
-
-            cb.Command = ChannelCommand.NoteOn;
-            cb.Build();
-
-            downEvent = t.Insert(downTick, cb.Result);
-            cb.Data2 = 0;
-            cb.Command = ChannelCommand.NoteOff;
-            cb.Build();
-
-            upEvent = t.Insert(upTick, cb.Result);
-            return true;
-        }
         public static int GetChannelFromStrum(ChordStrum cs)
         {
             int ret = 0;
@@ -806,26 +815,57 @@ namespace ProUpgradeEditor.Common
             return nb;
         }
 
-        public static double MicroToSec(double micro)
+
+        public static double timeScalar = 300.0;
+        public static double timeScalarZoomSpeed = 5;
+        public static double timeScalarMax = 5000.0;
+        public static double timeScalarMin = 1.0;
+
+        public static double ScaleUp(double value)
         {
-            return micro * 1000000.0;
+            return value * timeScalar;
         }
 
-        public static double SecToMicro(double sec)
+        public static double ScaleDown(double value)
         {
-            return sec / 1000000.0;
+            return value / timeScalar;
         }
 
-        public static double timeScalar = 275.0;
-        public static double ScaleTimeUp(double timeSeconds)
+        public static double ScaleDown(int value)
         {
-            return Math.Round(timeSeconds * (timeScalar));
+            return ((double)value) / timeScalar;
         }
+    }
 
-        public static double ScaleTimeDown(int scaledTime)
+    public static class GridScale
+    {
+        public static readonly double WholeNote = 1.0;
+        public static readonly double HalfNote = 0.5;
+        public static readonly double QuarterNote = 0.25;
+        public static readonly double EigthNote = 0.125;
+        public static readonly double SixteenthNote = 0.0625;
+        public static readonly double ThirtySecondNote = 0.03125;
+        public static readonly double SixtyFourthNote = 0.015625;
+        public static readonly double OneTwentyEightNote = 0.0078125;
+
+        public static TimeUnit GetTimeUnit(double scale)
         {
-            return (double)((double)scaledTime) / (timeScalar );
+            if (scale == WholeNote)
+                return TimeUnit.Whole;
+            else if (scale == HalfNote)
+                return TimeUnit.Half;
+            else if (scale == QuarterNote)
+                return TimeUnit.Quarter;
+            else if (scale == EigthNote)
+                return TimeUnit.Eight;
+            else if (scale == SixteenthNote)
+                return TimeUnit.Sixteenth;
+            else if (scale == ThirtySecondNote)
+                return TimeUnit.ThirtySecond;
+            else if (scale == SixtyFourthNote)
+                return TimeUnit.SixtyFourth;
+            else //if (scale == OneTwentyEightNote)
+                return TimeUnit.OneTwentyEigth;
         }
-
     }
 }

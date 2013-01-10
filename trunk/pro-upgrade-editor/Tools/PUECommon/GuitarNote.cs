@@ -4,27 +4,48 @@ using System.Linq;
 using System.Text;
 using Sanford.Multimedia;
 using Sanford.Multimedia.Midi;
-using ProUpgradeEditor.Common;
 
-namespace ProUpgradeEditor.DataLayer
+
+namespace ProUpgradeEditor.Common
 {
     public class GuitarNote : GuitarMessage
     {
+        public virtual int NoteString
+        {
+            get
+            {
+                return OwnerTrack.IsPro ?
+                    Utility.GetNoteString(Data1) :
+                    Utility.GetNoteString5(Data1);
+            }
+            set
+            {
+                if (OwnerTrack.IsPro)
+                {
+                    Data1 = Utility.GetStringLowE(Utility.GetStringDifficulty6(Data1)) + value;
+                }
+                else
+                {
+                    Data1 = Utility.GetStringLowE5(Utility.GetStringDifficulty5(Data1)) + value;
+                }
+
+                base.IsUpdated = true;
+            }
+        }
 
         public GuitarNote(GuitarTrack track, MidiEvent downEvent = null, MidiEvent upEvent = null)
-            : base(track, downEvent)
+            : base(track, downEvent, upEvent, GuitarMessageType.GuitarNote)
         {
-            SetUpEvent(upEvent);
+            
         }
 
-        public GuitarNote Clone(GuitarTrack destTrack, GuitarDifficulty difficulty, int minTick, int maxTick, int stringOffset = Int32.MinValue)
+        public GuitarNote CloneToMemory(GuitarTrack track)
         {
-            stringOffset = stringOffset.IsNull() ? 0 : stringOffset;
-
-            return GuitarNote.CreateNote(destTrack, difficulty, minTick, maxTick, NoteString+stringOffset, NoteFretDown, IsTapNote, IsArpeggioNote, IsXNote);
+            return GetNote(track, Difficulty, this.TickPair, NoteString, NoteFretDown, IsTapNote, IsArpeggioNote, IsXNote);
         }
 
-        public static GuitarNote GetNote(GuitarTrack track, GuitarDifficulty diff, int downTick, int upTick, int noteString, int noteFret, bool isTap, bool isArpeggio, bool isX)
+        public static GuitarNote GetNote(GuitarTrack track, GuitarDifficulty diff, 
+            TickPair ticks, int noteString, int noteFret, bool isTap, bool isArpeggio, bool isX)
         {
             var ret = new GuitarNote(track);
             if (track.IsPro)
@@ -35,10 +56,9 @@ namespace ProUpgradeEditor.DataLayer
             {
                 ret.Data1 = Utility.GetStringLowE5(diff) + noteString;
             }
-
+            
             ret.Data2 = noteFret + 100;
 
-            ret.NoteFretDown = noteFret;
             if (isX)
             {
                 ret.Channel = Utility.ChannelX;
@@ -56,43 +76,37 @@ namespace ProUpgradeEditor.DataLayer
                 ret.Channel = Utility.ChannelDefault;
             }
 
-            ret.downTick = downTick;
-            ret.upTick = upTick;
+            ret.SetTicks(ticks);
 
             return ret;
         }
 
-        public static GuitarNote CreateNote(GuitarTrack track, GuitarDifficulty diff,int downTick, int upTick, int noteString, int noteFret, bool isTap, bool isArpeggio, bool isX)
+        public static GuitarNote CreateNote(GuitarTrack track, GuitarDifficulty diff, TickPair ticks, 
+            int noteString, int noteFret, bool isTap, bool isArpeggio, bool isX)
         {
-            var ret = GetNote(track, diff, downTick, upTick, noteString, noteFret, isTap, isArpeggio, isX);
+            var ret = GetNote(track, diff, ticks, noteString, noteFret, isTap, isArpeggio, isX);
 
+            var ev = track.Insert(ret.Data1, ret.Data2, ret.Channel, ticks);
 
-            var cb = new ChannelMessageBuilder();
-            cb.Data1 = ret.Data1;
-            cb.Data2 = ret.Data2;
-            cb.MidiChannel = ret.Channel;
-            cb.Command = ChannelCommand.NoteOn;
+            ret.SetDownEvent(ev.Down);
+            ret.SetUpEvent(ev.Up);
 
-            cb.Build();
+            track.Messages.Add(ret);
 
-            var downEvent = track.Insert(downTick, cb.Result);
-
-            cb.Command = ChannelCommand.NoteOff;
-            cb.Data2 = 0;
-            cb.Build();
-
-            var upEvent = track.Insert(upTick, cb.Result);
-
-            ret.SetDownEvent(downEvent);
-            ret.SetUpEvent(upEvent);
-
-            ret.IsNew = true;
-           // track.Messages.Add(ret);
-            
             return ret;
         }
 
-        public int NoteFretDown { get { return Data2-100; } set { Data2 = value + 100; } }
+        public int NoteFretDown 
+        { 
+            get 
+            { 
+                return Data2-100;
+            } 
+            set 
+            { 
+                Data2 = value + 100;
+            } 
+        }
 
         public bool IsTapNote
         {

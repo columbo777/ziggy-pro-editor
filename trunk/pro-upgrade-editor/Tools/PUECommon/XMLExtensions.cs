@@ -15,9 +15,9 @@ namespace ProUpgradeEditor.Common
             {
                 if (!string.IsNullOrEmpty(rootName))
                 {
-                    var root = XMLUtil.LoadXml("<" + rootName + " />");
-                    root.GetNode(rootName).InnerXml += str;
-                    return root;
+                    var doc = new XmlDocument();
+                    var root = doc.FirstChild.AddNode(rootName, str);
+                    return doc;
                 }
                 else
                 {
@@ -44,48 +44,34 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
-        public static object[] AddItem(this object[] array, object newItem)
-        {
-            var arr = new object[array == null ? 1 : array.Length + 1];
-            arr[arr.Length - 1] = newItem;
-            if (array != null)
-            {
-                for (int x = 0; x < array.Length; x++)
-                {
-                    arr[x] = array[x];
-                }
-            }
-
-            array = arr;
-            return array.ToArray();
-        }
 
         public static XmlAttribute AddAttribute(this XmlNode node, string name, string value)
         {
             return XMLUtil.AddAttribute(node, name, value);
         }
-        public static XmlNode AddNodeValue(this XmlNode node, string name, string value, bool addEmpty = false)
-        {
-            if (addEmpty == false && string.IsNullOrEmpty(value))
-                return null;
-            var ret = node.AddNode(name);
-            ret.SetValue(value);
-            return ret;
-        }
+        
         public static XmlNode GetNode(this XmlNode node, string name) { return XMLUtil.GetNode(node, name); }
 
-        public static XmlNode AddNode(this XmlNode node, string name, bool addIfExists = true)
+        public static XmlNode AddNode(this XmlNode node, string name, string text, bool addIfExists = true, bool setValueIfExists = true)
         {
-            var existing = node.GetNode(name);
-            if (addIfExists == false && existing != null)
+            var ret = node.GetNode(name);
+            if (addIfExists == false && ret != null)
             {
-                return existing;
+                if (setValueIfExists)
+                {
+                    ret.SetValue(text);
+                }
             }
             else
             {
-
-                return XMLUtil.AddNode(node, name);
+                ret = node.AddNode(name);
+                ret.SetValue(text);
             }
+            return ret;
+        }
+        public static XmlNode AddNode(this XmlNode node, string name, bool addIfExists = true)
+        {
+            return AddNode(node, name, string.Empty, addIfExists);
         }
         public static XmlNode AddNodes(this XmlNode node, IEnumerable<XmlNode> nodes)
         {
@@ -134,10 +120,6 @@ namespace ProUpgradeEditor.Common
             return ((attrib != null) ? (attrib.OwnerElement as XmlNode) : null);
         }
 
-        public static bool IsEmpty(this string str)
-        {
-            return string.IsNullOrEmpty(str);
-        }
         public static XmlNode GetNode(this XmlDocument doc, string xpath)
         {
             return XMLUtil.GetNode(doc, xpath);

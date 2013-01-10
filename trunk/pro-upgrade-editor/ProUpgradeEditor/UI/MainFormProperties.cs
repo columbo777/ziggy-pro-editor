@@ -11,7 +11,6 @@ using System.Reflection;
 using System.Windows.Forms;
 using Sanford.Multimedia;
 using Sanford.Multimedia.Midi;
-using ProUpgradeEditor.DataLayer;
 using ProUpgradeEditor.Common;
 using System.Threading;
 using System.Globalization;
@@ -263,7 +262,7 @@ namespace ProUpgradeEditor.UI
             public static UtilProperty[] GetInitialProperties()
             {
                 return new UtilProperty[]{
-                    
+                    new UtilProperty( "View Lyrics in G5 Editor", true),
                     new UtilProperty( "Keep Midi Playback Selection", false),
                     new UtilProperty( "Keep Auto Gen Difficulty Selection", false),
 
@@ -838,6 +837,8 @@ namespace ProUpgradeEditor.UI
                    case "ProG Trainer": { Utility.SongTrainerPGText = (string)p.Data; } break;
                    case "ProB Trainer": {  Utility.SongTrainerPBText = (string)p.Data; } break;
                    case "Trainer Norm Offset": { Utility.SongTrainerNormOffset = (double)p.Data; } break;
+                   case "View Lyrics in G5 Editor": { trackEditorG5.ViewLyrics = (bool)p.Data; trackEditorG5.Invalidate(); } break;
+
                 default:
                     {
                         switch(p.Type){
@@ -917,6 +918,9 @@ namespace ProUpgradeEditor.UI
             checkBoxShow108.Checked = settings.GetValueBool("checkBoxShow108", false);
 
             textBoxZoom.Text = settings.GetValue("textBoxZoom", textBoxZoom.Text);
+            Utility.timeScalarZoomSpeed = settings.GetValue("timeScalarZoomSpeed", Utility.timeScalarZoomSpeed.ToStringEx()).ToDouble(10);
+            Utility.timeScalarMin = settings.GetValue("timeScalarMin", Utility.timeScalarMin.ToStringEx()).ToDouble(1.0);
+            Utility.timeScalarMax = settings.GetValue("timeScalarMax", Utility.timeScalarMax.ToStringEx()).ToDouble(999.0);
 
             checkUseDefaultFolders.Checked = settings.GetValueBool("useDefaultFolders", true);
             checkBoxInitSelectedTrackOnly.Checked = settings.GetValueBool("checkBoxInitSelectedTrackOnly", false);
@@ -1261,6 +1265,9 @@ namespace ProUpgradeEditor.UI
             settings.SetValue("checkBoxInitSelectedDifficultyOnly", checkBoxInitSelectedDifficultyOnly.Checked);
 
             settings.SetValue("textBoxZoom", textBoxZoom.Text);
+            settings.SetValue("timeScalarZoomSpeed", Utility.timeScalarZoomSpeed.ToStringEx());
+            settings.SetValue("timeScalarMin", Utility.timeScalarMin.ToStringEx());
+            settings.SetValue("timeScalarMax", Utility.timeScalarMax.ToStringEx());
 
             settings.SetValue("checkKeepSelection", checkKeepSelection.Checked);
             settings.SetValue("checkBoxClearAfterNote", checkBoxClearAfterNote.Checked);

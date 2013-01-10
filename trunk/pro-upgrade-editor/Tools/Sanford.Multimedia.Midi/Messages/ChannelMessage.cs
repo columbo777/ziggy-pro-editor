@@ -692,13 +692,7 @@ namespace Sanford.Multimedia.Midi
             get
             {
                 var ret = UnpackCommand(msg);
-                if (Data2 == 0)
-                {
-                    if (ret != ChannelCommand.NoteOff)
-                    {
-                        ret = ChannelCommand.NoteOff;
-                    }
-                }
+                
                 return ret;
             }
         }

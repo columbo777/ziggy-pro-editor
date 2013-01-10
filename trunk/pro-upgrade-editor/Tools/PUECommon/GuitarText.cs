@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sanford.Multimedia.Midi;
-using ProUpgradeEditor.Common;
 
-namespace ProUpgradeEditor.DataLayer
+
+namespace ProUpgradeEditor.Common
 {
 
     public class GuitarTextEvent : GuitarMessage
@@ -18,6 +18,7 @@ namespace ProUpgradeEditor.DataLayer
             }    
         }
 
+        
         public static GuitarTextEvent GetTextEvent(GuitarTrack track, MidiEvent ev)
         {
             if (ev != null)
@@ -42,34 +43,13 @@ namespace ProUpgradeEditor.DataLayer
             return ret;
         }
 
-        private GuitarTextEvent(GuitarTrack track, int tick, string text, MidiEvent midiEvent, GuitarTrainerMetaEventType type) : base(track, midiEvent)
+        private GuitarTextEvent(GuitarTrack track, int tick, string text, MidiEvent midiEvent, GuitarTrainerMetaEventType type) : 
+            base(track, midiEvent, null, GuitarMessageType.GuitarTextEvent)
         {
-            this.text = text;
-            
-            downTick = tick;
+            this.Text = text;
+            SetDownTick(tick);
         }
 
-        public override string Text
-        {
-            get
-            {
-                return base.Text;
-            }
-            set
-            {
-                if (this.MidiEvent != null && OwnerTrack != null)
-                {
-                    OwnerTrack.Remove(this.MidiEvent);
-                    
-                    this.MidiEvent = OwnerTrack.Insert(this.AbsoluteTicks, MetaTextBuilder.Create(MetaType.Text, value));
-                    this.text = value;
-                }
-                else
-                {
-                    base.Text = value;
-                }
-            }
-        }
         
         public override string ToString()
         {
@@ -80,6 +60,11 @@ namespace ProUpgradeEditor.DataLayer
         public bool IsTrainerEvent
         {
             get { return TrainerType != GuitarTrainerMetaEventType.Unknown; }
+        }
+
+        public override void CreateEvents()
+        {
+            SetDownEvent(OwnerTrack.Insert(DownTick, MetaTextBuilder.Create(MetaType.Text, Text)));
         }
 
 

@@ -86,26 +86,16 @@
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EditorResources">
-      <HintPath>..\lib\EditorResources.dll</HintPath>
-    </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="NAudio">
       <HintPath>..\Tools\NAudio\NAudio.dll</HintPath>
     </Reference>
     <Reference Include="NAudio.WindowsMediaFormat">
       <HintPath>..\Tools\NAudio\NAudio.WindowsMediaFormat.dll</HintPath>
     </Reference>
-    <Reference Include="PUECommon, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\PUECommon.dll</HintPath>
-    </Reference>
     <Reference Include="Sanford.Multimedia, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Sanford.Multimedia.dll</HintPath>
-    </Reference>
-    <Reference Include="Sanford.Multimedia.Midi, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Sanford.Multimedia.Midi.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -161,9 +151,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ProResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="TrackEditor.resx">
-      <DependentUpon>TrackEditor.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="UI\AboutForm.resx">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -192,9 +179,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="TrackEditor.cs">
-      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="UI\MainFormBatchMethods.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -374,6 +358,20 @@
     <Content Include="Resources\XPFolder.gif" />
     <Content Include="Resources\XPLens.gif" />
     <Content Include="Resources\XPRecycle.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Tools\EditorResources\EditorResources.csproj">
+      <Project>{F0F523DA-3085-4BE5-AC09-5F680F0E392E}</Project>
+      <Name>EditorResources</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tools\PUECommon\PUECommon.csproj">
+      <Project>{7767D3DD-6E1C-419E-9092-F3F3DDDF3D87}</Project>
+      <Name>PUECommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tools\Sanford.Multimedia.Midi\Sanford.Multimedia.Midi.csproj">
+      <Project>{4269C72A-8D3A-4737-8F89-72EAA33EA9E1}</Project>
+      <Name>Sanford.Multimedia.Midi</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

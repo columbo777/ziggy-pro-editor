@@ -8,7 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using Sanford.Multimedia.Midi;
 using ProUpgradeEditor;
-using ProUpgradeEditor.DataLayer;
+using ProUpgradeEditor.Common;
 
 namespace EditorResources.Components
 {

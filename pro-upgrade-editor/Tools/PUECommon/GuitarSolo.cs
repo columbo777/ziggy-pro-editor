@@ -3,22 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sanford.Multimedia.Midi;
-using ProUpgradeEditor.Common;
 
-namespace ProUpgradeEditor.DataLayer
+
+namespace ProUpgradeEditor.Common
 {
     public class GuitarSolo : GuitarModifier
     {
 
-        public GuitarSolo(GuitarTrack track, MidiEvent downEvent = null, MidiEvent upEvent = null) : base(track, downEvent, upEvent, GuitarModifierType.Solo) { }
+        public GuitarSolo(GuitarTrack track, MidiEvent downEvent = null, MidiEvent upEvent = null) : 
+            base(track, downEvent, upEvent, GuitarModifierType.Solo, GuitarMessageType.GuitarSolo) { }
 
-        public static GuitarSolo CreateSolo(GuitarTrack track, int downTick, int upTick)
+        public static GuitarSolo CreateSolo(GuitarTrack track, TickPair ticks)
         {
+            if (track.Messages.Solos.Any())
+            {
+            }
+            var ev = track.Insert(Utility.SoloData1, 100, Utility.ChannelDefault, ticks);
             
-            MidiEvent downEvent, upEvent;
-            Utility.CreateMessage(track, Utility.SoloData1, 100, Utility.ChannelDefault, downTick, upTick, out downEvent, out upEvent);
-
-            var ret = new GuitarSolo(track, downEvent, upEvent);
+            var ret = new GuitarSolo(track, ev.Down, ev.Up);
 
             track.Messages.Add(ret);
 

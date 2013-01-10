@@ -8,7 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using Sanford.Multimedia.Midi;
 using ProUpgradeEditor.Common;
-using ProUpgradeEditor.DataLayer;
+
 using ProUpgradeEditor;
 using System.Drawing.Drawing2D;
 
@@ -308,13 +308,9 @@ namespace MidiViewer
 
                 using(var p = new Pen(Color.Black))
                 {
-                    foreach (var msg in sequence.GetPrimaryTrack().ChanMessages.GetMidiEventPairs())
-                    {
-                        var tDown = ScaleTick( msg.Down.AbsoluteTicks );
-                        var tUp = ScaleTick( msg.Up.AbsoluteTicks );
-
-                        g.DrawLine(p, tDown, msg.Down.Data1, tUp, msg.Up.Data1);
-                    }
+                    
+                    
+                    
                 }
             }
             

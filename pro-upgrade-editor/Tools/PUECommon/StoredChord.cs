@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ProUpgradeEditor.Common;
 
-namespace ProUpgradeEditor
+
+namespace ProUpgradeEditor.Common
 {
     public class StoredChord
     {

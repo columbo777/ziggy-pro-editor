@@ -2,411 +2,567 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ProUpgradeEditor.Common;
+using Sanford.Multimedia.Midi;
 
-namespace ProUpgradeEditor.DataLayer
+
+namespace ProUpgradeEditor.Common
 {
-    public class GuitarMessageList : IEnumerable<GuitarMessage>
+    [Flags()]
+    public enum ChordQueryOption
     {
-        List<GuitarMessage> Messages;
-        GuitarTrack track;
-        public GuitarMessageList(GuitarTrack track)
-        {
-            this.track = track;
-            Messages = new List<GuitarMessage>();
-        }
+        Default = (0),
+        IncludeEndingOnMin = (1<<0),
+        IncludeStartingOnMax = (1<<1),
+    }
 
-        [Flags()]
-        enum GMDirtyState
-        {
-            
-            Chords = (1 << 1),
-            Powerup = (1 << 2),
-            Solo = (1 << 3),
-            Tempo = (1 << 4),
-            Timesig = (1 << 5),
-            Arpeggio = (1 << 6),
-            BigRock = (1 << 7),
-            SingleNote = (1 << 8),
-            MultiNote = (1 << 9),
-            TextEvent = (1 << 10),
-            Trainer = (1<<11),
-            HandPosition = (1<<12),
-            All = (Chords|Powerup|Solo|Tempo|Timesig|Arpeggio|BigRock|SingleNote|MultiNote|TextEvent|Trainer|HandPosition),
-        }
+    [Flags()]
+    public enum AdjustResult
+    {
+        NoResult = 0,
+        Success = (1 << 0),
         
-        GMDirtyState dirtyState = GMDirtyState.All;
-
-        void FlagDirty(GMessage mess)
-        {
-            if(mess is GuitarHandPosition)
-            {
-                dirtyState |= GMDirtyState.HandPosition;
-            }
-            if (mess is GuitarTextEvent)
-            {
-                dirtyState |= GMDirtyState.TextEvent;
-            }
-            if (mess is GuitarTrainer)
-            {
-                dirtyState |= GMDirtyState.Trainer;
-            }
-            if(mess is GuitarChord)
-            {
-                dirtyState |= GMDirtyState.Chords;
-            }
-            if(mess is GuitarPowerup)
-            {
-                dirtyState |= GMDirtyState.Powerup;
-            }
-            if(mess is GuitarSolo)
-            {
-                dirtyState |= GMDirtyState.Solo;
-            }
-            if(mess is GuitarTempo)
-            {
-                dirtyState |= GMDirtyState.Tempo;
-            }
-            if(mess is GuitarTimeSignature)
-            {
-                dirtyState |= GMDirtyState.Timesig;
-            }
-            if(mess is GuitarArpeggio)
-            {
-                dirtyState |= GMDirtyState.Arpeggio;
-            }
-            if(mess is GuitarBigRockEnding)
-            {
-                dirtyState |= GMDirtyState.BigRock;
-            }
-            if(mess is GuitarSingleStringTremelo)
-            {
-                dirtyState |= GMDirtyState.SingleNote;
-            }
-            if(mess is GuitarMultiStringTremelo)
-            {
-                dirtyState |= GMDirtyState.MultiNote;
-            }
-        }
-
+        AdjustedDownTickLeft = (1 << 1),
+        AdjustedDownTickRight = (1 << 2),
         
-        public void AddRange(IEnumerable<GuitarMessage> mess)
-        {
-            if (mess != null && mess.Any())
-            {
-                foreach (var msg in mess)
-                {
-                    Messages.Add(msg);
-                    FlagDirty(msg);
-                }
-            }
-        }
+        AdjustedUpTickLeft = (1 << 3),
+        AdjustedUpTickRight = (1 << 4),
 
+        ShortResult = (1 << 5),
         
-        public void Add(GuitarMessage mess)
-        {
-            if (mess is GuitarTrainer)
-            {
-                var m = mess as GuitarTrainer;
-                Add(m.Start);
-                if (m.Norm.MidiEvent != null)
-                {
-                    Add(m.Norm);
-                }
-                Add(m.End);
-                internalAdd(m);
-            }
-            else
-            {
-                internalAdd(mess);
-            }
-        }
+        Error = (1 << 6),
+        
+        AdjustedDownTick = (AdjustedDownTickLeft | AdjustedDownTickRight),
+        AdjustedUpTick = (AdjustedUpTickLeft | AdjustedUpTickRight),
+    }
 
-        private void internalAdd(GuitarMessage mess)
-        {
-            var l = Messages.LastOrDefault();
-            if (l != null && mess.AbsoluteTicks >= l.AbsoluteTicks)
-            {
-                Messages.Add(mess);
-            }
-            else
-            {
-                var t = mess.AbsoluteTicks;
-                var gt = Messages.LastOrDefault(x => x.AbsoluteTicks < t);
-                if (gt == null)
-                    Messages.Add(mess);
-                else
-                    Messages.Insert(Messages.IndexOf(gt)+1, mess);
-            }
-            FlagDirty(mess);
-        }
+    [Flags()]
+    public enum AdjustOption
+    {
+        NoAdjust = (0),
+        AllowGrow = (1 << 0),
+        AllowShrink = (1 << 1),
+        AllowShift = (1 << 2),
+        AllowAny = (AllowGrow | AllowShrink | AllowShift),
+    }
 
-        public void Remove(GuitarMessage mess)
-        {
-            Messages.Remove(mess);
-            FlagDirty(mess);
-        }
-
-        public void RemoveAt(int idx)
-        {
-            Remove(Messages[idx]);
-        }
+    public class GuitarMessageList
+    {
 
 
-        GuitarChord[] chords = new GuitarChord[0];
-        public GuitarChord[] Chords
+        public static IEnumerable<GuitarMessageType> AllMessageTypes
         {
             get
             {
-                if(dirtyState.HasFlag(GMDirtyState.Chords))
-                {
-                    chords = Messages.Where(x => x is GuitarChord).Cast<GuitarChord>().SortTicks().ToArray();
-                    dirtyState ^= GMDirtyState.Chords;
-                }
-                return chords;
+                yield return GuitarMessageType.GuitarHandPosition;
+                yield return GuitarMessageType.GuitarTextEvent;
+                yield return GuitarMessageType.GuitarTrainer;
+                yield return GuitarMessageType.GuitarChord;
+                yield return GuitarMessageType.GuitarChordStrum;
+                yield return GuitarMessageType.GuitarNote;
+                yield return GuitarMessageType.GuitarPowerup;
+                yield return GuitarMessageType.GuitarSolo;
+                yield return GuitarMessageType.GuitarTempo;
+                yield return GuitarMessageType.GuitarTimeSignature;
+                yield return GuitarMessageType.GuitarArpeggio;
+                yield return GuitarMessageType.GuitarBigRockEnding;
+                yield return GuitarMessageType.GuitarSingleStringTremelo;
+                yield return GuitarMessageType.GuitarMultiStringTremelo;
+                yield return GuitarMessageType.GuitarSlide;
+                yield return GuitarMessageType.GuitarHammeron;
             }
         }
 
-        GuitarPowerup[] powerups = new GuitarPowerup[0];
-        public GuitarPowerup[] Powerups
+        public IEnumerable<GuitarMessage> Where(Func<GuitarMessage,bool> func)
         {
-            get
+            foreach (var messageType in AllMessageTypes)
             {
+                var list = GetMessageListForType(messageType).List;
+                foreach (var msg in list)
+                {
+                    if (func(msg))
+                    {
+                        yield return msg;
+                    }
+                }
+            }
+        }
+
+        public GuitarHandPositionList HandPositions;
+        public GuitarTextEventList TextEvents;
+        public GuitarTrainerList Trainers;
+        
+        public GuitarPowerupList Powerups;
+        public GuitarSoloList Solos;
+        public GuitarTempoList Tempos;
+        public GuitarTimeSignatureList TimeSignatures;
+        public GuitarArpeggioList Arpeggios;
+        public GuitarBigRockEndingList BigRockEndings;
+        public GuitarSingleStringTremeloList SingleStringTremelos;
+        public GuitarMultiStringTremeloList MultiStringTremelos;
+
+        public GuitarChordList Chords;
+        public GuitarNoteList Notes;
+        public GuitarSlideList Slides;
+        public GuitarHammeronList Hammerons;
+        public ChordStrumList ChordStrums;
+
+        TrackEditor owner;
+
+        public IEnumerable<GuitarMessage> ImportMessageRange(IEnumerable<GuitarMessage> list)
+        {
+            var ret = new List<GuitarMessage>();
+
+            ret.AddRange(list.Where(x => x.IsMetaEvent()).ToList().Select(x => ImportMessage(x)).Where(x=> x != null));
+            ret.AddRange(list.Where(x => x.IsChannelEvent() && !x.IsChordSubItem() && !x.IsGuitarChord()).ToList().Select(x=> ImportMessage(x)).Where(x => x != null));
+            ret.AddRange(list.Where(x => x.IsChannelEvent() && x.IsChordSubItem()).ToList().Select(x => ImportMessage(x)).Where(x => x != null));
+            ret.AddRange(addContainerChords(ret));
+
+            return ret;
+        }
+
+        IEnumerable<GuitarMessage> addContainerChords(IEnumerable<GuitarMessage> list)
+        {
+            var ret = new List<GuitarMessage>();
+            ret.AddRange(list.Where(x=> x is GuitarNote).GroupByCloseTick().ToList().Select(x=>
+                new GuitarChord(owner.GuitarTrack, x.Cast<GuitarNote>(), true)).Where(x=> x != null));
+            var chordList = GetMessageListForType(GuitarMessageType.GuitarChord);
+            chordList.AddGuitarMessageRange(ret);
+            return ret;
+        }
+
+        public GuitarMessage ImportMessage(GuitarMessage msg)
+        {
+            var m = convertMessage(msg);
+            if (m != null)
+            {
+                var downEvent = owner.GuitarTrack.Insert(msg.DownTick, m.A);
+                MidiEvent upEvent = null;
+                if (m.B != null)
+                {
+                    upEvent = owner.GuitarTrack.Insert(msg.UpTick, m.B);
+                }
+                var newMessage = owner.GuitarTrack.CreateMessageByType(msg.MessageType, downEvent, upEvent);
+                if (newMessage != null)
+                {
+                    GetMessageListForType(msg.MessageType).Add(newMessage);
+                }
+                return newMessage;
+            }
+            return null;
+        }
+
+        public GuitarMessage ImportEvent(GuitarMessageType type, MidiEvent down, MidiEvent up = null)
+        {
+            var cd = convertEvent(down);
+            if(cd != null)
+            {
+                var downEvent = owner.GuitarTrack.Insert(down.AbsoluteTicks, cd);
+                MidiEvent upEvent = null;
+                if (up != null)
+                {
+                    var ue = convertEvent(up);
+                    if (ue != null)
+                    {
+                        upEvent = owner.GuitarTrack.Insert(up.AbsoluteTicks, ue);
+                    }
+                }
                 
-                if (dirtyState.HasFlag(GMDirtyState.Powerup))
+                var newMessage = owner.GuitarTrack.CreateMessageByType(type, downEvent, upEvent);
+                if (newMessage != null)
                 {
-                    powerups = Messages.Where(x => x is GuitarPowerup).SortTicks().Cast<GuitarPowerup>().ToArray();
-                    dirtyState ^= GMDirtyState.Powerup;
+                    GetMessageListForType(type).Add(newMessage);
                 }
-                return powerups;
+                return newMessage;
             }
+            return null;
         }
 
-        GuitarSolo[] solos = new GuitarSolo[0];
-        public GuitarSolo[] Solos
+        DataPair<IMidiMessage> convertMessage(GuitarMessage x)
         {
-            get
+            return new DataPair<IMidiMessage>(convertEvent(x.DownEvent), convertEvent(x.UpEvent));
+        }
+
+        IMidiMessage convertEvent(MidiEvent x)
+        {
+            IMidiMessage ret = null;
+            if (x != null)
             {
-                if ((dirtyState & GMDirtyState.Solo) == GMDirtyState.Solo)
+                ret = x.MidiMessage;
+                if (x.IsChannelEvent())
                 {
-                    solos = Messages.Where(x => x is GuitarSolo).SortTicks().Cast<GuitarSolo>().ToArray();
-                    dirtyState ^= GMDirtyState.Solo;
+                    if (owner.IsPro && !x.Owner.IsFileTypePro())
+                    {
+                        ret = x.ChannelMessage.ConvertToPro(owner.CurrentDifficulty);
+                    }
+                    else if (!owner.IsPro && x.Owner.IsFileTypePro())
+                    {
+                        ret = x.ChannelMessage.ConvertToG5(owner.CurrentDifficulty);
+                    }
                 }
-                return solos;
             }
+            return ret;
         }
 
-        GuitarTempo[] tempos = new GuitarTempo[0];
-        public GuitarTempo[] Tempos
+
+        public GuitarMessageList(TrackEditor owner)
         {
-            get
+            this.owner = owner;
+            HandPositions = new GuitarHandPositionList(owner);
+            TextEvents = new GuitarTextEventList(owner);
+            Trainers = new GuitarTrainerList(owner);
+            Chords = new GuitarChordList(owner);
+            Notes = new GuitarNoteList(owner);
+
+            Tempos = new GuitarTempoList(owner);
+            TimeSignatures = new GuitarTimeSignatureList(owner);
+
+            Arpeggios = new GuitarArpeggioList(owner);
+            BigRockEndings = new GuitarBigRockEndingList(owner);
+            SingleStringTremelos = new GuitarSingleStringTremeloList(owner);
+            MultiStringTremelos = new GuitarMultiStringTremeloList(owner);
+
+            Powerups = new GuitarPowerupList(owner);
+            Solos = new GuitarSoloList(owner);
+
+            Slides = new GuitarSlideList(owner);
+            Hammerons = new GuitarHammeronList(owner);
+            ChordStrums = new ChordStrumList(owner);
+        }
+
+        public IEnumerable<GuitarModifier> GetModifiersByType(GuitarModifierType type)
+        {
+            var ret = new List<GuitarModifier>();
+            switch (type)
             {
-                if ((dirtyState & GMDirtyState.Tempo) == GMDirtyState.Tempo)
+                case GuitarModifierType.Arpeggio:
+                    ret.AddRange(Arpeggios);
+                    break;
+                case GuitarModifierType.BigRockEnding:
+                    ret.AddRange(BigRockEndings);
+                    break;
+                case GuitarModifierType.Powerup:
+                    ret.AddRange(Powerups);
+                    break;
+                case GuitarModifierType.Solo:
+                    ret.AddRange(Solos);
+                    break;
+                case GuitarModifierType.MultiStringTremelo:
+                    ret.AddRange(MultiStringTremelos);
+                    break;
+                case GuitarModifierType.SingleStringTremelo:
+                    ret.AddRange(SingleStringTremelos);
+                    break;
+                
+            }
+            
+            return ret.ToList();
+        }
+
+        public IEnumerable<ChordModifier> GetChordModifiersByType(ChordModifierType type)
+        {
+            var ret = new List<ChordModifier>();
+            switch (type)
+            {
+                case ChordModifierType.Slide:
+                    ret.AddRange(Slides);
+                    break;
+                case ChordModifierType.SlideReverse:
+                    ret.AddRange(Slides.Where(x => x.IsReversed));
+                    break;
+                case ChordModifierType.Hammeron:
+                    ret.AddRange(Hammerons);
+                    break;
+                case ChordModifierType.ChordStrumLow:
+                    ret.AddRange(ChordStrums.Where(x => x.StrumMode == ChordStrum.Low));
+                    break;
+                case ChordModifierType.ChordStrumMed:
+                    ret.AddRange(ChordStrums.Where(x => x.StrumMode == ChordStrum.Mid));
+                    break;
+                case ChordModifierType.ChordStrumHigh:
+                    ret.AddRange(ChordStrums.Where(x => x.StrumMode == ChordStrum.High));
+                    break;
+            }
+            return ret;
+        }
+
+        public IEnumerable<GuitarModifier> GetModifiersBetweenTick(TickPair pair)
+        {
+            var ret = new List<GuitarModifier>();
+            ret.AddRange(Arpeggios.GetBetweenTick(pair));
+            ret.AddRange(BigRockEndings.GetBetweenTick(pair));
+            ret.AddRange(Powerups.GetBetweenTick(pair));
+            ret.AddRange(Solos.GetBetweenTick(pair));
+            ret.AddRange(MultiStringTremelos.GetBetweenTick(pair));
+            ret.AddRange(SingleStringTremelos.GetBetweenTick(pair));      
+                
+            return ret.ToList();
+        }
+
+        public ISpecializedList GetMessageListForType(GuitarMessageType type)
+        {
+            ISpecializedList ret = null;
+            switch (type)
+            {
+                case GuitarMessageType.GuitarHandPosition:
+                    ret = HandPositions;
+                    break;
+
+                case GuitarMessageType.GuitarTextEvent:
+                    ret = TextEvents;
+                    break;
+
+                case GuitarMessageType.GuitarTrainer:
+                    ret = Trainers;
+                    break;
+                case GuitarMessageType.GuitarChordStrum:
+                    ret = ChordStrums;
+                    break;
+                case GuitarMessageType.GuitarChord:
+                    ret = Chords;
+                    break;
+
+                case GuitarMessageType.GuitarNote:
+                    ret = Notes;
+                    break;
+
+                case GuitarMessageType.GuitarPowerup:
+                    ret = Powerups;
+                    break;
+
+                case GuitarMessageType.GuitarSolo:
+                    ret = Solos;
+                    break;
+
+                case GuitarMessageType.GuitarTempo:
+                    ret = Tempos;
+                    break;
+
+                case GuitarMessageType.GuitarTimeSignature:
+                    ret = TimeSignatures;
+                    break;
+
+                case GuitarMessageType.GuitarArpeggio:
+                    ret = Arpeggios;
+                    break;
+
+                case GuitarMessageType.GuitarBigRockEnding:
+                    ret = BigRockEndings;
+                    break;
+
+                case GuitarMessageType.GuitarSingleStringTremelo:
+                    ret = SingleStringTremelos;
+                    break;
+
+                case GuitarMessageType.GuitarMultiStringTremelo:
+                    ret = MultiStringTremelos;
+                    break;
+
+                case GuitarMessageType.GuitarSlide:
+                    ret = Slides;
+                    break;
+
+                case GuitarMessageType.GuitarHammeron:
+                    ret = Hammerons;
+                    break;
+            }
+            return ret;
+        }
+
+        
+
+        public AdjustResult AdjustChordTicks(GuitarChord chord, TickPair newTicks, AdjustOption option)
+        {
+            AdjustResult result;
+            var updatedTicks = GetAdjustChordTicks(newTicks, option, out result, chord);
+
+            if (!result.HasFlag(AdjustResult.Error) && updatedTicks.IsNull == false)
+            {
+                chord.SetTicks(updatedTicks);
+                chord.UpdateEvents();
+            }
+            return result;
+        }
+
+        public TickPair GetAdjustChordTicks(TickPair newTicks, AdjustOption option, out AdjustResult result, GuitarChord chord = null)
+        {
+            result = AdjustResult.NoResult;
+
+            var existingTicks = new TickPair(newTicks.Down, newTicks.Up);
+
+            var queryTicks = new TickPair(newTicks.Down, newTicks.Up);
+            if (option.HasFlag(AdjustOption.AllowGrow) || option.HasFlag(AdjustOption.AllowShift))
+            {
+                queryTicks = new TickPair(newTicks.Down, newTicks.Up);
+            }
+
+            var between = Chords.GetBetweenTick(queryTicks);
+
+            if (chord != null)
+            {
+                between = between.Where(x => x != chord);
+            }
+
+            if (!between.Any())
+            {
+                result = AdjustResult.Success;
+                return newTicks;
+            }
+            else
+            {
+                var closeToBegin = between.Where(x => x.TickPair.IsCloseUpDown(newTicks));
+                var closeToEnd = between.Where(x => x.TickPair.IsCloseDownUp(newTicks));
+                var closeChords = closeToBegin.Concat(closeToEnd).Distinct();
+
+                if (!closeChords.Any())
                 {
-                    tempos = Messages.Where(x => x is GuitarTempo).SortTicks().Cast<GuitarTempo>().ToArray();
-                    dirtyState ^= GMDirtyState.Tempo;
+                    result = AdjustResult.Success;
+                    return newTicks;
                 }
-                return tempos;
-            }
-        }
-
-        GuitarTimeSignature[] timeSignatures = new GuitarTimeSignature[0];
-        public GuitarTimeSignature[] TimeSignatures
-        {
-            get
-            {
-                if ((dirtyState & GMDirtyState.Timesig) == GMDirtyState.Timesig)
+                else
                 {
-                    timeSignatures = Messages.Where(x => x is GuitarTimeSignature).SortTicks().Cast<GuitarTimeSignature>().ToArray();
-                    dirtyState ^= GMDirtyState.Timesig;
+                    TickPair updatedTicks = new TickPair(newTicks.Down, newTicks.Up);
+
+                    var min = closeToBegin.GetMaxTick(updatedTicks.Down);
+                    var max = closeToEnd.GetMinTick(updatedTicks.Up);
+
+                    var updatedLen = updatedTicks.Up - updatedTicks.Down;
+
+                    var space = max - min;
+
+                    if (space <= 0)
+                    {
+                        result = AdjustResult.Error;
+                        return TickPair.NullValue;
+                    }
+
+                    if (updatedLen <= 0)
+                    {
+                        result = AdjustResult.Error;
+                        return TickPair.NullValue;
+                    }
+
+                    if (updatedLen == space)
+                    {
+                        result = AdjustResult.Success;
+                        return updatedTicks;
+                    }
+                    if ((updatedLen < space && option.HasFlag(AdjustOption.AllowGrow)) ||
+                        (updatedLen > space && option.HasFlag(AdjustOption.AllowShrink)))
+                    {
+                        if (updatedTicks.Down < min)
+                        {
+                            result |= AdjustResult.AdjustedDownTickRight;
+                        }
+                        else if (updatedTicks.Down > min)
+                        {
+                            result |= AdjustResult.AdjustedDownTickLeft;
+                        }
+                        updatedTicks.Down = min;
+
+                        if (updatedTicks.Up < max)
+                        {
+                            result |= AdjustResult.AdjustedUpTickRight;
+                        }
+                        else if (updatedTicks.Up > max)
+                        {
+                            result |= AdjustResult.AdjustedUpTickLeft;
+                        }
+                        updatedTicks.Up = max;
+
+                        updatedLen = updatedTicks.Up - updatedTicks.Down;
+
+                        if (updatedLen <= 0)
+                        {
+                            result = AdjustResult.Error;
+                            return TickPair.NullValue;
+                        }
+                        else
+                        {
+                            if (updatedLen < Utility.NoteCloseWidth)
+                            {
+                                result |= AdjustResult.ShortResult;
+                            }
+                            result |= AdjustResult.Success;
+                            return updatedTicks;
+                        }
+
+                    }
+                    else if (updatedLen < space && option.HasFlag(AdjustOption.AllowShift))
+                    {
+                        if (updatedTicks.Down < min)
+                        {
+                            updatedTicks.Down = min;
+                            updatedTicks.Up = min + updatedLen;
+                            result |= AdjustResult.AdjustedDownTickRight | AdjustResult.AdjustedUpTickRight;
+                        }
+                        else
+                        {
+                            updatedTicks.Up = max;
+                            updatedTicks.Down = max - updatedLen;
+                            result |= AdjustResult.AdjustedDownTickLeft | AdjustResult.AdjustedUpTickLeft;
+                        }
+
+                        updatedLen = updatedTicks.Up - updatedTicks.Down;
+
+                        if (updatedLen <= 0)
+                        {
+                            result = AdjustResult.Error;
+                            return TickPair.NullValue;
+                        }
+                        else
+                        {
+                            if (updatedLen < Utility.NoteCloseWidth)
+                            {
+                                result |= AdjustResult.ShortResult;
+                            }
+                            result |= AdjustResult.Success;
+
+                            return updatedTicks;
+                        }
+                    }
+                    else
+                    {
+                        result = AdjustResult.Error;
+                        return TickPair.NullValue;
+                    }
                 }
-                return timeSignatures;
             }
         }
 
-        GuitarArpeggio[] arpeggios = new GuitarArpeggio[0];
-        public GuitarArpeggio[] Arpeggios
+        public void AddRange<T>(IEnumerable<T> mess) where T : GuitarMessage
         {
-            get
+            if (mess != null)
             {
-                if ((dirtyState & GMDirtyState.Arpeggio) == GMDirtyState.Arpeggio)
+                var items = mess.GroupBy(m => m.MessageType).ToList();
+                if (items.Count > 1)
                 {
-                    arpeggios = Messages.Where(x => x is GuitarArpeggio).SortTicks().Cast<GuitarArpeggio>().ToArray();
-                    dirtyState ^= GMDirtyState.Arpeggio;
+                    foreach (var item in items)
+                    {
+                        AddRange(item.ToList());
+                    }
                 }
-                return arpeggios;
-            }
-        }
-
-        GuitarBigRockEnding[] bigRockEndings = new GuitarBigRockEnding[0];
-        public GuitarBigRockEnding[] BigRockEndings
-        {
-            get
-            {
-                if ((dirtyState & GMDirtyState.BigRock) == GMDirtyState.BigRock)
+                items.ForEach(x =>
                 {
-                    bigRockEndings = Messages.Where(x => x is GuitarBigRockEnding).SortTicks().Cast<GuitarBigRockEnding>().ToArray();
-                    dirtyState ^= GMDirtyState.BigRock;
-                }
-                return bigRockEndings;
-            }
-        }
-
-        GuitarSingleStringTremelo[] singleStringTremelos = new GuitarSingleStringTremelo[0];
-        public GuitarSingleStringTremelo[] SingleStringTremelos
-        {
-            get
-            {
-                if ((dirtyState & GMDirtyState.SingleNote) == GMDirtyState.SingleNote)
-                {
-                    singleStringTremelos = Messages.Where(x => x is GuitarSingleStringTremelo).SortTicks().Cast<GuitarSingleStringTremelo>().ToArray();
-                    dirtyState ^= GMDirtyState.SingleNote;
-                }
-                return singleStringTremelos;
-            }
-        }
-
-        GuitarMultiStringTremelo[] multiStringTremelos = new GuitarMultiStringTremelo[0];
-        public GuitarMultiStringTremelo[] MultiStringTremelos
-        {
-            get
-            {
-                if (dirtyState.HasFlag(GMDirtyState.MultiNote))
-                {
-                    multiStringTremelos = Messages.Where(x => x is GuitarMultiStringTremelo).SortTicks().Cast<GuitarMultiStringTremelo>().ToArray();
-                    dirtyState ^= GMDirtyState.MultiNote;
-                }
-                return multiStringTremelos;
-            }
-        }
-
-        GuitarTextEvent[] textEvents = new GuitarTextEvent[0];
-        public GuitarTextEvent[] TextEvents
-        {
-            get
-            {
-                if (dirtyState.HasFlag(GMDirtyState.TextEvent))
-                {
-                    textEvents = Messages.Where(x => x is GuitarTextEvent).SortTicks().Cast<GuitarTextEvent>().ToArray();
-                    dirtyState ^= GMDirtyState.TextEvent;
-                }
-                return textEvents;
-            }
-        }
-
-        GuitarTrainer[] trainers = new GuitarTrainer[0];
-        public GuitarTrainer[] Trainers
-        {
-            get
-            {
-                if (dirtyState.HasFlag(GMDirtyState.Trainer))
-                {
-                    trainers = Messages.Where(x => x is GuitarTrainer).SortTicks().Cast<GuitarTrainer>().ToArray();
-                    dirtyState ^= GMDirtyState.Trainer;
-                }
-                return trainers;
+                    GetMessageListForType(x.Key).AddGuitarMessageRange(x);
+                });
             }
         }
 
 
-        GuitarHandPosition[] handPositions = new GuitarHandPosition[0];
-        public GuitarHandPosition[] HandPositions
+        public void Add<T>(T mess) where T : GuitarMessage
         {
-            get
-            {
-                if (dirtyState.HasFlag(GMDirtyState.HandPosition))
-                {
-                    handPositions = Messages.Where(x => x is GuitarHandPosition).SortTicks().Cast<GuitarHandPosition>().ToArray();
-                    dirtyState ^= GMDirtyState.HandPosition;
-                }
-                return handPositions;
-            }
-        }
-
-        public IEnumerable<GuitarMessage> GetBetweenTick(int downTick, int upTick)
-        {
-            return Messages.Where(x => x.DownTick < upTick && x.UpTick > downTick && x.IsDeleted == false);
-        }
-
-        public bool Contains(GuitarMessage mess)
-        {
-            return Messages.Contains(mess);
-        }
-
-        public GuitarChord LastChord
-        {
-            get
-            {
-                return Chords.LastOrDefault() as GuitarChord;
-            }
-        }
-
-        public GuitarChord FirstChord
-        {
-            get
-            {
-                return Chords.FirstOrDefault() as GuitarChord;
-            }
-        }
-
-        public GuitarPowerup LastPowerup
-        {
-            get
-            {
-                return Powerups[Powerups.Length - 1] as GuitarPowerup;
-            }
-        }
-
-        public GuitarArpeggio LastArpeggio
-        {
-            get
-            {
-                return Arpeggios[Arpeggios.Length - 1] as GuitarArpeggio;
-            }
-        }
-
-        public GuitarBigRockEnding LastBigRockEnding
-        {
-            get
-            {
-                return BigRockEndings[BigRockEndings.Length - 1] as GuitarBigRockEnding;
-            }
-        }
-
-        public GuitarSingleStringTremelo LastSingleStringTremelo
-        {
-            get
-            {
-                return SingleStringTremelos[SingleStringTremelos.Length - 1] as GuitarSingleStringTremelo;
-            }
-        }
-
-        public GuitarMultiStringTremelo LastMultiStringTremelo
-        {
-            get
-            {
-                return MultiStringTremelos[MultiStringTremelos.Length - 1] as GuitarMultiStringTremelo;
-            }
-        }
-
-        public GuitarSolo LastSolo
-        {
-            get
-            {
-                return Solos[Solos.Length - 1] as GuitarSolo;
-            }
+            GetMessageListForType(mess.MessageType).Add(mess);
         }
 
 
 
-        public IEnumerator<GuitarMessage> GetEnumerator()
+        public void Remove<T>(T mess) where T : GuitarMessage
         {
-            return Messages.GetEnumerator();
+            GetMessageListForType(mess.MessageType).Remove(mess);
         }
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return Messages.GetEnumerator();
-        }
+
+
+
     }
 }

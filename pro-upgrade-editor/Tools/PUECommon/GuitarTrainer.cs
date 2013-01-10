@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ProUpgradeEditor.DataLayer;
+
 using Sanford.Multimedia.Midi;
 
 namespace ProUpgradeEditor.Common
@@ -146,7 +146,7 @@ namespace ProUpgradeEditor.Common
         }
 
         public GuitarTrainer(GuitarTrack track, GuitarTrainerType type)
-            : base(track, null)
+            : base(track, null, null, GuitarMessageType.GuitarTrainer)
         {
             Start = GuitarTextEvent.GetTextEvent(track, null);
             End = GuitarTextEvent.GetTextEvent(track, null);
@@ -162,11 +162,7 @@ namespace ProUpgradeEditor.Common
             {
                 return Start.AbsoluteTicks;
             }
-            set
-            {
-                Start.AbsoluteTicks = value;
-
-            }
+            
         }
 
         public override int UpTick
@@ -175,99 +171,57 @@ namespace ProUpgradeEditor.Common
             {
                 return End.AbsoluteTicks;
             }
-            set
-            {
-                End.AbsoluteTicks = value;
-            }
         }
 
-        public void SetTicks(int start, int end, bool loopable)
+        public override void SetTicks(TickPair ticks)
         {
-
-            if (end > start)
+            if (ticks.IsValid)
             {
-                
-                Start.Text = StartText;
-                Start.DownTick = start;
+                Start.SetDownTick(ticks.Down);
+                End.SetDownTick(ticks.Up);
 
-                End.Text = EndText;
-                End.DownTick = end;
-
-                Loopable = loopable;
                 if (Loopable)
                 {
-                    Norm.Text = NormText;
-                    UpdateNormTick(start, end);
+                    Norm.SetDownTick(GetNormTick(ticks));
                 }
-                else
-                {
-                    if (Norm.DownEvent != null && OwnerTrack != null)
-                    {
-                        OwnerTrack.Remove(Norm);
-                        Norm.DownEvent = null;
-                    }
-                }
-
             }
         }
 
-        public void UpdateTicks(int start, int end, bool loopable)
+
+        public override void UpdateEvents()
         {
-            if (end > start)
+            if (Start != null)
             {
-                this.Loopable = loopable;
-                this.Start.AbsoluteTicks = start;
-                this.End.AbsoluteTicks = end;
-                if (this.Loopable)
-                {
-                    UpdateNormTick(start, end);
-                }
-                else
-                {
-                    if (Norm.MidiEvent != null && OwnerTrack != null)
-                    {
-                        OwnerTrack.Remove(Norm);
-                        Norm.MidiEvent = null;
-                    }
-                }
+                Start.SetDownTick(TickPair.Down);
+                Start.UpdateEvents();
             }
+            if (End != null)
+            {
+                End.SetDownTick(TickPair.Up);
+                End.UpdateEvents();
+            }
+            
+            if (this.Loopable)
+            {
+                Norm.SetDownTick(GetNormTick(TickPair));
+                Norm.UpdateEvents();
+            }
+            base.UpdateEvents();
         }
 
-
-
-        public void RemoveSubMessages()
-        {   
-            if(OwnerTrack != null && !IsDeleted)
-            {
-                if (Start.MidiEvent != null)
-                {
-                    OwnerTrack.Remove(Start);
-                    Start.MidiEvent = null;
-                }
-                
-                if (Norm.MidiEvent != null)
-                {
-                    OwnerTrack.Remove(Norm);
-                    Norm.MidiEvent = null;
-                }
-                if (End.MidiEvent != null)
-                {
-                    OwnerTrack.Remove(End);
-                    End.MidiEvent = null;
-                }
-
-            }
-        }
-
-        private void UpdateNormTick(int start, int end)
+        public override void RemoveEvents()
         {
-            var normTick = start + (int)((end - start) * Utility.SongTrainerNormOffset);
-            if (Norm.MidiEvent == null)
-            {
-                Norm = GuitarTextEvent.CreateTextEvent(OwnerTrack, normTick, NormText);
-            }
-            Norm.AbsoluteTicks = normTick;
+            Start.RemoveEvents();
+            Norm.RemoveEvents();
+            End.RemoveEvents();
         }
+
+
+        int GetNormTick(TickPair ticks)
+        {
+            return ticks.Down + (int)((ticks.TickLength) * Utility.SongTrainerNormOffset);
+        }
+
 
         public override string ToString()
         {

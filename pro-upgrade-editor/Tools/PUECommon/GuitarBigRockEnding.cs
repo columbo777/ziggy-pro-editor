@@ -3,29 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sanford.Multimedia.Midi;
-using ProUpgradeEditor.Common;
 
-namespace ProUpgradeEditor.DataLayer
+
+namespace ProUpgradeEditor.Common
 {
     public class GuitarBigRockEnding : GuitarModifier
     {
-        public GuitarBigRockEnding(GuitarTrack track, MidiEvent downEvent, MidiEvent upEvent) : base(track, downEvent, upEvent, GuitarModifierType.BigRockEnding) { }
+        public GuitarBigRockEnding(GuitarTrack track, MidiEvent downEvent, MidiEvent upEvent) : 
+            base(track, downEvent, upEvent, GuitarModifierType.BigRockEnding, GuitarMessageType.GuitarBigRockEnding) { }
 
 
-        public static GuitarBigRockEnding CreateBigRockEnding(GuitarTrack track, int downTick, int upTick)
+        public static GuitarBigRockEnding CreateBigRockEnding(GuitarTrack track, TickPair ticks)
         {
             GuitarBigRockEnding ret = null;
             bool first = true;
             foreach (var bre in Utility.BigRockEndingData1)
             {
-                MidiEvent downEvent, upEvent;
-                Utility.CreateMessage(track, bre, 100, Utility.ChannelDefault, downTick, upTick, out downEvent, out upEvent);
+                var ev = track.Insert(bre, 100, Utility.ChannelDefault, ticks);
 
                 if (first)
                 {
                     first = false;
 
-                    ret = new GuitarBigRockEnding(track, downEvent, upEvent);
+                    ret = new GuitarBigRockEnding(track, ev.Down, ev.Up);
                     track.Messages.Add(ret);
                 }
             }

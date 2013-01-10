@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sanford.Multimedia.Midi;
-using ProUpgradeEditor.Common;
 
-namespace ProUpgradeEditor.DataLayer
+
+namespace ProUpgradeEditor.Common
 {
     public class GuitarPowerup : GuitarModifier
     {
-        public GuitarPowerup(GuitarTrack track, MidiEvent downEvent, MidiEvent upEvent) : base(track, downEvent, upEvent, GuitarModifierType.Powerup) { }
+        public GuitarPowerup(GuitarTrack track, MidiEvent downEvent, MidiEvent upEvent) : 
+            base(track, downEvent, upEvent, GuitarModifierType.Powerup, GuitarMessageType.GuitarPowerup) { }
 
 
-        public static GuitarPowerup CreatePowerup(GuitarTrack track, int downTick, int upTick)
+        public static GuitarPowerup CreatePowerup(GuitarTrack track, TickPair ticks)
         {
-            MidiEvent downEvent, upEvent;
-            Utility.CreateMessage(track, Utility.PowerupData1, 100, Utility.ChannelDefault, downTick, upTick, out downEvent, out upEvent);
+            var ev = track.Insert(Utility.PowerupData1, 100, Utility.ChannelDefault, ticks);
 
-            var ret = new GuitarPowerup(track, downEvent, upEvent);
+            var ret = new GuitarPowerup(track, ev.Down, ev.Up);
 
             track.Messages.Add(ret);
 

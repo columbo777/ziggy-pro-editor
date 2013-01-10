@@ -11,7 +11,6 @@ using System.Reflection;
 using System.Windows.Forms;
 using Sanford.Multimedia;
 using Sanford.Multimedia.Midi;
-using ProUpgradeEditor.DataLayer;
 using ProUpgradeEditor.Common;
 using System.Threading;
 using System.Globalization;
@@ -129,16 +128,15 @@ namespace ProUpgradeEditor.UI
 
             listBox.Items.Clear();
 
-            var modList = gt.Messages.Where(x =>
-                x is GuitarModifier &&
-                ((GuitarModifier)x).ModifierType == type).ToArray();
 
-            for (int x = 0; x < modList.Length; x++)
+
+            var modList = gt.Messages.GetModifiersByType(type).ToList();
+
+            foreach(var obj in modList)
             {
-                var obj = modList[x];
                 listBox.Items.Add(new stringObject()
                 {
-                    Name = type.ToString() + (x + 1).ToString(),
+                    Name = type.ToString() + (modList.IndexOf(obj)).ToString(),
                     Obj = obj,
                 });
 
@@ -162,7 +160,7 @@ namespace ProUpgradeEditor.UI
             if (gt == null || gt.Messages == null)
                 return;
 
-            foreach (var p in gt.Messages.Where(x => x is GuitarModifier && ((GuitarModifier)x).ModifierType == type))
+            foreach (var p in gt.Messages.GetModifiersByType(type).ToList())
             {
                 p.Selected = false;
             }

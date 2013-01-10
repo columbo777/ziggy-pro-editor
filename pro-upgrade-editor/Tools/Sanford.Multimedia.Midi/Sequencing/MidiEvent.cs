@@ -14,12 +14,31 @@ namespace Sanford.Multimedia.Midi
 
         private MidiEvent previous = null;
 
-        bool dirty;
         bool deleted;
 
         public int Data1 { get { return this.ChannelMessage != null ? this.ChannelMessage.Data1 : int.MinValue; } }
         public int Data2 { get { return this.ChannelMessage != null ? this.ChannelMessage.Data2 : int.MinValue; } }
-        public ChannelCommand Command { get { return this.ChannelMessage != null ? this.ChannelMessage.Command : 0; } }
+        public ChannelCommand Command 
+        { 
+            get 
+            {
+                if (this.ChannelMessage != null)
+                {
+                    if (owner != null && owner.FileType == FileType.Guitar5)
+                    {
+                        if (Data2 == 0 || Data2 == 64)
+                        {
+                            return ChannelCommand.NoteOff;
+                        }
+                        return this.ChannelMessage.Command;
+                    }
+                    else
+                        return ChannelMessage.Command;
+                }
+                else
+                    return 0;
+            } 
+        }
         public int Channel { get { return this.ChannelMessage != null ? this.ChannelMessage.MidiChannel : int.MinValue; } }
 
         public MessageType MessageType
@@ -54,15 +73,15 @@ namespace Sanford.Multimedia.Midi
             return "";
         }
 
-        public MidiEvent(Track owner, int absoluteTicks, IMidiMessage message, bool startDirty=true)
+        public MidiEvent(Track owner, int absoluteTicks, IMidiMessage message)
         {
             this.owner = owner;
             this.absoluteTicks = absoluteTicks;
             this.message = message;
-            dirty = startDirty;
             deleted = false;
         }
 
+        
         public IMidiMessage Clone()
         {
             IMidiMessage ret = null;
@@ -99,7 +118,6 @@ namespace Sanford.Multimedia.Midi
         internal void SetAbsoluteTicks(int absoluteTicks)
         {
             this.absoluteTicks = absoluteTicks;
-            dirty = true;
         }
 
         public Track Owner
@@ -180,16 +198,10 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
-        public bool Dirty
-        {
-            get { return dirty; }
-            set { dirty = value; }
-        }
-
         public bool Deleted
         {
             get { return deleted; }
-            set { deleted = value; dirty = true; }
+            set { deleted = value; }
         }
 
         public ChannelMessage ChannelMessage

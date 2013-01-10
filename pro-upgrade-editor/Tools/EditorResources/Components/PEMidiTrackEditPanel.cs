@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
 using Sanford.Multimedia.Midi;
 using ProUpgradeEditor;
-using ProUpgradeEditor.DataLayer;
+using ProUpgradeEditor.Common;
 
 namespace EditorResources.Components
 {
@@ -508,7 +508,7 @@ namespace EditorResources.Components
 
         public IEnumerable<TrackDifficulty> TrackDifficulties
         {
-            get { return panelTracks.Controls.ToEnumerable<PEMidiTrack>().Select(x=> new TrackDifficulty(x.Track, x.SelectedDifficulty)); }
+            get { return panelTracks.Controls.ToEnumerable<PEMidiTrack>().Select(x=> new TrackDifficulty(x.Track.Name, x.SelectedDifficulty)); }
         }
 
         private void buttonRename_Click(object sender, EventArgs e)

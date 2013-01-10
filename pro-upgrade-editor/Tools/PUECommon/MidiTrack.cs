@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Sanford.Multimedia.Midi;
 
-namespace ProUpgradeEditor.DataLayer
+namespace ProUpgradeEditor.Common
 {
 
 }

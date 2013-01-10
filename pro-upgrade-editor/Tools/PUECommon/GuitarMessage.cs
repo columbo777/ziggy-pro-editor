@@ -3,19 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sanford.Multimedia.Midi;
-using ProUpgradeEditor.Common;
+
 using System.Collections;
 using System.Diagnostics;
 
-namespace ProUpgradeEditor.DataLayer
+namespace ProUpgradeEditor.Common
 {
-    public enum MessageType
+    public enum GuitarMessageType
     {
         Unknown,
         GuitarHandPosition,
         GuitarTextEvent,
         GuitarTrainer,
         GuitarChord,
+        GuitarChordStrum,
+        GuitarNote,
         GuitarPowerup,
         GuitarSolo,
         GuitarTempo,
@@ -24,362 +26,502 @@ namespace ProUpgradeEditor.DataLayer
         GuitarBigRockEnding,
         GuitarSingleStringTremelo,
         GuitarMultiStringTremelo,
+        GuitarSlide,
+        GuitarHammeron
     }
 
-    public class GMessage : DeletableEntity, IComparable<GMessage>
+
+
+    public class GuitarHandPositionList : SpecializedMessageList<GuitarHandPosition> 
     {
-        public MessageType MessageType
+        public GuitarHandPositionList(TrackEditor owner) : base(owner) { }
+    }
+    public class GuitarTextEventList : SpecializedMessageList<GuitarTextEvent> 
+    {
+        public GuitarTextEventList(TrackEditor owner) : base(owner) { }
+    }
+    public class GuitarTrainerList : SpecializedMessageList<GuitarTrainer> 
+    {
+        public GuitarTrainerList(TrackEditor owner) : base(owner) { }
+    }
+    public class GuitarChordList : SpecializedMessageList<GuitarChord> 
+    {
+        public GuitarChordList(TrackEditor owner) : base(owner) { }
+        public IEnumerable<GuitarChord> GetBetweenTick(int tickMin, int tickMax)
+        {
+            return this.Where(x => x.DownTick < tickMax && x.UpTick > tickMin);
+        }
+    }
+    public class GuitarNoteList : SpecializedMessageList<GuitarNote> 
+    {
+        public GuitarNoteList(TrackEditor owner) : base(owner) { }
+    }
+    
+    public class GuitarTempoList : SpecializedMessageList<GuitarTempo> 
+    {
+        public GuitarTempoList(TrackEditor owner) : base(owner) { }
+        public GuitarTempo GetTempoFromTick(int tick)
+        {
+            return ElementAt(GetIndexFromTick(tick));
+        }
+        public GuitarTempo GetTempoFromTime(double time)
+        {
+            return ElementAt(GetIndexFromTime(time));
+        }
+    }
+    public class GuitarTimeSignatureList : SpecializedMessageList<GuitarTimeSignature> { public GuitarTimeSignatureList(TrackEditor owner) : base(owner) { }}
+    public class GuitarPowerupList : SpecializedMessageList<GuitarPowerup> { public GuitarPowerupList(TrackEditor owner) : base(owner) { }}
+    public class GuitarSoloList : SpecializedMessageList<GuitarSolo> { public GuitarSoloList(TrackEditor owner) : base(owner) { }}
+    public class GuitarArpeggioList : SpecializedMessageList<GuitarArpeggio> { public GuitarArpeggioList (TrackEditor owner) : base(owner) { }}
+    public class GuitarBigRockEndingList : SpecializedMessageList<GuitarBigRockEnding> { public GuitarBigRockEndingList(TrackEditor owner) : base(owner) { }}
+    public class GuitarSingleStringTremeloList : SpecializedMessageList<GuitarSingleStringTremelo> { public GuitarSingleStringTremeloList(TrackEditor owner) : base(owner) { }}
+    public class GuitarMultiStringTremeloList : SpecializedMessageList<GuitarMultiStringTremelo> { public GuitarMultiStringTremeloList(TrackEditor owner) : base(owner) { }}
+    public class GuitarSlideList : SpecializedMessageList<GuitarSlide> { public GuitarSlideList(TrackEditor owner) : base(owner) { }}
+    public class GuitarHammeronList : SpecializedMessageList<GuitarHammeron> { public GuitarHammeronList(TrackEditor owner) : base(owner) { }}
+    public class ChordStrumList : SpecializedMessageList<GuitarChordStrum> { public ChordStrumList(TrackEditor owner) : base(owner) { }}
+
+
+    public class MidiEventProps
+    {
+        public GuitarTrack OwnerTrack { get; set; }
+
+        public int Data2 { get; set; }
+        
+        public int Data1 { get; set; }
+        
+        public int Channel { get; set; }
+
+        public ChannelCommand Command { get; set; }
+
+        public string Text { get; set; }
+
+        public TickPair TickPair { get; set; }
+
+        public TimePair TimePair { get; set; }
+
+        MidiEventPair _eventPair;
+        public MidiEventPair EventPair
         {
             get
             {
-                if (this is GuitarHandPosition)
-                    return MessageType.GuitarHandPosition;
-                else if (this is GuitarTextEvent)
-                    return MessageType.GuitarTextEvent;
-                else if (this is GuitarTrainer)
-                    return MessageType.GuitarTrainer;
-                else if (this is GuitarChord)
-                    return MessageType.GuitarChord;
-                else if (this is GuitarPowerup)
-                    return MessageType.GuitarPowerup;
-                else if (this is GuitarSolo)
-                    return MessageType.GuitarSolo;
-                else if (this is GuitarTempo)
-                    return MessageType.GuitarTempo;
-                else if (this is GuitarTimeSignature)
-                    return MessageType.GuitarTimeSignature;
-                else if (this is GuitarArpeggio)
-                    return MessageType.GuitarArpeggio;
-                else if (this is GuitarBigRockEnding)
-                    return MessageType.GuitarBigRockEnding;
-                else if (this is GuitarSingleStringTremelo)
-                    return MessageType.GuitarSingleStringTremelo;
-                else if (this is GuitarMultiStringTremelo)
-                    return MessageType.GuitarMultiStringTremelo;
-                else
-                    return MessageType.Unknown;
+                return _eventPair;
             }
-        }
-        GuitarTrack ownerTrack;
-        public GuitarTrack OwnerTrack
-        {
-            get{ return ownerTrack; }
+            
         }
 
-        public GMessage(GuitarTrack track, MidiEvent downEvent)
+        public MidiEventProps(GuitarTrack owner) 
         {
-            
-            this.ownerTrack = track;
-            
-            this.downEvent = downEvent;
-            
-            if (downEvent != null)
-            {
-                this.downTick = downEvent.AbsoluteTicks;
-            }
-            else
-            {
-                this.downTick = Int32.MinValue;
-            }
+            resetProps(owner);
         }
 
+        private void resetProps(GuitarTrack owner)
+        {
+            OwnerTrack = owner;
+            Data1 = Int32.MinValue;
+            Data2 = Int32.MinValue;
+            Channel = Int32.MinValue;
+            Command = ChannelCommand.Invalid;
+            Text = string.Empty;
+            TickPair = TickPair.NullValue;
+            TimePair = TimePair.NullValue;
+            _eventPair = new MidiEventPair(owner);
+        }
+
+        public MidiEventProps CloneToMemory(GuitarTrack owner)
+        {
+            var ret = new MidiEventProps(owner);
+            ret.setEventPair(EventPair.CloneToMemory(owner));
+            ret.OwnerTrack = OwnerTrack;
+            ret.Data1 = Data1;
+            ret.Data2 = Data2;
+            ret.Channel = Channel;
+            ret.Command = Command;
+            ret.Text = Text;
+            ret.TickPair = new TickPair(TickPair);
+            ret.TimePair = new TimePair(TimePair);
+            return ret;
+        }
+
+        public MidiEventProps(GuitarTrack owner, MidiEvent down, MidiEvent up) : this(owner, new MidiEventPair(owner, down,up))
+        {
+            
+        }
+        public MidiEventProps(GuitarTrack owner, MidiEventPair pair) : this(owner)
+        {
+            setEventPair(pair);
+        }
+
+        public void SetDownEvent(MidiEvent ev)
+        {
+            if (ev == null && TickPair.Down.IsNull() &&
+                _eventPair.Down != null)
+            {
+                TickPair = new TickPair(_eventPair.Down.AbsoluteTicks, TickPair.Down);
+            }
+            _eventPair.Down = ev;
+        }
+        public void SetUpEvent(MidiEvent ev)
+        {
+            if (ev == null && TickPair.Up.IsNull() &&
+                _eventPair.Up != null)
+            {
+                TickPair = new TickPair(TickPair.Down, _eventPair.Up.AbsoluteTicks);
+            }
+            _eventPair.Up = ev;
+        }
+
+        public void SetUpdatedEventPair(MidiEventPair pair)
+        {
+            resetProps(OwnerTrack);
+            setEventPair(pair);
+        }
+
+        private void setEventPair(MidiEventPair pair)
+        {
+            _eventPair = new MidiEventPair(pair);
+
+            if (_eventPair.Down != null)
+            {
+                if (_eventPair.Down.IsChannelEvent())
+                {
+                    Data1 = _eventPair.Down.Data1;
+                    Data2 = _eventPair.Down.Data2;
+                    Channel = _eventPair.Down.Channel;
+                    Command = _eventPair.Down.Command;
+                }
+                if (_eventPair.Down.IsTextEvent())
+                {
+                    Text = _eventPair.Down.MetaMessage.Text;
+                }
+            }
+
+            this.TickPair = new TickPair( (_eventPair.Down == null ? Int32.MinValue : _eventPair.Down.AbsoluteTicks),
+                                     (_eventPair.Up == null ? Int32.MinValue : _eventPair.Up.AbsoluteTicks));
+        }
+    }
+
+    public class GuitarMessage : DeletableEntity
+    {
+        protected GuitarMessageType messageType;
+        protected MidiEventProps props;
+        
         protected bool selected;
 
-        public virtual bool Selected { get { return selected; } set { selected = value; } }
 
-        protected MidiEvent downEvent;
+        public GuitarMessage(GuitarTrack owner, MidiEvent downEvent, MidiEvent upEvent, GuitarMessageType type)
+            : this(owner, new MidiEventPair(owner, downEvent, upEvent), type)
+        {
+            
+        }
+
+        public GuitarMessage(GuitarTrack owner, MidiEventProps props, GuitarMessageType type)
+        {
+            this.props = props.CloneToMemory(owner);
+            this.messageType = type;
+        }
+
+        public GuitarMessage(GuitarTrack track, MidiEventPair pair, GuitarMessageType type)
+        {
+            this.messageType = type;
+            this.props = new MidiEventProps(track, pair);
+        }
+
+        public virtual void UpdateEvents()
+        {
+            if (OwnerTrack != null)
+            {
+                RemoveEvents();
+
+                CreateEvents();
+
+                IsUpdated = false;
+               
+            }
+        }
+
+        public virtual void CreateEvents()
+        {
+            if (!props.Data1.IsNull() &&
+                !props.Data2.IsNull() &&
+                !props.Channel.IsNull() &&
+                 props.TickPair.IsValid)
+            {
+                props.SetUpdatedEventPair(
+                    OwnerTrack.Insert(props.Data1, props.Data2, props.Channel, props.TickPair));
+            }
+        }
+
+        public GuitarMessageType MessageType
+        {
+            get
+            {
+                return GetMessageType();
+            }
+            set 
+            { 
+                messageType = value;
+               
+            }
+        }
+
+
+        
+        public GuitarTrack OwnerTrack
+        {
+            get{ return props.OwnerTrack; }
+        }
+
+        
+        public virtual bool Selected 
+        { 
+            get 
+            { 
+                return selected; 
+            } 
+            set 
+            { 
+                selected = value; 
+            } 
+        }
+
+        
         public virtual MidiEvent DownEvent
         {
             get
             {
-                return downEvent;
+                return props.EventPair.Down;
             }
-            set
+        }
+
+        public virtual MidiEvent UpEvent
+        {
+            get
             {
-                downEvent = value;
-                if (value != null)
-                {
-                    downTick = value.AbsoluteTicks;
-                }
-                this.IsUpdated = true;
+                return props.EventPair.Up;
             }
+            
         }
 
         public MidiEvent MidiEvent
         {
             get { return DownEvent; }
-            set 
-            { 
-                DownEvent = value; 
-            }
         }
 
         public int AbsoluteTicks
         {
             get { return DownTick; }
-            set { DownTick = value; }
         }
-
-        protected int downTick;
+        
         public virtual int DownTick
         {
             get
             {
-                return downTick;
-            }
-            set
-            {
-                downTick = value;
-                this.IsUpdated = true;
+                return props.TickPair.Down;
             }
         }
 
-        public void SetDownEvent(MidiEvent ev)
-        {
-            this.downEvent = ev;
-            if (ev != null)
-            {
-                this.downTick = ev.AbsoluteTicks;
-            }
-        }
-        public virtual double StartTime 
-        { 
-            get 
-            { 
-                return OwnerTrack.TickToTime(DownTick);
-            } 
-        }
-
-        public override bool IsDirty
+        public virtual int UpTick
         {
             get
             {
-                return base.IsDirty;
-            }
-            set
-            {
-                base.IsDirty = value;
+                return props.TickPair.Up;
             }
         }
 
-        public virtual int CompareTo(GMessage other)
+        public virtual void SetDownTick(int tick)
         {
-            if (DownTick > other.DownTick)
+            props.TickPair = new TickPair(tick, props.TickPair.Up);
+        }
+
+        public virtual void SetUpTick(int tick)
+        {
+            props.TickPair = new TickPair(props.TickPair.Down, tick);
+        }
+
+        public virtual void SetTicks(TickPair ticks)
+        {
+            props.TickPair = new TickPair(ticks);
+        }
+
+        public virtual void SetDownEvent(MidiEvent ev)
+        {
+            props.SetDownEvent(ev);
+        }
+
+        public virtual void RemoveEvents()
+        {
+            RemoveDownEvent();
+            RemoveUpEvent();
+        }
+
+        public virtual void RemoveUpEvent()
+        {
+            if (UpEvent != null && UpEvent.Deleted == false)
             {
-                return 1;
-            }
-            else if (DownTick < other.DownTick)
-            {
-                return -1;
-            }
-            else
-            {
-                return 0;
+                if (OwnerTrack != null)
+                {
+                    OwnerTrack.Remove(UpEvent);
+                }
+                SetUpEvent(null);
+               
             }
         }
-    }
+
+        public virtual void RemoveDownEvent()
+        {
+            if (DownEvent != null && DownEvent.Deleted == false)
+            {
+                if (OwnerTrack != null)
+                {
+                    OwnerTrack.Remove(DownEvent);
+                }
+                SetDownEvent(null);
+            }
+        }
+
+        public virtual void SnapEvents()
+        {
+            var newTicks = OwnerTrack.Owner.SnapLeftRightTicks(TickPair);
+            if (newTicks.CompareTo(TickPair) != 0)
+            {
+                SetTicks(newTicks);
+                if (HasEvents)
+                {
+                    UpdateEvents();
+                }
+            }
+        }
+
+        public virtual bool HasEvents
+        {
+            get { return HasDownEvent || HasUpEvent; }
+        }
+
+        public virtual bool HasDownEvent
+        {
+            get { return DownEvent != null && DownEvent.Deleted == false; }
+        }
+
+        public virtual bool HasUpEvent
+        {
+            get { return UpEvent != null && UpEvent.Deleted == false; }
+        }
+
+        public virtual void SetMidiEvent(MidiEvent ev)
+        {
+            SetDownEvent(ev);
+        }
+
+        public virtual void SetUpEvent(MidiEvent ev)
+        {
+            props.SetUpEvent(ev);
+        }
 
 
+        public virtual MidiEventPair EventPair { get { return props.EventPair; } }
+        public virtual TickPair TickPair { get { return new TickPair(DownTick, UpTick); } }
+        public virtual TimePair TimePair { get { return new TimePair(StartTime, EndTime); } }
+        public virtual TickPair ScreenPointPair { get { return new TickPair(StartScreenPoint, EndScreenPoint); } }
+        
 
-    public class GuitarMessage : GMessage
-    {
-        protected string text;
         public virtual string Text
         {
             get
             {
-                return ( MidiEvent == null ? text : MidiEvent.ToString()); 
+                return props.Text; 
             }
             set
             {
-                text = value;
-                this.IsUpdated = true;
+                props.Text = value;
             }
         }
-        public virtual T Clone<T>(GuitarTrack destTrack, int minTick, int maxTick) where T : GuitarMessage, new()
+
+        public virtual int StartScreenPoint
         {
-            var cb = new ChannelMessageBuilder(this.downEvent.ChannelMessage);
-            cb.Command = ChannelCommand.NoteOn;
-            cb.Build();
-
-            var downEvent = destTrack.Insert(minTick, cb.Result);
-
-            cb.Command = ChannelCommand.NoteOff;
-            cb.Build();
-            var upEvent = destTrack.Insert(maxTick, cb.Result);
-
-            T ret = new T();
-            ret.SetDownEvent(downEvent);
-            ret.SetUpEvent(upEvent);
-
-            return ret;
-        }
-
-        public GuitarMessage(GuitarTrack track, MidiEvent downEvent, MidiEvent upEvent)
-            : this(track, downEvent)
-        {
-            SetUpEvent(upEvent);
-        }
-
-        
-        public GuitarMessage(GuitarTrack track, MidiEvent ev) : base(track, ev)
-        {
-            this.upTick = int.MinValue;
-
-            SetDownEvent(ev);
-
-            if (ev != null && ev.ChannelMessage != null)
+            get 
             {
-                data1 = ev.ChannelMessage.Data1;
-                data2 = ev.ChannelMessage.Data2;
-
-                if (downEvent != null && downEvent.ChannelMessage != null)
-                {
-                    command = (downEvent.ChannelMessage.Command == ChannelCommand.NoteOff || Data2 == 0) ? ChannelCommand.NoteOff : ChannelCommand.NoteOn;
-                    channel = downEvent.ChannelMessage.MidiChannel;
-                }
-                else
-                {
-                    command = 0;
-                    channel = 0;
-                }
-            }
-            else
-            {
-                data1 = -1;
-                data2 = -1;
-                command = 0;
-                channel = 0;
+                return (int)Math.Round(Utility.ScaleUp(StartTime));
             }
         }
 
-        public override double StartTime
+        public virtual int EndScreenPoint
         {
             get
             {
-                return base.StartTime;
+                return (int)Math.Round(Utility.ScaleUp(EndTime));
+            }
+        }
+
+        public virtual double StartTime
+        {
+            get
+            {
+                return OwnerTrack.TickToTime(DownTick);
             }
         }
 
         public virtual double EndTime 
         { 
-            get 
-            { 
-                return OwnerTrack.TickToTime(UpTick); 
-            } 
+            get
+            {
+                return OwnerTrack.TickToTime(UpTick);
+            }
         }
 
-        protected int data1;
+        public virtual double TimeLength
+        {
+            get { return EndTime - StartTime; }
+        }
+
         public virtual int Data1
         {
             get
             {
-                return data1;
+                return props.Data1;
             }
             set
             {
-                data1 = value;
-                this.IsUpdated = true;
+                props.Data1 = value;
             }
         }
 
-        protected int data2;
+        
         public virtual int Data2
         {
             get
             {
-                return data2;
+                return props.Data2;
             }
             set
             {
-                data2 = value;
-                this.IsUpdated = true;
-            }
-        }
-
-        public virtual int NoteString
-        {
-            get 
-            {
-                return OwnerTrack.IsPro ? 
-                    Utility.GetNoteString(Data1) : 
-                    Utility.GetNoteString5(Data1); 
-            }
-            set
-            {
-                if (OwnerTrack.IsPro)
-                {
-                    Data1 = Utility.GetStringLowE(Utility.GetStringDifficulty6(data1)) + value;
-                }
-                else
-                {
-                    Data1 = Utility.GetStringLowE5(Utility.GetStringDifficulty5(data1)) + value;
-                }
-
-                base.IsUpdated = true;
+                props.Data2 = value;
             }
         }
 
         
-        ChannelCommand command;
         public virtual ChannelCommand Command
         {
             get
             {
-                return (ChannelCommand)command;
+                return props.Command;
             }
             set
             {
-                command = value;
-                IsUpdated = true;
+                props.Command = value;
             }
         }
 
 
-        public virtual GuitarMessage ConvertDifficulty(GuitarDifficulty toDifficulty)
-        {
-            GuitarMessage ret = null;
 
-            var d1 = Utility.GetModifierData1ForDifficulty(Data1, Difficulty, toDifficulty);
-            if (d1 != -1)
-            {
-                ret = new GuitarMessage(OwnerTrack, null);
-                ret.Data1 = d1;
-                ret.Data2 = Data2;
-                ret.Channel = Channel;
-                ret.Command = Command;
-                ret.DownTick = DownTick;
-                
-            }
-            else
-            {
-                var ns = Utility.GetNoteString(Data1);
-                if (ns != -1)
-                {
-                    ret = new GuitarMessage(OwnerTrack, null);
-                    ret.Data1 = Utility.GetStringLowE(toDifficulty) + ns;
-                    ret.Data2 = Data2;
-                    ret.Channel = Channel;
-                    ret.Command = Command;
-                    ret.DownTick = DownTick;
-                }
-            }
-
-            return ret;
-        }
-        
-
-        int channel;
         public virtual int Channel
         {
             get
             {
-                return channel;
+                return props.Channel;
             }
             set
             {
-                channel = value;
-                IsUpdated = true;
+                props.Channel = value;
             }
         }
 
@@ -391,75 +533,6 @@ namespace ProUpgradeEditor.DataLayer
             }
         }
 
-        protected MidiEvent upEvent;
-        public virtual MidiEvent UpEvent
-        {
-            get
-            {
-                return upEvent;
-            }
-            set
-            {
-                upEvent = value;
-                if (value != null)
-                {
-                    upTick = value.AbsoluteTicks;
-                }
-                this.IsUpdated = true;
-            }
-        }
-        protected int upTick;
-        public virtual int UpTick
-        {
-            get
-            {
-                if (upTick.IsNull())
-                    upTick = DownTick+1;
-
-                return upTick;
-            }
-            set
-            {
-                upTick = value;
-                this.IsUpdated = true;
-            }
-        }
-
-        public override int DownTick
-        {
-            get
-            {
-                return base.DownTick;
-            }
-            set
-            {
-                base.DownTick = value;
-            }
-        }
-        
-        public void SetUpEvent(MidiEvent ev, int ticks = int.MinValue)
-        {
-            this.upEvent = ev;
-            if (ticks.IsNull() && ev != null)
-            {
-                this.upTick = ev.AbsoluteTicks;
-            }
-            else
-            {
-                this.upTick = ticks;
-            }
-        }
-
-        protected bool deleted;
-       
-
-        public override int GetHashCode()
-        {
-            int ret = (DownTick << 16) + DownTick;
-          
-            return ret;
-        }
-
         public override string ToString()
         {
             return "Down: " + DownTick.ToString() + " Up: " + UpTick.ToString() + 
@@ -467,42 +540,109 @@ namespace ProUpgradeEditor.DataLayer
         }
 
 
-        public virtual ChannelMessage DownChannelMessage { get { return DownEvent.MidiMessage as ChannelMessage; } }
-        public virtual ChannelMessage UpChannelMessage { get { return UpEvent.MidiMessage as ChannelMessage; } }
+        public virtual ChannelMessage DownChannelMessage { get { return DownEvent.ChannelMessage; } }
+        public virtual ChannelMessage UpChannelMessage { get { return UpEvent.ChannelMessage; } }
 
         public virtual int TickLength { get { return UpTick - DownTick; } }
 
-        public virtual double TimeLength
-        {
-            get { return EndTime - StartTime; }
-        }
 
         public virtual bool IsDownEventClose(GuitarMessage m2)
         {
             if (DownTick.IsNull() || m2.DownTick.IsNull())
                 return false;
 
-            var v = (int)Math.Abs(DownTick - m2.DownTick);
-            return v <= Utility.NoteCloseWidth;
+            return TickPair.IsCloseDownDown(m2.TickPair);
         }
 
         public virtual bool IsUpEventClose(GuitarMessage m2)
         {
-            var v = Math.Abs(UpTick - m2.UpTick);
-            return v <= Utility.NoteCloseWidth;
+            if (UpTick.IsNull() || m2.UpTick.IsNull())
+                return false;
+
+            return TickPair.IsCloseUpUp(m2.TickPair);
         }
 
-        public virtual bool IsBefore(GuitarMessage obj)
+        public override bool IsUpdated
         {
-            return (DownTick - obj.DownTick) < 0;
+            get
+            {
+                return base.IsUpdated;
+            }
+            set
+            {
+                base.IsUpdated = value;
+            }
         }
 
-        public virtual bool IsAfter(GuitarMessage obj)
+        public override bool IsDeleted
         {
-            return (DownTick - obj.DownTick) > 0;
+            get
+            {
+                return base.IsDeleted;
+            }
+            set
+            {
+                base.IsDeleted = value;
+            }
         }
 
-        
+        public override bool IsNew
+        {
+            get
+            {
+                return base.IsNew;
+            }
+            set
+            {
+                base.IsNew = value;
+            }
+        }
+
+        private GuitarMessageType GetMessageType()
+        {
+            if (messageType == GuitarMessageType.Unknown)
+            {
+                if (this is GuitarHandPosition)
+                    return GuitarMessageType.GuitarHandPosition;
+                else if (this is GuitarTextEvent)
+                    return GuitarMessageType.GuitarTextEvent;
+                else if (this is GuitarTrainer)
+                    return GuitarMessageType.GuitarTrainer;
+                else if (this is GuitarChord)
+                    return GuitarMessageType.GuitarChord;
+                else if (this is GuitarNote)
+                    return GuitarMessageType.GuitarNote;
+                else if (this is GuitarPowerup)
+                    return GuitarMessageType.GuitarPowerup;
+                else if (this is GuitarSolo)
+                    return GuitarMessageType.GuitarSolo;
+                else if (this is GuitarTempo)
+                    return GuitarMessageType.GuitarTempo;
+                else if (this is GuitarTimeSignature)
+                    return GuitarMessageType.GuitarTimeSignature;
+                else if (this is GuitarArpeggio)
+                    return GuitarMessageType.GuitarArpeggio;
+                else if (this is GuitarBigRockEnding)
+                    return GuitarMessageType.GuitarBigRockEnding;
+                else if (this is GuitarSingleStringTremelo)
+                    return GuitarMessageType.GuitarSingleStringTremelo;
+                else if (this is GuitarMultiStringTremelo)
+                    return GuitarMessageType.GuitarMultiStringTremelo;
+                else if (this is GuitarSlide)
+                    return GuitarMessageType.GuitarSlide;
+                else if (this is GuitarHammeron)
+                    return GuitarMessageType.GuitarHammeron;
+                else
+                {
+                    return messageType;
+                }
+            }
+            else
+            {
+                return messageType;
+            }
+        }
+
     }
 
 

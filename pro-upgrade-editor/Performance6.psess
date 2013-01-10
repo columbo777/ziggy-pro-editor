@@ -49,25 +49,10 @@
   </PostinstrumentEvent>
   <Reports>
     <Report>
-      <Path>C:\pue\ProUpgradeEditor\Report130105(2).vsp</Path>
+      <Path>C:\pue\ProUpgradeEditor\Report130107(6).vsp</Path>
     </Report>
     <Report>
-      <Path>C:\pue\ProUpgradeEditor\Report130107.vsp</Path>
-    </Report>
-    <Report>
-      <Path>C:\pue\ProUpgradeEditor\Report130107(1).vsp</Path>
-    </Report>
-    <Report>
-      <Path>C:\pue\ProUpgradeEditor\Report130107(2).vsp</Path>
-    </Report>
-    <Report>
-      <Path>C:\pue\ProUpgradeEditor\Report130107(3).vsp</Path>
-    </Report>
-    <Report>
-      <Path>C:\pue\ProUpgradeEditor\Report130107(4).vsp</Path>
-    </Report>
-    <Report>
-      <Path>C:\pue\ProUpgradeEditor\Report130107(5).vsp</Path>
+      <Path>C:\pue\ProUpgradeEditor\Report130107(7).vsp</Path>
     </Report>
   </Reports>
   <RuntimeMarks>

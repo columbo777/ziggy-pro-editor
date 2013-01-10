@@ -11,7 +11,6 @@ using System.Reflection;
 using System.Windows.Forms;
 using Sanford.Multimedia;
 using Sanford.Multimedia.Midi;
-using ProUpgradeEditor.DataLayer;
 using ProUpgradeEditor.Common;
 using System.Threading;
 using System.Globalization;
@@ -63,7 +62,7 @@ namespace ProUpgradeEditor.UI
                     {
                         if (ex.Message.ToLower().Contains("in use"))
                         {
-                            DisconnectMidiDevice();
+                            
                             ShutDownMidiDevice();
 
                             try
@@ -432,6 +431,8 @@ namespace ProUpgradeEditor.UI
 
         void ShutDownMidiDevice()
         {
+            DisconnectMidiDevice();
+
             try
             {
                 timerMidiPlayback.Enabled = false;
@@ -455,16 +456,19 @@ namespace ProUpgradeEditor.UI
             playbackSequencerAttached = false;
         }
 
-        void CreateMidiPlaybackDeviceIfNull()
+        bool CreateMidiPlaybackDeviceIfNull()
         {
+            var ret = false;
             try
             {
                 if (midiPlaybackDevice == null)
                 {
                     midiPlaybackDevice = new OutputDevice(midiDeviceIndex, SynchronizationContext.Current);
                 }
+                ret = midiPlaybackDevice != null;
             }
             catch { }
+            return ret;
         }
 
         class naudioPlayer
@@ -640,12 +644,13 @@ namespace ProUpgradeEditor.UI
                 if (EditorPro.Sequence == null)
                     return;
                 
+                if (!CreateMidiPlaybackDeviceIfNull())
+                    return;
+
                 if (midiPlaybackSequencer == null)
                 {
                     midiPlaybackSequencer = new Sequencer();
                 }
-                CreateMidiPlaybackDeviceIfNull();
-                
 
                 if (playbackSequencerAttached == false)
                 {
@@ -678,7 +683,7 @@ namespace ProUpgradeEditor.UI
                 if (mainTrack != null)
                 {
                     
-                    midiPlaybackSequence.AddTempo(EditorPro.GuitarTrack.FindTempoTrack());
+                    midiPlaybackSequence.AddTempo(EditorPro.GuitarTrack.GetTempoTrack());
                     Track t = new Track(FileType.Pro, mainTrack.Name);
 
                     var cb = new ChannelMessageBuilder();
@@ -1057,31 +1062,20 @@ namespace ProUpgradeEditor.UI
                 return;
             }
 
+            ShutDownMidiDevice();
             
-            try
-            {
-                ShutDownMidiDevice();
-            }
-            catch { }
-
             var itm = comboMidiDevice.SelectedItem as MidiOutputListItem;
             if (itm == null)
                 return;
 
             midiDeviceIndex = itm.index;
-            try
+            
+            if (!CreateMidiPlaybackDeviceIfNull())
             {
+                midiDeviceIndex = 0;
                 CreateMidiPlaybackDeviceIfNull();
             }
-            catch
-            {
-                try
-                {
-                    midiDeviceIndex = 0;
-                    CreateMidiPlaybackDeviceIfNull();
-                }
-                catch { }
-            }
+           
         }
 
         private void UpdateMidiInstrument(bool loading)
@@ -1107,16 +1101,17 @@ namespace ProUpgradeEditor.UI
 
             try
             {
-                CreateMidiPlaybackDeviceIfNull();
+                if (CreateMidiPlaybackDeviceIfNull())
+                {
+                    var cb = new ChannelMessageBuilder();
 
-                var cb = new ChannelMessageBuilder();
-
-                cb.Command = ChannelCommand.ProgramChange;
-                cb.MidiChannel = 0;
-                cb.Data1 = instrument;
-                cb.Data2 = 100;
-                cb.Build();
-                midiPlaybackDevice.Send(cb.Result);
+                    cb.Command = ChannelCommand.ProgramChange;
+                    cb.MidiChannel = 0;
+                    cb.Data1 = instrument;
+                    cb.Data2 = 100;
+                    cb.Build();
+                    midiPlaybackDevice.Send(cb.Result);
+                }
             }
             catch { }
         }
@@ -1125,38 +1120,40 @@ namespace ProUpgradeEditor.UI
         {
             try
             {
-                CreateMidiPlaybackDeviceIfNull();
+                if (CreateMidiPlaybackDeviceIfNull())
+                {
 
-                var cb = new ChannelMessageBuilder();
+                    var cb = new ChannelMessageBuilder();
 
-                cb.Command = ChannelCommand.ProgramChange;
-                cb.MidiChannel = 0;
-                cb.Data1 = instrument;
-                cb.Data2 = 100;
-                cb.Build();
-                midiPlaybackDevice.Send(cb.Result);
+                    cb.Command = ChannelCommand.ProgramChange;
+                    cb.MidiChannel = 0;
+                    cb.Data1 = instrument;
+                    cb.Data2 = 100;
+                    cb.Build();
+                    midiPlaybackDevice.Send(cb.Result);
 
-                cb.Command = ChannelCommand.NoteOn;
-                cb.MidiChannel = 0;
-                cb.Data1 = 44;
-                cb.Data2 = 100;
-                cb.Build();
-                midiPlaybackDevice.Send(cb.Result);
-
-
-                Thread.Sleep(500);
-
-                cb.Command = ChannelCommand.NoteOff;
-                cb.Build();
-                midiPlaybackDevice.Send(cb.Result);
+                    cb.Command = ChannelCommand.NoteOn;
+                    cb.MidiChannel = 0;
+                    cb.Data1 = 44;
+                    cb.Data2 = 100;
+                    cb.Build();
+                    midiPlaybackDevice.Send(cb.Result);
 
 
-                cb.Command = ChannelCommand.ProgramChange;
-                cb.MidiChannel = 0;
-                cb.Data1 = oldInstrument;
-                cb.Data2 = 100;
-                cb.Build();
-                midiPlaybackDevice.Send(cb.Result);
+                    Thread.Sleep(500);
+
+                    cb.Command = ChannelCommand.NoteOff;
+                    cb.Build();
+                    midiPlaybackDevice.Send(cb.Result);
+
+
+                    cb.Command = ChannelCommand.ProgramChange;
+                    cb.MidiChannel = 0;
+                    cb.Data1 = oldInstrument;
+                    cb.Data2 = 100;
+                    cb.Build();
+                    midiPlaybackDevice.Send(cb.Result);
+                }
             }
             catch { }
 
@@ -1169,7 +1166,8 @@ namespace ProUpgradeEditor.UI
         {
             try
             {
-                CreateMidiPlaybackDeviceIfNull();
+                if (!CreateMidiPlaybackDeviceIfNull())
+                    return;
 
                 var cb = new ChannelMessageBuilder();
                 var messages = new List<ChannelMessage>();
@@ -1269,56 +1267,61 @@ namespace ProUpgradeEditor.UI
         }
 
 
-        private void RefreshMidiOutputList()
+        private bool RefreshMidiOutputList()
         {
-            comboMidiDevice.BeginUpdate();
-            comboMidiDevice.Items.Clear();
             try
             {
-                for (int i = 0; i < OutputDevice.DeviceCount; i++)
+                comboMidiDevice.BeginUpdate();
+                comboMidiDevice.Items.Clear();
+                try
                 {
-                    try
+                    for (int i = 0; i < OutputDevice.DeviceCount; i++)
                     {
-                        var caps = OutputDevice.GetDeviceCapabilities(i);
-                        if (caps.voices > 0 || caps.notes > 0)
+                        try
                         {
-                            comboMidiDevice.Items.Add(new MidiOutputListItem() { index = i, Caps = caps });
-                        }
-                    }
-                    catch { }
-                }
-
-                midiDeviceIndex = settings.GetValueInt("MidiDeviceIndex", 0);
-
-                var seldev = settings.GetValue("MidiDeviceDesc");
-                if (!string.IsNullOrEmpty(seldev))
-                {
-                    try
-                    {
-                        for (int i = 0; i < OutputDevice.DeviceCount; i++)
-                        {
-                            var itm = (comboMidiDevice.Items[i] as MidiOutputListItem);
-                            if (itm.ToString() == seldev)
+                            var caps = OutputDevice.GetDeviceCapabilities(i);
+                            if (caps.voices > 0 || caps.notes > 0)
                             {
-                                comboMidiDevice.SelectedIndex = i;
-                                midiDeviceIndex = itm.index;
-                                break;
+                                comboMidiDevice.Items.Add(new MidiOutputListItem() { index = i, Caps = caps });
                             }
                         }
+                        catch { }
                     }
-                    catch { }
-                }
-                else
-                {
-                    if (midiDeviceIndex < comboMidiDevice.Items.Count && midiDeviceIndex >= 0)
+
+                    midiDeviceIndex = settings.GetValueInt("MidiDeviceIndex", 0);
+
+                    var seldev = settings.GetValue("MidiDeviceDesc");
+                    if (!string.IsNullOrEmpty(seldev))
                     {
-                        comboMidiDevice.SelectedIndex = midiDeviceIndex;
+                        try
+                        {
+                            for (int i = 0; i < OutputDevice.DeviceCount; i++)
+                            {
+                                var itm = (comboMidiDevice.Items[i] as MidiOutputListItem);
+                                if (itm.ToString() == seldev)
+                                {
+                                    comboMidiDevice.SelectedIndex = i;
+                                    midiDeviceIndex = itm.index;
+                                    break;
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+                    else
+                    {
+                        if (midiDeviceIndex < comboMidiDevice.Items.Count && midiDeviceIndex >= 0)
+                        {
+                            comboMidiDevice.SelectedIndex = midiDeviceIndex;
+                        }
                     }
                 }
+                catch { }
+
+                comboMidiDevice.EndUpdate();
             }
             catch { }
-
-            comboMidiDevice.EndUpdate();
+            return comboMidiDevice.Items.Count>0;
         }
     }
 }

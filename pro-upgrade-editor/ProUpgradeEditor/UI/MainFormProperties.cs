@@ -262,6 +262,9 @@ namespace ProUpgradeEditor.UI
             public static UtilProperty[] GetInitialProperties()
             {
                 return new UtilProperty[]{
+                    new UtilProperty( "Show Measure Numbers", true),
+                    new UtilProperty( "Show Tempos", true),
+                    new UtilProperty( "Show Time Signatures", true),
                     new UtilProperty( "View Lyrics in G5 Editor", true),
                     new UtilProperty( "Keep Midi Playback Selection", false),
                     new UtilProperty( "Keep Auto Gen Difficulty Selection", false),
@@ -351,6 +354,8 @@ namespace ProUpgradeEditor.UI
                     new UtilProperty( "ProB Trainer", Utility.SongTrainerPBText),
                    
                     new UtilProperty("Trainer Norm Offset", Utility.SongTrainerNormOffset),
+                    new UtilProperty("Modify WebTab Scale", Utility.ModifyWebTabScale),
+                    
                 };
             }
         }
@@ -826,18 +831,26 @@ namespace ProUpgradeEditor.UI
                 case "Sel. Text Event Color": { Utility.SelectedTextEventBrush = (SolidBrush)p.Data;} break;
                   
                 case "Text Event Begin": { Utility.TextEventBeginTag = (string)p.Data; } break;
-                   case "Text Event End": { Utility.TextEventEndTag = (string)p.Data; } break;
-                   case "ProG Trainer Begin": {  Utility.SongTrainerBeginPGText = (string)p.Data; } break;
-                   case "ProB Trainer Begin": {  Utility.SongTrainerBeginPBText = (string)p.Data; } break;
-                   case "ProG Trainer Norm": {  Utility.SongTrainerNormPGText = (string)p.Data; } break;
-                   case "ProB Trainer Norm": {  Utility.SongTrainerNormPBText = (string)p.Data; } break;
-                   case "ProG Trainer End": {  Utility.SongTrainerEndPGText = (string)p.Data; } break;
-                   case "ProB Trainer End": {  Utility.SongTrainerEndPBText = (string)p.Data; } break;
+                case "Text Event End": { Utility.TextEventEndTag = (string)p.Data; } break;
+                case "ProG Trainer Begin": {  Utility.SongTrainerBeginPGText = (string)p.Data; } break;
+                case "ProB Trainer Begin": {  Utility.SongTrainerBeginPBText = (string)p.Data; } break;
+                case "ProG Trainer Norm": {  Utility.SongTrainerNormPGText = (string)p.Data; } break;
+                case "ProB Trainer Norm": {  Utility.SongTrainerNormPBText = (string)p.Data; } break;
+                case "ProG Trainer End": {  Utility.SongTrainerEndPGText = (string)p.Data; } break;
+                case "ProB Trainer End": {  Utility.SongTrainerEndPBText = (string)p.Data; } break;
                    
-                   case "ProG Trainer": { Utility.SongTrainerPGText = (string)p.Data; } break;
-                   case "ProB Trainer": {  Utility.SongTrainerPBText = (string)p.Data; } break;
-                   case "Trainer Norm Offset": { Utility.SongTrainerNormOffset = (double)p.Data; } break;
-                   case "View Lyrics in G5 Editor": { trackEditorG5.ViewLyrics = (bool)p.Data; trackEditorG5.Invalidate(); } break;
+                case "ProG Trainer": { Utility.SongTrainerPGText = (string)p.Data; } break;
+                case "ProB Trainer": {  Utility.SongTrainerPBText = (string)p.Data; } break;
+                case "Trainer Norm Offset": { Utility.SongTrainerNormOffset = (double)p.Data; } break;
+                case "View Lyrics in G5 Editor": { trackEditorG5.ViewLyrics = (bool)p.Data; trackEditorG5.Invalidate(); } break;
+                case "Show Measure Numbers": { Utility.ShowMeasureNumbers = (bool)p.Data; EditorPro.Invalidate(); }
+                    break;
+                case "Show Tempos": { Utility.ShowTempos = (bool)p.Data; EditorPro.Invalidate(); }
+                    break;
+                case "Show Time Signatures": { Utility.ShowTimeSignatures = (bool)p.Data; EditorPro.Invalidate(); }
+                    break;
+                case "Modify WebTab Scale": { Utility.ModifyWebTabScale = (bool)p.Data; EditorPro.Invalidate(); }
+                    break;
 
                 default:
                     {
@@ -1006,70 +1019,7 @@ namespace ProUpgradeEditor.UI
 
             RefreshMidiInputList();
             CheckMidiInputVisibility();
-
-            foreach (UtilProperty prop in Properties)
-            {
-                if (prop.Type == PropertyType.Brush)
-                {
-                    SolidBrush p = prop.Data as SolidBrush;
-                    var v = settings.GetValue("Util_" + prop.Description, p.Color);
-                    if (p.Color != v)
-                    {
-                        prop.Data = new SolidBrush(v);
-                        OnUtilPropertyChange(prop);
-                    }
-                }
-                else if (prop.Type == PropertyType.Pen)
-                {
-                    Pen p = prop.Data as Pen;
-                    var v = settings.GetValue("Util_" + prop.Description, p.Color);
-                    if (p.Color != v)
-                    {
-                        prop.Data = new Pen(v, p.Width);
-                        OnUtilPropertyChange(prop);
-                    }
-                }
-                else if (prop.Type == PropertyType.Double)
-                {
-                    double d = (double)prop.Data;
-                    var v = settings.GetValue("Util_" + prop.Description, d.ToString());
-                    if (d.ToString() != v)
-                    {
-                        prop.Data = (v).ToDouble(0);
-                        OnUtilPropertyChange(prop);
-                    }
-                }
-                else if (prop.Type == PropertyType.Integer)
-                {
-                    int d = (int)prop.Data;
-                    var v = settings.GetValue("Util_" + prop.Description, d.ToString());
-                    if (d.ToString() != v)
-                    {
-                        prop.Data = (v).ToInt(0);
-                        OnUtilPropertyChange(prop);
-                    }
-                }
-                else if (prop.Type == PropertyType.Bool)
-                {
-                    var b = (bool)prop.Data;
-                    var v = settings.GetValue("Util_" + prop.Description, b.ToString());
-                    if (b.ToString() != v)
-                    {
-                        prop.Data = v.ToBool();
-                        OnUtilPropertyChange(prop);
-                    }
-                }
-                else if (prop.Type == PropertyType.String)
-                {
-                    string d = (string)prop.Data;
-                    var v = settings.GetValue("Util_" + prop.Description, d);
-                    if (d != v)
-                    {
-                        prop.Data = v;
-                        OnUtilPropertyChange(prop);
-                    }
-                }
-            }
+            UpdateProperties(true);
 
             comboNoteEditorCopyPatternPreset.Items.Clear();
             comboNoteEditorCopyPatternPreset.SelectedIndex = -1;
@@ -1200,6 +1150,74 @@ namespace ProUpgradeEditor.UI
             CheckNoteChannelVisibility();
 
             PostLoadSettings();
+        }
+
+        private void UpdateProperties(bool loading)
+        {
+
+            foreach (UtilProperty prop in Properties)
+            {
+                if (prop.Type == PropertyType.Brush)
+                {
+                    SolidBrush p = prop.Data as SolidBrush;
+                    var v = settings.GetValue("Util_" + prop.Description, p.Color);
+                    if (loading || p.Color != v)
+                    {
+                        prop.Data = new SolidBrush(v);
+                        OnUtilPropertyChange(prop);
+                    }
+                }
+                else if (prop.Type == PropertyType.Pen)
+                {
+                    Pen p = prop.Data as Pen;
+                    var v = settings.GetValue("Util_" + prop.Description, p.Color);
+                    if (loading || p.Color != v)
+                    {
+                        prop.Data = new Pen(v, p.Width);
+                        OnUtilPropertyChange(prop);
+                    }
+                }
+                else if (prop.Type == PropertyType.Double)
+                {
+                    double d = (double)prop.Data;
+                    var v = settings.GetValue("Util_" + prop.Description, d.ToString());
+                    if (loading || d.ToString() != v)
+                    {
+                        prop.Data = (v).ToDouble(0);
+                        OnUtilPropertyChange(prop);
+                    }
+                }
+                else if (prop.Type == PropertyType.Integer)
+                {
+                    int d = (int)prop.Data;
+                    var v = settings.GetValue("Util_" + prop.Description, d.ToString());
+                    if (loading || d.ToString() != v)
+                    {
+                        prop.Data = (v).ToInt(0);
+                        OnUtilPropertyChange(prop);
+                    }
+                }
+                else if (prop.Type == PropertyType.Bool)
+                {
+                    var b = (bool)prop.Data;
+                    var v = settings.GetValue("Util_" + prop.Description, b.ToString());
+                    if (loading || b.ToString() != v)
+                    {
+                        prop.Data = v.ToBool();
+                        OnUtilPropertyChange(prop);
+                    }
+                }
+                else if (prop.Type == PropertyType.String)
+                {
+                    string d = (string)prop.Data;
+                    var v = settings.GetValue("Util_" + prop.Description, d);
+                    if (loading || d != v)
+                    {
+                        prop.Data = v;
+                        OnUtilPropertyChange(prop);
+                    }
+                }
+            }
         }
 
         private void RefreshMidiInputList()

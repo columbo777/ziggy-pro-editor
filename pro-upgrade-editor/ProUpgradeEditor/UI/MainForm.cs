@@ -38,29 +38,32 @@ namespace ProUpgradeEditor.UI
 
             InitializeComponent();
 
-            checkBoxRenderMouseSnap.Visible = false;
-            Editors = new List<TrackEditor>() { trackEditorG5, trackEditorG6 };
+            if (!DesignMode)
+            {
+                checkBoxRenderMouseSnap.Visible = false;
+                Editors = new List<TrackEditor>() { trackEditorG5, trackEditorG6 };
 
-            tabContainerMain.SizeChanged += new EventHandler(tabContainerMain_SizeChanged);
-            tabContainerMain.Resize += new EventHandler(tabContainerMain_Resize);
-            tabContainerMain.AllowDrop = true;
-            tabPackageEditor.AllowDrop = true;
-            tabPackageEditor.DragOver += new DragEventHandler(tabPackageEditor_DragOver);
-            tabPackageEditor.DragDrop += new DragEventHandler(tabPackageEditor_DragDrop);
+                tabContainerMain.SizeChanged += new EventHandler(tabContainerMain_SizeChanged);
+                tabContainerMain.Resize += new EventHandler(tabContainerMain_Resize);
+                tabContainerMain.AllowDrop = true;
+                tabPackageEditor.AllowDrop = true;
+                tabPackageEditor.DragOver += new DragEventHandler(tabPackageEditor_DragOver);
+                tabPackageEditor.DragDrop += new DragEventHandler(tabPackageEditor_DragDrop);
 
-            tabSongLibSongProperties.AllowDrop = true;
-            tabSongLibSongProperties.DragOver += new DragEventHandler(tabSongLibSongProperties_DragOver);
-            tabSongLibSongProperties.DragDrop += new DragEventHandler(tabSongLibSongProperties_DragDrop);
+                tabSongLibSongProperties.AllowDrop = true;
+                tabSongLibSongProperties.DragOver += new DragEventHandler(tabSongLibSongProperties_DragOver);
+                tabSongLibSongProperties.DragDrop += new DragEventHandler(tabSongLibSongProperties_DragDrop);
 
-            tabSongLibraryUtility.AllowDrop = true;
-            tabSongLibraryUtility.DragOver += new DragEventHandler(tabSongLibraryUtility_DragOver);
-            tabSongLibraryUtility.DragDrop += new DragEventHandler(tabSongLibraryUtility_DragDrop);
-            this.AllowDrop = true;
-            animationTimer.Interval = 10;
+                tabSongLibraryUtility.AllowDrop = true;
+                tabSongLibraryUtility.DragOver += new DragEventHandler(tabSongLibraryUtility_DragOver);
+                tabSongLibraryUtility.DragDrop += new DragEventHandler(tabSongLibraryUtility_DragDrop);
+                this.AllowDrop = true;
+                animationTimer.Interval = 10;
 
-            midiTrackEditorPro.RequestBackup += new EventHandler(midiTrackEditorPro_RequestBackup);
+                midiTrackEditorPro.RequestBackup += new EventHandler(midiTrackEditorPro_RequestBackup);
 
-            EditorPro.OnStatusIdle += new EventHandler(EditorPro_OnStatusIdle);
+                EditorPro.OnStatusIdle += new EventHandler(EditorPro_OnStatusIdle);
+            }
         }
 
         void EditorPro_OnStatusIdle(object sender, EventArgs e)
@@ -68,6 +71,7 @@ namespace ProUpgradeEditor.UI
             RefreshModifierListBoxes();
             RefreshTrainers();
             RefreshTextEvents();
+            UpdateControlsForDifficulty(EditorPro.CurrentDifficulty);
         }
 
         void midiTrackEditorPro_RequestBackup(object sender, EventArgs e)
@@ -481,7 +485,7 @@ namespace ProUpgradeEditor.UI
             var result = OnTrackEditorProClick(editor, e);
             RefreshModifierListBoxes();
             if (result == true)
-                EditorPro.SetStatusIdle();
+                EditorPro.SetSelectionStateIdle();
             return result;
         }
 
@@ -493,7 +497,7 @@ namespace ProUpgradeEditor.UI
         void EditorPro_OnReloadTrack(TrackEditor editor, SelectNextEnum selectNext)
         {
             ReloadTrackPro(selectNext);
-            
+
         }
 
         void checkScrollToSelection_CheckedChanged(object sender, EventArgs e)
@@ -732,7 +736,7 @@ namespace ProUpgradeEditor.UI
 
         private void button109_Click(object sender, EventArgs e)
         {
-            EditorPro.SetStatusIdle();
+            EditorPro.SetSelectionStateIdle();
         }
 
         private void radioGrid128thNote_CheckedChanged(object sender, EventArgs e)
@@ -788,7 +792,7 @@ namespace ProUpgradeEditor.UI
                 if (diff.A != null && diff.A.SelectedTrackDifficulty != null && diff.A.SelectedTrackDifficulty.Track != null)
                 {
 
-                    foreach (var item in diff.A.Difficulties.Where(x => 
+                    foreach (var item in diff.A.Difficulties.Where(x =>
                         midiTrackEditorPro.TrackDifficulties.Any(y => y.Track == x.Track && y.Difficulty != x.Difficulty)))
                     {
                         EditorPro.SetTrack(item.Track, item.Difficulty);
@@ -799,7 +803,7 @@ namespace ProUpgradeEditor.UI
                 if (diff.B != null && diff.B.SelectedTrackDifficulty != null && diff.B.SelectedTrackDifficulty.Track != null)
                 {
 
-                    foreach (var item in diff.B.Difficulties.Where(x => 
+                    foreach (var item in diff.B.Difficulties.Where(x =>
                         midiTrackEditorG5.TrackDifficulties.Any(y => y.Track == x.Track && y.Difficulty != x.Difficulty)))
                     {
                         EditorG5.SetTrack(item.Track, item.Difficulty);
@@ -1304,10 +1308,10 @@ namespace ProUpgradeEditor.UI
                             if (diff == GuitarDifficulty.Expert)
                                 diff |= GuitarDifficulty.All;
 
-                            EditorPro.Messages.Where(x=> diff.HasFlag(x.Difficulty)).ToList().ForEach(x => EditorPro.RemoveMessage(x));
-                            
+                            EditorPro.Messages.Where(x => diff.HasFlag(x.Difficulty)).ToList().ForEach(x => EditorPro.RemoveMessage(x));
+
                             EditorPro.Messages.ImportMessageRange(
-                                EditorG5.Messages.Where(x=> diff.HasFlag(x.Difficulty)).ToList());
+                                EditorG5.Messages.Where(x => diff.HasFlag(x.Difficulty)).ToList());
                         }
                         else
                         {
@@ -1448,7 +1452,7 @@ namespace ProUpgradeEditor.UI
 
         private void button16_Click(object sender, EventArgs e)
         {
-            EditorPro.SetStatusIdle();
+            EditorPro.SetSelectionStateIdle();
 
         }
         private void button20_Click(object sender, EventArgs e)
@@ -1482,7 +1486,7 @@ namespace ProUpgradeEditor.UI
 
         private void button17_Click(object sender, EventArgs e)
         {
-            EditorPro.SetStatusIdle();
+            EditorPro.SetSelectionStateIdle();
 
         }
 
@@ -1565,7 +1569,7 @@ namespace ProUpgradeEditor.UI
 
         private void button22_Click(object sender, EventArgs e)
         {
-            EditorPro.SetStatusIdle();
+            EditorPro.SetSelectionStateIdle();
 
         }
 
@@ -1588,7 +1592,7 @@ namespace ProUpgradeEditor.UI
 
         private void button28_Click(object sender, EventArgs e)
         {
-            EditorPro.SetStatusIdle();
+            EditorPro.SetSelectionStateIdle();
 
         }
 
@@ -1814,7 +1818,7 @@ namespace ProUpgradeEditor.UI
 
         private void button39_Click(object sender, EventArgs e)
         {
-            EditorPro.SetStatusIdle();
+            EditorPro.SetSelectionStateIdle();
 
         }
 
@@ -1885,7 +1889,7 @@ namespace ProUpgradeEditor.UI
 
         private void button45_Click(object sender, EventArgs e)
         {
-            EditorPro.SetStatusIdle();
+            EditorPro.SetSelectionStateIdle();
 
         }
 
@@ -2333,7 +2337,7 @@ namespace ProUpgradeEditor.UI
 
             if (EditorPro.IsLoaded)
             {
-                
+
                 EditorPro.SetTrackMaximum();
 
                 if (SelectedChord == null)
@@ -2347,12 +2351,12 @@ namespace ProUpgradeEditor.UI
             }
             if (EditorG5.IsLoaded)
             {
-               
+
                 EditorG5.SetTrackMaximum();
             }
 
             ScrollToSelection();
-             
+
         }
 
         private void button84_Click(object sender, EventArgs e)
@@ -2369,12 +2373,12 @@ namespace ProUpgradeEditor.UI
 
             if (Utility.timeScalar < Utility.timeScalarMin)
                 Utility.timeScalar = Utility.timeScalarMin;
-                
+
             this.textBoxZoom.Text = Utility.timeScalar.ToString();
 
             if (EditorPro.IsLoaded)
             {
-                
+
                 EditorPro.SetTrackMaximum();
 
                 if (SelectedChord == null)
@@ -2388,10 +2392,10 @@ namespace ProUpgradeEditor.UI
             }
             if (EditorG5.IsLoaded)
             {
-               
+
                 EditorG5.SetTrackMaximum();
             }
-            
+
             ScrollToSelection();
         }
 
@@ -7019,7 +7023,7 @@ namespace ProUpgradeEditor.UI
                     }
                     ch.UpdateEvents();
                 }
-                
+
                 EditorPro.Invalidate();
             }
             catch
@@ -7616,7 +7620,7 @@ namespace ProUpgradeEditor.UI
             TickPair ticks;
             ret = EditorG5.SnapToNotes(chord.TickPair, out ticks);
 
-            if(ret)
+            if (ret)
             {
                 chord.SetTicks(ticks);
                 chord.UpdateEvents();
@@ -7634,13 +7638,13 @@ namespace ProUpgradeEditor.UI
                 {
                     if (gc.Count() > 1)
                     {
-                        gc = GuitarTrackG5.Messages.Chords.GetBetweenTick(chord.TickPair + Utility.NoteCloseWidth);
+                        gc = GuitarTrackG5.Messages.Chords.GetBetweenTick(chord.TickPair.Expand(-1));
                         if (gc.Count() > 1)
                         {
-                            gc = GuitarTrackG5.Messages.Chords.GetBetweenTick(chord.TickPair - Utility.NoteCloseWidth);
+                            gc = GuitarTrackG5.Messages.Chords.GetBetweenTick(chord.TickPair.Offset(Utility.TickCloseWidth));
                             if (gc.Count() > 1)
                             {
-                                gc = GuitarTrackG5.Messages.Chords.GetBetweenTick(chord.TickPair);
+                                gc = GuitarTrackG5.Messages.Chords.GetBetweenTick(chord.TickPair.Expand(-Utility.TickCloseWidth));
                             }
                         }
                     }
@@ -7673,7 +7677,7 @@ namespace ProUpgradeEditor.UI
                     chords = EditorPro.Messages.Chords.ToList();
 
                 chords.ForEach(x => x.SnapEvents());
-                
+
                 EditorPro.Invalidate();
             }
             catch
@@ -7813,12 +7817,12 @@ namespace ProUpgradeEditor.UI
 
         private void buttonCancelProGuitarTrainer_Click(object sender, EventArgs e)
         {
-            EditorPro.SetStatusIdle();
+            EditorPro.SetSelectionStateIdle();
         }
 
         private void buttonCancelProBassTrainer_Click(object sender, EventArgs e)
         {
-            EditorPro.SetStatusIdle();
+            EditorPro.SetSelectionStateIdle();
         }
 
         private void buttonAddProGuitarTrainer_Click(object sender, EventArgs e)
@@ -7996,7 +8000,7 @@ namespace ProUpgradeEditor.UI
                             EditorPro.SelectedTextEvent.UpdateEvents();
 
                             var ev = EditorPro.SelectedTextEvent;
-                            
+
                             RefreshTextEvents();
 
                             listTextEvents.SetSelectedItem(ev);
@@ -8443,7 +8447,7 @@ namespace ProUpgradeEditor.UI
 
                 EditorPro.Invalidate();
 
-                MessageBox.Show(numSnapped.ToString() + " notes snapped");
+                
             }
             catch
             {
@@ -8470,7 +8474,6 @@ namespace ProUpgradeEditor.UI
                         numSnapped++;
                 }
 
-                MessageBox.Show(numSnapped.ToString() + " notes snapped");
             }
             catch { }
             EditorPro.Invalidate();
@@ -8752,7 +8755,7 @@ namespace ProUpgradeEditor.UI
             public static void Update(int elapsedMS)
             {
                 DateTime now = DateTime.Now;
-                double timeElapsed = elapsedMS / 1000.0;
+                double timeElapsed = elapsedMS.CastObject<double>() / 1000.0;
 
                 foreach (var item in animatingControls.ToList())
                 {
@@ -8762,7 +8765,6 @@ namespace ProUpgradeEditor.UI
                         Point point = item.End;
                         if (item.TimeElapsed < item.TotalAnimTime)
                         {
-
                             var progress = GetProgress(item.Routine, item.Progress, item.TotalAnimTime);
                             point = GetUpdatedPoint(progress, item.Start, item.End);
                         }
@@ -9138,7 +9140,7 @@ namespace ProUpgradeEditor.UI
 
                         tempoNode.AddAttribute("secondsPerWholeNote", (tempo.Tempo / 100000.0).ToStringEx());
                         tempoNode.AddAttribute("secondsPerTick", tempo.SecondsPerTick.ToStringEx());
-                        
+
                     }
 
 
@@ -9279,7 +9281,7 @@ namespace ProUpgradeEditor.UI
 
                         tempoNode.AddAttribute("secondsPerWholeNote", (tempo.Tempo / 100000.0).ToStringEx());
                         tempoNode.AddAttribute("secondsPerTick", tempo.SecondsPerTick.ToStringEx());
-                        
+
 
                     }
                 }
@@ -9635,5 +9637,231 @@ namespace ProUpgradeEditor.UI
                 return;
             CheckNotesGridSelection();
         }
+
+        private void MainForm_Activated(object sender, EventArgs e)
+        {
+            if (!DesignMode)
+            {
+                EditorPro.Invalidate();
+                EditorG5.Invalidate();
+            }
+        }
+
+        public class MidiEventData1Comparer : IEqualityComparer<MidiEvent>
+        {
+            public bool Equals(MidiEvent x, MidiEvent y)
+            {
+                return x.Data1 == y.Data1;
+            }
+
+
+            public int GetHashCode(MidiEvent obj)
+            {
+                return obj.Data1;
+            }
+        }
+
+        public class MidiEventData2Comparer : IEqualityComparer<MidiEvent>
+        {
+            public bool Equals(MidiEvent x, MidiEvent y)
+            {
+                return x.Data2 == y.Data2;
+            }
+
+            public int GetHashCode(MidiEvent obj)
+            {
+                return obj.Data2;
+            }
+        }
+
+        private void midiExportToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var file = ShowOpenMidiFile();
+            if (!file.IsEmpty() && file.FileExists())
+                ImportTabSiteExportXml(file);
+        }
+
+        private void ImportTabSiteExportXml(string file)
+        {
+            var doc = Encoding.ASCII.GetString(ReadFileBytes(file)).ToXmlDocument();
+
+            var seq = new Sequence(FileType.Pro, 480);
+
+            seq.AddTempo(EditorG5.GuitarTrack.GetTempoTrack().Clone());
+
+            var names = XMLUtil.GetNodeList(doc, "//part-list/score-part/score-instrument/instrument-name").Select(x => XMLUtil.GetNodeValue(x)).ToArray();
+
+            var partNodes = XMLUtil.GetNodeList(doc, "//score-partwise/part");
+            foreach (var partNode in partNodes)
+            {
+                Track inst = new Track(FileType.Pro, names[partNodes.IndexOf(partNode)]);
+
+                var measures = XMLUtil.GetNodeList(partNode, "measure");
+
+                var tcb = new TempoChangeBuilder();
+
+                var lastUpTick = EditorG5.Messages.Chords.Last().UpTick;
+                var firstDownTick = EditorG5.Messages.Chords.First().DownTick;
+                var tickOffset = 0;
+                bool foundFirstNote = false;
+
+                var attrib = new TabSiteMeasureAttribute();
+                foreach (var measure in measures)
+                {
+                    TabSiteMeasureAttribute.FromMeasure(ref attrib, measure);
+
+                    var division = (double)attrib.Divisions;
+
+                    var measureNotes = XMLUtil.GetNodeList(measure, "note");
+                    foreach (var note in measureNotes)
+                    {
+                        var duration = XMLUtil.GetNodeValue(note, "duration").ToDouble();
+
+                        var actualNotes = XMLUtil.GetNodeValue(note, "time-modification/actual-notes").ToInt();
+                        var normalNotes = XMLUtil.GetNodeValue(note, "time-modification/normal-notes").ToInt();
+
+                        var noteString = XMLUtil.GetNodeValue(note, "notations/technical/string").ToInt();
+                        var noteFret = XMLUtil.GetNodeValue(note, "notations/technical/fret").ToInt();
+
+                        var rest = XMLUtil.GetNode(note, "rest");
+                        var chordNode = XMLUtil.GetNode(note, "chord");
+
+                        
+                        var numTicks = calculateTicks(seq, division, duration);
+
+                        if (noteString.IsNull() == false && noteFret.IsNull() == false &&
+                            noteFret < 25 && noteFret >= 0 && noteString >= 1 && noteString <= 6)
+                        {
+                            if (rest == null && noteFret.IsNull() == false && noteString.IsNull() == false)
+                            {
+                                var data1 = Utility.ExpertData1Strings[attrib.StaffLines - noteString];
+
+                                if (foundFirstNote == false)
+                                {
+                                    foundFirstNote = true;
+                                }
+                                if (chordNode != null)
+                                {
+                                    inst.Insert(tickOffset - numTicks, new ChannelMessage(ChannelCommand.NoteOn, data1, 100 + noteFret, 0));
+                                    inst.Insert(tickOffset, new ChannelMessage(ChannelCommand.NoteOff, data1, 0, 0));
+                                }
+                                else
+                                {
+                                    inst.Insert(tickOffset, new ChannelMessage(ChannelCommand.NoteOn, data1, 100 + noteFret, 0));
+                                    inst.Insert(tickOffset + numTicks, new ChannelMessage(ChannelCommand.NoteOff, data1, 0, 0));
+                                }
+                            }
+                        }
+                        if (chordNode == null)
+                        {
+                            tickOffset += numTicks;
+                        }
+
+                    }
+                }
+                if (inst.ChanMessages.Count() > 5)
+                {
+
+                    var gtickPair = EditorG5.Messages.Chords.GetTickPair();
+
+                    EditorPro.Close();
+                    
+                    seq.Add(inst);
+                    EditorPro.SetTrack6(seq, inst);
+                    EditorPro.CurrentDifficulty = GuitarDifficulty.Easy;
+                    EditorPro.CurrentDifficulty = GuitarDifficulty.Expert;
+                    var proPair = EditorPro.Messages.Chords.GetTickPair();
+
+                    if (Utility.ModifyWebTabScale)
+                    {
+                        var scale = gtickPair.TickLength.ToDouble() / proPair.TickLength.ToDouble();
+
+                        var firstDown = EditorPro.Messages.Chords.First().DownTick;
+
+                        EditorPro.Messages.Chords.ToList().ForEach(x =>
+                        {
+                            var down = gtickPair.Down + ((x.DownTick - firstDown).ToDouble() * scale).Round();
+                            var up = gtickPair.Down + ((x.UpTick - firstDown).ToDouble() * scale).Round();
+                            x.SetTicks(new TickPair(down, up));
+                        });
+
+                        SnapToG5();
+                    }
+
+                    CopySoloDataForCurrentTrack();
+
+                    CopyPowerupDataForCurrentTrack();
+
+                    CopyTextEvents(true);
+
+                    CopyBigRockEnding();
+
+                }
+            }
+
+            var saveFileName = ShowSaveFileDlg("Save File", file.GetFolderName(), file.GetFileNameWithoutExtension() + Utility.DefaultPROFileExtension);
+            if (!saveFileName.IsEmpty())
+            {
+                seq.Save(saveFileName);
+
+                EditorPro.LoadMidi17(saveFileName, ReadFileBytes(saveFileName), false);
+            }
+        }
+
+        private static int calculateTicks(Sequence seq, double division, double duration)
+        {
+
+            var numTicks = ((duration * ((double)seq.Division) / (division)) ).Round();
+            return numTicks;
+        }
+
+        public class TabSiteMeasureAttribute
+        {
+            public int Divisions;
+            public int StaffLines;
+            public string[] StaffLineTuning;
+            public int Beats;
+            public int BeatType;
+
+            public static void FromMeasure(ref TabSiteMeasureAttribute ret, XmlNode measureNode)
+            {
+                var attributes = XMLUtil.GetNode(measureNode, "attributes");
+                if (attributes != null)
+                {
+                    var i = XMLUtil.GetNodeValue(attributes, "divisions").ToInt();
+                    if (i.IsNull() == false)
+                    {
+                        ret.Divisions = i;
+                    }
+
+                    //num strings (ex: 6)
+                    i = XMLUtil.GetNodeValue(attributes, "staff-details/staff-lines").ToInt();
+                    if (i.IsNull() == false)
+                    {
+                        ret.StaffLines = i;
+                    }
+
+                    //string tuning (ex: E)
+                    var n = XMLUtil.GetNode(attributes, "staff-details/staff-tuning");
+                    if (n != null)
+                    {
+                        ret.StaffLineTuning = XMLUtil.GetNodeList(n, "tuning-step").Select(x => XMLUtil.GetNodeValue(x)).ToArray();
+                    }
+
+                    //beats per bar (ex: 6)
+                    var b = XMLUtil.GetNodeValue(attributes, "time/beats").ToInt();
+                    if (b.IsNull() == false) { ret.Beats = b; }
+
+                    //4 = quarter note
+                    b = XMLUtil.GetNodeValue(attributes, "time/beat-type").ToInt();
+                    if (b.IsNull() == false)
+                    {
+                        ret.BeatType = b;
+                    }
+                }
+
+            }
+        }
+
     }
 }

@@ -77,46 +77,16 @@ namespace Sanford.Multimedia.Midi
 
         internal static int PackStatus(int message, int status)
         {
-            #region Require
-
-            if(status < 0 || status > StatusMaxValue)
-            {
-                throw new ArgumentOutOfRangeException("status", status,
-                    "Status value out of range.");
-            }
-
-            #endregion            
-
             return (message & StatusMask) | status;
         }
 
         internal static int PackData1(int message, int data1)
         {
-            #region Require
-
-            if(data1 < 0 || data1 > DataMaxValue)
-            {
-                throw new ArgumentOutOfRangeException("data1", data1,
-                    "Data 1 value out of range.");
-            }
-
-            #endregion
-
             return (message & Data1Mask) | (data1 << Shift);
         }
 
         internal static int PackData2(int message, int data2)
         {
-            #region Require
-
-            if(data2 < 0 || data2 > DataMaxValue)
-            {
-                System.Diagnostics.Debug.WriteLine(
-                    "Data 2 value out of range.");
-            }
-
-            #endregion
-
             return (message & Data2Mask) | (data2 << (Shift * 2));
         }
 

@@ -404,7 +404,7 @@ namespace ProUpgradeEditor.Common
             int stringOffset=int.MinValue)
         {
             return GuitarChord.CreateChord(track, track.CurrentDifficulty,
-                ticks,
+                track.Owner.SnapLeftRightTicks(ticks),
                 Notes.GetFretsAtStringOffset(stringOffset.GetIfNull(0)),
                 Notes.GetChannelsAtStringOffset(stringOffset.GetIfNull(0)),
                 IsSlide, IsSlideReversed, IsHammeron, StrumMode);
@@ -412,9 +412,9 @@ namespace ProUpgradeEditor.Common
 
         public override void CreateEvents()
         {
-            SetTicks(OwnerTrack.Owner.SnapLeftRightTicks(TickPair));
+            SnapEvents();
 
-            OwnerTrack.RemoveRange(OwnerTrack.Messages.Chords.GetBetweenTick(TickPair).ToList());
+            OwnerTrack.Remove(OwnerTrack.Messages.Chords.GetBetweenTick(TickPair).ToList());
 
             Notes.ForEach(x => x.CreateEvents());
             Modifiers.ForEach(x => x.CreateEvents());
@@ -451,8 +451,8 @@ namespace ProUpgradeEditor.Common
         }
         public override void UpdateEvents()
         {
-            Notes.ForEach(x => x.UpdateEvents());
-            Modifiers.ForEach(x => x.UpdateEvents());
+            RemoveEvents();
+            CreateEvents();
         }
 
         public override void RemoveEvents()

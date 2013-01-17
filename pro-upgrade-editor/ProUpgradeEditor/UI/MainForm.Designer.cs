@@ -671,6 +671,8 @@
             this.xBoxUSBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tabVToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.midiExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             groupBox24 = new System.Windows.Forms.GroupBox();
             groupBox15 = new System.Windows.Forms.GroupBox();
             groupBox3 = new System.Windows.Forms.GroupBox();
@@ -2524,10 +2526,10 @@
             this.tabSongLibUtility.Controls.Add(this.button117);
             this.tabSongLibUtility.Controls.Add(this.button75);
             this.tabSongLibUtility.ImageIndex = 69;
-            this.tabSongLibUtility.Location = new System.Drawing.Point(4, 24);
+            this.tabSongLibUtility.Location = new System.Drawing.Point(4, 23);
             this.tabSongLibUtility.Name = "tabSongLibUtility";
             this.tabSongLibUtility.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSongLibUtility.Size = new System.Drawing.Size(773, 488);
+            this.tabSongLibUtility.Size = new System.Drawing.Size(773, 489);
             this.tabSongLibUtility.TabIndex = 1;
             this.tabSongLibUtility.Text = "Batch Utilities";
             // 
@@ -3102,9 +3104,9 @@
             // tabSongLibSongUtility
             // 
             this.tabSongLibSongUtility.Controls.Add(this.groupBox47);
-            this.tabSongLibSongUtility.Location = new System.Drawing.Point(4, 24);
+            this.tabSongLibSongUtility.Location = new System.Drawing.Point(4, 23);
             this.tabSongLibSongUtility.Name = "tabSongLibSongUtility";
-            this.tabSongLibSongUtility.Size = new System.Drawing.Size(773, 488);
+            this.tabSongLibSongUtility.Size = new System.Drawing.Size(773, 489);
             this.tabSongLibSongUtility.TabIndex = 2;
             this.tabSongLibSongUtility.Text = "Song Utility";
             this.tabSongLibSongUtility.UseVisualStyleBackColor = true;
@@ -3166,10 +3168,10 @@
             this.tabTrackEditor.Controls.Add(this.panel2);
             this.tabTrackEditor.ForeColor = System.Drawing.SystemColors.ControlText;
             this.tabTrackEditor.ImageIndex = 46;
-            this.tabTrackEditor.Location = new System.Drawing.Point(4, 24);
+            this.tabTrackEditor.Location = new System.Drawing.Point(4, 23);
             this.tabTrackEditor.Margin = new System.Windows.Forms.Padding(0);
             this.tabTrackEditor.Name = "tabTrackEditor";
-            this.tabTrackEditor.Size = new System.Drawing.Size(1095, 522);
+            this.tabTrackEditor.Size = new System.Drawing.Size(1095, 523);
             this.tabTrackEditor.TabIndex = 1;
             this.tabTrackEditor.Text = "Track Editor";
             // 
@@ -3295,10 +3297,10 @@
             this.tabNoteEditor.Controls.Add(this.groupBoxStrumMarkers);
             this.tabNoteEditor.ForeColor = System.Drawing.SystemColors.ControlText;
             this.tabNoteEditor.ImageIndex = 13;
-            this.tabNoteEditor.Location = new System.Drawing.Point(4, 24);
+            this.tabNoteEditor.Location = new System.Drawing.Point(4, 23);
             this.tabNoteEditor.Name = "tabNoteEditor";
             this.tabNoteEditor.Padding = new System.Windows.Forms.Padding(3);
-            this.tabNoteEditor.Size = new System.Drawing.Size(1095, 522);
+            this.tabNoteEditor.Size = new System.Drawing.Size(1095, 523);
             this.tabNoteEditor.TabIndex = 2;
             this.tabNoteEditor.Text = "Note Editor";
             this.tabNoteEditor.Click += new System.EventHandler(this.tabPage2_Click);
@@ -5362,10 +5364,10 @@
             this.tabModifierEditor.Controls.Add(this.groupBoxPowerup);
             this.tabModifierEditor.Controls.Add(this.groupBoxSolo);
             this.tabModifierEditor.ImageIndex = 71;
-            this.tabModifierEditor.Location = new System.Drawing.Point(4, 24);
+            this.tabModifierEditor.Location = new System.Drawing.Point(4, 23);
             this.tabModifierEditor.Name = "tabModifierEditor";
             this.tabModifierEditor.Padding = new System.Windows.Forms.Padding(3);
-            this.tabModifierEditor.Size = new System.Drawing.Size(1095, 522);
+            this.tabModifierEditor.Size = new System.Drawing.Size(1095, 523);
             this.tabModifierEditor.TabIndex = 4;
             this.tabModifierEditor.Text = "Modifier Editor";
             this.tabModifierEditor.Click += new System.EventHandler(this.tabPage4_Click);
@@ -6022,10 +6024,10 @@
             this.tabPageEvents.Controls.Add(this.groupBoxProBassTrainers);
             this.tabPageEvents.Controls.Add(this.groupBoxProGuitarTrainers);
             this.tabPageEvents.ImageIndex = 59;
-            this.tabPageEvents.Location = new System.Drawing.Point(4, 24);
+            this.tabPageEvents.Location = new System.Drawing.Point(4, 23);
             this.tabPageEvents.Name = "tabPageEvents";
             this.tabPageEvents.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageEvents.Size = new System.Drawing.Size(1095, 522);
+            this.tabPageEvents.Size = new System.Drawing.Size(1095, 523);
             this.tabPageEvents.TabIndex = 10;
             this.tabPageEvents.Text = "Events";
             // 
@@ -6512,10 +6514,10 @@
             this.tabPackageEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
             this.tabPackageEditor.Controls.Add(this.tabControl3);
             this.tabPackageEditor.ImageIndex = 52;
-            this.tabPackageEditor.Location = new System.Drawing.Point(4, 24);
+            this.tabPackageEditor.Location = new System.Drawing.Point(4, 23);
             this.tabPackageEditor.Name = "tabPackageEditor";
             this.tabPackageEditor.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPackageEditor.Size = new System.Drawing.Size(1095, 522);
+            this.tabPackageEditor.Size = new System.Drawing.Size(1095, 523);
             this.tabPackageEditor.TabIndex = 7;
             this.tabPackageEditor.Text = "Package Editor";
             this.tabPackageEditor.DragEnter += new System.Windows.Forms.DragEventHandler(this.tabPage3_DragEnter);
@@ -6529,7 +6531,7 @@
             this.tabControl3.Location = new System.Drawing.Point(3, 3);
             this.tabControl3.Name = "tabControl3";
             this.tabControl3.SelectedIndex = 0;
-            this.tabControl3.Size = new System.Drawing.Size(1089, 516);
+            this.tabControl3.Size = new System.Drawing.Size(1089, 517);
             this.tabControl3.TabIndex = 23;
             // 
             // tabPage8
@@ -6539,7 +6541,7 @@
             this.tabPage8.Location = new System.Drawing.Point(4, 24);
             this.tabPage8.Name = "tabPage8";
             this.tabPage8.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage8.Size = new System.Drawing.Size(1081, 488);
+            this.tabPage8.Size = new System.Drawing.Size(1081, 489);
             this.tabPage8.TabIndex = 1;
             this.tabPage8.Text = "Package Viewer";
             // 
@@ -6560,7 +6562,7 @@
             this.groupBox32.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.groupBox32.Location = new System.Drawing.Point(3, 3);
             this.groupBox32.Name = "groupBox32";
-            this.groupBox32.Size = new System.Drawing.Size(1075, 484);
+            this.groupBox32.Size = new System.Drawing.Size(1075, 485);
             this.groupBox32.TabIndex = 0;
             this.groupBox32.TabStop = false;
             this.groupBox32.Text = "Package Viewer";
@@ -6622,7 +6624,7 @@
             this.textBoxPackageDTAText.Name = "textBoxPackageDTAText";
             this.textBoxPackageDTAText.ReadOnly = true;
             this.textBoxPackageDTAText.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBoxPackageDTAText.Size = new System.Drawing.Size(614, 346);
+            this.textBoxPackageDTAText.Size = new System.Drawing.Size(614, 347);
             this.textBoxPackageDTAText.TabIndex = 5;
             this.textBoxPackageDTAText.WordWrap = false;
             // 
@@ -6721,10 +6723,10 @@
             this.tabPage6.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.tabPage6.Controls.Add(this.groupBox31);
             this.tabPage6.Controls.Add(this.groupBox30);
-            this.tabPage6.Location = new System.Drawing.Point(4, 24);
+            this.tabPage6.Location = new System.Drawing.Point(4, 22);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage6.Size = new System.Drawing.Size(1081, 488);
+            this.tabPage6.Size = new System.Drawing.Size(1081, 490);
             this.tabPage6.TabIndex = 0;
             this.tabPage6.Text = "Package Utility";
             // 
@@ -6874,10 +6876,10 @@
             this.tabUSBDrive.Controls.Add(this.buttonUSBDeleteSelected);
             this.tabUSBDrive.Controls.Add(this.button125);
             this.tabUSBDrive.ImageIndex = 22;
-            this.tabUSBDrive.Location = new System.Drawing.Point(4, 24);
+            this.tabUSBDrive.Location = new System.Drawing.Point(4, 23);
             this.tabUSBDrive.Name = "tabUSBDrive";
             this.tabUSBDrive.Padding = new System.Windows.Forms.Padding(3);
-            this.tabUSBDrive.Size = new System.Drawing.Size(1095, 522);
+            this.tabUSBDrive.Size = new System.Drawing.Size(1095, 523);
             this.tabUSBDrive.TabIndex = 9;
             this.tabUSBDrive.Text = "USB Drive";
             // 
@@ -7236,10 +7238,10 @@
             this.tabSettings.Controls.Add(this.groupBox17);
             this.tabSettings.Controls.Add(this.groupBox19);
             this.tabSettings.ImageIndex = 30;
-            this.tabSettings.Location = new System.Drawing.Point(4, 24);
+            this.tabSettings.Location = new System.Drawing.Point(4, 23);
             this.tabSettings.Name = "tabSettings";
             this.tabSettings.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSettings.Size = new System.Drawing.Size(1095, 522);
+            this.tabSettings.Size = new System.Drawing.Size(1095, 523);
             this.tabSettings.TabIndex = 5;
             this.tabSettings.Text = "Settings";
             // 
@@ -8180,7 +8182,6 @@
             this.trackEditorG5.ScrollToSelectionEnabled = false;
             this.trackEditorG5.SelectCurrentPoint = new System.Drawing.Point(0, 0);
             this.trackEditorG5.SelectStartPoint = new System.Drawing.Point(0, 0);
-            
             this.trackEditorG5.Show108Events = false;
             this.trackEditorG5.ShowNotesGrid = false;
             this.trackEditorG5.Size = new System.Drawing.Size(1101, 117);
@@ -8307,7 +8308,6 @@
             this.trackEditorG6.ScrollToSelectionEnabled = false;
             this.trackEditorG6.SelectCurrentPoint = new System.Drawing.Point(0, 0);
             this.trackEditorG6.SelectStartPoint = new System.Drawing.Point(0, 0);
-            
             this.trackEditorG6.Show108Events = false;
             this.trackEditorG6.ShowNotesGrid = false;
             this.trackEditorG6.Size = new System.Drawing.Size(1101, 117);
@@ -8553,9 +8553,10 @@
             // 
             this.importToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.cONPackageToolStripMenuItem,
-            this.zipFileToolStripMenuItem});
+            this.zipFileToolStripMenuItem,
+            this.tabVToolStripMenuItem});
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.importToolStripMenuItem.Text = "&Import";
             // 
             // cONPackageToolStripMenuItem
@@ -8630,11 +8631,27 @@
             this.aboutToolStripMenuItem.Text = "&About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
+            // tabVToolStripMenuItem
+            // 
+            this.tabVToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.midiExportToolStripMenuItem});
+            this.tabVToolStripMenuItem.Name = "tabVToolStripMenuItem";
+            this.tabVToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.tabVToolStripMenuItem.Text = "Tab Exporter";
+            // 
+            // midiExportToolStripMenuItem
+            // 
+            this.midiExportToolStripMenuItem.Name = "midiExportToolStripMenuItem";
+            this.midiExportToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.midiExportToolStripMenuItem.Text = "Midi Export XML";
+            this.midiExportToolStripMenuItem.Click += new System.EventHandler(this.midiExportToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.Gainsboro;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.AutoValidate = System.Windows.Forms.AutoValidate.Disable;
+            this.BackColor = System.Drawing.SystemColors.Control;
+            this.CausesValidation = false;
             this.ClientSize = new System.Drawing.Size(1103, 874);
             this.Controls.Add(this.tabContainerMain);
             this.Controls.Add(this.panelProEditor);
@@ -8647,6 +8664,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainForm";
             this.Text = "Ziggys Pro Guitar Editor";
+            this.Activated += new System.EventHandler(this.MainForm_Activated);
             this.Load += new System.EventHandler(this.Form1_Load);
             groupBox24.ResumeLayout(false);
             this.panel8.ResumeLayout(false);
@@ -9422,6 +9440,8 @@
         private System.Windows.Forms.ToolStripMenuItem saveProXMLToolStripMenuItem;
         private System.Windows.Forms.RadioButton radioGridHalfNote;
         private System.Windows.Forms.RadioButton radioGridWholeNote;
+        private System.Windows.Forms.ToolStripMenuItem tabVToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem midiExportToolStripMenuItem;
         
 
     }

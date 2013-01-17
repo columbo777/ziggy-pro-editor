@@ -572,11 +572,11 @@ namespace ProUpgradeEditor.UI
             EditorG5.CurrentDifficulty = targetDifficulty;
 
             var target5 = EditorG5.Messages.Chords.ToList();
-            sourceChords = sourceChords.Where(c => target5.AnyBetweenTick(c.TickPair)).ToList();
+            sourceChords = sourceChords.Where(c => target5.AnyBetweenTick(c.TickPair.Expand(-1))).ToList();
 
             if (targetDifficulty.IsHard())
             {
-                ProGuitarTrack.RemoveRange(ProGuitarTrack.Messages.Arpeggios.ToList());
+                ProGuitarTrack.Remove(ProGuitarTrack.Messages.Arpeggios.ToList());
 
                 foreach (var arp in sourceArp.Where(x => sourceChords.AnyBetweenTick(x.TickPair)))
                 {
@@ -641,7 +641,6 @@ namespace ProUpgradeEditor.UI
 
         private bool ExecuteBatchRebuildCON()
         {
-
             try
             {
                 buttonSongLibCancel.Enabled = true;
@@ -1320,7 +1319,7 @@ namespace ProUpgradeEditor.UI
                             }
 
                             bool arpeggioMissingChords = false;
-                            bool missingHelperNotes = false;
+                            
                             foreach (var mod in EditorPro.GuitarTrack.Messages.Arpeggios.ToList())
                             {
                                 var chords = EditorPro.GuitarTrack.Messages.Chords.GetBetweenTick(
@@ -1330,26 +1329,14 @@ namespace ProUpgradeEditor.UI
                                 {
                                     arpeggioMissingChords = true;
                                 }
-                                else
-                                {
-                                    bool hasHelper = chords.First().Notes.Any(x=> x.IsArpeggioNote);
-                                    
-                                    if (hasHelper == false)
-                                    {
-                                        missingHelperNotes = true;
-                                    }
-                                }
+                                
                             }
 
                             if (arpeggioMissingChords)
                             {
                                 fileErrors.Add(trackName + " Arpeggio found with no chords: " + EditorPro.CurrentDifficulty.ToString());
                             }
-                            if (missingHelperNotes)
-                            {
-                                fileErrors.Add(trackName + " Arpeggio missing helper notes: " + EditorPro.CurrentDifficulty.ToString());
-                            }
-
+                            
                             bool modWithNoNotes =
                                 EditorPro.GuitarTrack.Messages.SingleStringTremelos.Any(x =>
                                     !EditorPro.GuitarTrack.Messages.Chords.GetBetweenTick(new TickPair(x.DownTick, x.UpTick)).Any());
@@ -1365,15 +1352,6 @@ namespace ProUpgradeEditor.UI
                             if (modWithNoNotes)
                             {
                                 fileErrors.Add(trackName + " Multi string tremelo with no notes: " + EditorPro.CurrentDifficulty.ToString());
-                            }
-
-                            modWithNoNotes = 
-                                EditorPro.GuitarTrack.Messages.Powerups.Any(x =>
-                                    !EditorPro.GuitarTrack.Messages.Chords.GetBetweenTick(new TickPair(x.DownTick, x.UpTick)).Any());
-                            
-                            if (modWithNoNotes)
-                            {
-                                fileErrors.Add(trackName + " Powerup with no notes: " + EditorPro.CurrentDifficulty.ToString());
                             }
 
                             bool hasNotes = false;

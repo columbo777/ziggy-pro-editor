@@ -552,6 +552,7 @@ namespace ProUpgradeEditor.Common
         public void Add<T>(T mess) where T : GuitarMessage
         {
             GetMessageListForType(mess.MessageType).Add(mess);
+            
         }
 
 

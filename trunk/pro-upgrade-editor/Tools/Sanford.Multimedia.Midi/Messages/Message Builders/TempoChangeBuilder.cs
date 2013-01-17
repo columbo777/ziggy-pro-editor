@@ -107,30 +107,19 @@ namespace Sanford.Multimedia.Midi
         /// </exception>
         public void Initialize(MetaMessage e)
         {
-            #region Require
-
-            if(e == null)
-            {
-                throw new ArgumentNullException("e");
-            }
-            else if(e.MetaType != MetaType.Tempo)
-            {
-                throw new ArgumentException("Wrong meta message type.", "e");
-            }
-
-            #endregion
-
+            
             int t = 0;
 
+            var b = e.GetBytes();
             // If this platform uses little endian byte order.
             if(BitConverter.IsLittleEndian)
             {
-                int d = e.Length - 1;
-
+                int d = b.Length - 1;
+                
                 // Pack tempo.
                 for(int i = 0; i < e.Length; i++)
                 {
-                    t |= e[d] << (Shift * i);
+                    t |= b[d] << (Shift * i);
                     d--;
                 }
             }
@@ -140,7 +129,7 @@ namespace Sanford.Multimedia.Midi
                 // Pack tempo.
                 for(int i = 0; i < e.Length; i++)
                 {
-                    t |= e[i] << (Shift * i);
+                    t |= b[i] << (Shift * i);
                 }                    
             }
 
@@ -165,16 +154,7 @@ namespace Sanford.Multimedia.Midi
             }
             set
             {
-                #region Require
-
-                if(value < 0)
-                {
-                    throw new ArgumentOutOfRangeException("Tempo", value,
-                        "Tempo is out of range.");
-                }
-
-                #endregion
-
+                
                 tempo = value;
 
                 changed = true;

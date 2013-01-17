@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace Sanford.Multimedia.Midi
 {
@@ -15,30 +16,36 @@ namespace Sanford.Multimedia.Midi
         private MidiEvent previous = null;
 
         bool deleted;
-
-        public int Data1 { get { return this.ChannelMessage != null ? this.ChannelMessage.Data1 : int.MinValue; } }
-        public int Data2 { get { return this.ChannelMessage != null ? this.ChannelMessage.Data2 : int.MinValue; } }
+        int data1;
+        int data2;
+        public int Data1 
+        { 
+            get 
+            {
+                return data1;
+                //this.ChannelMessage != null ? this.ChannelMessage.Data1 : int.MinValue; 
+            } 
+        }
+        public int Data2 
+        { 
+            get 
+            {
+                return data2;
+                //return this.ChannelMessage != null ? this.ChannelMessage.Data2 : int.MinValue; 
+            } 
+        }
+        int channelCommand;
         public ChannelCommand Command 
         { 
             get 
             {
-                if (this.ChannelMessage != null)
-                {
-                    if (owner != null && owner.FileType == FileType.Guitar5)
-                    {
-                        if (Data2 == 0 || Data2 == 64)
-                        {
-                            return ChannelCommand.NoteOff;
-                        }
-                        return this.ChannelMessage.Command;
-                    }
-                    else
-                        return ChannelMessage.Command;
-                }
-                else
-                    return 0;
+                return (ChannelCommand)channelCommand;
             } 
         }
+
+        public bool IsOn { get { return channelCommand == (int)ChannelCommand.NoteOn; } }
+        public bool IsOff { get { return channelCommand == (int)ChannelCommand.NoteOff; } }
+
         public int Channel { get { return this.ChannelMessage != null ? this.ChannelMessage.MidiChannel : int.MinValue; } }
 
         public MessageType MessageType
@@ -52,25 +59,63 @@ namespace Sanford.Multimedia.Midi
 
         public override string ToString()
         {
-            
+            var ret = new StringBuilder(64);
+
             if (message != null)
             {
-                if (message.MessageType == MessageType.Meta)
+                if (MessageType == MessageType.Meta)
                 {
-                    return  ((MetaMessage)message).ToString();
+                    var meta = message as MetaMessage;
+                    if (meta.MetaType == Midi.MetaType.TrackName)
+                    {
+                        ret.Append(meta.Text);
+                    }
+                    else
+                    {
+                        ret.Append(AbsoluteTicks.ToString());
+                        ret.Append(" - ");
+                        ret.Append(this.MetaMessage.ToString());
+                    }
                 }
-                var cm = message as ChannelMessage;
-                if (cm != null)
+                else if(MessageType == Midi.MessageType.Channel)
                 {
-                    return AbsoluteTicks.ToString() + " - " + message.MessageType.ToString() + " cmd: " + cm.Command.ToString() + " d1: " + cm.Data1 + " d2: " + cm.Data2.ToString() +
-                        " chan: " + cm.MidiChannel.ToString(); ;
+                    int msg = (message as ChannelMessage).Message;
+                    ret.Append(AbsoluteTicks.ToString());
+                    ret.Append(" cmd: ");
+                    ret.Append(ChannelMessage.UnpackCommand(msg));
+
+                    ret.Append(" chan: ");
+                    ret.Append(ChannelMessage.UnpackMidiChannel(msg));
+
+                    ret.Append(" d1: ");
+                    ret.Append(ChannelMessage.UnpackData1(msg));
+
+                    ret.Append(" d2: ");
+                    ret.Append(ChannelMessage.UnpackData2(msg));
+
+                    ret.Append(" - stat: ");
+                    ret.Append(ChannelMessage.UnpackStatus(msg));
+                }
+                else if(message is ShortMessage)
+                {
+                    var msg = (message as ShortMessage).Message;
+                    ret.Append(AbsoluteTicks.ToString());
+                    ret.Append(" - d1: ");
+                    ret.Append(ShortMessage.UnpackData1(msg));
+
+                    ret.Append(" - d2: ");
+                    ret.Append(ShortMessage.UnpackData2(msg));
+
+                    ret.Append(" - stat: ");
+                    ret.Append(ShortMessage.UnpackStatus(msg));
                 }
                 else
                 {
-                    return AbsoluteTicks.ToString() + " - " +  cm.MessageType.ToString();
+                    ret.Append(AbsoluteTicks.ToString());
+                    ret.Append(this.MessageType.ToString());
                 }
             }
-            return "";
+            return ret.ToString();
         }
 
         public MidiEvent(Track owner, int absoluteTicks, IMidiMessage message)
@@ -79,6 +124,23 @@ namespace Sanford.Multimedia.Midi
             this.absoluteTicks = absoluteTicks;
             this.message = message;
             deleted = false;
+
+            data2 = data1 = Int32.MinValue;
+            channelCommand = 0;
+
+            if (message is ChannelMessage)
+            {
+                int msg = (message as ChannelMessage).Message;
+                channelCommand = (int)ChannelMessage.UnpackCommand(msg);
+                data1 = ChannelMessage.UnpackData1(msg);
+                data2 = ChannelMessage.UnpackData2(msg);
+            }
+            else if (message is ShortMessage)
+            {
+                var msg = (message as ShortMessage).Message;
+                data1 = ShortMessage.UnpackData1(msg);
+                data2 = ShortMessage.UnpackData2(msg);
+            }
         }
 
         
@@ -88,21 +150,15 @@ namespace Sanford.Multimedia.Midi
 
             if (this.MessageType == MessageType.Channel)
             {
-                var cb = new ChannelMessageBuilder(this.ChannelMessage);
-                cb.Build();
-                ret = cb.Result;
+                ret = new ChannelMessage(ChannelMessage.Message);
             }
             else if (this.MessageType == MessageType.Meta)
             {
-                var mb = new MetaTextBuilder(this.MetaMessage);
-                mb.Build();
-                ret = mb.Result;
+                ret = new MetaMessage(this.MetaType, this.MetaMessage.GetBytes());
             }
             else if(this.MessageType == MessageType.SystemCommon)
             {
-                var sb = new SysCommonMessageBuilder(this.MidiMessage as SysCommonMessage);
-                sb.Build();
-                ret = sb.Result;
+                ret = new SysCommonMessage((this.MidiMessage as SysCommonMessage).Message);
             }
             else if(this.MessageType == MessageType.SystemExclusive) 
             {

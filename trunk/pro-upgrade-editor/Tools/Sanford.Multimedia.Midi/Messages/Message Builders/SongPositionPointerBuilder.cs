@@ -122,20 +122,6 @@ namespace Sanford.Multimedia.Midi
         /// </exception>
         public void Initialize(SysCommonMessage message)
         {
-            #region Require
-
-            if(message == null)
-            {
-                throw new ArgumentNullException("message");
-            }
-            else if(message.SysCommonType != SysCommonType.SongPositionPointer)
-            {
-                throw new ArgumentException(
-                    "Message is not a song position pointer message.");
-            }
-
-            #endregion
-
             builder.Initialize(message);
         }
 
@@ -163,16 +149,6 @@ namespace Sanford.Multimedia.Midi
             }
             set
             {
-                #region Require
-
-                if(value < 0)
-                {
-                    throw new ArgumentOutOfRangeException("PositionInTicks", value,
-                        "Position in ticks out of range.");
-                }
-
-                #endregion
-
                 SongPosition = value / (tickScale * TicksPer16thNote);
             }
         }        
@@ -191,16 +167,6 @@ namespace Sanford.Multimedia.Midi
             }
             set
             {
-                #region Require
-
-                if (value % PpqnClock.DefaultPpqnValue != 0)
-                {
-                    throw new ArgumentException(
-                        "Invalid pulses per quarter note value.");
-                }
-
-                #endregion
-
                 ppqn = value;
 
                 tickScale = ppqn / PpqnClock.DefaultPpqnValue;
@@ -221,16 +187,6 @@ namespace Sanford.Multimedia.Midi
             }
             set
             {
-                #region Require
-
-                if(value < 0)
-                {
-                    throw new ArgumentOutOfRangeException("SongPosition", value,
-                        "Song position pointer out of range.");
-                }
-
-                #endregion
-
                 builder.Data1 = value & Mask;
                 builder.Data2 = value >> Shift;
             }

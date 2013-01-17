@@ -456,75 +456,21 @@ namespace Sanford.Multimedia.Midi
         #endregion
 
         #region Construction
-        
-        /// <summary>
-        /// Initializes a new instance of the ChannelEventArgs class with the
-        /// specified command, MIDI channel, and data 1 values.
-        /// </summary>
-        /// <param name="command">
-        /// The command value.
-        /// </param>
-        /// <param name="midiChannel">
-        /// The MIDI channel.
-        /// </param>
-        /// <param name="data1">
-        /// The data 1 value.
-        /// </param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// If midiChannel is less than zero or greater than 15. Or if 
-        /// data1 is less than zero or greater than 127.
-        /// </exception>
-        public ChannelMessage(ChannelCommand command, int midiChannel, int data1)
-        { 
-            msg = 0;
 
-            msg = PackCommand(msg, command);
-            msg = PackMidiChannel(msg, midiChannel);
-            msg = PackData1(msg, data1);
-
-            #region Ensure
-
-            Debug.Assert(Command == command);
-            Debug.Assert(MidiChannel == midiChannel);
-            Debug.Assert(Data1 == data1);
-
-            #endregion
-        }        
-
-        /// <summary>
-        /// Initializes a new instance of the ChannelEventArgs class with the 
-        /// specified command, MIDI channel, data 1, and data 2 values.
-        /// </summary>
-        /// <param name="command">
-        /// The command value.
-        /// </param>
-        /// <param name="midiChannel">
-        /// The MIDI channel.
-        /// </param>
-        /// <param name="data1">
-        /// The data 1 value.
-        /// </param>
-        /// <param name="data2">
-        /// The data 2 value.
-        /// </param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// If midiChannel is less than zero or greater than 15. Or if 
-        /// data1 or data 2 is less than zero or greater than 127. 
-        /// </exception>
-        public ChannelMessage(ChannelCommand command, int midiChannel, 
-            int data1, int data2)
+        public ChannelMessage(ChannelCommand command, int data1, int data2, int midiChannel = 0)
         {
             msg = 0;
-
             msg = PackCommand(msg, command);
-            msg = PackMidiChannel(msg, midiChannel);
-            msg = PackData1(msg, data1);
-            msg = PackData2(msg, data2);
-
-           
+            if(midiChannel != 0)
+                msg = PackMidiChannel(msg, midiChannel);
+            if(data1 != 0)
+                msg = PackData1(msg, data1);
+            if(data2 != 0)
+                msg = PackData2(msg, data2);
         }
 
-        internal ChannelMessage(int message)
+
+        public ChannelMessage(int message)
         {
             this.msg = message;            
         }
@@ -557,18 +503,7 @@ namespace Sanford.Multimedia.Midi
         /// </returns>
         public override bool Equals(object obj)
         {
-            #region Guard
-
-            if(!(obj is ChannelMessage))
-            {
-                return false;
-            }
-
-            #endregion
-            
-            ChannelMessage e = (ChannelMessage)obj;            
-
-            return this.msg == e.msg;
+            return this.msg == ((ChannelMessage)obj).msg;
         }
 
         /// <summary>
@@ -585,8 +520,7 @@ namespace Sanford.Multimedia.Midi
         {
             int result;
 
-            if(command == ChannelCommand.ChannelPressure ||
-                command == ChannelCommand.ProgramChange)
+            if(command == ChannelCommand.ChannelPressure || command == ChannelCommand.ProgramChange)
             {
                 result = 1;
             }
@@ -645,16 +579,6 @@ namespace Sanford.Multimedia.Midi
         /// </exception>
         internal static int PackMidiChannel(int message, int midiChannel)
         {
-            #region Preconditons
-
-            if(midiChannel < 0 || midiChannel > MidiChannelMaxValue)
-            {
-                throw new ArgumentOutOfRangeException("midiChannel", midiChannel,
-                    "MIDI channel out of range.");
-            }
-
-            #endregion
-
             return (message & MidiChannelMask) | midiChannel;
         }
 
@@ -691,9 +615,7 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                var ret = UnpackCommand(msg);
-                
-                return ret;
+                return UnpackCommand(msg);
             }
         }
         
@@ -726,7 +648,6 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                
                 return UnpackData2(msg);
             }
         }
@@ -742,7 +663,6 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
-        public object Tag { get; set; }
 
         #endregion
 

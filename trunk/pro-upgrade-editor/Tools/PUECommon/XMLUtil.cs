@@ -10,8 +10,32 @@ namespace ProUpgradeEditor.Common
     {
         public static XmlDocument LoadXml(string xml)
         {
-            XmlDocument ret = new XmlDocument();
-            ret.LoadXml(xml);
+            var ret = new XmlDocument();
+            try
+            {
+                ret.LoadXml(xml);
+            }
+            catch { }
+            return ret;
+        }
+        public static string GetNodeValue(XmlNode rootNode)
+        {
+            string ret = string.Empty;
+            if (rootNode != null)
+            {
+                var n = rootNode;
+                if (n != null)
+                {
+                    if (n.NodeType == XmlNodeType.Attribute)
+                    {
+                        ret = n.Value ?? string.Empty;
+                    }
+                    else
+                    {
+                        ret = n.InnerText ?? string.Empty;
+                    }
+                }
+            }
             return ret;
         }
         public static string GetNodeValue(XmlNode rootNode, string xpath)

@@ -26,13 +26,14 @@ namespace ProUpgradeEditor.Common
         }
         public bool IsLoaded
         {
-            get { return guitarTrack.IsLoaded; }
+            get { return guitarTrack != null && guitarTrack.IsLoaded; }
         }
         public bool ViewLyrics
         {
             get;
             set;
         }
+
         public void AddTrack(Track t)
         {
             if (IsLoaded)
@@ -1003,32 +1004,7 @@ namespace ProUpgradeEditor.Common
                         DrawChords5(g, c);
                     }
 
-                    if (ViewLyrics)
-                    {
-                        var visLyrics = new List<GuitarTextEvent>();
-                        try
-                        {
-                            if (ViewLyrics)
-                            {
-                                if (Sequence.HasVocalTrack() &&
-                                    guitarTrack != null &&
-                                    guitarTrack.GetTrack() != null &&
-                                    guitarTrack.GetTrack().Name.IsVocalTrackName5() == false)
-                                {
-                                    visLyrics.AddRange(Sequence.GetVocalTrack().Meta.Where(x => x.IsTextEvent()).
-                                        Where(x => x.AbsoluteTicks > visTicks.Down &&
-                                            x.AbsoluteTicks < visTicks.Up).ToList()
-                                        .Where(x => x.MetaMessage.Text.StartsWithEx("[") == false)
-                                        .Select(x => GuitarTextEvent.GetTextEvent(guitarTrack, x)));
-                                }
-                            }
-                        }
-                        catch { }
-                        
-                        visLyrics.AddRange(visText);
-                        
-                        DrawTextEvents(g, true, false, visLyrics);
-                    }
+                    visTicks = DrawLyrics(g, visTicks, visText);
                 }
                 else
                 {
@@ -1074,6 +1050,37 @@ namespace ProUpgradeEditor.Common
 
             }
             catch { }
+        }
+
+        private TickPair DrawLyrics(Graphics g, TickPair visTicks, List<GuitarTextEvent> visText)
+        {
+            if (ViewLyrics)
+            {
+                var visLyrics = new List<GuitarTextEvent>();
+                try
+                {
+                    if (ViewLyrics)
+                    {
+                        if (Sequence.HasVocalTrack() &&
+                            guitarTrack != null &&
+                            guitarTrack.GetTrack() != null &&
+                            guitarTrack.GetTrack().Name.IsVocalTrackName5() == false)
+                        {
+                            visLyrics.AddRange(Sequence.GetVocalTrack().Meta.Where(x => x.IsTextEvent()).
+                                Where(x => x.AbsoluteTicks > visTicks.Down &&
+                                    x.AbsoluteTicks < visTicks.Up).ToList()
+                                .Where(x => x.MetaMessage.Text.StartsWithEx("[") == false)
+                                .Select(x => GuitarTextEvent.GetTextEvent(guitarTrack, x)));
+                        }
+                    }
+                }
+                catch { }
+
+                visLyrics.AddRange(visText);
+
+                DrawTextEvents(g, true, false, visLyrics);
+            }
+            return visTicks;
         }
 
         private void DrawBeatNoteGrid5(PaintEventArgs e, IEnumerable<GuitarTempo> visTempo, IEnumerable<GuitarTimeSignature> visTimeSig)
@@ -1143,36 +1150,98 @@ namespace ProUpgradeEditor.Common
 
             var gridScale = (int)GridScale.GetTimeUnit(GridScalar);
 
-            foreach (var point in guitarTrack.NoteGrid.Points.Where(x =>
-                x.ScreenPoint.IsBetween(left, right, true) &&
-                (x.IntTimeUnit.IsBetween(gridScale, gridScale / 4) ||
-                (x.IntTimeUnit > gridScale))).ToList())
+            var gridPoints = GetVisibleGridPoints(left, right);
+
+            foreach (var point in gridPoints)
             {
-                var isMatchingUnit = point.IntTimeUnit >= gridScale;
-                var isNextLevel = point.IntTimeUnit == gridScale / 2;
-                var isNextNextLevel = point.IntTimeUnit == gridScale / 4;
+                drawGridLine(e, point.ScreenPoint);
 
-                var color = isMatchingUnit ? Utility.beatPen.Color : isNextLevel ? Color.FromArgb(200, 200, 200) : Color.FromArgb(240, 240, 240);
+                var next = gridPoints.ElementAtOrDefault(gridPoints.IndexOf(point) + 1);
+                
+                var p = point.ScreenPoint;
 
-                using (var p = new Pen(color, 1.5f))
+                var endPoint = (next == null ? GetScreenPointFromTick(guitarTrack.GetTrack().Length) : next.ScreenPoint);
+                var len = (endPoint - p).ToDouble();
+
+                if (len >= 10)
                 {
-                    var sp = point.ScreenPoint - HScrollValue;
+                    var subTickDivision = (len / 2.0).Round();
 
-                    if (isMatchingUnit)
+                    var subTickPoint = point.ScreenPoint + subTickDivision;
+
+                    drawGridLineSubTick(e, subTickPoint, 1);
+
+                    if (len >= 30)
                     {
-                        e.Graphics.DrawLine(p, sp, 0, sp, ClientSize.Height);
-                    }
-                    else if (isNextLevel)
-                    {
-                        e.Graphics.DrawLine(p, sp, 0, sp, ClientSize.Height / 15);
-                    }
-                    else if (isNextNextLevel)
-                    {
-                        e.Graphics.DrawLine(p, sp, 0, sp, ClientSize.Height / 18);
+                        var subTickDivision2 = (subTickDivision / 2.0).Round();
+
+                        drawGridLineSubTick(e, subTickPoint - subTickDivision2, 0);
+                        drawGridLineSubTick(e, subTickPoint + subTickDivision2, 0);
                     }
                 }
             }
-            
+
+            if (Utility.ShowMeasureNumbers)
+            {
+                foreach (var point in gridPoints.Where(x => x.IsWholeNote && x.MeasureNumber > 0))
+                {
+                    DrawTextAtTime(e.Graphics, true, false, new TickPair(point.Tick, point.Tick + 120), point.MeasureNumber.ToStringEx(), Utility.TextEventBrush, false);
+                }
+            }
+
+            if (Utility.ShowTempos)
+            {
+                foreach (var tempo in visTempo)
+                {
+                    DrawTextAtTime(e.Graphics, true, false, new TickPair(tempo.ScreenPointPair.Down, tempo.ScreenPointPair.Down + 120), "BPM: " + (tempo.QuarterNotesPerSecond * 60.0).Round(3).Round(), Utility.TextEventBrush, false);
+                }
+            }
+
+            if (Utility.ShowTimeSignatures)
+            {
+                foreach (var ts in visTimeSig)
+                {
+                    DrawTextAtTime(e.Graphics, true, false, new TickPair(ts.ScreenPointPair.Down, ts.ScreenPointPair.Down), "" + ts.Numerator + "/" + ts.Denominator, Utility.TextEventBrush, false);
+                }
+            }
+        }
+
+        private void drawGridLineSubTick(PaintEventArgs e, int screenPoint, int tickLevel)
+        {
+            using (var p = new Pen(Utility.beatPen.Color, 1.5f))
+            {
+                e.Graphics.DrawLine(p, screenPoint - HScrollValue, 0, screenPoint - HScrollValue, ClientSize.Height / (tickLevel == 0 ? 18 : 15));
+            }
+        }
+
+        private void drawGridLine(PaintEventArgs e, int screenPoint)
+        {
+            using (var p = new Pen(Utility.beatPen.Color, 1.5f))
+            {
+                e.Graphics.DrawLine(p, screenPoint - HScrollValue, 0, screenPoint - HScrollValue, ClientSize.Height);
+            }
+        }
+
+        IEnumerable<GridPoint> GetVisibleGridPoints(int screenLeft, int screenRight)
+        {
+            var ret = new List<GridPoint>();
+
+            var points = guitarTrack.NoteGrid.Points.ToList();
+
+            ret = points.Where(x => x.ScreenPoint.IsBetween(screenLeft, screenRight, true)).ToList();
+
+            if (ret.Any())
+            {
+                var idx = points.IndexOf(ret.First());
+                if (idx > 0)
+                    ret.Insert(0, points.ElementAt(idx - 1));
+
+                var next = points.ElementAtOrDefault(points.IndexOf(ret.Last()) + 1);
+                if (next != null)
+                    ret.Add(next);
+            }
+
+            return ret;
         }
 
         private Pen GetNoteGridPen()
@@ -1658,7 +1727,7 @@ namespace ProUpgradeEditor.Common
                 var sp = items.First().ScreenPointPair;
                 FirstChordOffset = new Point(sp.Down - owner.HScrollValue, mouseStringBegin);
 
-                UpdatePastePoint(mousePoint);
+                UpdatePastePoint(mousePoint, Point.Empty);
             }
             public void BeginPaste(Point startPoint)
             {
@@ -1671,9 +1740,9 @@ namespace ProUpgradeEditor.Common
 
                 FirstChordOffset = new Point(sp.Down - owner.HScrollValue, mouseStringBegin);
 
-                UpdatePastePoint(mousePointBegin);
+                UpdatePastePoint(mousePointBegin, Point.Empty);
             }
-            public void UpdatePastePoint(Point newMousePosition)
+            public void UpdatePastePoint(Point newMousePosition, Point mouseDelta)
             {
                 if (!items.Any())
                 {
@@ -1699,7 +1768,7 @@ namespace ProUpgradeEditor.Common
 
                     if (snappedLeft && snappedRight)
                     {
-                        if (Math.Abs(offsetPointLeft.X - snapLeft) < Math.Abs(offsetPointRight.X - snapRight))
+                        if (mouseDelta.X < 0)// Math.Abs(offsetPointLeft.X - snapLeft) < Math.Abs(offsetPointRight.X - snapRight))
                         {
                             newMousePosition.X = snapLeft - offset.X;
                         }
@@ -1765,6 +1834,8 @@ namespace ProUpgradeEditor.Common
                 DrawChords6(g, visChords, true);
 
                 DrawTransparentBackgroundOverlay(g, 20, clipRect);
+
+                
 
                 Draw108Events(g, true, false, visHand);
                 Draw108Events(g, true, true, visHand);
@@ -1850,7 +1921,7 @@ namespace ProUpgradeEditor.Common
             {
                 foreach (var item in vis.Where(x => x.Selected == drawSelected))
                 {
-                    Draw108Event(g, tabActive, drawSelected, item,
+                    DrawTextAtTime(g, tabActive, drawSelected, 
                         new TickPair(item.DownTick, item.UpTick + 2),
                         "Fret: " + item.NoteFretDown,
                         drawSelected ? Utility.SelectedTextEventBrush : Utility.TextEventBrush);
@@ -2051,9 +2122,7 @@ namespace ProUpgradeEditor.Common
 
                 if (drawSelected == isSel)
                 {
-
                     DrawTextEvent(g, tabActive, drawSelected, tr, tb);
-
                 }
             }
         }
@@ -2131,25 +2200,31 @@ namespace ProUpgradeEditor.Common
         }
 
 
-        private void Draw108Event(Graphics g, bool tabActive, bool drawSelected,
-            GuitarHandPosition ev, TickPair ticks, string text, SolidBrush tb)
+        private void DrawTextAtTime(Graphics g, bool tabActive, bool drawSelected, TickPair ticks, string text, SolidBrush tb, bool fullHeight=true)
         {
-
+            if (ticks.TickLength <= 0)
+                ticks.Up = ticks.Down + 120;
             var screenTicks = GetClientPointFromTick(ticks);
 
             if (screenTicks.Up > 0 && screenTicks.Down < Width)
             {
-                g.FillRectangle(tb,
-                    screenTicks.Down,
-                    0, screenTicks.Up - screenTicks.Down,
-                    Height - HScroll.Height - 1);
-                using (var p = new Pen(tb))
-                {
-                    g.DrawRectangle(p, screenTicks.Down, 0, screenTicks.Up - screenTicks.Down, Height - HScroll.Height - 1);
-                }
-
                 
                 var size = g.MeasureString(text, Utility.fretFont);
+                if (fullHeight)
+                {
+                    using (var br = new SolidBrush(Color.FromArgb(80, tb.Color)))
+                    {
+                        g.FillRectangle(br,
+                            screenTicks.Down,
+                            0, size.Width + 1,
+                            fullHeight ? (Height - HScroll.Height - 1) : size.Height + 2);
+                    }
+                    using (var p = new Pen(tb))
+                    {
+                        g.DrawRectangle(p, screenTicks.Down, 0, screenTicks.Up - screenTicks.Down, fullHeight ? (Height - HScroll.Height - 1) : size.Height + 2);
+                    }
+                }
+                
 
 
                 var textRect = new RectangleF((float)screenTicks.Down, (size.Height * (0)) + (0 * size.Height * 0.1f),
@@ -2169,7 +2244,7 @@ namespace ProUpgradeEditor.Common
                 }
 
 
-                using (var tbg = new SolidBrush(Color.FromArgb(tabActive ? (drawSelected ? 255 : 180) : 80, Utility.BackgroundBrush.Color)))
+                using (var tbg = new SolidBrush(Color.FromArgb(tabActive ? (drawSelected ? 255 : 200) : 80, Utility.BackgroundBrush.Color)))
                 {
                     g.FillRectangle(tbg,
                         textRect.X, textRect.Y, textRect.Width, textRect.Height + 1);
@@ -2233,6 +2308,11 @@ namespace ProUpgradeEditor.Common
         public double GetTimeFromClientPoint(int x)
         {
             return Utility.ScaleDown(HScrollValue+x);
+        }
+
+        public TimePair GetTimeFromScreenPoint(TickPair screenPoint)
+        {
+            return new TimePair(Utility.ScaleDown(screenPoint.Down), Utility.ScaleDown(screenPoint.Up));
         }
 
         public double GetTimeFromScreenPoint(int x)
@@ -2350,8 +2430,7 @@ namespace ProUpgradeEditor.Common
 
             if (IsLoaded && GridSnap)
             {
-                var screenPoint = GetClientPointFromTick(tick);
-
+                
                 if (NoteSnapG5 && (EditorType == EEditorType.ProGuitar && Editor5.IsLoaded))
                 {
                     int point;
@@ -2383,7 +2462,7 @@ namespace ProUpgradeEditor.Common
                 if (((NoteSnapG5 && EditorType == EEditorType.Guitar5) ||
                     (NoteSnapG6 && EditorType == EEditorType.ProGuitar)))
                 {
-                    var closeUnit = guitarTrack.GetClosePointToScreenPoint(HScrollValue+screenPoint, GridScalar);
+                    var closeUnit = guitarTrack.GetCloseGridPointToScreenPoint(GetScreenPointFromTick(tick));
                     if (closeUnit != null)
                     {
                         var dist = Math.Abs(tick - closeUnit.Tick);
@@ -2495,6 +2574,8 @@ namespace ProUpgradeEditor.Common
                 return;
 
             IsMouseOver = true;
+
+            lastMouseClient = PointToClient(MousePosition);
         }
 
         protected override void OnMouseLeave(EventArgs e)
@@ -2560,7 +2641,7 @@ namespace ProUpgradeEditor.Common
 
                 if (value == EditorCreationState.Idle)
                 {
-                    SetStatusIdle();
+                    SetSelectionStateIdle();
                 }
 
                 if (OnCreationStateChanged != null)
@@ -2655,14 +2736,9 @@ namespace ProUpgradeEditor.Common
                     {
                         if (SelectedChords.Count == 1)
                         {
-                            var mouseChord = GetChordFromPoint(PointToClient(MousePosition));
-
-                            if (mouseChord != null && mouseChord.Selected)
+                            if (OnSetChordToScreen != null)
                             {
-                                if (OnSetChordToScreen != null)
-                                {
-                                    OnSetChordToScreen(this, mouseChord, true);
-                                }
+                                OnSetChordToScreen(this, SelectedChord, true);
                             }
                         }
                     }
@@ -2800,51 +2876,36 @@ namespace ProUpgradeEditor.Common
 
         private bool MovingSelectorMouseUp()
         {
-
             bool ret = false;
-            var sel = CurrentSelector;
-
-            if (sel.StartPoint.X != sel.CurrentPoint.X)
+            if (CurrentSelector != null)
             {
-                var tickPair = sel.Chord.TickPair;
+                var sel = CurrentSelector;
 
-                var screenTick = GetTickFromClientPoint(sel.CurrentPoint.X + (sel.IsRight ? Utility.SelectorWidth : 0));
-
-                if (sel.IsRight && (screenTick > tickPair.Down + Utility.NoteCloseWidth))
+                if (sel.StartPoint.X != sel.CurrentPoint.X)
                 {
-                    int up;
-                    if (SnapTick(screenTick, out up))
+                    var tickPair = sel.Chord.TickPair;
+
+                    if (sel.IsRight)
                     {
-                        tickPair.Up = up;
+                        tickPair.Up = GetTickFromClientPoint(sel.CurrentPoint.X + Utility.SelectorWidth);
                     }
                     else
                     {
-                        tickPair.Up = screenTick;
+                        tickPair.Down = GetTickFromClientPoint(sel.CurrentPoint.X);
                     }
-                }
-                else if (sel.IsRight == false && (screenTick < tickPair.Up - Utility.NoteCloseWidth))
-                {
-                    int down;
-                    if (SnapTick(screenTick, out down))
-                    {
-                        tickPair.Down = down;
-                    }
-                    else
-                    {
-                        tickPair.Down = screenTick;
-                    }
-                }
-                if (tickPair.Down != sel.Chord.DownTick || tickPair.Up != sel.Chord.UpTick)
-                {
-                    ret = true;
                     try
                     {
-                        EditorPro.BackupSequence();
+                        if (tickPair.TickLength > Utility.TickCloseWidth)
+                        {
+                            EditorPro.BackupSequence();
 
-                        sel.Chord.SetTicks(SnapLeftRightTicks(tickPair));
-                        sel.Chord.UpdateEvents();
+                            sel.Chord.SetTicks(tickPair);
+                            sel.Chord.UpdateEvents();
+                        }
+                        ret = true;
                     }
                     catch { }
+
                 }
             }
             EditorPro.Invalidate();
@@ -2854,15 +2915,39 @@ namespace ProUpgradeEditor.Common
 
         public TickPair SnapLeftRightClientPoint(TickPair clientPoint)
         {
-            return GetClientPointFromTick(SnapLeftRightTicks(GetTickFromClientPoint(clientPoint)));
+            var screenPoint = clientPoint.Offset(HScrollValue);
+
+            var gridPointDown = guitarTrack.GetCloseGridPointToScreenPoint(screenPoint.Down);
+            var gridPointUp = guitarTrack.GetCloseGridPointToScreenPoint(screenPoint.Up);
+
+            var timePair = GetTimeFromScreenPoint(screenPoint.Expand(10));
+
+            var closeChords6 = Messages.Chords.GetBetweenTime(timePair).ToList();
+            var closeChords5 = new List<GuitarChord>();
+            if (IsPro && Editor5.IsLoaded && NoteSnapG5)
+            {
+                closeChords5.AddRange(Editor5.Messages.Chords.GetBetweenTime(timePair).ToList());
+            }
+
+            var closeToLeft6 = closeChords6.Where(x => x.ScreenPointPair.Up.IsCloseScreenPoint(screenPoint.Down)).ToList();
+            var closeToLeft5 = closeChords5.Where(x => x.ScreenPointPair.Up.IsCloseScreenPoint(screenPoint.Down)).ToList();
+
+            var closeToRight6 = closeChords6.Where(x => x.ScreenPointPair.Down.IsCloseScreenPoint(screenPoint.Up)).ToList();
+            var closeToRight5 = closeChords5.Where(x => x.ScreenPointPair.Down.IsCloseScreenPoint(screenPoint.Up)).ToList();
+
+            screenPoint = snapLeftScreenPoint(screenPoint, gridPointDown, closeToLeft6, closeToLeft5);
+            screenPoint = snapRightScreenPoint(screenPoint, gridPointUp, closeToRight6, closeToRight5);
+            if (screenPoint.TickLength <= 10)
+            {
+            }
+            return screenPoint.Offset(-HScrollValue);
         }
 
         public TickPair SnapLeftRightTicks(TickPair tickPair)
         {
-            var screenPair = GetScreenPointFromTick(tickPair);
 
-            var gridPointDown = guitarTrack.GetClosePointToScreenPoint(screenPair.Down, GridScalar);
-            var gridPointUp = guitarTrack.GetClosePointToScreenPoint(screenPair.Up, GridScalar);
+            var gridPointDown = guitarTrack.GetCloseGridPointToTick(tickPair.Down);
+            var gridPointUp = guitarTrack.GetCloseGridPointToTick(tickPair.Up);
 
             var closeChords6 = Messages.Chords.GetBetweenTick(tickPair.Expand(10)).ToList();
             var closeChords5 = new List<GuitarChord>();
@@ -2871,20 +2956,106 @@ namespace ProUpgradeEditor.Common
                 closeChords5.AddRange(Editor5.Messages.Chords.GetBetweenTick(tickPair.Expand(10)).ToList());
             }
 
-            var closeToLeft6 = closeChords6.Where(x => x.ScreenPointPair.Up.IsCloseScreenPoint(screenPair.Down)).ToList();
-            var closeToLeft5 = closeChords5.Where(x => x.ScreenPointPair.Up.IsCloseScreenPoint(screenPair.Down)).ToList();
+            var closeToLeft6 = closeChords6.Where(x => x.UpTick.IsCloseTick(tickPair.Down)).ToList();
+            var closeToLeft5 = closeChords5.Where(x => x.UpTick.IsCloseTick(tickPair.Down)).ToList();
 
-            var closeToRight6 = closeChords6.Where(x => x.ScreenPointPair.Down.IsCloseScreenPoint(screenPair.Up)).ToList();
-            var closeToRight5 = closeChords5.Where(x => x.ScreenPointPair.Down.IsCloseScreenPoint(screenPair.Up)).ToList();
+            var closeToRight6 = closeChords6.Where(x => x.DownTick.IsCloseTick(tickPair.Up)).ToList();
+            var closeToRight5 = closeChords5.Where(x => x.DownTick.IsCloseTick(tickPair.Up)).ToList();
 
-            screenPair = snapLeft(screenPair, gridPointDown, closeToLeft6, closeToLeft5);
-            screenPair = snapRight(screenPair, gridPointUp, closeToRight6, closeToRight5);
+            tickPair = snapLeftTick(tickPair, gridPointDown, closeToLeft6, closeToLeft5);
+            tickPair = snapRightTick(tickPair, gridPointUp, closeToRight6, closeToRight5);
 
-            return GetTickFromScreenPoint(screenPair);
+            return tickPair;
         }
 
-        private TickPair snapLeft(TickPair screenPair, GridPoint gridPointDown, List<GuitarChord> closeToLeft, List<GuitarChord> closeToLeft5)
+        private TickPair snapLeftTick(TickPair tickPair, GridPoint gridPointDown, List<GuitarChord> closeToLeft, List<GuitarChord> closeToLeft5)
         {
+            var gridTick = Int32.MinValue;
+            if (gridPointDown != null)
+            {
+                gridTick = gridPointDown.Tick;
+            }
+
+            if (closeToLeft.Any())
+            {
+                var maxLeft = closeToLeft.Max(x => x.UpTick);
+
+                if (maxLeft > tickPair.Down)
+                {
+                    tickPair.Down = maxLeft;
+                }
+                else if (gridPointDown != null)
+                {
+                    var gd = gridTick.DistSq(tickPair.Down);
+                    if (gd < maxLeft.DistSq(tickPair.Down))
+                    {
+                        tickPair.Down = gridTick;
+                    }
+                    else
+                    {
+                        tickPair.Down = maxLeft;
+                    }
+                }
+                else
+                {
+                    tickPair.Down = maxLeft;
+                }
+            }
+            else if (gridPointDown != null)
+            {
+                tickPair.Down = gridTick;
+            }
+            return tickPair;
+        }
+
+
+        private TickPair snapRightTick(TickPair tickPair, GridPoint gridPoint, List<GuitarChord> closeToRight, List<GuitarChord> closeToRight5)
+        {
+            var gridTick = Int32.MinValue;
+            if (gridPoint != null)
+            {
+                gridTick = gridPoint.Tick;
+            }
+            if (closeToRight.Any())
+            {
+                var minDown = closeToRight.Min(x => x.DownTick);
+
+                if (minDown < tickPair.Up)
+                {
+                    tickPair.Up = minDown;
+                }
+                else if (gridPoint != null)
+                {
+                    var gd = gridTick.DistSq(tickPair.Up);
+                    if (gd < minDown.DistSq(tickPair.Up))
+                    {
+                        tickPair.Up = gridTick;
+                    }
+                    else
+                    {
+                        tickPair.Up = minDown;
+                    }
+                }
+                else
+                {
+                    tickPair.Up = minDown;
+                }
+            }
+            else if (gridPoint != null)
+            {
+                tickPair.Up = gridTick;
+            }
+            return tickPair;
+        }
+
+        private TickPair snapLeftScreenPoint(TickPair screenPair, GridPoint gridPoint, List<GuitarChord> closeToLeft, List<GuitarChord> closeToLeft5)
+        {
+            var gridScreenPoint = Int32.MinValue;
+            if (gridPoint != null)
+            {
+                gridScreenPoint = gridPoint.ScreenPoint;
+            }
+
             if (closeToLeft.Any())
             {
                 var maxLeft = closeToLeft.Max(x => x.ScreenPointPair.Up);
@@ -2893,12 +3064,12 @@ namespace ProUpgradeEditor.Common
                 {
                     screenPair.Down = maxLeft;
                 }
-                else if (gridPointDown != null)
+                else if (gridPoint != null)
                 {
-                    var gd = gridPointDown.ScreenPoint.DistSq(screenPair.Down);
+                    var gd = gridScreenPoint.DistSq(screenPair.Down);
                     if (gd < maxLeft.DistSq(screenPair.Down))
                     {
-                        screenPair.Down = gridPointDown.ScreenPoint;
+                        screenPair.Down = gridScreenPoint;
                     }
                     else
                     {
@@ -2910,20 +3081,20 @@ namespace ProUpgradeEditor.Common
                     screenPair.Down = maxLeft;
                 }
             }
-            else if (gridPointDown != null)
+            else if (gridPoint != null)
             {
-                screenPair.Down = gridPointDown.ScreenPoint;
+                screenPair.Down = gridScreenPoint;
             }
             return screenPair;
         }
 
 
-        private TickPair snapRight(TickPair screenPair, GridPoint gridPoint, List<GuitarChord> closeToRight, List<GuitarChord> closeToRight5)
+        private TickPair snapRightScreenPoint(TickPair screenPair, GridPoint gridPoint, List<GuitarChord> closeToRight, List<GuitarChord> closeToRight5)
         {
             var gridScreenPoint = Int32.MinValue;
             if (gridPoint != null)
             {
-                gridScreenPoint = GetScreenPointFromTick(gridPoint.Tick);
+                gridScreenPoint = gridPoint.ScreenPoint;
             }
 
             if (closeToRight.Any())
@@ -2948,7 +3119,7 @@ namespace ProUpgradeEditor.Common
                 }
                 else
                 {
-                    screenPair.Down = minDown;
+                    screenPair.Up = minDown;
                 }
             }
             else if (gridPoint != null)
@@ -2958,6 +3129,7 @@ namespace ProUpgradeEditor.Common
             return screenPair;
         }
 
+        Point lastMouseClient = Point.Empty;
         protected override void OnMouseMove(MouseEventArgs e)
         {
             if (e != null)
@@ -2969,7 +3141,7 @@ namespace ProUpgradeEditor.Common
                 return;
 
             var mouseClient = PointToClient(MousePosition);
-
+            
             if (CurrentSelectionState == EditorSelectionState.MovingSelector)
             {
                 if (MouseButtons.HasFlag(MouseButtons.Left))
@@ -2984,7 +3156,7 @@ namespace ProUpgradeEditor.Common
             else if (CurrentSelectionState == EditorSelectionState.PastingNotes ||
                      CurrentSelectionState == EditorSelectionState.MovingNotes)
             {
-                CopyChords.UpdatePastePoint(mouseClient);
+                CopyChords.UpdatePastePoint(mouseClient, new Point(mouseClient.X - lastMouseClient.X, mouseClient.Y - lastMouseClient.Y));
             }
             else if (CurrentSelectionState == EditorSelectionState.Idle)
             {
@@ -3026,6 +3198,8 @@ namespace ProUpgradeEditor.Common
             }
 
             UpdateSelectorVisibility();
+
+            lastMouseClient = mouseClient;
         }
 
 
@@ -3102,7 +3276,7 @@ namespace ProUpgradeEditor.Common
             {
                 BackupSequence();
 
-                SelectedChords.ToList().ForEach(x => guitarTrack.Remove(x));
+                guitarTrack.Remove(SelectedChords.ToList());
                 Invalidate();
             }
             catch { RestoreBackup(); }
@@ -3255,7 +3429,7 @@ namespace ProUpgradeEditor.Common
             var newChords = new List<GuitarChord>();
             try
             {
-                if (CopyChords.Count() > 0)
+                if (CopyChords.Any())
                 {
                     if (CurrentSelectionState != TrackEditor.EditorSelectionState.PastingNotes &&
                         CurrentSelectionState != TrackEditor.EditorSelectionState.MovingNotes)
@@ -3283,7 +3457,7 @@ namespace ProUpgradeEditor.Common
 
                     pasteRange = EditorPro.SnapTickPairPro(pasteRange);
                     
-                    guitarTrack.RemoveRange(guitarTrack.Messages.Chords.GetBetweenTick(pasteRange.Expand(-Utility.NoteCloseWidth)).ToList());
+                    guitarTrack.Remove(guitarTrack.Messages.Chords.GetBetweenTick(pasteRange.Expand(-Utility.NoteCloseWidth)).ToList());
 
                     foreach (var c in CopyChords)
                     {
@@ -3362,16 +3536,27 @@ namespace ProUpgradeEditor.Common
 
         public event EventHandler OnStatusIdle;
 
-        public void SetStatusIdle()
+        public void SetSelectionStateIdle()
         {
             if (CurrentSelectionState != EditorSelectionState.Idle)
             {
                 CurrentSelectionState = EditorSelectionState.Idle;
+                
                 OnStatusIdle.IfObjectNotNull(x => x(null, null));
             }
+            
             Invalidate();
-
         }
+
+        public void SetCreationStateIdle()
+        {
+            if (CreationState != EditorCreationState.Idle)
+            {
+                CreationState = EditorCreationState.Idle;
+            }
+            Invalidate();
+        }
+
         public bool IsStatusIdle()
         {
             return CurrentSelectionState == EditorSelectionState.Idle;
@@ -3387,7 +3572,7 @@ namespace ProUpgradeEditor.Common
 
                 if (IsStatusIdle() == false)
                 {
-                    SetStatusIdle();
+                    SetSelectionStateIdle();
                 }
 
                 var nx = PointToClient(MousePosition);
@@ -3918,26 +4103,23 @@ namespace ProUpgradeEditor.Common
             var pasteStartTime = GetTimeFromClientPoint(param.MinChordX + param.Offset.X);
             
             var copyChordTickPair = CopyChords.GetTickPair();
-            var copyChordTimePair = guitarTrack.TickToTime(copyChordTickPair);
-
             foreach (var c in CopyChords)
             {
-                var timeOffset = c.StartTime - copyChordTimePair.Down;
-                var tickOffset = c.DownTick - copyChordTickPair.Down;
+                var tickOffset = (c.DownTick - copyChordTickPair.Down);
 
-                var chordOldTempo = guitarTrack.GetTempo(c.DownTick+tickOffset);
-
-                var chordNewTempo = guitarTrack.GetTempo(pasteStartTick+tickOffset);
-
-                var newTimeLen = chordNewTempo.SecondsPerTick * ((double)c.TickLength);
-
-                var timeStart = pasteStartTime + (((double)tickOffset) * chordNewTempo.SecondsPerTick);
-                var timeEnd = timeStart + newTimeLen;
+                var tempo = guitarTrack.GetTempo(copyChordTickPair.Down+tickOffset);
+                var timeOffset = ((double)(tickOffset) * tempo.SecondsPerTick);
+                var timeStart = pasteStartTime + timeOffset;
+                var timeEnd = timeStart + c.TickLength * tempo.SecondsPerTick;
 
                 var screenStart = GetClientPointFromTime(timeStart);
                 var screenEnd = GetClientPointFromTime(timeEnd);
 
-                var screenPair = SnapLeftRightClientPoint(new TickPair(screenStart, screenEnd));
+                var screenPair = new TickPair(screenStart, screenEnd);
+                if (screenStart  >= 0 && screenEnd <= Width)
+                {
+                    screenPair = SnapLeftRightClientPoint(new TickPair(screenStart, screenEnd));
+                }
 
                 foreach (GuitarNote note in c.Notes)
                 {

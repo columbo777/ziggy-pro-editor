@@ -69,10 +69,19 @@ namespace ProUpgradeEditor.Common
         {
             get { return TickLengthDouble / OwnerTrack.SequenceDivision; }
         }
-        
+        public double NumWholeNotes
+        {
+            get { return NumQuarterNotes * 4.0; }
+        }
         public double NumOneTwentyEight
         {
             get { return NumQuarterNotes * 32.0; }
+        }
+
+        public double GetTicksPerBeat(TimeUnit unit)
+        {
+            var scale = 1.0 / (double)unit;
+            return TicksPerWholeNote / scale;
         }
 
         public double TicksPerOneTwentyEight
@@ -83,6 +92,17 @@ namespace ProUpgradeEditor.Common
         public double TicksPerQuarterNote
         {
             get { return TickLengthDouble / NumQuarterNotes; }
+        }
+        
+        public double TicksPerWholeNote
+        {
+            get { return TicksPerQuarterNote * 4.0; }
+        }
+
+        public double GetSecondsPerBeat(TimeUnit unit)
+        {
+            var scale = 1.0 / (double)unit;
+            return SecondsPerWholeNote / scale;
         }
 
         public double SecondsPerOneTwentyEight
@@ -95,6 +115,14 @@ namespace ProUpgradeEditor.Common
             get { return 1.0 / QuarterNotesPerSecond; }
         }
 
+        public double SecondsPerWholeNote
+        {
+            get { return SecondsPerQuarterNote * 4.0; }
+        }
+        public double WholeNotesPerSecond
+        {
+            get { return QuarterNotesPerSecond / 4.0; }
+        }
         public double QuarterNotesPerSecond
         {
             get { return 1000000.0 / Tempo; }
@@ -140,7 +168,7 @@ namespace ProUpgradeEditor.Common
 
         public override string ToString()
         {
-            return AbsoluteTicks + " - Tempo: " + Tempo;
+            return "Tempo: " + DownTick + " - " + UpTick + " - BPM: " + (int)(QuarterNotesPerSecond * 60).Round(0);
         }
 
     }
@@ -157,6 +185,11 @@ namespace ProUpgradeEditor.Common
         public double Denominator = 4;
         public double ClocksPerMetronomeClick = 24;
         public double ThirtySecondNotesPerQuarterNote = 8;
+
+        public override string ToString()
+        {
+            return "TimeSig: " + DownTick + " - " + UpTick + " - " + (int)Numerator + "/" + (int)Denominator;
+        }
 
         public static GuitarTimeSignature GetTimeSignature(GuitarTrack track,
             int startTick = 0,

@@ -23,9 +23,7 @@ namespace ProUpgradeEditor.Common
     {
         protected TrackEditor owner;
 
-        List<T> itemList;
-
-        public virtual TickPair TickRange { get; internal set; }
+        protected List<T> itemList;
 
         public override string ToString()
         {
@@ -37,7 +35,6 @@ namespace ProUpgradeEditor.Common
         {
             this.owner = owner;
             itemList = new List<T>();
-            TickRange = new TickPair();
         }
 
         public virtual T ElementAt(int index)
@@ -54,7 +51,6 @@ namespace ProUpgradeEditor.Common
             {
                 this.internalRemove(gm);
             }
-            internalUpdateTickRange();
         }
 
         public virtual void AddGuitarMessageRange(IEnumerable<GuitarMessage> mess)
@@ -63,7 +59,6 @@ namespace ProUpgradeEditor.Common
             {
                 this.internalInsert(gm as T);
             }
-            internalUpdateTickRange();
         }
 
         public virtual void AddRange(IEnumerable<T> mess)
@@ -72,7 +67,6 @@ namespace ProUpgradeEditor.Common
             {
                 this.internalInsert(gm as T);
             }
-            internalUpdateTickRange();
         }
 
         public virtual IEnumerable<GuitarMessage> List
@@ -80,115 +74,72 @@ namespace ProUpgradeEditor.Common
             get { return itemList; }
         }
 
+        SpecializedMessageList()
+        {
+            
+        }
+
         public virtual int GetIndexFromTick(int itemTick)
         {
-            int ret = 0;
-
-            var itemCount = itemList.Count;
-
-            if (itemCount == 0)
-            {
-                return 0;
-            }
-            else if (itemTick >= TickRange.Up)
-            {
-                return itemCount;
-            }
-            else if (itemTick <= TickRange.Down)
+            if (!itemList.Any())
             {
                 return 0;
             }
             else
             {
-                if (itemCount < 20)
+                if (itemTick <= this.First().DownTick)
                 {
-                    for (int x = 0; x < itemCount; x++)
-                    {
-                        if (itemList[x].AbsoluteTicks >= itemTick)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            ret = x;
-                        }
-                    }
+                    return 0;
+                }
+                else if (itemTick >= this.Last().DownTick)
+                {
+                    return -1;
                 }
                 else
                 {
-                    int rangeMin = 0;
-                    int rangeMax = itemCount - 1;
-                    int rangeCount = rangeMax - rangeMin;
-                    int rangeMid = rangeMin + rangeCount / 2;
-
-                    var low = itemList.ElementAt(rangeMin).AbsoluteTicks;
-                    var mid = itemList.ElementAt(rangeMid).AbsoluteTicks;
-                    var high = itemList.ElementAt(rangeMax).AbsoluteTicks;
-
-                    while (true)
-                    {
-                        if (itemTick.IsBetween(low, mid))
-                        {
-                            rangeMax = rangeMid;
-                            high = mid;
-                        }
-                        else if (itemTick.IsBetween(mid, high))
-                        {
-                            rangeMin = rangeMid;
-                            low = mid;
-                        }
-                        else if (itemTick < low)
-                        {
-                            return rangeMin;
-                        }
-                        else if (itemTick > high)
-                        {
-                            return rangeMax;
-                        }
-                        rangeCount = rangeMax - rangeMin;
-                        rangeMid = rangeMin + rangeCount / 2;
-                        mid = itemList.ElementAt(rangeMid).AbsoluteTicks;
-
-                        if (rangeCount < 5)
-                        {
-                            ret = rangeMin;
-
-                            for (int x = 0; x < rangeCount; x++)
-                            {
-                                if (itemList[rangeMin + x].AbsoluteTicks >= itemTick)
-                                {
-                                    break;
-                                }
-                                else
-                                {
-                                    ret = (rangeMin + x);
-                                }
-                            }
-                            break;
-                        }
-                    }
+                    return itemList.FindLastIndex(x => x.DownTick < itemTick)+1;
                 }
             }
-            return ret;
         }
 
-        public virtual int GetIndexFromTime(double itemTime)
+        public virtual int GetIndexFromTime(double time)
         {
-            T retItem = null;
-            foreach (var item in itemList)
+            if (!itemList.Any())
             {
-                if (item.StartTime <= itemTime)
-                    retItem = item;
-                else
-                    break;
+                return 0;
             }
-            return itemList.IndexOf(retItem);
+            else
+            {
+                if (time <= this.First().StartTime)
+                {
+                    return 0;
+                }
+                else if (time >= this.Last().StartTime)
+                {
+                    return this.itemList.Count - 1;
+                }
+                else
+                {
+                    return itemList.FindLastIndex(x => x.StartTime < time)+1;
+                }
+            }
         }
+
         protected virtual void internalInsert(T item)
         {
             if (item != null)
             {
-                itemList.Insert(GetIndexFromTick(item.AbsoluteTicks), item);
+                item.IsDeleted = false;
+
+                var idx = GetIndexFromTick(item.AbsoluteTicks);
+                if (idx == -1 || idx >= this.itemList.Count)
+                {
+                    itemList.Add(item);
+                }
+                else
+                {
+                    itemList.Insert(idx, item);
+                }
             }
         }
 
@@ -205,26 +156,9 @@ namespace ProUpgradeEditor.Common
             itemList.Remove(item);
         }
 
-        protected virtual void internalUpdateTickRange()
-        {
-            if (itemList.Any())
-            {
-                var f = itemList.First();
-                var l = itemList.Last();
-
-                TickRange = new TickPair(f.DownTick, l.UpTick.GetIfNull(l.AbsoluteTicks));
-            }
-            else
-            {
-                TickRange = new TickPair();
-            }
-        }
-
-
         public virtual void Clear()
         {
             itemList.Clear();
-            internalUpdateTickRange();
         }
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
@@ -243,8 +177,6 @@ namespace ProUpgradeEditor.Common
             if (item != null)
             {
                 internalInsert(item);
-
-                internalUpdateTickRange();
             }
         }
 
@@ -254,7 +186,6 @@ namespace ProUpgradeEditor.Common
             if (item != null)
             {
                 internalRemove(item);
-                internalUpdateTickRange();
             }
         }
 

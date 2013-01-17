@@ -98,16 +98,166 @@ namespace Sanford.Multimedia.Midi
 
     #endregion
 
-	/// <summary>
-	/// Represents MIDI meta messages.
-	/// </summary>
-	/// <remarks>
-	/// Meta messages are MIDI messages that are stored in MIDI files. These
-	/// messages are not sent or received via MIDI but are read and 
-	/// interpretted from MIDI files. They provide information that describes 
-	/// a MIDI file's properties. For example, tempo changes are implemented
-	/// using meta messages.
-	/// </remarks>
+	public class KeySignature
+    {
+
+
+        public KeySignature(MetaMessage msg)
+        {
+            var b = msg.GetBytes();
+            IsMajor = (((sbyte)b[1]) == 0);
+            Key = FromBytes(b[0], b[1]);
+        }
+        public KeySignature(byte dataKey, byte dataMajor)
+        {
+            IsMajor = ((sbyte)dataMajor) == 0;
+            Key = FromBytes(dataKey, dataMajor);
+        }
+
+        public static Key FromBytes(byte dataKey, byte dataMajor)
+        {
+            Key ret = (Key)0;
+            var major = ((sbyte)dataMajor == 0);
+            // If the key is major.
+            if (major)
+            {
+                switch ((sbyte)dataKey)
+                {
+                    case -7:
+                        ret = Key.CFlatMajor;
+                        break;
+
+                    case -6:
+                        ret = Key.GFlatMajor;
+                        break;
+
+                    case -5:
+                        ret = Key.DFlatMajor;
+                        break;
+
+                    case -4:
+                        ret = Key.AFlatMajor;
+                        break;
+
+                    case -3:
+                        ret = Key.EFlatMajor;
+                        break;
+
+                    case -2:
+                        ret = Key.BFlatMajor;
+                        break;
+
+                    case -1:
+                        ret = Key.FMajor;
+                        break;
+
+                    case 0:
+                        ret = Key.CMajor;
+                        break;
+
+                    case 1:
+                        ret = Key.GMajor;
+                        break;
+
+                    case 2:
+                        ret = Key.DMajor;
+                        break;
+
+                    case 3:
+                        ret = Key.AMajor;
+                        break;
+
+                    case 4:
+                        ret = Key.EMajor;
+                        break;
+
+                    case 5:
+                        ret = Key.BMajor;
+                        break;
+
+                    case 6:
+                        ret = Key.FSharpMajor;
+                        break;
+
+                    case 7:
+                        ret = Key.CSharpMajor;
+                        break;
+                }
+
+            }
+            // Else the Key is minor.
+            else
+            {
+                switch ((sbyte)dataKey)
+                {
+                    case -7:
+                        ret = Key.AFlatMinor;
+                        break;
+
+                    case -6:
+                        ret = Key.EFlatMinor;
+                        break;
+
+                    case -5:
+                        ret = Key.BFlatMinor;
+                        break;
+
+                    case -4:
+                        ret = Key.FMinor;
+                        break;
+
+                    case -3:
+                        ret = Key.CMinor;
+                        break;
+
+                    case -2:
+                        ret = Key.GMinor;
+                        break;
+
+                    case -1:
+                        ret = Key.DMinor;
+                        break;
+
+                    case 0:
+                        ret = Key.AMinor;
+                        break;
+
+                    case 1:
+                        ret = Key.EMinor;
+                        break;
+
+                    case 2:
+                        ret = Key.BMinor;
+                        break;
+
+                    case 3:
+                        ret = Key.FSharpMinor;
+                        break;
+
+                    case 4:
+                        ret = Key.CSharpMinor;
+                        break;
+
+                    case 5:
+                        ret = Key.GSharpMinor;
+                        break;
+
+                    case 6:
+                        ret = Key.DSharpMinor;
+                        break;
+
+                    case 7:
+                        ret = Key.ASharpMinor;
+                        break;
+                }
+            }
+            return ret;
+        }
+
+        public Key Key { get; internal set; }
+        public bool IsMajor { get; internal set; }
+    }
+
 	[ImmutableObject(true)]
 	public sealed class MetaMessage : IMidiMessage
 	{
@@ -157,7 +307,6 @@ namespace Sanford.Multimedia.Midi
 
 		public MetaMessage(MetaType type, byte[] data)
         {
-            
             this.type = type;
             
             // Create storage for meta message data.
@@ -165,8 +314,12 @@ namespace Sanford.Multimedia.Midi
 
             // Copy data into storage.
             data.CopyTo(this.data, 0);
-
         }
+
+        public MetaMessage(MetaType type, string data) : this(type, System.Text.Encoding.ASCII.GetBytes(data))
+        {
+        }
+
 
         public byte[] GetBytes()
         {
@@ -180,7 +333,6 @@ namespace Sanford.Multimedia.Midi
 
         public override bool Equals(object obj)
         {
-            
             bool equal = true;
             MetaMessage message = (MetaMessage)obj;
 
@@ -202,7 +354,7 @@ namespace Sanford.Multimedia.Midi
             for(int i = 0; i < Length && equal; i++)
             {
                 // If a data value does not match.
-                if(this[i] != message[i])
+                if(this.data[i] != message.data[i])
                 {
                     // The messages are not equal.
                     equal = false;
@@ -259,23 +411,14 @@ namespace Sanford.Multimedia.Midi
 
         public override string ToString()
         {
-            if (!string.IsNullOrEmpty(Text))
+            var ret = Text;
+            if (!string.IsNullOrEmpty(ret))
             {
-                return Text;
+                return ret;
             }
             else
             {
                 return MetaType.ToString();
-            }
-        }
-
-        public byte this[int index]
-        {
-            get
-            {
-              
-
-                return data[index];
             }
         }
 
@@ -323,6 +466,13 @@ namespace Sanford.Multimedia.Midi
                 return MessageType.Meta;
             }
         }
+
+        public KeySignature KeySignature
+        {
+            get { return IsKeySignature ? new KeySignature(data[0], data[1]) : null; }
+        }
+
+        public bool IsKeySignature { get { return MetaType == Midi.MetaType.KeySignature; } }
 
     }
 }

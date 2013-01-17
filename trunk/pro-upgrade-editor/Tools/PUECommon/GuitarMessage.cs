@@ -32,53 +32,58 @@ namespace ProUpgradeEditor.Common
 
 
 
-    public class GuitarHandPositionList : SpecializedMessageList<GuitarHandPosition> 
+    public class GuitarHandPositionList : SpecializedMessageList<GuitarHandPosition>
     {
         public GuitarHandPositionList(TrackEditor owner) : base(owner) { }
     }
-    public class GuitarTextEventList : SpecializedMessageList<GuitarTextEvent> 
+    public class GuitarTextEventList : SpecializedMessageList<GuitarTextEvent>
     {
         public GuitarTextEventList(TrackEditor owner) : base(owner) { }
     }
-    public class GuitarTrainerList : SpecializedMessageList<GuitarTrainer> 
+    public class GuitarTrainerList : SpecializedMessageList<GuitarTrainer>
     {
         public GuitarTrainerList(TrackEditor owner) : base(owner) { }
     }
-    public class GuitarChordList : SpecializedMessageList<GuitarChord> 
+    public class GuitarChordList : SpecializedMessageList<GuitarChord>
     {
         public GuitarChordList(TrackEditor owner) : base(owner) { }
         public IEnumerable<GuitarChord> GetBetweenTick(int tickMin, int tickMax)
         {
             return this.Where(x => x.DownTick < tickMax && x.UpTick > tickMin);
         }
+
     }
-    public class GuitarNoteList : SpecializedMessageList<GuitarNote> 
+    public class GuitarNoteList : SpecializedMessageList<GuitarNote>
     {
         public GuitarNoteList(TrackEditor owner) : base(owner) { }
     }
-    
-    public class GuitarTempoList : SpecializedMessageList<GuitarTempo> 
+
+
+    public class GuitarTempoList : SpecializedMessageList<GuitarTempo>
     {
-        public GuitarTempoList(TrackEditor owner) : base(owner) { }
-        public GuitarTempo GetTempoFromTick(int tick)
+        public GuitarTempoList(TrackEditor owner)
+            : base(owner)
         {
-            return ElementAt(GetIndexFromTick(tick));
+            
         }
-        public GuitarTempo GetTempoFromTime(double time)
+
+
+        public GuitarTempo GetTempo(int tick)
         {
-            return ElementAt(GetIndexFromTime(time));
+            return itemList.SingleByDownTick(tick < 0 ? 0 : tick > itemList.Last().DownTick ? itemList.Last().DownTick: tick );
         }
+
     }
-    public class GuitarTimeSignatureList : SpecializedMessageList<GuitarTimeSignature> { public GuitarTimeSignatureList(TrackEditor owner) : base(owner) { }}
-    public class GuitarPowerupList : SpecializedMessageList<GuitarPowerup> { public GuitarPowerupList(TrackEditor owner) : base(owner) { }}
-    public class GuitarSoloList : SpecializedMessageList<GuitarSolo> { public GuitarSoloList(TrackEditor owner) : base(owner) { }}
-    public class GuitarArpeggioList : SpecializedMessageList<GuitarArpeggio> { public GuitarArpeggioList (TrackEditor owner) : base(owner) { }}
-    public class GuitarBigRockEndingList : SpecializedMessageList<GuitarBigRockEnding> { public GuitarBigRockEndingList(TrackEditor owner) : base(owner) { }}
-    public class GuitarSingleStringTremeloList : SpecializedMessageList<GuitarSingleStringTremelo> { public GuitarSingleStringTremeloList(TrackEditor owner) : base(owner) { }}
-    public class GuitarMultiStringTremeloList : SpecializedMessageList<GuitarMultiStringTremelo> { public GuitarMultiStringTremeloList(TrackEditor owner) : base(owner) { }}
-    public class GuitarSlideList : SpecializedMessageList<GuitarSlide> { public GuitarSlideList(TrackEditor owner) : base(owner) { }}
-    public class GuitarHammeronList : SpecializedMessageList<GuitarHammeron> { public GuitarHammeronList(TrackEditor owner) : base(owner) { }}
-    public class ChordStrumList : SpecializedMessageList<GuitarChordStrum> { public ChordStrumList(TrackEditor owner) : base(owner) { }}
+    public class GuitarTimeSignatureList : SpecializedMessageList<GuitarTimeSignature> { public GuitarTimeSignatureList(TrackEditor owner) : base(owner) { } }
+    public class GuitarPowerupList : SpecializedMessageList<GuitarPowerup> { public GuitarPowerupList(TrackEditor owner) : base(owner) { } }
+    public class GuitarSoloList : SpecializedMessageList<GuitarSolo> { public GuitarSoloList(TrackEditor owner) : base(owner) { } }
+    public class GuitarArpeggioList : SpecializedMessageList<GuitarArpeggio> { public GuitarArpeggioList(TrackEditor owner) : base(owner) { } }
+    public class GuitarBigRockEndingList : SpecializedMessageList<GuitarBigRockEnding> { public GuitarBigRockEndingList(TrackEditor owner) : base(owner) { } }
+    public class GuitarSingleStringTremeloList : SpecializedMessageList<GuitarSingleStringTremelo> { public GuitarSingleStringTremeloList(TrackEditor owner) : base(owner) { } }
+    public class GuitarMultiStringTremeloList : SpecializedMessageList<GuitarMultiStringTremelo> { public GuitarMultiStringTremeloList(TrackEditor owner) : base(owner) { } }
+    public class GuitarSlideList : SpecializedMessageList<GuitarSlide> { public GuitarSlideList(TrackEditor owner) : base(owner) { } }
+    public class GuitarHammeronList : SpecializedMessageList<GuitarHammeron> { public GuitarHammeronList(TrackEditor owner) : base(owner) { } }
+    public class ChordStrumList : SpecializedMessageList<GuitarChordStrum> { public ChordStrumList(TrackEditor owner) : base(owner) { } }
 
 
     public class MidiEventProps
@@ -86,9 +91,9 @@ namespace ProUpgradeEditor.Common
         public GuitarTrack OwnerTrack { get; set; }
 
         public int Data2 { get; set; }
-        
+
         public int Data1 { get; set; }
-        
+
         public int Channel { get; set; }
 
         public ChannelCommand Command { get; set; }
@@ -106,10 +111,10 @@ namespace ProUpgradeEditor.Common
             {
                 return _eventPair;
             }
-            
+
         }
 
-        public MidiEventProps(GuitarTrack owner) 
+        public MidiEventProps(GuitarTrack owner)
         {
             resetProps(owner);
         }
@@ -142,11 +147,13 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
-        public MidiEventProps(GuitarTrack owner, MidiEvent down, MidiEvent up) : this(owner, new MidiEventPair(owner, down,up))
+        public MidiEventProps(GuitarTrack owner, MidiEvent down, MidiEvent up)
+            : this(owner, new MidiEventPair(owner, down, up))
         {
-            
+
         }
-        public MidiEventProps(GuitarTrack owner, MidiEventPair pair) : this(owner)
+        public MidiEventProps(GuitarTrack owner, MidiEventPair pair)
+            : this(owner)
         {
             setEventPair(pair);
         }
@@ -195,7 +202,7 @@ namespace ProUpgradeEditor.Common
                 }
             }
 
-            this.TickPair = new TickPair( (_eventPair.Down == null ? Int32.MinValue : _eventPair.Down.AbsoluteTicks),
+            this.TickPair = new TickPair((_eventPair.Down == null ? Int32.MinValue : _eventPair.Down.AbsoluteTicks),
                                      (_eventPair.Up == null ? Int32.MinValue : _eventPair.Up.AbsoluteTicks));
         }
     }
@@ -204,14 +211,14 @@ namespace ProUpgradeEditor.Common
     {
         protected GuitarMessageType messageType;
         protected MidiEventProps props;
-        
+
         protected bool selected;
 
 
         public GuitarMessage(GuitarTrack owner, MidiEvent downEvent, MidiEvent upEvent, GuitarMessageType type)
             : this(owner, new MidiEventPair(owner, downEvent, upEvent), type)
         {
-            
+
         }
 
         public GuitarMessage(GuitarTrack owner, MidiEventProps props, GuitarMessageType type)
@@ -235,7 +242,7 @@ namespace ProUpgradeEditor.Common
                 CreateEvents();
 
                 IsUpdated = false;
-               
+
             }
         }
 
@@ -257,34 +264,34 @@ namespace ProUpgradeEditor.Common
             {
                 return GetMessageType();
             }
-            set 
-            { 
+            set
+            {
                 messageType = value;
-               
+
             }
         }
 
 
-        
+
         public GuitarTrack OwnerTrack
         {
-            get{ return props.OwnerTrack; }
+            get { return props.OwnerTrack; }
         }
 
-        
-        public virtual bool Selected 
-        { 
-            get 
-            { 
-                return selected; 
-            } 
-            set 
-            { 
-                selected = value; 
-            } 
+
+        public virtual bool Selected
+        {
+            get
+            {
+                return selected;
+            }
+            set
+            {
+                selected = value;
+            }
         }
 
-        
+
         public virtual MidiEvent DownEvent
         {
             get
@@ -299,7 +306,7 @@ namespace ProUpgradeEditor.Common
             {
                 return props.EventPair.Up;
             }
-            
+
         }
 
         public MidiEvent MidiEvent
@@ -311,7 +318,7 @@ namespace ProUpgradeEditor.Common
         {
             get { return DownTick; }
         }
-        
+
         public virtual int DownTick
         {
             get
@@ -363,7 +370,7 @@ namespace ProUpgradeEditor.Common
                     OwnerTrack.Remove(UpEvent);
                 }
                 SetUpEvent(null);
-               
+
             }
         }
 
@@ -422,13 +429,13 @@ namespace ProUpgradeEditor.Common
         public virtual TickPair TickPair { get { return new TickPair(DownTick, UpTick); } }
         public virtual TimePair TimePair { get { return new TimePair(StartTime, EndTime); } }
         public virtual TickPair ScreenPointPair { get { return new TickPair(StartScreenPoint, EndScreenPoint); } }
-        
+
 
         public virtual string Text
         {
             get
             {
-                return props.Text; 
+                return props.Text;
             }
             set
             {
@@ -438,7 +445,7 @@ namespace ProUpgradeEditor.Common
 
         public virtual int StartScreenPoint
         {
-            get 
+            get
             {
                 return (int)Math.Round(Utility.ScaleUp(StartTime));
             }
@@ -460,8 +467,8 @@ namespace ProUpgradeEditor.Common
             }
         }
 
-        public virtual double EndTime 
-        { 
+        public virtual double EndTime
+        {
             get
             {
                 return OwnerTrack.TickToTime(UpTick);
@@ -485,7 +492,7 @@ namespace ProUpgradeEditor.Common
             }
         }
 
-        
+
         public virtual int Data2
         {
             get
@@ -498,7 +505,9 @@ namespace ProUpgradeEditor.Common
             }
         }
 
-        
+        public bool IsOn { get { return Command == ChannelCommand.NoteOn; } }
+        public bool IsOff { get { return Command == ChannelCommand.NoteOff; } }
+
         public virtual ChannelCommand Command
         {
             get
@@ -535,7 +544,7 @@ namespace ProUpgradeEditor.Common
 
         public override string ToString()
         {
-            return "Down: " + DownTick.ToString() + " Up: " + UpTick.ToString() + 
+            return "Down: " + DownTick.ToString() + " Up: " + UpTick.ToString() +
                 " Deleted: " + this.IsDeleted + " Dirty: " + this.IsDirty;
         }
 

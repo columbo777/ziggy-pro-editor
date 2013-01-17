@@ -15,17 +15,7 @@ namespace Sanford.Multimedia.Midi
         {
             if (Count > 0)
             {
-                var def = Meta.FirstOrDefault(
-                        x => x.MetaMessage.MetaType == MetaType.TrackName);
-
-                if (def == null)
-                {
-                    Debug.WriteLine("Error");
-                }
-                else
-                {
-                    return def;
-                }
+                return Meta.FirstOrDefault(x => x.MetaMessage.MetaType == MetaType.TrackName);
             }
             
             return null;
@@ -261,6 +251,13 @@ namespace Sanford.Multimedia.Midi
             count = 1;
         }
 
+        public void Remove(IEnumerable<MidiEvent> ev)
+        {
+            foreach (var e in ev)
+            {
+                Remove(e);
+            }
+        }
         public void Remove(MidiEvent ev)
         {
             if (ev == null)

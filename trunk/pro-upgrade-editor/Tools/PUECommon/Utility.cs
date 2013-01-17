@@ -280,9 +280,11 @@ namespace ProUpgradeEditor.Common
         
         public static int NoteCloseWidth = 8;
 
+        public static int TickCloseWidth = 10;
+
         public static bool IsCloseTick(int a, int b)
         {
-            return (Math.Abs(a - b) < NoteCloseWidth);
+            return (Math.Abs(a - b) < TickCloseWidth);
         }
 
         public static int SelectorWidth = 4;
@@ -444,13 +446,8 @@ namespace ProUpgradeEditor.Common
                     return GuitarDifficulty.Easy;
 
                 if (data1 == ExpertSoloData1_G5)
-                    return GuitarDifficulty.Expert;
-                if (data1 == HardSoloData1_G5)
-                    return GuitarDifficulty.Hard;
-                if (data1 == MediumSoloData1_G5)
-                    return GuitarDifficulty.Medium;
-                if (data1 == EasySoloData1_G5)
-                    return GuitarDifficulty.Easy;
+                    return GuitarDifficulty.All;
+                
                 if (data1 == SoloData1)
                     return GuitarDifficulty.All;
 
@@ -835,6 +832,12 @@ namespace ProUpgradeEditor.Common
         {
             return ((double)value) / timeScalar;
         }
+
+
+        public static bool ShowMeasureNumbers = false;
+        public static bool ShowTempos = false;
+        public static bool ShowTimeSignatures = false;
+        public static bool ModifyWebTabScale = false;
     }
 
     public static class GridScale

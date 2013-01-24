@@ -18,29 +18,29 @@ namespace Sanford.Multimedia.Midi
         bool deleted;
         int data1;
         int data2;
-        public int Data1 
-        { 
-            get 
+        public int Data1
+        {
+            get
             {
                 return data1;
                 //this.ChannelMessage != null ? this.ChannelMessage.Data1 : int.MinValue; 
-            } 
+            }
         }
-        public int Data2 
-        { 
-            get 
+        public int Data2
+        {
+            get
             {
                 return data2;
                 //return this.ChannelMessage != null ? this.ChannelMessage.Data2 : int.MinValue; 
-            } 
+            }
         }
         int channelCommand;
-        public ChannelCommand Command 
-        { 
-            get 
+        public ChannelCommand Command
+        {
+            get
             {
                 return (ChannelCommand)channelCommand;
-            } 
+            }
         }
 
         public bool IsOn { get { return channelCommand == (int)ChannelCommand.NoteOn; } }
@@ -77,7 +77,7 @@ namespace Sanford.Multimedia.Midi
                         ret.Append(this.MetaMessage.ToString());
                     }
                 }
-                else if(MessageType == Midi.MessageType.Channel)
+                else if (MessageType == Midi.MessageType.Channel)
                 {
                     int msg = (message as ChannelMessage).Message;
                     ret.Append(AbsoluteTicks.ToString());
@@ -96,7 +96,7 @@ namespace Sanford.Multimedia.Midi
                     ret.Append(" - stat: ");
                     ret.Append(ChannelMessage.UnpackStatus(msg));
                 }
-                else if(message is ShortMessage)
+                else if (message is ShortMessage)
                 {
                     var msg = (message as ShortMessage).Message;
                     ret.Append(AbsoluteTicks.ToString());
@@ -143,7 +143,7 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
-        
+
         public IMidiMessage Clone()
         {
             IMidiMessage ret = null;
@@ -156,11 +156,11 @@ namespace Sanford.Multimedia.Midi
             {
                 ret = new MetaMessage(this.MetaType, this.MetaMessage.GetBytes());
             }
-            else if(this.MessageType == MessageType.SystemCommon)
+            else if (this.MessageType == MessageType.SystemCommon)
             {
                 ret = new SysCommonMessage((this.MidiMessage as SysCommonMessage).Message);
             }
-            else if(this.MessageType == MessageType.SystemExclusive) 
+            else if (this.MessageType == MessageType.SystemExclusive)
             {
                 ret = new SysExMessage((this.MidiMessage as SysExMessage).GetBytes());
             }
@@ -190,7 +190,7 @@ namespace Sanford.Multimedia.Midi
             {
                 return absoluteTicks;
             }
-            set 
+            set
             {
                 if (absoluteTicks != value)
                 {
@@ -209,7 +209,7 @@ namespace Sanford.Multimedia.Midi
             {
                 int deltaTicks;
 
-                if(Previous != null)
+                if (Previous != null)
                 {
                     deltaTicks = AbsoluteTicks - previous.AbsoluteTicks;
                 }
@@ -307,10 +307,11 @@ namespace Sanford.Multimedia.Midi
                             return -1;
                         else if (this.absoluteTicks > b.absoluteTicks)
                             return 1;
-                        else return 0;
+                        else
+                            return 0;
                     }
                 }
-                else if (this.MessageType == MessageType.Channel && 
+                else if (this.MessageType == MessageType.Channel &&
                         b.MessageType == MessageType.Channel)
                 {
                     var cm = this.ChannelMessage;
@@ -342,7 +343,7 @@ namespace Sanford.Multimedia.Midi
                 }
                 else
                 {
-                   return 0;
+                    return 0;
                 }
             }
         }

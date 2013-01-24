@@ -50,7 +50,7 @@ namespace EditorResources.Components
 
 
         Point mouseDownPoint = new Point();
-        
+
         private void peWaveViewerControl1_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Left))
@@ -63,7 +63,7 @@ namespace EditorResources.Components
         {
             if (e.Button.HasFlag(System.Windows.Forms.MouseButtons.Left))
             {
-                
+
                 var left = Math.Min(mouseDownPoint.X, e.Location.X);
                 var right = Math.Max(mouseDownPoint.X, e.Location.X);
 
@@ -78,13 +78,13 @@ namespace EditorResources.Components
 
         private void peWaveViewerControl1_MouseMove(object sender, MouseEventArgs e)
         {
-            
+
         }
 
         private void peWaveViewerControl1_Load(object sender, EventArgs e)
         {
             Invalidate();
         }
-        
+
     }
 }

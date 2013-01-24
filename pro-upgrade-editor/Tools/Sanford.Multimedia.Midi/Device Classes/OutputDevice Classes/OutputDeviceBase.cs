@@ -79,7 +79,7 @@ namespace Sanford.Multimedia.Midi
 
         // For releasing buffers.
         protected DelegateQueue delegateQueue = new DelegateQueue();
-        
+
         protected readonly object lockObject = new object();
 
         // The number of buffers still in the queue.
@@ -89,9 +89,10 @@ namespace Sanford.Multimedia.Midi
         private MidiHeaderBuilder headerBuilder = new MidiHeaderBuilder();
 
         // The device handle.
-        protected IntPtr hndle = IntPtr.Zero; 
+        protected IntPtr hndle = IntPtr.Zero;
 
-        public OutputDeviceBase(int deviceID) : base(deviceID)
+        public OutputDeviceBase(int deviceID)
+            : base(deviceID)
         {
         }
 
@@ -102,7 +103,7 @@ namespace Sanford.Multimedia.Midi
 
         protected override void Dispose(bool disposing)
         {
-            if(disposing)
+            if (disposing)
             {
                 delegateQueue.Dispose();
             }
@@ -114,7 +115,7 @@ namespace Sanford.Multimedia.Midi
         {
             #region Require
 
-            if(IsDisposed)
+            if (IsDisposed)
             {
                 throw new ObjectDisposedException(this.GetType().Name);
             }
@@ -126,7 +127,7 @@ namespace Sanford.Multimedia.Midi
 
         public virtual void Send(SysExMessage message)
         {
-            lock(lockObject)
+            lock (lockObject)
             {
                 if (message.Length == 0)
                     return;
@@ -138,7 +139,7 @@ namespace Sanford.Multimedia.Midi
                 int result = midiOutPrepareHeader(Handle, headerBuilder.Result, SizeOfMidiHeader);
 
                 // If the system exclusive buffer was prepared successfully.
-                if(result == MidiDeviceException.MMSYSERR_NOERROR)
+                if (result == MidiDeviceException.MMSYSERR_NOERROR)
                 {
                     bufferCount++;
 
@@ -146,7 +147,7 @@ namespace Sanford.Multimedia.Midi
                     result = midiOutLongMsg(Handle, headerBuilder.Result, SizeOfMidiHeader);
 
                     // If the system exclusive message could not be sent.
-                    if(result != MidiDeviceException.MMSYSERR_NOERROR)
+                    if (result != MidiDeviceException.MMSYSERR_NOERROR)
                     {
                         midiOutUnprepareHeader(Handle, headerBuilder.Result, SizeOfMidiHeader);
                         bufferCount--;
@@ -175,21 +176,21 @@ namespace Sanford.Multimedia.Midi
 
         public virtual void Send(SysRealtimeMessage message)
         {
-           
+
             Send(message.Message);
         }
 
         public override void Reset()
         {
-          
-            lock(lockObject)
+
+            lock (lockObject)
             {
                 // Reset the OutputDevice.
-                int result = midiOutReset(Handle); 
+                int result = midiOutReset(Handle);
 
-                if(result == MidiDeviceException.MMSYSERR_NOERROR)
+                if (result == MidiDeviceException.MMSYSERR_NOERROR)
                 {
-                    while(bufferCount > 0)
+                    while (bufferCount > 0)
                     {
                         try
                         {
@@ -202,17 +203,17 @@ namespace Sanford.Multimedia.Midi
                 {
                     // Throw an exception.
                     throw new OutputDeviceException(result);
-                }                
+                }
             }
-        }        
+        }
 
         protected void Send(int message)
         {
-            lock(lockObject)
+            lock (lockObject)
             {
                 int result = midiOutShortMsg(Handle, message);
 
-                if(result != MidiDeviceException.MMSYSERR_NOERROR)
+                if (result != MidiDeviceException.MMSYSERR_NOERROR)
                 {
                     throw new OutputDeviceException(result);
                 }
@@ -227,7 +228,7 @@ namespace Sanford.Multimedia.Midi
             int result = midiOutGetDevCaps(deviceID, ref caps, Marshal.SizeOf(caps));
 
             // If the capabilities could not be retrieved.
-            if(result != MidiDeviceException.MMSYSERR_NOERROR)
+            if (result != MidiDeviceException.MMSYSERR_NOERROR)
             {
                 // Throw an exception.
                 throw new OutputDeviceException(result);
@@ -239,13 +240,13 @@ namespace Sanford.Multimedia.Midi
         // Handles Windows messages.
         protected virtual void HandleMessage(IntPtr handle, int msg, int instance, int param1, int param2)
         {
-            if(msg == MOM_OPEN)
+            if (msg == MOM_OPEN)
             {
             }
-            else if(msg == MOM_CLOSE)
+            else if (msg == MOM_CLOSE)
             {
             }
-            else if(msg == MOM_DONE)
+            else if (msg == MOM_DONE)
             {
                 delegateQueue.Post(ReleaseBuffer, new IntPtr(param1));
             }
@@ -254,14 +255,14 @@ namespace Sanford.Multimedia.Midi
         // Releases buffers.
         private void ReleaseBuffer(object state)
         {
-            lock(lockObject)
+            lock (lockObject)
             {
                 IntPtr headerPtr = (IntPtr)state;
 
                 // Unprepare the buffer.
                 int result = midiOutUnprepareHeader(Handle, headerPtr, SizeOfMidiHeader);
 
-                if(result != MidiDeviceException.MMSYSERR_NOERROR)
+                if (result != MidiDeviceException.MMSYSERR_NOERROR)
                 {
                     Exception ex = new OutputDeviceException(result);
 
@@ -275,7 +276,7 @@ namespace Sanford.Multimedia.Midi
 
                 Monitor.Pulse(lockObject);
 
-                Debug.Assert(bufferCount >= 0);                
+                Debug.Assert(bufferCount >= 0);
             }
         }
 
@@ -283,16 +284,16 @@ namespace Sanford.Multimedia.Midi
         {
             #region Guard
 
-            if(IsDisposed)
+            if (IsDisposed)
             {
                 return;
             }
 
             #endregion
 
-            lock(lockObject)
+            lock (lockObject)
             {
-                Close();          
+                Close();
             }
         }
 
@@ -310,6 +311,6 @@ namespace Sanford.Multimedia.Midi
             {
                 return midiOutGetNumDevs();
             }
-        }        
+        }
     }
 }

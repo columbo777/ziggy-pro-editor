@@ -36,7 +36,7 @@ using System;
 using System.Collections;
 
 namespace Sanford.Multimedia.Midi
-{ 
+{
     /// <summary>
     /// Defines constants representing various system exclusive message types.
     /// </summary>
@@ -53,9 +53,9 @@ namespace Sanford.Multimedia.Midi
         Continuation = 0xF7
     }
 
-	/// <summary>
-	/// Represents MIDI system exclusive messages.
-	/// </summary>
+    /// <summary>
+    /// Represents MIDI system exclusive messages.
+    /// </summary>
     public sealed class SysExMessage : IMidiMessage, IEnumerable
     {
         #region SysExEventMessage Members
@@ -93,23 +93,23 @@ namespace Sanford.Multimedia.Midi
         {
             #region Require
 
-            if(data.Length < 1)
+            if (data.Length < 1)
             {
                 throw new ArgumentException(
                     "System exclusive data is too short.", "data");
             }
-            else if(data[0] != (byte)SysExType.Start && 
+            else if (data[0] != (byte)SysExType.Start &&
                 data[0] != (byte)SysExType.Continuation)
             {
                 throw new ArgumentException(
                     "Unknown status value.", "data");
             }
 
-            #endregion            
-         
+            #endregion
+
             this.data = new byte[data.Length];
             data.CopyTo(this.data, 0);
-        }        
+        }
 
         #endregion
 
@@ -133,7 +133,7 @@ namespace Sanford.Multimedia.Midi
         {
             #region Guard
 
-            if(!(obj is SysExMessage))
+            if (!(obj is SysExMessage))
             {
                 return false;
             }
@@ -144,14 +144,14 @@ namespace Sanford.Multimedia.Midi
 
             bool equals = true;
 
-            if(this.Length != message.Length)
+            if (this.Length != message.Length)
             {
                 equals = false;
             }
 
-            for(int i = 0; i < this.Length && equals; i++)
+            for (int i = 0; i < this.Length && equals; i++)
             {
-                if(this[i] != message[i])
+                if (this[i] != message[i])
                 {
                     equals = false;
                 }
@@ -182,7 +182,7 @@ namespace Sanford.Multimedia.Midi
             {
                 #region Require
 
-                if(index < 0 || index >= Length)
+                if (index < 0 || index >= Length)
                 {
                     throw new ArgumentOutOfRangeException("index", index,
                         "Index into system exclusive message out of range.");

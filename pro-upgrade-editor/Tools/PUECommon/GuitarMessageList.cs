@@ -11,8 +11,8 @@ namespace ProUpgradeEditor.Common
     public enum ChordQueryOption
     {
         Default = (0),
-        IncludeEndingOnMin = (1<<0),
-        IncludeStartingOnMax = (1<<1),
+        IncludeEndingOnMin = (1 << 0),
+        IncludeStartingOnMax = (1 << 1),
     }
 
     [Flags()]
@@ -20,17 +20,17 @@ namespace ProUpgradeEditor.Common
     {
         NoResult = 0,
         Success = (1 << 0),
-        
+
         AdjustedDownTickLeft = (1 << 1),
         AdjustedDownTickRight = (1 << 2),
-        
+
         AdjustedUpTickLeft = (1 << 3),
         AdjustedUpTickRight = (1 << 4),
 
         ShortResult = (1 << 5),
-        
+
         Error = (1 << 6),
-        
+
         AdjustedDownTick = (AdjustedDownTickLeft | AdjustedDownTickRight),
         AdjustedUpTick = (AdjustedUpTickLeft | AdjustedUpTickRight),
     }
@@ -65,6 +65,7 @@ namespace ProUpgradeEditor.Common
                 yield return GuitarMessageType.GuitarTimeSignature;
                 yield return GuitarMessageType.GuitarArpeggio;
                 yield return GuitarMessageType.GuitarBigRockEnding;
+                yield return GuitarMessageType.GuitarBigRockEndingSubMessage;
                 yield return GuitarMessageType.GuitarSingleStringTremelo;
                 yield return GuitarMessageType.GuitarMultiStringTremelo;
                 yield return GuitarMessageType.GuitarSlide;
@@ -72,7 +73,7 @@ namespace ProUpgradeEditor.Common
             }
         }
 
-        public IEnumerable<GuitarMessage> Where(Func<GuitarMessage,bool> func)
+        public IEnumerable<GuitarMessage> Where(Func<GuitarMessage, bool> func)
         {
             foreach (var messageType in AllMessageTypes)
             {
@@ -90,7 +91,7 @@ namespace ProUpgradeEditor.Common
         public GuitarHandPositionList HandPositions;
         public GuitarTextEventList TextEvents;
         public GuitarTrainerList Trainers;
-        
+
         public GuitarPowerupList Powerups;
         public GuitarSoloList Solos;
         public GuitarTempoList Tempos;
@@ -107,26 +108,35 @@ namespace ProUpgradeEditor.Common
         public ChordStrumList ChordStrums;
 
         TrackEditor owner;
+        public TrackEditor Owner { get { return owner; } }
 
         public IEnumerable<GuitarMessage> ImportMessageRange(IEnumerable<GuitarMessage> list)
         {
             var ret = new List<GuitarMessage>();
 
-            ret.AddRange(list.Where(x => x.IsMetaEvent()).ToList().Select(x => ImportMessage(x)).Where(x=> x != null));
-            ret.AddRange(list.Where(x => x.IsChannelEvent() && !x.IsChordSubItem() && !x.IsGuitarChord()).ToList().Select(x=> ImportMessage(x)).Where(x => x != null));
+            ret.AddRange(list.Where(x => x.IsMetaEvent()).ToList().Select(x => ImportMessage(x)).Where(x => x != null));
+            ret.AddRange(list.Where(x => x.IsChannelEvent() && !x.IsChordSubItem() && !x.IsGuitarChord()).ToList().Select(x => ImportMessage(x)).Where(x => x != null));
             ret.AddRange(list.Where(x => x.IsChannelEvent() && x.IsChordSubItem()).ToList().Select(x => ImportMessage(x)).Where(x => x != null));
             ret.AddRange(addContainerChords(ret));
 
             return ret;
         }
 
+
         IEnumerable<GuitarMessage> addContainerChords(IEnumerable<GuitarMessage> list)
         {
             var ret = new List<GuitarMessage>();
-            ret.AddRange(list.Where(x=> x is GuitarNote).GroupByCloseTick().ToList().Select(x=>
-                new GuitarChord(owner.GuitarTrack, x.Cast<GuitarNote>(), true)).Where(x=> x != null));
-            var chordList = GetMessageListForType(GuitarMessageType.GuitarChord);
-            chordList.AddGuitarMessageRange(ret);
+            foreach (var noteset in list.Where(x => x is GuitarNote).GroupByCloseTick().ToList())
+            {
+                var chord = GuitarChord.GetChord(this, noteset.Cast<GuitarNote>().Where(x => x != null), true);
+                if (chord != null)
+                {
+                    ret.Add(chord);
+
+                    GetMessageListForType(GuitarMessageType.GuitarChord).Add(chord);
+                }
+            }
+
             return ret;
         }
 
@@ -141,7 +151,7 @@ namespace ProUpgradeEditor.Common
                 {
                     upEvent = owner.GuitarTrack.Insert(msg.UpTick, m.B);
                 }
-                var newMessage = owner.GuitarTrack.CreateMessageByType(msg.MessageType, downEvent, upEvent);
+                var newMessage = owner.GuitarTrack.CreateMessageByType(owner.Messages, msg.MessageType, downEvent, upEvent);
                 if (newMessage != null)
                 {
                     GetMessageListForType(msg.MessageType).Add(newMessage);
@@ -154,7 +164,7 @@ namespace ProUpgradeEditor.Common
         public GuitarMessage ImportEvent(GuitarMessageType type, MidiEvent down, MidiEvent up = null)
         {
             var cd = convertEvent(down);
-            if(cd != null)
+            if (cd != null)
             {
                 var downEvent = owner.GuitarTrack.Insert(down.AbsoluteTicks, cd);
                 MidiEvent upEvent = null;
@@ -166,8 +176,8 @@ namespace ProUpgradeEditor.Common
                         upEvent = owner.GuitarTrack.Insert(up.AbsoluteTicks, ue);
                     }
                 }
-                
-                var newMessage = owner.GuitarTrack.CreateMessageByType(type, downEvent, upEvent);
+
+                var newMessage = owner.GuitarTrack.CreateMessageByType(owner.Messages, type, downEvent, upEvent);
                 if (newMessage != null)
                 {
                     GetMessageListForType(type).Add(newMessage);
@@ -252,9 +262,9 @@ namespace ProUpgradeEditor.Common
                 case GuitarModifierType.SingleStringTremelo:
                     ret.AddRange(SingleStringTremelos);
                     break;
-                
+
             }
-            
+
             return ret.ToList();
         }
 
@@ -293,8 +303,8 @@ namespace ProUpgradeEditor.Common
             ret.AddRange(Powerups.GetBetweenTick(pair));
             ret.AddRange(Solos.GetBetweenTick(pair));
             ret.AddRange(MultiStringTremelos.GetBetweenTick(pair));
-            ret.AddRange(SingleStringTremelos.GetBetweenTick(pair));      
-                
+            ret.AddRange(SingleStringTremelos.GetBetweenTick(pair));
+
             return ret.ToList();
         }
 
@@ -346,6 +356,7 @@ namespace ProUpgradeEditor.Common
                     break;
 
                 case GuitarMessageType.GuitarBigRockEnding:
+                case GuitarMessageType.GuitarBigRockEndingSubMessage:
                     ret = BigRockEndings;
                     break;
 
@@ -368,7 +379,7 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
-        
+
 
         public AdjustResult AdjustChordTicks(GuitarChord chord, TickPair newTicks, AdjustOption option)
         {
@@ -533,37 +544,64 @@ namespace ProUpgradeEditor.Common
         {
             if (mess != null)
             {
-                var items = mess.GroupBy(m => m.MessageType).ToList();
-                if (items.Count > 1)
+                foreach (var x in mess)
                 {
-                    foreach (var item in items)
-                    {
-                        AddRange(item.ToList());
-                    }
+                    Add(x);
                 }
-                items.ForEach(x =>
-                {
-                    GetMessageListForType(x.Key).AddGuitarMessageRange(x);
-                });
             }
         }
 
 
         public void Add<T>(T mess) where T : GuitarMessage
         {
-            GetMessageListForType(mess.MessageType).Add(mess);
-            
+            if (mess != null)
+            {
+                var list = GetMessageListForType(mess.MessageType);
+                if (list != null)
+                {
+                    list.Add(mess);
+                    mess.IsDeleted = false;
+                }
+            }
         }
 
-
-
-        public void Remove<T>(T mess) where T : GuitarMessage
+        public MidiEvent Insert(int absoluteTicks, IMidiMessage ev)
         {
-            GetMessageListForType(mess.MessageType).Remove(mess);
+            return owner.GuitarTrack.Insert(absoluteTicks, ev);
         }
 
+        public MidiEventPair Insert(int data1, int data2, int channel, TickPair ticks)
+        {
+            return owner.GuitarTrack.Insert(data1, data2, channel, ticks);
+        }
 
+        public void Remove(GuitarMessage mess)
+        {
+            internalRemove(mess);
+        }
 
+        public void Remove(MidiEvent mess)
+        {
+            owner.GuitarTrack.Remove(mess);
+        }
+        public void Remove(IEnumerable<GuitarMessage> mess)
+        {
+            foreach (var m in mess.ToList())
+                internalRemove(m);
+        }
+        public void Remove(IEnumerable<MidiEvent> mess)
+        {
+            owner.GuitarTrack.Remove(mess);
+        }
+        internal void internalRemove<T>(T mess) where T : GuitarMessage
+        {
+            if (mess != null)
+            {
+                mess.RemoveEvents();
+
+                GetMessageListForType(mess.MessageType).Remove(mess);
+            }
+        }
 
     }
 }

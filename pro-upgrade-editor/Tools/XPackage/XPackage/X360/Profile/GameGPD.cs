@@ -1,12 +1,16 @@
 ﻿// NOTE This class is protected under GPL License as well as terms and conditions.
-/* */ // Most notably, you must not obfuscate/protect this code, you must include an open source
-/* */ // to your project that uses this code, and you must also not make profit on it.
-/* */ // For more details, access:
+/* */
+// Most notably, you must not obfuscate/protect this code, you must include an open source
+/* */
+// to your project that uses this code, and you must also not make profit on it.
+/* */
+// For more details, access:
 // *http://www.gnu.org/
 // *License included in the library source
 // *License located at X360.XPackage.Resources.GPL30
 // *X360.XAbout.GNUProtected for GNU and TaC (Terms and Conditions)
-/* */ // You agree to these terms when you use this code.
+/* */
+// You agree to these terms when you use this code.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +38,8 @@ namespace X360.Profile
         /// <summary>
         /// Achievement unlocked online
         /// </summary>
-        UnlockedOnline }
+        UnlockedOnline
+    }
 
     /// <summary>
     /// Auto unlock
@@ -48,7 +53,8 @@ namespace X360.Profile
         /// <summary>
         /// Offline
         /// </summary>
-        Offline }
+        Offline
+    }
 
     /// <summary>
     /// Object to hold Achievement entries
@@ -92,7 +98,8 @@ namespace X360.Profile
             {
                 if (value.Length <= xDescription1.Length)
                     xDescription1 = value.PadRight(xDescription1.Length, ' ');
-                else xDescription1 = value.Substring(0, xDescription1.Length);
+                else
+                    xDescription1 = value.Substring(0, xDescription1.Length);
             }
         }
         /// <summary>
@@ -105,7 +112,8 @@ namespace X360.Profile
             {
                 if (value.Length <= xDescription2.Length)
                     xDescription2 = value.PadRight(xDescription2.Length, ' ');
-                else xDescription2 = value.Substring(0, xDescription2.Length);
+                else
+                    xDescription2 = value.Substring(0, xDescription2.Length);
             }
         }
         /// <summary>
@@ -126,7 +134,8 @@ namespace X360.Profile
             {
                 if (value.Length <= xTitle.Length)
                     xTitle = value.PadRight(xTitle.Length, ' ');
-                else xTitle = value.Substring(0, xTitle.Length);
+                else
+                    xTitle = value.Substring(0, xTitle.Length);
             }
         }
         /// <summary>
@@ -247,7 +256,7 @@ namespace X360.Profile
             }
             return xReturn;
         }
-        
+
         internal uint xCalcUT()
         {
             uint xReturn = 0;
@@ -292,7 +301,7 @@ namespace X360.Profile
             xActive = false;
             return xReturn;
         }
-        
+
         /// <summary>
         /// Calculate the total possible credit
         /// </summary>
@@ -370,7 +379,7 @@ namespace X360.Profile
                 return false;
             return FCAC() & !(xActive = false);
         }
-        
+
         /// <summary>
         /// Unlock all achievements
         /// </summary>
@@ -472,7 +481,8 @@ namespace X360.Profile
                 Image xReturn = GetImageByID(xAchievements[xAchievementIndex].imageID);
                 return (xReturn == null) ? XPackage.Resources.NoImage : xReturn;
             }
-            else return XPackage.Resources.Locked;
+            else
+                return XPackage.Resources.Locked;
         }
 
         /// <summary>
@@ -480,7 +490,8 @@ namespace X360.Profile
         /// </summary>
         /// <param name="GPDLocale"></param>
         /// <param name="TitleID"></param>
-        public GameGPD(string GPDLocale, uint TitleID) : base(GPDLocale, TitleID)
+        public GameGPD(string GPDLocale, uint TitleID)
+            : base(GPDLocale, TitleID)
         {
             if (!IsValid)
                 return;

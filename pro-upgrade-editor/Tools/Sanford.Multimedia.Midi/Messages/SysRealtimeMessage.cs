@@ -39,7 +39,7 @@ using System.Diagnostics;
 namespace Sanford.Multimedia.Midi
 {
     #region System Realtime Message Types
-    
+
     /// <summary>
     /// Defines constants representing the various system realtime message types.
     /// </summary>
@@ -68,8 +68,8 @@ namespace Sanford.Multimedia.Midi
         /// <summary>
         /// Represents the stop system realtime type.
         /// </summary>
-        Stop,    
-    
+        Stop,
+
         /// <summary>
         /// Represents the active sense system realtime type.
         /// </summary>
@@ -83,16 +83,16 @@ namespace Sanford.Multimedia.Midi
 
     #endregion
 
-	/// <summary>
-	/// Represents MIDI system realtime messages.
-	/// </summary>
-	/// <remarks>
-	/// System realtime messages are MIDI messages that are primarily concerned 
-	/// with controlling and synchronizing MIDI devices. 
-	/// </remarks>
-	[ImmutableObject(true)]
-	public sealed class SysRealtimeMessage : ShortMessage
-	{
+    /// <summary>
+    /// Represents MIDI system realtime messages.
+    /// </summary>
+    /// <remarks>
+    /// System realtime messages are MIDI messages that are primarily concerned 
+    /// with controlling and synchronizing MIDI devices. 
+    /// </remarks>
+    [ImmutableObject(true)]
+    public sealed class SysRealtimeMessage : ShortMessage
+    {
         #region SysRealtimeMessage Members
 
         #region System Realtime Messages
@@ -100,43 +100,43 @@ namespace Sanford.Multimedia.Midi
         /// <summary>
         /// The instance of the system realtime start message.
         /// </summary>
-        public static readonly SysRealtimeMessage StartMessage = 
+        public static readonly SysRealtimeMessage StartMessage =
             new SysRealtimeMessage(SysRealtimeType.Start);
 
         /// <summary>
         /// The instance of the system realtime continue message.
         /// </summary>
-        public static readonly SysRealtimeMessage ContinueMessage = 
+        public static readonly SysRealtimeMessage ContinueMessage =
             new SysRealtimeMessage(SysRealtimeType.Continue);
 
         /// <summary>
         /// The instance of the system realtime stop message.
         /// </summary>
-        public static readonly SysRealtimeMessage StopMessage = 
+        public static readonly SysRealtimeMessage StopMessage =
             new SysRealtimeMessage(SysRealtimeType.Stop);
 
         /// <summary>
         /// The instance of the system realtime clock message.
         /// </summary>
-        public static readonly SysRealtimeMessage ClockMessage = 
+        public static readonly SysRealtimeMessage ClockMessage =
             new SysRealtimeMessage(SysRealtimeType.Clock);
 
         /// <summary>
         /// The instance of the system realtime tick message.
         /// </summary>
-        public static readonly SysRealtimeMessage TickMessage = 
+        public static readonly SysRealtimeMessage TickMessage =
             new SysRealtimeMessage(SysRealtimeType.Tick);
 
         /// <summary>
         /// The instance of the system realtime active sense message.
         /// </summary>
-        public static readonly SysRealtimeMessage ActiveSenseMessage = 
+        public static readonly SysRealtimeMessage ActiveSenseMessage =
             new SysRealtimeMessage(SysRealtimeType.ActiveSense);
 
         /// <summary>
         /// The instance of the system realtime reset message.
         /// </summary>
-        public static readonly SysRealtimeMessage ResetMessage = 
+        public static readonly SysRealtimeMessage ResetMessage =
             new SysRealtimeMessage(SysRealtimeType.Reset);
 
         #endregion
@@ -182,7 +182,7 @@ namespace Sanford.Multimedia.Midi
         {
             #region Guard
 
-            if(!(obj is SysRealtimeMessage))
+            if (!(obj is SysRealtimeMessage))
             {
                 return false;
             }
@@ -197,7 +197,7 @@ namespace Sanford.Multimedia.Midi
         #endregion
 
         #region Properties
-        
+
         /// <summary>
         /// Gets the SysRealtimeType.
         /// </summary>
@@ -208,7 +208,7 @@ namespace Sanford.Multimedia.Midi
                 return (SysRealtimeType)msg;
             }
         }
-   
+
         /// <summary>
         /// Gets the MessageType.
         /// </summary>

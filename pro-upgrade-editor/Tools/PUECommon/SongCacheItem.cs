@@ -44,7 +44,7 @@ namespace ProUpgradeEditor
             AutoGenGuitarEasy = true;
             AutoGenGuitarHard = true;
             AutoGenGuitarMedium = true;
-            
+
             IsDirty = false;
         }
 
@@ -77,7 +77,7 @@ namespace ProUpgradeEditor
 
         bool copyGuitarToBass;
         public bool CopyGuitarToBass { get { return copyGuitarToBass; } set { if (copyGuitarToBass != value) { copyGuitarToBass = value; this.IsUpdated = true; } } }
-        
+
         string[] guitarTuning;
         public string[] GuitarTuning { get { return guitarTuning; } set { if (guitarTuning != value) { guitarTuning = value; this.IsUpdated = true; } } }
 
@@ -140,7 +140,7 @@ namespace ProUpgradeEditor
 
         public override string ToString()
         {
-            return   (Description.Length > 0 ? Description : SongName) + " [" + CacheSongID.ToString() + "]";
+            return (Description.Length > 0 ? Description : SongName) + " [" + CacheSongID.ToString() + "]";
         }
 
         public int CompareTo(SongCacheItem other)

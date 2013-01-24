@@ -12,7 +12,7 @@ namespace Sanford.Multimedia.Midi
     /// </summary>
     public enum MetaType
     {
-        
+
         /// <summary>
         /// Represents sequencer number type.
         /// </summary>
@@ -98,7 +98,7 @@ namespace Sanford.Multimedia.Midi
 
     #endregion
 
-	public class KeySignature
+    public class KeySignature
     {
 
 
@@ -258,9 +258,9 @@ namespace Sanford.Multimedia.Midi
         public bool IsMajor { get; internal set; }
     }
 
-	[ImmutableObject(true)]
-	public sealed class MetaMessage : IMidiMessage
-	{
+    [ImmutableObject(true)]
+    public sealed class MetaMessage : IMidiMessage
+    {
         /// <summary>
         /// The amount to shift data bytes when calculating the hash code.
         /// </summary>
@@ -293,7 +293,7 @@ namespace Sanford.Multimedia.Midi
         /// <summary>
         /// End of track meta message.
         /// </summary>
-        public static readonly MetaMessage EndOfTrackMessage = 
+        public static readonly MetaMessage EndOfTrackMessage =
             new MetaMessage(MetaType.EndOfTrack, new byte[0]);
 
         // The meta message type.
@@ -305,10 +305,10 @@ namespace Sanford.Multimedia.Midi
         // The hash code value.
         private int hashCode;
 
-		public MetaMessage(MetaType type, byte[] data)
+        public MetaMessage(MetaType type, byte[] data)
         {
             this.type = type;
-            
+
             // Create storage for meta message data.
             this.data = new byte[data.Length];
 
@@ -316,7 +316,8 @@ namespace Sanford.Multimedia.Midi
             data.CopyTo(this.data, 0);
         }
 
-        public MetaMessage(MetaType type, string data) : this(type, System.Text.Encoding.ASCII.GetBytes(data))
+        public MetaMessage(MetaType type, string data)
+            : this(type, System.Text.Encoding.ASCII.GetBytes(data))
         {
         }
 
@@ -328,7 +329,7 @@ namespace Sanford.Multimedia.Midi
 
         public override int GetHashCode()
         {
-            return hashCode;            
+            return hashCode;
         }
 
         public override bool Equals(object obj)
@@ -337,24 +338,24 @@ namespace Sanford.Multimedia.Midi
             MetaMessage message = (MetaMessage)obj;
 
             // If the types do not match.
-            if(MetaType != message.MetaType)
+            if (MetaType != message.MetaType)
             {
                 // The messages are not equal
                 equal = false;
             }
 
             // If the message lengths are not equal.
-            if(equal && Length != message.Length)
+            if (equal && Length != message.Length)
             {
                 // The message are not equal.
                 equal = false;
             }
 
             // Check to see if the data is equal.
-            for(int i = 0; i < Length && equal; i++)
+            for (int i = 0; i < Length && equal; i++)
             {
                 // If a data value does not match.
-                if(this.data[i] != message.data[i])
+                if (this.data[i] != message.data[i])
                 {
                     // The messages are not equal.
                     equal = false;
@@ -366,22 +367,22 @@ namespace Sanford.Multimedia.Midi
 
         // Calculates the hash code.
         private void CalculateHashCode()
-        {            
+        {
             // TODO: This algorithm may need work.
 
             hashCode = (int)MetaType;
 
-            for(int i = 0; i < data.Length; i += 3)
+            for (int i = 0; i < data.Length; i += 3)
             {
                 hashCode ^= data[i];
             }
 
-            for(int i = 1; i < data.Length; i += 3)
+            for (int i = 1; i < data.Length; i += 3)
             {
                 hashCode ^= data[i] << Shift;
             }
 
-            for(int i = 2; i < data.Length; i += 3)
+            for (int i = 2; i < data.Length; i += 3)
             {
                 hashCode ^= data[i] << Shift * 2;
             }
@@ -428,11 +429,11 @@ namespace Sanford.Multimedia.Midi
         public int Length
         {
             get
-            { 
+            {
                 return data.Length;
             }
         }
-        
+
         /// <summary>
         /// Gets the type of meta message.
         /// </summary>

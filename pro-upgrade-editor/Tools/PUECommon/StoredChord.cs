@@ -31,7 +31,7 @@ namespace ProUpgradeEditor.Common
                 }
                 else
                 {
-                    txt += ("(" +(s.Length > 0 ?  s : Utility.StoredChordEmptyNote) + ")" ) + Utility.StoredChordNoteSeparator;
+                    txt += ("(" + (s.Length > 0 ? s : Utility.StoredChordEmptyNote) + ")") + Utility.StoredChordNoteSeparator;
                 }
             }
             txt += Utility.StoredChordSuffix;

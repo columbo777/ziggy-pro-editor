@@ -43,7 +43,7 @@ namespace Sanford.Multimedia.Midi
     /// <summary>
     /// Defines constants for ChannelMessage types.
     /// </summary>
-    public enum ChannelCommand 
+    public enum ChannelCommand
     {
         Invalid = 0,
         /// <summary>
@@ -64,8 +64,8 @@ namespace Sanford.Multimedia.Midi
         /// <summary>
         /// Represents the controller command type.
         /// </summary>
-        Controller = 0xB0,  
-  
+        Controller = 0xB0,
+
         /// <summary>
         /// Represents the program change command type.
         /// </summary>
@@ -75,8 +75,8 @@ namespace Sanford.Multimedia.Midi
         /// Represents the channel pressure (aftertouch) command 
         /// type.
         /// </summary>
-        ChannelPressure = 0xD0,   
-     
+        ChannelPressure = 0xD0,
+
         /// <summary>
         /// Represents the pitch wheel command type.
         /// </summary>
@@ -341,7 +341,7 @@ namespace Sanford.Multimedia.Midi
         /// The Tremelo Level.
         /// </summary>
         TremeloLevel,
-        
+
         /// <summary>
         /// The Chorus Level.
         /// </summary>
@@ -401,7 +401,7 @@ namespace Sanford.Multimedia.Midi
         /// The Local Keyboard.
         /// </summary>
         LocalKeyboard,
-        
+
         /// <summary>
         /// The All Notes Off.
         /// </summary>
@@ -430,12 +430,12 @@ namespace Sanford.Multimedia.Midi
 
     #endregion
 
-	/// <summary>
-	/// Represents MIDI channel messages.
-	/// </summary>
-	[ImmutableObject(true)]
-	public sealed class ChannelMessage : ShortMessage
-	{
+    /// <summary>
+    /// Represents MIDI channel messages.
+    /// </summary>
+    [ImmutableObject(true)]
+    public sealed class ChannelMessage : ShortMessage
+    {
 
         #region ChannelEventArgs Members
 
@@ -461,18 +461,18 @@ namespace Sanford.Multimedia.Midi
         {
             msg = 0;
             msg = PackCommand(msg, command);
-            if(midiChannel != 0)
+            if (midiChannel != 0)
                 msg = PackMidiChannel(msg, midiChannel);
-            if(data1 != 0)
+            if (data1 != 0)
                 msg = PackData1(msg, data1);
-            if(data2 != 0)
+            if (data2 != 0)
                 msg = PackData2(msg, data2);
         }
 
 
         public ChannelMessage(int message)
         {
-            this.msg = message;            
+            this.msg = message;
         }
 
         #endregion
@@ -520,7 +520,7 @@ namespace Sanford.Multimedia.Midi
         {
             int result;
 
-            if(command == ChannelCommand.ChannelPressure || command == ChannelCommand.ProgramChange)
+            if (command == ChannelCommand.ChannelPressure || command == ChannelCommand.ProgramChange)
             {
                 result = 1;
             }
@@ -531,7 +531,7 @@ namespace Sanford.Multimedia.Midi
 
             return result;
         }
-   
+
         /// <summary>
         /// Unpacks the command value from the specified integer channel 
         /// message.
@@ -546,7 +546,7 @@ namespace Sanford.Multimedia.Midi
         {
             return (ChannelCommand)(message & DataMask & MidiChannelMask);
         }
-     
+
         /// <summary>
         /// Unpacks the MIDI channel from the specified integer channel 
         /// message.
@@ -597,7 +597,7 @@ namespace Sanford.Multimedia.Midi
         internal static int PackCommand(int message, ChannelCommand command)
         {
             return (message & CommandMask) | (int)command;
-        }        
+        }
 
         #endregion
 
@@ -618,7 +618,7 @@ namespace Sanford.Multimedia.Midi
                 return UnpackCommand(msg);
             }
         }
-        
+
         /// <summary>
         /// Gets the MIDI channel.
         /// </summary>
@@ -638,9 +638,9 @@ namespace Sanford.Multimedia.Midi
             get
             {
                 return UnpackData1(msg);
-            }                
+            }
         }
-        
+
         /// <summary>
         /// Gets the second data value.
         /// </summary>
@@ -666,6 +666,6 @@ namespace Sanford.Multimedia.Midi
 
         #endregion
 
-        #endregion        
+        #endregion
     }
 }

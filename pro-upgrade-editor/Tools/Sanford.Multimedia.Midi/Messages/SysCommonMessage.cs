@@ -68,12 +68,12 @@ namespace Sanford.Multimedia.Midi
 
     #endregion
 
-	/// <summary>
-	/// Represents MIDI system common messages.
-	/// </summary>
-	[ImmutableObject(true)]
-	public sealed class SysCommonMessage : ShortMessage
-	{
+    /// <summary>
+    /// Represents MIDI system common messages.
+    /// </summary>
+    [ImmutableObject(true)]
+    public sealed class SysCommonMessage : ShortMessage
+    {
         #region SysCommonMessage Members
 
         #region Construction
@@ -85,8 +85,8 @@ namespace Sanford.Multimedia.Midi
         /// <param name="type">
         /// The type of SysCommonMessage.
         /// </param>
-		public SysCommonMessage(SysCommonType type)
-		{
+        public SysCommonMessage(SysCommonType type)
+        {
             msg = (int)type;
 
             #region Ensure
@@ -110,7 +110,7 @@ namespace Sanford.Multimedia.Midi
         /// If data1 is less than zero or greater than 127.
         /// </exception>
         public SysCommonMessage(SysCommonType type, int data1)
-        { 
+        {
             msg = (int)type;
             msg = PackData1(msg, data1);
 
@@ -151,8 +151,8 @@ namespace Sanford.Multimedia.Midi
             Debug.Assert(Data2 == data2);
 
             #endregion
-        }       
- 
+        }
+
         internal SysCommonMessage(int message)
         {
             this.msg = message;
@@ -188,7 +188,7 @@ namespace Sanford.Multimedia.Midi
         {
             #region Guard
 
-            if(!(obj is SysCommonMessage))
+            if (!(obj is SysCommonMessage))
             {
                 return false;
             }
@@ -216,7 +216,7 @@ namespace Sanford.Multimedia.Midi
                 return (SysCommonType)UnpackStatus(msg);
             }
         }
-        
+
         /// <summary>
         /// Gets the first data value.
         /// </summary>
@@ -236,7 +236,7 @@ namespace Sanford.Multimedia.Midi
             get
             {
                 return UnpackData2(msg);
-            }                    
+            }
         }
 
         /// <summary>

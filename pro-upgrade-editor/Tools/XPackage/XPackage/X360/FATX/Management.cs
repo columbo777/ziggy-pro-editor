@@ -231,7 +231,7 @@ namespace X360.FATX
         {
             // Tries to read the offsets of Xbox 360 drives to see if the magic's match
             xType = DriveTypes.Unknown;
-            
+
             try
             {
                 if (xIO.IOType != DataType.Drive || ((DriveIO)xIO).xDrive.Type != DeviceType.LogicalDrive)
@@ -385,9 +385,9 @@ namespace X360.FATX
         /// <summary>
         /// Determines if this Drive is successfully obtained
         /// </summary>
-        public FATXPartition[] Partitions 
-        { 
-            get 
+        public FATXPartition[] Partitions
+        {
+            get
             {
                 if (xPartitions != null)
                 {
@@ -397,7 +397,7 @@ namespace X360.FATX
                 {
                     return null;
                 }
-            } 
+            }
         }
         /// <summary>
         /// True if parse success
@@ -408,7 +408,8 @@ namespace X360.FATX
             {
                 if (xIO == null)
                     return (xDrive != null && xDrive.Accessed);
-                else return (xIO.Accessed);
+                else
+                    return (xIO.Accessed);
             }
         }
         /// <summary>
@@ -473,9 +474,9 @@ namespace X360.FATX
                 var subFolder = parent.Folders[x];
                 if (string.Compare(subFolder.Name, folderName, true) == 0)
                 {
-                    
+
                     ret = subFolder;
-                    
+
                     break;
                 }
             }
@@ -547,7 +548,7 @@ namespace X360.FATX
             FATXFolderEntry ret = null;
 
             xReadToFolder(Path, out ret);
-            
+
             return ret;
         }
 
@@ -556,7 +557,7 @@ namespace X360.FATX
             xFolderOut = null;
 
             List<string> findFolders = GetPathFromString(Path);
-            if(findFolders == null || findFolders.Count == 0)
+            if (findFolders == null || findFolders.Count == 0)
                 return null;
 
 
@@ -584,7 +585,7 @@ namespace X360.FATX
             while (findFolders.Count > 0)
             {
                 var entry = GetSubEntry(findFolders[0], contents);
-                
+
                 if (entry != null)
                 {
                     if (entry.xIsValid)
@@ -595,7 +596,7 @@ namespace X360.FATX
                             if (fe != null)
                             {
                                 xFolderOut = fe;
-                                
+
                                 contents = fe.xRead();
                             }
                             else
@@ -624,12 +625,12 @@ namespace X360.FATX
                     }
                 }
                 findFolders.RemoveAt(0);
-                if (contents == null )
+                if (contents == null)
                     return null;
-                
+
             }
 
-            
+
 
             return contents;
             /*
@@ -777,7 +778,8 @@ namespace X360.FATX
                         name = "System";
                     else if (i == 2)
                         name = "Compatability";
-                    else name = "Content";
+                    else
+                        name = "Content";
                     FATXPartition x = new FATXPartition((off * SectorSize), (len * SectorSize),
                         this, name);
                     if (x.IsValid)
@@ -796,7 +798,7 @@ namespace X360.FATX
             {
                 xIO.Dispose();
             }
-            if(Partitions != null)
+            if (Partitions != null)
             {
                 foreach (FATXPartition x in Partitions)
                     x.xTable.xAllocTable.Dispose(true);
@@ -828,7 +830,7 @@ namespace X360.FATX
             if (!xdrive.Accessed)
                 throw new Exception("Invalid input");
             //if (!FATXManagement.IsFATX(ref xdrive, out xType))
-             //   throw new Exception("Drive is not FATX");
+            //   throw new Exception("Drive is not FATX");
             xType = DriveTypes.USBFlashDrive;
             xactive = true;
             xDrive = xdrive;
@@ -904,7 +906,7 @@ namespace X360.FATX
         {
             extthrd(xIOOut);
             //System.Threading.Thread x = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(extthrd));
-           // x.Start(xIOOut);
+            // x.Start(xIOOut);
             //while (x.IsAlive)
             //    System.Windows.Forms.Application.DoEvents();
             if (xactive)
@@ -956,7 +958,7 @@ namespace X360.FATX
             //System.Threading.Thread x = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(rstthrd));
             //x.Start(xImageDrive);
             //while (x.IsAlive)
-              //  System.Windows.Forms.Application.DoEvents();
+            //  System.Windows.Forms.Application.DoEvents();
             return !(xactive = false);
         }
 
@@ -1001,7 +1003,8 @@ namespace X360.FATX
                     // Make a new handle to a drive
                     xIO.OpenAgain();
                 }
-                else xIO = new DriveIO(ref xDrive, true);
+                else
+                    xIO = new DriveIO(ref xDrive, true);
             }
             else if (xType == DriveTypes.USBFlashDrive && xIO == null || !xIO.Accessed)
             {
@@ -1011,7 +1014,8 @@ namespace X360.FATX
                     string file = xDrive.DeviceName + @"\Xbox360\Data" + i.ToString("000#");
                     if (File.Exists(file))
                         files.Add(file);
-                    else break;
+                    else
+                        break;
                 }
                 xIO = new MultiFileIO(files.ToArray(), true);
             }

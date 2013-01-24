@@ -39,9 +39,9 @@ using Sanford.Multimedia;
 
 namespace Sanford.Multimedia.Midi
 {
-	/// <summary>
-	/// The base class for all MIDI devices.
-	/// </summary>
+    /// <summary>
+    /// The base class for all MIDI devices.
+    /// </summary>
     /// 
 
     public abstract class Devicebase : IDisposable
@@ -61,25 +61,25 @@ namespace Sanford.Multimedia.Midi
         public abstract IntPtr Handle { get; }
         public bool IsDisposed { get { return this.disposed; } }
 
-        
+
 
         public abstract void Close();
         public abstract void Dispose();
-        protected virtual void Dispose(bool disposing) 
-        { 
-            if(disposing)
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
             {
                 this.disposed = true;
             }
         }
-        protected virtual void OnError(ErrorEventArgs e) 
-        { 
+        protected virtual void OnError(ErrorEventArgs e)
+        {
             return;
         }
         public abstract void Reset();
     }
     public abstract class MidiDevice : Devicebase
-	{
+    {
         #region MidiDevice Members
 
         #region Win32 Midi Device Functions
@@ -100,10 +100,11 @@ namespace Sanford.Multimedia.Midi
             SizeOfMidiHeader = Marshal.SizeOf(typeof(MidiHeader));
         }
 
-        public MidiDevice(int deviceID) : base(deviceID)
-        {            
+        public MidiDevice(int deviceID)
+            : base(deviceID)
+        {
         }
-        
+
         /// <summary>
         /// Connects a MIDI InputDevice to a MIDI thru or OutputDevice, or 
         /// connects a MIDI thru device to a MIDI OutputDevice. 
@@ -122,7 +123,7 @@ namespace Sanford.Multimedia.Midi
         {
             var result = midiConnect(handleA, handleB, IntPtr.Zero);
 
-            if(result != MidiDeviceException.MMSYSERR_NOERROR)
+            if (result != MidiDeviceException.MMSYSERR_NOERROR)
             {
                 throw new MidiDeviceException((int)result);
             }
@@ -145,12 +146,12 @@ namespace Sanford.Multimedia.Midi
         {
             var result = midiDisconnect(handleA, handleB, IntPtr.Zero);
 
-            if(result != MidiDeviceException.MMSYSERR_NOERROR)
+            if (result != MidiDeviceException.MMSYSERR_NOERROR)
             {
                 throw new MidiDeviceException((int)result);
             }
-        }        
+        }
 
-        #endregion        
+        #endregion
     }
 }

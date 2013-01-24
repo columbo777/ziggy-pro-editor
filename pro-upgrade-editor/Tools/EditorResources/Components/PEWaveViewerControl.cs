@@ -16,7 +16,7 @@ namespace EditorResources.Components
         public PEWaveViewerControl()
         {
             InitializeComponent();
-            this.DoubleBuffered=true;   
+            this.DoubleBuffered = true;
         }
 
         public PEWaveViewerControl(IContainer container)
@@ -24,8 +24,8 @@ namespace EditorResources.Components
             container.Add(this);
 
             InitializeComponent();
-            
-            this.DoubleBuffered=true;
+
+            this.DoubleBuffered = true;
         }
 
         protected override void OnResize(EventArgs e)
@@ -38,13 +38,13 @@ namespace EditorResources.Components
         {
             if (waveStream == null)
                 return;
-            
+
             startPosition = 0;
 
             var samples = (int)(waveStream.Length / bytesPerSample);
 
             SamplesPerPixel = samples / Math.Max(1, this.Width);
-            
+
             Invalidate();
         }
 
@@ -71,7 +71,7 @@ namespace EditorResources.Components
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            
+
             if (disposing && (components != null))
             {
                 if (waveStream != null)
@@ -83,15 +83,15 @@ namespace EditorResources.Components
             }
             base.Dispose(disposing);
         }
-       
 
-        
+
+
 
         private WaveStream waveStream;
         private int samplesPerPixel = 128;
         private long startPosition;
         private int bytesPerSample;
-            
+
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public WaveStream WaveStream
         {
@@ -104,7 +104,7 @@ namespace EditorResources.Components
                 waveStream = value;
                 if (waveStream != null)
                 {
-                    
+
                     bytesPerSample = (waveStream.WaveFormat.BitsPerSample / 8) * waveStream.WaveFormat.Channels;
                 }
                 startPosition = 0;
@@ -128,7 +128,7 @@ namespace EditorResources.Components
             }
             set
             {
-                samplesPerPixel = Math.Max(1,value);
+                samplesPerPixel = Math.Max(1, value);
             }
         }
 
@@ -148,7 +148,7 @@ namespace EditorResources.Components
             }
         }
 
-        
+
         protected override void OnPaint(PaintEventArgs e)
         {
             var highPoints = new List<PointF>();
@@ -164,7 +164,7 @@ namespace EditorResources.Components
 
                 for (float x = e.ClipRectangle.X; x < e.ClipRectangle.Right; x += 1)
                 {
-                    
+
                     bytesRead = waveStream.Read(waveData, 0, samplesPerPixel * bytesPerSample);
                     if (bytesRead == 0)
                         break;
@@ -179,7 +179,7 @@ namespace EditorResources.Components
                         if (sample > sampleHigh)
                             sampleHigh = sample;
                     }
-                    
+
                     float lowPercent = (((sampleLow) - short.MinValue) / ushort.MaxValue);
                     float highPercent = (((sampleHigh) - short.MinValue) / ushort.MaxValue);
 
@@ -191,12 +191,12 @@ namespace EditorResources.Components
                 highPoints.AddRange(lowPoints);
 
                 e.Graphics.FillPolygon(Brushes.Blue, highPoints.ToArray());
-                
-                
+
+
             }
 
-            
-            
+
+
             base.OnPaint(e);
         }
 

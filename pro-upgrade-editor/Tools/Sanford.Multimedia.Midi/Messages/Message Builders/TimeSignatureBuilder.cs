@@ -39,8 +39,8 @@ namespace Sanford.Multimedia.Midi
     /// <summary>
     /// Provides easy to use functionality for time signature MetaMessages.
     /// </summary>
-	public class TimeSignatureBuilder : IMessageBuilder
-	{
+    public class TimeSignatureBuilder : IMessageBuilder
+    {
         #region TimeSignature Members
 
         #region Constants
@@ -100,10 +100,10 @@ namespace Sanford.Multimedia.Midi
         /// The TimeSignatureBuilder uses the specified MetaMessage to 
         /// initialize its property values.
         /// </remarks>
-		public TimeSignatureBuilder(MetaMessage message)
+        public TimeSignatureBuilder(MetaMessage message)
         {
-            Initialize(message);            
-		}
+            Initialize(message);
+        }
 
         #endregion
 
@@ -122,7 +122,7 @@ namespace Sanford.Multimedia.Midi
         {
             #region Require
 
-            if(message.MetaType != MetaType.TimeSignature)
+            if (message.MetaType != MetaType.TimeSignature)
             {
                 throw new ArgumentException("Wrong meta event type.", "message");
             }
@@ -152,7 +152,7 @@ namespace Sanford.Multimedia.Midi
             {
                 #region Require
 
-                if(value < 1)
+                if (value < 1)
                 {
                     throw new ArgumentOutOfRangeException("Numerator", value,
                         "Numerator out of range.");
@@ -185,11 +185,11 @@ namespace Sanford.Multimedia.Midi
             {
                 #region Require
 
-                if(value < 2 || value > 32)
+                if (value < 2 || value > 32)
                 {
                     throw new ArgumentOutOfRangeException("Denominator must be between 2 and 32.");
                 }
-                else if((value & (value - 1)) != 0)
+                else if ((value & (value - 1)) != 0)
                 {
                     throw new ArgumentException("Denominator must be a power of 2.");
                 }
@@ -265,7 +265,7 @@ namespace Sanford.Multimedia.Midi
         {
             // If any of the properties have changed since the last time the
             // message was built.
-            if(changed)
+            if (changed)
             {
                 result = new MetaMessage(MetaType.TimeSignature, data);
                 changed = false;

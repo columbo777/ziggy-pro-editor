@@ -47,7 +47,7 @@ namespace ProUpgradeEditor.Common
         {
             List<CompilerError> errors;
             var ret = Compile(csharpText, out errors);
-            if (ret==null)
+            if (ret == null)
             {
                 errors.ForEach(x => x.ToString().OutputDebug());
             }

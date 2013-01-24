@@ -12,7 +12,7 @@ namespace ProUpgradeEditor.Common
     public class GuitarTempo : GuitarMessage
     {
         public double Tempo;
-        public GuitarTempo(GuitarTrack track, MidiEvent ev)
+        public GuitarTempo(GuitarMessageList track, MidiEvent ev)
             : base(track, ev, null, GuitarMessageType.GuitarTempo)
         {
             if (ev == null)
@@ -41,7 +41,7 @@ namespace ProUpgradeEditor.Common
             {
                 if (_cacheStartTime.IsNull())
                 {
-                    _cacheStartTime = OwnerTrack.Messages.Tempos.Where(x => x.AbsoluteTicks < AbsoluteTicks).Sum(x => x.TimeLength);
+                    _cacheStartTime = Owner.Tempos.Where(x => x.AbsoluteTicks < AbsoluteTicks).Sum(x => x.TimeLength);
                 }
                 return _cacheStartTime;
             }
@@ -67,33 +67,63 @@ namespace ProUpgradeEditor.Common
 
         public double NumQuarterNotes
         {
-            get { return TickLengthDouble / OwnerTrack.SequenceDivision; }
+            get { return TickLengthDouble / Owner.Owner.GuitarTrack.SequenceDivision; }
         }
         public double NumWholeNotes
         {
             get { return NumQuarterNotes * 4.0; }
         }
-        public double NumOneTwentyEight
+        public double NumOneTwentyEigthNotes
         {
             get { return NumQuarterNotes * 32.0; }
         }
-
+        public double NumSixtyFourthNotes
+        {
+            get { return NumQuarterNotes * 16.0; }
+        }
+        public double NumThirtySecondNotes
+        {
+            get { return NumQuarterNotes * 8.0; }
+        }
+        public double NumSixteenthNotes
+        {
+            get { return NumQuarterNotes * 4.0; }
+        }
+        public double NumEigthNotes
+        {
+            get { return NumQuarterNotes * 2.0; }
+        }
         public double GetTicksPerBeat(TimeUnit unit)
         {
             var scale = 1.0 / (double)unit;
             return TicksPerWholeNote / scale;
         }
 
-        public double TicksPerOneTwentyEight
+        public double TicksPerOneTwentyEigthNote
         {
-            get { return TickLengthDouble / NumOneTwentyEight; }
+            get { return TickLengthDouble / NumOneTwentyEigthNotes; }
         }
-
+        public double TicksPerSixtyFourth
+        {
+            get { return TickLengthDouble / NumSixtyFourthNotes; }
+        }
+        public double TicksPerThirtySecondNote
+        {
+            get { return TickLengthDouble / NumThirtySecondNotes; }
+        }
+        public double TicksPerSixteenthNote
+        {
+            get { return TickLengthDouble / NumSixteenthNotes; }
+        }
+        public double TicksPerEigthNote
+        {
+            get { return TickLengthDouble / NumEigthNotes; }
+        }
         public double TicksPerQuarterNote
         {
             get { return TickLengthDouble / NumQuarterNotes; }
         }
-        
+
         public double TicksPerWholeNote
         {
             get { return TicksPerQuarterNote * 4.0; }
@@ -110,9 +140,24 @@ namespace ProUpgradeEditor.Common
             get { return SecondsPerQuarterNote / 32.0; }
         }
 
+        public double SecondsPerEigthNote
+        {
+            get { return SecondsPerQuarterNote / 4.0; }
+        }
+
+        public double SecondsPerSixteenthNote
+        {
+            get { return SecondsPerEigthNote / 4.0; }
+        }
+
         public double SecondsPerQuarterNote
         {
             get { return 1.0 / QuarterNotesPerSecond; }
+        }
+
+        public double SecondsPerHalfNote
+        {
+            get { return SecondsPerQuarterNote * 2.0; }
         }
 
         public double SecondsPerWholeNote
@@ -130,7 +175,7 @@ namespace ProUpgradeEditor.Common
 
         public double TicksPerSecond
         {
-            get { return 1000000.0 / (Tempo / OwnerTrack.SequenceDivision); }
+            get { return 1000000.0 / (Tempo / Owner.Owner.GuitarTrack.SequenceDivision); }
         }
 
         public double SecondsPerTick
@@ -140,7 +185,7 @@ namespace ProUpgradeEditor.Common
 
         public static GuitarTempo GetTempo(GuitarTrack track, double tempo)
         {
-            var ret = new GuitarTempo(track, null);
+            var ret = new GuitarTempo(track.Messages, null);
             ret.Tempo = tempo;
             return ret;
         }
@@ -176,7 +221,7 @@ namespace ProUpgradeEditor.Common
 
     public class GuitarTimeSignature : GuitarMessage
     {
-        public static GuitarTimeSignature GetDefaultTimeSignature(GuitarTrack track)
+        public static GuitarTimeSignature GetDefaultTimeSignature(GuitarMessageList track)
         {
             return new GuitarTimeSignature(track, null);
         }
@@ -191,7 +236,7 @@ namespace ProUpgradeEditor.Common
             return "TimeSig: " + DownTick + " - " + UpTick + " - " + (int)Numerator + "/" + (int)Denominator;
         }
 
-        public static GuitarTimeSignature GetTimeSignature(GuitarTrack track,
+        public static GuitarTimeSignature GetTimeSignature(GuitarMessageList track,
             int startTick = 0,
             int numerator = 4,
             int denominator = 4,
@@ -204,7 +249,7 @@ namespace ProUpgradeEditor.Common
             ret.ClocksPerMetronomeClick = clocksPerMetronomeClick;
             ret.ThirtySecondNotesPerQuarterNote = thirtySecondNotesPerQuarterNote;
             ret.SetDownTick(startTick);
-            
+
             return ret;
         }
 
@@ -220,26 +265,26 @@ namespace ProUpgradeEditor.Common
         }
 
         public static GuitarTimeSignature CreateTimeSignature(
-            GuitarTrack track,
-            int startTick=0,
-            int numerator=4, 
-            int denominator=4, 
-            int clocksPerMetronomeClick=24,
-            int thirtySecondNotesPerQuarterNote=8)
+            GuitarMessageList track,
+            int startTick = 0,
+            int numerator = 4,
+            int denominator = 4,
+            int clocksPerMetronomeClick = 24,
+            int thirtySecondNotesPerQuarterNote = 8)
         {
-            var ret = GetTimeSignature(track, startTick, 
+            var ret = GetTimeSignature(track, startTick,
                 numerator, denominator, clocksPerMetronomeClick, thirtySecondNotesPerQuarterNote);
 
             ret.SetDownEvent(track.Insert(startTick, ret.BuildMessage()));
 
-            track.Messages.Add(ret);
+            track.Add(ret);
             return ret;
         }
 
-        public GuitarTimeSignature(GuitarTrack track, MidiEvent ev)
+        public GuitarTimeSignature(GuitarMessageList track, MidiEvent ev)
             : base(track, ev, null, GuitarMessageType.GuitarTimeSignature)
         {
-            
+
             if (ev == null)
             {
                 SetDownTick(0);

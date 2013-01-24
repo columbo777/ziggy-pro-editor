@@ -128,13 +128,13 @@ namespace ProUpgradeEditor.Common
         public void SetStart(MidiEvent ev)
         {
             var t = ev.MetaMessage.Text.GetGuitarTrainerMetaEventType();
-            start = GuitarTextEvent.GetTextEvent(OwnerTrack, ev);
+            start = GuitarTextEvent.GetTextEvent(Owner, ev);
             trainerIndex = StartText.GetTrainerEventIndex();
         }
 
         public void SetEnd(MidiEvent ev)
         {
-            end = GuitarTextEvent.GetTextEvent(OwnerTrack, ev);
+            end = GuitarTextEvent.GetTextEvent(Owner, ev);
         }
 
         public void SetNorm(MidiEvent ev)
@@ -145,7 +145,7 @@ namespace ProUpgradeEditor.Common
             }
         }
 
-        public GuitarTrainer(GuitarTrack track, GuitarTrainerType type)
+        public GuitarTrainer(GuitarMessageList track, GuitarTrainerType type)
             : base(track, null, null, GuitarMessageType.GuitarTrainer)
         {
             Start = GuitarTextEvent.GetTextEvent(track, null);
@@ -162,7 +162,7 @@ namespace ProUpgradeEditor.Common
             {
                 return Start.AbsoluteTicks;
             }
-            
+
         }
 
         public override int UpTick
@@ -200,7 +200,7 @@ namespace ProUpgradeEditor.Common
                 End.SetDownTick(TickPair.Up);
                 End.UpdateEvents();
             }
-            
+
             if (this.Loopable)
             {
                 Norm.SetDownTick(GetNormTick(TickPair));

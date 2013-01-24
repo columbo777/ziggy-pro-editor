@@ -71,11 +71,12 @@
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
@@ -96,11 +97,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AudioDSP.cs" />
     <Compile Include="CodeCompiler.cs" />
     <Compile Include="GuitarGrid.cs" />
     <Compile Include="GuitarHammeron.cs" />
     <Compile Include="GuitarSlide.cs" />
     <Compile Include="GuitarTrainer.cs" />
+    <Compile Include="MP3WaveView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="SpecializedMessageList.cs" />
     <Compile Include="TrackDifficulty.cs" />
     <Compile Include="Entity.cs" />
@@ -148,6 +153,7 @@
     </Compile>
     <EmbeddedResource Include="TrackEditor.resx">
       <DependentUpon>TrackEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -161,6 +167,18 @@
     <None Include="puecommon.snk" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NAudio\NAudio.WindowsMediaFormat\NAudio.WindowsMediaFormat.csproj">
+      <Project>{1868FC77-FD6F-4881-9CF5-DE7451806BFA}</Project>
+      <Name>NAudio.WindowsMediaFormat</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NAudio\NAudio\NAudio.csproj">
+      <Project>{DA4F02E3-0B5E-42CD-B8D9-5583FA51D66E}</Project>
+      <Name>NAudio</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PitchTracker\PitchTracker.csproj">
+      <Project>{5B3976E0-4948-45EF-933F-056172687C7C}</Project>
+      <Name>PitchTracker</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Sanford.Multimedia.Midi\Sanford.Multimedia.Midi.csproj">
       <Project>{4269C72A-8D3A-4737-8F89-72EAA33EA9E1}</Project>
       <Name>Sanford.Multimedia.Midi</Name>

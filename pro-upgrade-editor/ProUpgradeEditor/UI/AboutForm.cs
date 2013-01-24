@@ -18,7 +18,7 @@ namespace ProUpgradeEditor.UI
 
         private void AboutForm_Load(object sender, EventArgs e)
         {
-            
+
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -29,7 +29,7 @@ namespace ProUpgradeEditor.UI
         private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start("http://rockbandscores.com/scores.cgi?player=ziggy+xna+mvp&instrument=PROGUITAR&platform=Xbox&showall=on&showrb3=on&showrb2=on&showrb1=on&showlego=on&showdlc=on&showrbn=on");
-            
+
         }
     }
 }

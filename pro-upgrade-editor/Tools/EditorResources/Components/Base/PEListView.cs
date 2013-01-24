@@ -24,12 +24,12 @@ namespace EditorResources.Components
     public partial class PEListView : ListView
     {
 
-        
+
         public class PEListViewEventArgs : EventArgs
         {
             public PEListViewItem Item;
         }
-        
+
         public class PEListViewItem : ListViewItem
         {
             Track track;
@@ -37,7 +37,7 @@ namespace EditorResources.Components
             PEListView.PEListViewItem parentItem;
             PEListView ownerView;
 
-            
+
             public PEListViewItem(PEListView ownerView, PEListView.PEListViewItem parentItem, string text, Track track, GuitarDifficulty difficulty)
                 : base(text)
             {
@@ -59,9 +59,10 @@ namespace EditorResources.Components
         public class PEListViewItemCollection : ListViewItemCollection, IEnumerable<PEListViewItem>
         {
             PEListView owner;
-            
 
-            public PEListViewItemCollection(PEListView view) : base(view)
+
+            public PEListViewItemCollection(PEListView view)
+                : base(view)
             {
                 owner = view;
             }
@@ -95,7 +96,7 @@ namespace EditorResources.Components
 
             public new void Clear()
             {
-                foreach(PEListViewItem item in this)
+                foreach (PEListViewItem item in this)
                 {
                     item.Selected = false;
                 }
@@ -116,16 +117,16 @@ namespace EditorResources.Components
                 return this.GetEnumerator();
             }
         }
-        
+
         Font headerFont;
-        
+
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         private ColumnHeaderCollection headers
         {
             get { return Columns; }
-            set 
+            set
             {
                 Columns.Clear();
                 foreach (ColumnHeader h in value)
@@ -136,7 +137,7 @@ namespace EditorResources.Components
         }
 
         PEListViewItemCollection items;
-        public new PEListViewItemCollection Items 
+        public new PEListViewItemCollection Items
         {
             get { return items; }
         }
@@ -145,13 +146,13 @@ namespace EditorResources.Components
         public PEListViewItem SelectedItem
         {
             get { return selectedItem; }
-            set 
-            { 
+            set
+            {
                 selectedItem = value;
 
             }
         }
-        
+
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
@@ -192,16 +193,16 @@ namespace EditorResources.Components
             set { headerColorBottom = value; }
         }
 
-        
-        
+
+
         public PEListView()
         {
             headerFont = this.Font;
             headers = Columns;
             items = new PEListViewItemCollection(this);
-            
+
             InitializeComponent();
-            resizeColumn();            
+            resizeColumn();
         }
 
         public void ActivateItem(PEListViewItem li)
@@ -267,7 +268,7 @@ namespace EditorResources.Components
         }
         private void PEListView_DrawSubItem(object sender, DrawListViewSubItemEventArgs e)
         {
-           
+
             PEListViewItem item = e.Item as PEListViewItem;
             if (item.ParentItem != null)
             {
@@ -304,7 +305,7 @@ namespace EditorResources.Components
         {
 
             using (LinearGradientBrush brush =
-                new LinearGradientBrush(e.Bounds, headerColorTop, 
+                new LinearGradientBrush(e.Bounds, headerColorTop,
                     headerColorBottom, LinearGradientMode.Vertical))
             {
                 //#FFD3D3D3
@@ -314,11 +315,11 @@ namespace EditorResources.Components
             // Draw the header text.
             TextRenderer.DrawText((IDeviceContext)e.Graphics, e.Header.Text, HeaderFont,
                 e.Bounds, Color.Black, TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.LeftAndRightPadding);
-                
-            
+
+
             e.Graphics.DrawLine(Pens.Black,
-                new Point(e.Bounds.Location.X, e.Bounds.Height-1),
-                new Point(e.Bounds.Location.X + e.Bounds.Width, e.Bounds.Height-1));
+                new Point(e.Bounds.Location.X, e.Bounds.Height - 1),
+                new Point(e.Bounds.Location.X + e.Bounds.Width, e.Bounds.Height - 1));
         }
 
         private void PEListView_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
@@ -335,7 +336,7 @@ namespace EditorResources.Components
             if (SelectedItems.Count > 0)
             {
                 var li = SelectedItems[0] as PEListViewItem;
-                
+
                 if (selectedItem != li)
                 {
                     selectedItem = li;
@@ -349,7 +350,7 @@ namespace EditorResources.Components
             }
         }
 
-        public PEListView.PEListViewItem GetItemFromScreenPoint(Point screenPoint, bool allowSubItem=false)
+        public PEListView.PEListViewItem GetItemFromScreenPoint(Point screenPoint, bool allowSubItem = false)
         {
             var p = PointToClient(screenPoint);
             var pItem = GetItemAt(p.X, p.Y) as PEListView.PEListViewItem;

@@ -1,12 +1,16 @@
 ﻿// NOTE This class is protected under GPL License as well as terms and conditions.
-/* */ // Most notably, you must not obfuscate/protect this code, you must include an open source
-/* */ // to your project that uses this code, and you must also not make profit on it.
-/* */ // For more details, access:
+/* */
+// Most notably, you must not obfuscate/protect this code, you must include an open source
+/* */
+// to your project that uses this code, and you must also not make profit on it.
+/* */
+// For more details, access:
 // *http://www.gnu.org/
 // *License included in the library source
 // *License located at X360.XPackage.Resources.GPL30
 // *X360.XAbout.GNUProtected for GNU and TaC (Terms and Conditions)
-/* */ // You agree to these terms when you use this code.
+/* */
+// You agree to these terms when you use this code.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +32,8 @@ namespace X360.Profile
     /// <summary>
     /// Account type
     /// </summary>
-    public enum AccountType : byte {
+    public enum AccountType : byte
+    {
         /// <summary>
         /// Stock account
         /// </summary>
@@ -36,7 +41,8 @@ namespace X360.Profile
         /// <summary>
         /// Dev/Demo/Etc Account
         /// </summary>
-        Kits }
+        Kits
+    }
 
     /// <summary>
     /// Pass code values
@@ -77,7 +83,8 @@ namespace X360.Profile
         /// <summary></summary>
         Silver = 0x30,
         /// <summary></summary>
-        Gold = 0x60 }
+        Gold = 0x60
+    }
 
     /// <summary>
     /// Object to hold a user Account
@@ -106,15 +113,15 @@ namespace X360.Profile
         /// <summary>
         /// Account XUID
         /// </summary>
-        public ulong XUID { get { return xXUID; }}
+        public ulong XUID { get { return xXUID; } }
         /// <summary>
         /// Can go on Xbox Live
         /// </summary>
-        public bool IsLiveEnabled { get { return xIsLive; }}
+        public bool IsLiveEnabled { get { return xIsLive; } }
         /// <summary>
         /// Parse success
         /// </summary>
-        public bool Success { get { return xSuccess; }}
+        public bool Success { get { return xSuccess; } }
         /// <summary>
         /// Gets/Sets account type
         /// </summary>
@@ -236,7 +243,7 @@ namespace X360.Profile
                     return false;
                 if (xIsLive)
                 {
-                    byte[] xService = (ThisType == AccountType.Stock ? 
+                    byte[] xService = (ThisType == AccountType.Stock ?
                         new byte[] { 0x50, 0x52, 0x4F, 0x44 } : // PROD
                         new byte[] { 0x50, 0x41, 0x53, 0x54 }); // PART
                     xNewPayload.Position = 0x34;

@@ -19,7 +19,7 @@ namespace ProUpgradeEditor
         EasyMediumHard = Easy | Medium | Hard,
         EasyMedium = Easy | Medium,
         HardExpert = Hard | Expert,
-        Unknown = 1<<5
+        Unknown = 1 << 5
     }
 
     public class GenDiffConfig

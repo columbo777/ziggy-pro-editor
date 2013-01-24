@@ -7,9 +7,9 @@ using System.Linq;
 
 namespace Sanford.Multimedia.Midi
 {
-	/// <summary>
-	/// Writes a Track to a Stream.
-	/// </summary>
+    /// <summary>
+    /// Writes a Track to a Stream.
+    /// </summary>
     internal class TrackWriter
     {
         private static readonly byte[] TrackHeader =
@@ -27,26 +27,26 @@ namespace Sanford.Multimedia.Midi
         private Stream stream;
 
         // Running status.
-        private int runningStatus = 0;        
+        private int runningStatus = 0;
 
         // The Track data in raw bytes.
         private List<byte> trackData = new List<byte>();
 
-        
+
         public void Write(Stream strm)
         {
             this.stream = strm;
 
             trackData.Clear();
-            
+
             stream.Write(TrackHeader, 0, TrackHeader.Length);
 
-            
-            foreach(MidiEvent e in track.Iterator())
-            {                
+
+            foreach (MidiEvent e in track.Iterator())
+            {
                 WriteVariableLengthValue(e.DeltaTicks);
 
-                switch(e.MidiMessage.MessageType)
+                switch (e.MidiMessage.MessageType)
                 {
                     case MessageType.Channel:
                         Write((ChannelMessage)e.MidiMessage);
@@ -74,14 +74,14 @@ namespace Sanford.Multimedia.Midi
 
             byte[] trackLength = BitConverter.GetBytes(trackData.Count);
 
-            if(BitConverter.IsLittleEndian)
+            if (BitConverter.IsLittleEndian)
             {
                 Array.Reverse(trackLength);
             }
 
             stream.Write(trackLength, 0, trackLength.Length);
 
-            foreach(byte b in trackData)
+            foreach (byte b in trackData)
             {
                 stream.WriteByte(b);
             }
@@ -97,14 +97,14 @@ namespace Sanford.Multimedia.Midi
 
             v >>= 7;
 
-            while(v > 0)
+            while (v > 0)
             {
                 count++;
                 array[count] = (byte)((v & 0x7F) | 0x80);
                 v >>= 7;
             }
 
-            while(count >= 0)
+            while (count >= 0)
             {
                 trackData.Add(array[count]);
                 count--;
@@ -113,7 +113,7 @@ namespace Sanford.Multimedia.Midi
 
         private void Write(ChannelMessage message)
         {
-            if(runningStatus != message.Status)
+            if (runningStatus != message.Status)
             {
                 trackData.Add((byte)message.Status);
                 runningStatus = message.Status;
@@ -121,7 +121,7 @@ namespace Sanford.Multimedia.Midi
 
             trackData.Add((byte)message.Data1);
 
-            if(ChannelMessage.DataBytesPerType(message.Command) == 2)
+            if (ChannelMessage.DataBytesPerType(message.Command) == 2)
             {
                 trackData.Add((byte)message.Data2);
             }
@@ -136,7 +136,7 @@ namespace Sanford.Multimedia.Midi
 
             WriteVariableLengthValue(message.Length - 1);
 
-            for(int i = 1; i < message.Length; i++)
+            for (int i = 1; i < message.Length; i++)
             {
                 trackData.Add(message[i]);
             }
@@ -145,9 +145,9 @@ namespace Sanford.Multimedia.Midi
         private void Write(MetaMessage message)
         {
 
-            
+
             trackData.Add((byte)message.Status);
-            
+
             trackData.Add((byte)message.MetaType);
 
             WriteVariableLengthValue(message.Length);
@@ -165,7 +165,7 @@ namespace Sanford.Multimedia.Midi
 
             trackData.Add((byte)message.Status);
 
-            switch(message.SysCommonType)
+            switch (message.SysCommonType)
             {
                 case SysCommonType.MidiTimeCode:
                     trackData.Add((byte)message.Data1);

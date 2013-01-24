@@ -36,11 +36,11 @@ using System;
 
 namespace Sanford.Multimedia.Midi
 {
-	/// <summary>
-	/// Provides basic functionality for generating tick events with pulses per 
+    /// <summary>
+    /// Provides basic functionality for generating tick events with pulses per 
     /// quarter note resolution.
-	/// </summary>
-	public abstract class PpqnClock : IClock
+    /// </summary>
+    public abstract class PpqnClock : IClock
     {
         #region PpqnClock Members
 
@@ -56,7 +56,7 @@ namespace Sanford.Multimedia.Midi
         /// </summary>
         public const int DefaultPpqnValue = 24;
 
-        
+
 
         // The number of microseconds per millisecond.
         private const int MicrosecondsPerMillisecond = 1000;
@@ -79,7 +79,7 @@ namespace Sanford.Multimedia.Midi
 
         // The timer period.
         private readonly int timerPeriod;
-        
+
         // Indicates whether the clock is running.
         protected bool running = false;
 
@@ -91,7 +91,7 @@ namespace Sanford.Multimedia.Midi
         {
             #region Require
 
-            if(timerPeriod < 1)
+            if (timerPeriod < 1)
             {
                 throw new ArgumentOutOfRangeException("timerPeriod", timerPeriod,
                     "Timer period cannot be less than one.");
@@ -112,13 +112,13 @@ namespace Sanford.Multimedia.Midi
         protected int GetTempo()
         {
             return tempo;
-        }        
+        }
 
         protected void SetTempo(int tempo)
         {
             #region Require
 
-            if(tempo < 1)
+            if (tempo < 1)
             {
                 throw new ArgumentOutOfRangeException(
                     "Tempo out of range.");
@@ -156,7 +156,7 @@ namespace Sanford.Multimedia.Midi
         {
             EventHandler handler = Tick;
 
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, EventArgs.Empty);
             }
@@ -166,7 +166,7 @@ namespace Sanford.Multimedia.Midi
         {
             EventHandler handler = Started;
 
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, e);
             }
@@ -176,7 +176,7 @@ namespace Sanford.Multimedia.Midi
         {
             EventHandler handler = Stopped;
 
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, e);
             }
@@ -186,7 +186,7 @@ namespace Sanford.Multimedia.Midi
         {
             EventHandler handler = Continued;
 
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, e);
             }
@@ -220,7 +220,7 @@ namespace Sanford.Multimedia.Midi
             }
             set
             {
-                
+
 
                 ppqn = value;
 

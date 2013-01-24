@@ -53,33 +53,33 @@ namespace Sanford.Multimedia.Midi
         /// <summary>
         /// Size of the buffer.
         /// </summary>
-        public int bufferLength; 
+        public int bufferLength;
 
         /// <summary>
         /// Actual amount of data in the buffer. This value should be less than 
         /// or equal to the value given in the dwBufferLength member.
         /// </summary>
-        public int bytesRecorded; 
+        public int bytesRecorded;
 
         /// <summary>
         /// Custom user data.
         /// </summary>
-        public int user; 
+        public int user;
 
         /// <summary>
         /// Flags giving information about the buffer.
         /// </summary>
-        public int flags; 
+        public int flags;
 
         /// <summary>
         /// Reserved; do not use.
         /// </summary>
-        public IntPtr next; 
+        public IntPtr next;
 
         /// <summary>
         /// Reserved; do not use.
         /// </summary>
-        public int reserved; 
+        public int reserved;
 
         /// <summary>
         /// Offset into the buffer when a callback is performed. (This 
@@ -88,13 +88,13 @@ namespace Sanford.Multimedia.Midi
         /// This offset enables an application to determine which 
         /// event caused the callback. 
         /// </summary>
-        public int offset; 
+        public int offset;
 
         /// <summary>
         /// Reserved; do not use.
         /// </summary>
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst=4)]
-        public int[] reservedArray; 
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+        public int[] reservedArray;
 
         #endregion
     }

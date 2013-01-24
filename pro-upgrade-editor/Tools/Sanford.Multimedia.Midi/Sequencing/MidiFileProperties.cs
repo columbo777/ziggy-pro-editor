@@ -10,10 +10,10 @@ namespace Sanford.Multimedia.Midi
     /// </summary>
     public enum SmpteFrameRate
     {
-        Smpte24     = 24,
-        Smpte25     = 25,
+        Smpte24 = 24,
+        Smpte25 = 25,
         Smpte30Drop = 29,
-        Smpte30     = 30
+        Smpte30 = 30
     }
 
     /// <summary>
@@ -23,13 +23,13 @@ namespace Sanford.Multimedia.Midi
     {
         Ppqn,
         Smpte
-    }    
+    }
 
-	/// <summary>
-	/// Represents MIDI file properties.
-	/// </summary>
-	internal class MidiFileProperties
-	{
+    /// <summary>
+    /// Represents MIDI file properties.
+    /// </summary>
+    internal class MidiFileProperties
+    {
         private const int PropertyLength = 2;
 
         private static readonly byte[] MidiFileHeader =
@@ -52,13 +52,13 @@ namespace Sanford.Multimedia.Midi
 
         private SequenceType sequenceType = SequenceType.Ppqn;
 
-		public MidiFileProperties()
-		{
-		}
+        public MidiFileProperties()
+        {
+        }
 
         public void Read(Stream strm)
         {
-          
+
 
             format = trackCount = division = 0;
 
@@ -74,23 +74,23 @@ namespace Sanford.Multimedia.Midi
             bool found = false;
             int result;
 
-            while(!found)
+            while (!found)
             {
                 result = stream.ReadByte();
 
-                if(result == 'M')
+                if (result == 'M')
                 {
                     result = stream.ReadByte();
 
-                    if(result == 'T')
+                    if (result == 'T')
                     {
                         result = stream.ReadByte();
 
-                        if(result == 'h')
+                        if (result == 'h')
                         {
                             result = stream.ReadByte();
 
-                            if(result == 'd')
+                            if (result == 'd')
                             {
                                 found = true;
                             }
@@ -98,16 +98,16 @@ namespace Sanford.Multimedia.Midi
                     }
                 }
 
-                if(result < 0)
+                if (result < 0)
                 {
                     throw new MidiFileException("Unable to find MIDI file header.");
                 }
             }
 
             // Eat the header length.
-            for(int i = 0; i < 4; i++)
+            for (int i = 0; i < 4; i++)
             {
-                if(stream.ReadByte() < 0)
+                if (stream.ReadByte() < 0)
                 {
                     throw new MidiFileException("Unable to find MIDI file header.");
                 }
@@ -120,12 +120,12 @@ namespace Sanford.Multimedia.Midi
 
             int result = strm.Read(data, 0, data.Length);
 
-            if(result != data.Length)
+            if (result != data.Length)
             {
                 throw new MidiFileException("End of MIDI file unexpectedly reached.");
             }
 
-            if(BitConverter.IsLittleEndian)
+            if (BitConverter.IsLittleEndian)
             {
                 Array.Reverse(data);
             }
@@ -135,7 +135,7 @@ namespace Sanford.Multimedia.Midi
 
         public void Write(Stream strm)
         {
-         
+
 
             strm.Write(MidiFileHeader, 0, MidiFileHeader.Length);
             WriteProperty(strm, (ushort)Format);
@@ -147,7 +147,7 @@ namespace Sanford.Multimedia.Midi
         {
             byte[] data = BitConverter.GetBytes(property);
 
-            if(BitConverter.IsLittleEndian)
+            if (BitConverter.IsLittleEndian)
             {
                 Array.Reverse(data);
             }
@@ -159,13 +159,13 @@ namespace Sanford.Multimedia.Midi
         {
             bool result;
             byte[] data = BitConverter.GetBytes((short)division);
-            
-            if(BitConverter.IsLittleEndian)
+
+            if (BitConverter.IsLittleEndian)
             {
                 Array.Reverse(data);
             }
 
-            if((sbyte)data[0] < 0)
+            if ((sbyte)data[0] < 0)
             {
                 result = true;
             }
@@ -177,7 +177,7 @@ namespace Sanford.Multimedia.Midi
             return result;
         }
 
-        
+
 
         public int Format
         {
@@ -187,11 +187,11 @@ namespace Sanford.Multimedia.Midi
             }
             set
             {
-             
+
 
                 format = value;
 
-             
+
             }
         }
 
@@ -203,11 +203,11 @@ namespace Sanford.Multimedia.Midi
             }
             set
             {
-                
+
 
                 trackCount = value;
 
-                
+
             }
         }
 
@@ -219,16 +219,16 @@ namespace Sanford.Multimedia.Midi
             }
             set
             {
-                if(IsSmpte(value))
+                if (IsSmpte(value))
                 {
-                    byte[] data = BitConverter.GetBytes((short)value); 
+                    byte[] data = BitConverter.GetBytes((short)value);
 
-                    if(BitConverter.IsLittleEndian)
+                    if (BitConverter.IsLittleEndian)
                     {
                         Array.Reverse(data);
                     }
 
-                    if((sbyte)data[0] != -(int)SmpteFrameRate.Smpte24 &&                        
+                    if ((sbyte)data[0] != -(int)SmpteFrameRate.Smpte24 &&
                         (sbyte)data[0] != -(int)SmpteFrameRate.Smpte25 &&
                         (sbyte)data[0] != -(int)SmpteFrameRate.Smpte30 &&
                         (sbyte)data[0] != -(int)SmpteFrameRate.Smpte30Drop)
@@ -240,16 +240,16 @@ namespace Sanford.Multimedia.Midi
                         sequenceType = SequenceType.Smpte;
                     }
                 }
-                else 
+                else
                 {
-                    
+
                     sequenceType = SequenceType.Ppqn;
-                    
+
                 }
 
                 division = value;
 
-                
+
             }
         }
 
@@ -260,11 +260,12 @@ namespace Sanford.Multimedia.Midi
                 return sequenceType;
             }
         }
-	}
+    }
 
     public class MidiFileException : ApplicationException
     {
-        public MidiFileException(string message) : base(message)
+        public MidiFileException(string message)
+            : base(message)
         {
         }
     }

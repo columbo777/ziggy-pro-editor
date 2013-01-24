@@ -13,7 +13,7 @@ namespace ProUpgradeEditor.Common
 
     public class SettingMgr
     {
-        XmlDocument xml=null;
+        XmlDocument xml = null;
         XmlDocument defaultxml = null;
         bool loadSaved = true;
         XmlNode root;
@@ -32,9 +32,9 @@ namespace ProUpgradeEditor.Common
                 return cache_executingFolder;
             }
         }
-        
+
         string currentExecutingFolder;
-        
+
         string settingFileName;
         public string SettingFileName
         {
@@ -60,13 +60,13 @@ namespace ProUpgradeEditor.Common
 
         public string SettingFilePath
         {
-            get 
+            get
             {
                 if (currentExecutingFolder == null)
                 {
-                    return Path.Combine(executingFolder, DefaultSettingFileName); 
+                    return Path.Combine(executingFolder, DefaultSettingFileName);
                 }
-                return Path.Combine(currentExecutingFolder, SettingFileName); 
+                return Path.Combine(currentExecutingFolder, SettingFileName);
             }
             set
             {
@@ -78,7 +78,7 @@ namespace ProUpgradeEditor.Common
                         currentExecutingFolder = Path.GetDirectoryName(value);
                         xml = null;
                         root = null;
-                        
+
                     }
                 }
                 catch
@@ -98,7 +98,7 @@ namespace ProUpgradeEditor.Common
 
         public SettingMgr()
         {
-            
+
         }
 
         public void LoadSettings()
@@ -117,9 +117,9 @@ namespace ProUpgradeEditor.Common
                     {
                         defaultxml.Load(DefaultSettingFilePath);
                         defaultroot = XMLUtil.GetNode(defaultxml, "root");
-                        
+
                     }
-                    catch 
+                    catch
                     {
                         defaultroot = null;
                     }
@@ -133,12 +133,12 @@ namespace ProUpgradeEditor.Common
                 else
                 {
                     defaultroot = XMLUtil.AddNode(defaultxml, "root");
-                    
+
                 }
             }
 
-            
-            
+
+
             try
             {
                 if (SettingFilePath == DefaultSettingFilePath)
@@ -192,12 +192,12 @@ namespace ProUpgradeEditor.Common
                     }
                 }
             }
-            catch 
+            catch
             {
                 xml = defaultxml;
                 root = defaultroot;
             }
-            
+
         }
 
         string getValuePath(string name)
@@ -274,12 +274,12 @@ namespace ProUpgradeEditor.Common
             var valuePath = getValuePath(name);
             int i;
             var r = XMLUtil.GetNodeValue(root, valuePath);
-            if (string.IsNullOrEmpty(r) || int.TryParse(r, out i)==false)
+            if (string.IsNullOrEmpty(r) || int.TryParse(r, out i) == false)
             {
                 i = defaultValue;
             }
             return i;
-        
+
         }
         public string GetValue(string name, string defaultValue)
         {
@@ -309,7 +309,7 @@ namespace ProUpgradeEditor.Common
                 var val = XMLUtil.GetNodeValue(root, valuePath);
 
                 int i;
-                if(string.IsNullOrEmpty(val) || int.TryParse(val, out i)==false)
+                if (string.IsNullOrEmpty(val) || int.TryParse(val, out i) == false)
                 {
                     return defaultColor;
                 }

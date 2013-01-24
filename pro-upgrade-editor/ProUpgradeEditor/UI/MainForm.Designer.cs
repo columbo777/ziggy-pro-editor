@@ -34,9 +34,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             System.Windows.Forms.GroupBox groupBox3;
             System.Windows.Forms.GroupBox groupBox14;
-            System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("File Name", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("Size", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("Date", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("File Name", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Size", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Date", System.Windows.Forms.HorizontalAlignment.Left);
             this.panel8 = new System.Windows.Forms.Panel();
             this.midiTrackEditorG5 = new EditorResources.Components.PEMidiTrackEditPanel();
             this.button102 = new System.Windows.Forms.Button();
@@ -314,6 +314,9 @@
             this.button52 = new System.Windows.Forms.Button();
             this.checkBoxSearchByNoteFret = new System.Windows.Forms.CheckBox();
             this.groupBox10 = new System.Windows.Forms.GroupBox();
+            this.buttonFindNoteInMP3 = new System.Windows.Forms.Button();
+            this.buttonSelectForward = new System.Windows.Forms.Button();
+            this.buttonFixOverlappingNotes = new System.Windows.Forms.Button();
             this.buttonNoteUtilSelectAll = new System.Windows.Forms.Button();
             this.buttonUtilMethodSetToG5 = new System.Windows.Forms.Button();
             this.buttonUtilMethodFindNoteLenZero = new System.Windows.Forms.Button();
@@ -331,6 +334,7 @@
             this.buttonAddSlideHammeron = new System.Windows.Forms.Button();
             this.button32 = new System.Windows.Forms.Button();
             this.button53 = new System.Windows.Forms.Button();
+            this.buttonSelectBack = new System.Windows.Forms.Button();
             this.button54 = new System.Windows.Forms.Button();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
             this.textBox14 = new System.Windows.Forms.TextBox();
@@ -455,7 +459,7 @@
             this.groupBox43 = new System.Windows.Forms.GroupBox();
             this.buttonRefresh108Events = new System.Windows.Forms.Button();
             this.checkBoxShow108 = new System.Windows.Forms.CheckBox();
-            this.list108 = new System.Windows.Forms.ListBox();
+            this.comboBox180 = new System.Windows.Forms.ListBox();
             this.groupBoxTextEvents = new System.Windows.Forms.GroupBox();
             this.checkBoxShowTrainersInTextEvents = new System.Windows.Forms.CheckBox();
             this.listTextEvents = new System.Windows.Forms.ListBox();
@@ -663,6 +667,8 @@
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cONPackageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zipFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tabVToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.midiExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -671,8 +677,6 @@
             this.xBoxUSBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.tabVToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.midiExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             groupBox24 = new System.Windows.Forms.GroupBox();
             groupBox15 = new System.Windows.Forms.GroupBox();
             groupBox3 = new System.Windows.Forms.GroupBox();
@@ -3532,7 +3536,7 @@
             this.groupBox40.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.groupBox40.Location = new System.Drawing.Point(345, 152);
             this.groupBox40.Name = "groupBox40";
-            this.groupBox40.Size = new System.Drawing.Size(94, 115);
+            this.groupBox40.Size = new System.Drawing.Size(82, 115);
             this.groupBox40.TabIndex = 15;
             this.groupBox40.TabStop = false;
             this.groupBox40.Text = "Difficulty";
@@ -3541,9 +3545,9 @@
             // 
             this.radioNoteEditDifficultyExpert.Checked = true;
             this.radioNoteEditDifficultyExpert.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.radioNoteEditDifficultyExpert.Location = new System.Drawing.Point(6, 72);
+            this.radioNoteEditDifficultyExpert.Location = new System.Drawing.Point(6, 79);
             this.radioNoteEditDifficultyExpert.Name = "radioNoteEditDifficultyExpert";
-            this.radioNoteEditDifficultyExpert.Size = new System.Drawing.Size(81, 17);
+            this.radioNoteEditDifficultyExpert.Size = new System.Drawing.Size(70, 17);
             this.radioNoteEditDifficultyExpert.TabIndex = 7;
             this.radioNoteEditDifficultyExpert.TabStop = true;
             this.radioNoteEditDifficultyExpert.Text = "Expert";
@@ -3554,9 +3558,9 @@
             // radioNoteEditDifficultyHard
             // 
             this.radioNoteEditDifficultyHard.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.radioNoteEditDifficultyHard.Location = new System.Drawing.Point(6, 53);
+            this.radioNoteEditDifficultyHard.Location = new System.Drawing.Point(6, 60);
             this.radioNoteEditDifficultyHard.Name = "radioNoteEditDifficultyHard";
-            this.radioNoteEditDifficultyHard.Size = new System.Drawing.Size(81, 17);
+            this.radioNoteEditDifficultyHard.Size = new System.Drawing.Size(70, 17);
             this.radioNoteEditDifficultyHard.TabIndex = 6;
             this.radioNoteEditDifficultyHard.Text = "Hard";
             this.radioNoteEditDifficultyHard.UseCompatibleTextRendering = true;
@@ -3566,9 +3570,9 @@
             // radioNoteEditDifficultyMedium
             // 
             this.radioNoteEditDifficultyMedium.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.radioNoteEditDifficultyMedium.Location = new System.Drawing.Point(6, 34);
+            this.radioNoteEditDifficultyMedium.Location = new System.Drawing.Point(6, 41);
             this.radioNoteEditDifficultyMedium.Name = "radioNoteEditDifficultyMedium";
-            this.radioNoteEditDifficultyMedium.Size = new System.Drawing.Size(81, 17);
+            this.radioNoteEditDifficultyMedium.Size = new System.Drawing.Size(70, 17);
             this.radioNoteEditDifficultyMedium.TabIndex = 5;
             this.radioNoteEditDifficultyMedium.Text = "Medium";
             this.radioNoteEditDifficultyMedium.UseCompatibleTextRendering = true;
@@ -3578,9 +3582,9 @@
             // radioNoteEditDifficultyEasy
             // 
             this.radioNoteEditDifficultyEasy.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.radioNoteEditDifficultyEasy.Location = new System.Drawing.Point(6, 15);
+            this.radioNoteEditDifficultyEasy.Location = new System.Drawing.Point(6, 22);
             this.radioNoteEditDifficultyEasy.Name = "radioNoteEditDifficultyEasy";
-            this.radioNoteEditDifficultyEasy.Size = new System.Drawing.Size(81, 17);
+            this.radioNoteEditDifficultyEasy.Size = new System.Drawing.Size(70, 17);
             this.radioNoteEditDifficultyEasy.TabIndex = 4;
             this.radioNoteEditDifficultyEasy.Text = "Easy";
             this.radioNoteEditDifficultyEasy.UseCompatibleTextRendering = true;
@@ -3599,9 +3603,9 @@
             this.groupBox37.Controls.Add(this.checkTwoNotePowerChord);
             this.groupBox37.Controls.Add(this.checkRealtimeNotes);
             this.groupBox37.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
-            this.groupBox37.Location = new System.Drawing.Point(677, 251);
+            this.groupBox37.Location = new System.Drawing.Point(698, 251);
             this.groupBox37.Name = "groupBox37";
-            this.groupBox37.Size = new System.Drawing.Size(173, 187);
+            this.groupBox37.Size = new System.Drawing.Size(152, 187);
             this.groupBox37.TabIndex = 8;
             this.groupBox37.TabStop = false;
             this.groupBox37.Text = "Midi Input";
@@ -3611,7 +3615,7 @@
             this.checkBoxClearIfNoFrets.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkBoxClearIfNoFrets.Location = new System.Drawing.Point(6, 121);
             this.checkBoxClearIfNoFrets.Name = "checkBoxClearIfNoFrets";
-            this.checkBoxClearIfNoFrets.Size = new System.Drawing.Size(155, 17);
+            this.checkBoxClearIfNoFrets.Size = new System.Drawing.Size(143, 17);
             this.checkBoxClearIfNoFrets.TabIndex = 6;
             this.checkBoxClearIfNoFrets.Text = "Clear If No Note Held";
             this.checkBoxClearIfNoFrets.UseVisualStyleBackColor = true;
@@ -3801,7 +3805,7 @@
             this.checkBoxUseCurrentChord.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkBoxUseCurrentChord.Location = new System.Drawing.Point(6, 66);
             this.checkBoxUseCurrentChord.Name = "checkBoxUseCurrentChord";
-            this.checkBoxUseCurrentChord.Size = new System.Drawing.Size(109, 17);
+            this.checkBoxUseCurrentChord.Size = new System.Drawing.Size(102, 17);
             this.checkBoxUseCurrentChord.TabIndex = 3;
             this.checkBoxUseCurrentChord.Text = "Use Current";
             this.checkBoxUseCurrentChord.UseVisualStyleBackColor = true;
@@ -4339,6 +4343,9 @@
             // groupBox10
             // 
             this.groupBox10.BackColor = System.Drawing.Color.Transparent;
+            this.groupBox10.Controls.Add(this.buttonFindNoteInMP3);
+            this.groupBox10.Controls.Add(this.buttonSelectForward);
+            this.groupBox10.Controls.Add(this.buttonFixOverlappingNotes);
             this.groupBox10.Controls.Add(this.buttonNoteUtilSelectAll);
             this.groupBox10.Controls.Add(this.buttonUtilMethodSetToG5);
             this.groupBox10.Controls.Add(this.buttonUtilMethodFindNoteLenZero);
@@ -4356,15 +4363,56 @@
             this.groupBox10.Controls.Add(this.buttonAddSlideHammeron);
             this.groupBox10.Controls.Add(this.button32);
             this.groupBox10.Controls.Add(this.button53);
+            this.groupBox10.Controls.Add(this.buttonSelectBack);
             this.groupBox10.Controls.Add(this.button54);
             this.groupBox10.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.groupBox10.Location = new System.Drawing.Point(211, 273);
             this.groupBox10.Name = "groupBox10";
-            this.groupBox10.Size = new System.Drawing.Size(312, 221);
+            this.groupBox10.Size = new System.Drawing.Size(481, 221);
             this.groupBox10.TabIndex = 11;
             this.groupBox10.TabStop = false;
             this.groupBox10.Text = "Utility Methods";
             this.groupBox10.Enter += new System.EventHandler(this.groupBox10_Enter);
+            // 
+            // buttonFindNoteInMP3
+            // 
+            this.buttonFindNoteInMP3.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
+            this.buttonFindNoteInMP3.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.buttonFindNoteInMP3.Location = new System.Drawing.Point(319, 131);
+            this.buttonFindNoteInMP3.Name = "buttonFindNoteInMP3";
+            this.buttonFindNoteInMP3.Size = new System.Drawing.Size(143, 23);
+            this.buttonFindNoteInMP3.TabIndex = 22;
+            this.buttonFindNoteInMP3.Text = "Find Pitch In MP3";
+            this.toolTip1.SetToolTip(this.buttonFindNoteInMP3, "Searches the MP3 for pitch");
+            this.buttonFindNoteInMP3.UseVisualStyleBackColor = true;
+            this.buttonFindNoteInMP3.Visible = false;
+            this.buttonFindNoteInMP3.Click += new System.EventHandler(this.buttonFindNoteInMP3_Click);
+            // 
+            // buttonSelectForward
+            // 
+            this.buttonSelectForward.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
+            this.buttonSelectForward.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.buttonSelectForward.Location = new System.Drawing.Point(5, 108);
+            this.buttonSelectForward.Name = "buttonSelectForward";
+            this.buttonSelectForward.Size = new System.Drawing.Size(103, 23);
+            this.buttonSelectForward.TabIndex = 21;
+            this.buttonSelectForward.Text = "Select Forward";
+            this.toolTip1.SetToolTip(this.buttonSelectForward, "Snaps all chords");
+            this.buttonSelectForward.UseVisualStyleBackColor = true;
+            this.buttonSelectForward.Click += new System.EventHandler(this.buttonSelectForward_Click);
+            // 
+            // buttonFixOverlappingNotes
+            // 
+            this.buttonFixOverlappingNotes.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
+            this.buttonFixOverlappingNotes.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.buttonFixOverlappingNotes.Location = new System.Drawing.Point(319, 108);
+            this.buttonFixOverlappingNotes.Name = "buttonFixOverlappingNotes";
+            this.buttonFixOverlappingNotes.Size = new System.Drawing.Size(143, 23);
+            this.buttonFixOverlappingNotes.TabIndex = 20;
+            this.buttonFixOverlappingNotes.Text = "Fix Overlapping Notes";
+            this.toolTip1.SetToolTip(this.buttonFixOverlappingNotes, "Snaps all chords");
+            this.buttonFixOverlappingNotes.UseVisualStyleBackColor = true;
+            this.buttonFixOverlappingNotes.Click += new System.EventHandler(this.buttonFixOverlappingNotes_Click);
             // 
             // buttonNoteUtilSelectAll
             // 
@@ -4383,7 +4431,7 @@
             // 
             this.buttonUtilMethodSetToG5.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.buttonUtilMethodSetToG5.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.buttonUtilMethodSetToG5.Location = new System.Drawing.Point(252, 62);
+            this.buttonUtilMethodSetToG5.Location = new System.Drawing.Point(408, 62);
             this.buttonUtilMethodSetToG5.Name = "buttonUtilMethodSetToG5";
             this.buttonUtilMethodSetToG5.Size = new System.Drawing.Size(54, 23);
             this.buttonUtilMethodSetToG5.TabIndex = 18;
@@ -4396,7 +4444,7 @@
             // 
             this.buttonUtilMethodFindNoteLenZero.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.buttonUtilMethodFindNoteLenZero.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.buttonUtilMethodFindNoteLenZero.Location = new System.Drawing.Point(163, 16);
+            this.buttonUtilMethodFindNoteLenZero.Location = new System.Drawing.Point(319, 16);
             this.buttonUtilMethodFindNoteLenZero.Name = "buttonUtilMethodFindNoteLenZero";
             this.buttonUtilMethodFindNoteLenZero.Size = new System.Drawing.Size(143, 23);
             this.buttonUtilMethodFindNoteLenZero.TabIndex = 17;
@@ -4409,7 +4457,7 @@
             // 
             this.buttonDownOctave.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.buttonDownOctave.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.buttonDownOctave.Location = new System.Drawing.Point(95, 154);
+            this.buttonDownOctave.Location = new System.Drawing.Point(252, 62);
             this.buttonDownOctave.Name = "buttonDownOctave";
             this.buttonDownOctave.Size = new System.Drawing.Size(66, 23);
             this.buttonDownOctave.TabIndex = 16;
@@ -4422,7 +4470,7 @@
             // 
             this.buttonUpOctave.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.buttonUpOctave.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.buttonUpOctave.Location = new System.Drawing.Point(5, 154);
+            this.buttonUpOctave.Location = new System.Drawing.Point(162, 62);
             this.buttonUpOctave.Name = "buttonUpOctave";
             this.buttonUpOctave.Size = new System.Drawing.Size(88, 23);
             this.buttonUpOctave.TabIndex = 15;
@@ -4435,7 +4483,7 @@
             // 
             this.button133.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.button133.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button133.Location = new System.Drawing.Point(163, 62);
+            this.button133.Location = new System.Drawing.Point(319, 62);
             this.button133.Name = "button133";
             this.button133.Size = new System.Drawing.Size(88, 23);
             this.button133.TabIndex = 14;
@@ -4448,7 +4496,7 @@
             // 
             this.button132.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.button132.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button132.Location = new System.Drawing.Point(163, 39);
+            this.button132.Location = new System.Drawing.Point(319, 39);
             this.button132.Name = "button132";
             this.button132.Size = new System.Drawing.Size(143, 23);
             this.button132.TabIndex = 13;
@@ -4461,7 +4509,7 @@
             // 
             this.buttonUp12.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.buttonUp12.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.buttonUp12.Location = new System.Drawing.Point(5, 108);
+            this.buttonUp12.Location = new System.Drawing.Point(162, 16);
             this.buttonUp12.Name = "buttonUp12";
             this.buttonUp12.Size = new System.Drawing.Size(88, 23);
             this.buttonUp12.TabIndex = 12;
@@ -4474,7 +4522,7 @@
             // 
             this.buttonDownString.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.buttonDownString.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.buttonDownString.Location = new System.Drawing.Point(95, 131);
+            this.buttonDownString.Location = new System.Drawing.Point(252, 39);
             this.buttonDownString.Name = "buttonDownString";
             this.buttonDownString.Size = new System.Drawing.Size(66, 23);
             this.buttonDownString.TabIndex = 11;
@@ -4487,7 +4535,7 @@
             // 
             this.button76.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.button76.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button76.Location = new System.Drawing.Point(163, 85);
+            this.button76.Location = new System.Drawing.Point(319, 85);
             this.button76.Name = "button76";
             this.button76.Size = new System.Drawing.Size(143, 23);
             this.button76.TabIndex = 10;
@@ -4500,7 +4548,7 @@
             // 
             this.button124.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.button124.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button124.Location = new System.Drawing.Point(5, 131);
+            this.button124.Location = new System.Drawing.Point(162, 39);
             this.button124.Name = "button124";
             this.button124.Size = new System.Drawing.Size(88, 23);
             this.button124.TabIndex = 9;
@@ -4513,7 +4561,7 @@
             // 
             this.button122.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.button122.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button122.Location = new System.Drawing.Point(95, 108);
+            this.button122.Location = new System.Drawing.Point(252, 16);
             this.button122.Name = "button122";
             this.button122.Size = new System.Drawing.Size(66, 23);
             this.button122.TabIndex = 8;
@@ -4565,9 +4613,9 @@
             // 
             this.button32.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
             this.button32.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button32.Location = new System.Drawing.Point(95, 85);
+            this.button32.Location = new System.Drawing.Point(94, 85);
             this.button32.Name = "button32";
-            this.button32.Size = new System.Drawing.Size(66, 23);
+            this.button32.Size = new System.Drawing.Size(67, 23);
             this.button32.TabIndex = 3;
             this.button32.Text = "Combine";
             this.toolTip1.SetToolTip(this.button32, "Combine the currently selected note with the next note, extending the end of the " +
@@ -4587,6 +4635,18 @@
             this.toolTip1.SetToolTip(this.button53, "Extend the end of the selected note to the beginning of the next note");
             this.button53.UseVisualStyleBackColor = true;
             this.button53.Click += new System.EventHandler(this.button53_Click);
+            // 
+            // buttonSelectBack
+            // 
+            this.buttonSelectBack.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.25F);
+            this.buttonSelectBack.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.buttonSelectBack.Location = new System.Drawing.Point(109, 108);
+            this.buttonSelectBack.Name = "buttonSelectBack";
+            this.buttonSelectBack.Size = new System.Drawing.Size(52, 23);
+            this.buttonSelectBack.TabIndex = 5;
+            this.buttonSelectBack.Text = "Back";
+            this.buttonSelectBack.UseVisualStyleBackColor = true;
+            this.buttonSelectBack.Click += new System.EventHandler(this.buttonSelectBack_Click);
             // 
             // button54
             // 
@@ -6035,7 +6095,7 @@
             // 
             this.groupBox43.Controls.Add(this.buttonRefresh108Events);
             this.groupBox43.Controls.Add(this.checkBoxShow108);
-            this.groupBox43.Controls.Add(this.list108);
+            this.groupBox43.Controls.Add(this.comboBox180);
             this.groupBox43.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.groupBox43.Location = new System.Drawing.Point(612, 6);
             this.groupBox43.Name = "groupBox43";
@@ -6068,16 +6128,16 @@
             this.checkBoxShow108.UseVisualStyleBackColor = true;
             this.checkBoxShow108.CheckedChanged += new System.EventHandler(this.checkBoxShow108_CheckedChanged);
             // 
-            // list108
+            // comboBox180
             // 
-            this.list108.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.list108.FormattingEnabled = true;
-            this.list108.ItemHeight = 15;
-            this.list108.Location = new System.Drawing.Point(6, 19);
-            this.list108.Name = "list108";
-            this.list108.Size = new System.Drawing.Size(253, 274);
-            this.list108.TabIndex = 1;
-            this.list108.SelectedIndexChanged += new System.EventHandler(this.list108_SelectedIndexChanged);
+            this.comboBox180.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.comboBox180.FormattingEnabled = true;
+            this.comboBox180.ItemHeight = 15;
+            this.comboBox180.Location = new System.Drawing.Point(6, 19);
+            this.comboBox180.Name = "comboBox180";
+            this.comboBox180.Size = new System.Drawing.Size(253, 274);
+            this.comboBox180.TabIndex = 1;
+            this.comboBox180.SelectedIndexChanged += new System.EventHandler(this.comboBox180_SelectedIndexChanged);
             // 
             // groupBoxTextEvents
             // 
@@ -6726,7 +6786,7 @@
             this.tabPage6.Location = new System.Drawing.Point(4, 22);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage6.Size = new System.Drawing.Size(1081, 490);
+            this.tabPage6.Size = new System.Drawing.Size(1081, 491);
             this.tabPage6.TabIndex = 0;
             this.tabPage6.Text = "Package Utility";
             // 
@@ -6916,16 +6976,16 @@
             this.listUSBFileView.AllowColumnReorder = true;
             this.listUSBFileView.AllowDrop = true;
             this.listUSBFileView.GridLines = true;
-            listViewGroup4.Header = "File Name";
-            listViewGroup4.Name = "FileName";
-            listViewGroup5.Header = "Size";
-            listViewGroup5.Name = "Size";
-            listViewGroup6.Header = "Date";
-            listViewGroup6.Name = "Date";
+            listViewGroup1.Header = "File Name";
+            listViewGroup1.Name = "FileName";
+            listViewGroup2.Header = "Size";
+            listViewGroup2.Name = "Size";
+            listViewGroup3.Header = "Date";
+            listViewGroup3.Name = "Date";
             this.listUSBFileView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup4,
-            listViewGroup5,
-            listViewGroup6});
+            listViewGroup1,
+            listViewGroup2,
+            listViewGroup3});
             this.listUSBFileView.HideSelection = false;
             this.listUSBFileView.LabelEdit = true;
             this.listUSBFileView.LabelWrap = false;
@@ -8166,6 +8226,7 @@
             this.trackEditorG5.Editor5 = null;
             this.trackEditorG5.EditorPro = null;
             this.trackEditorG5.EditorType = ProUpgradeEditor.Common.TrackEditor.EEditorType.None;
+            this.trackEditorG5.EnableRenderMP3Wave = false;
             this.trackEditorG5.GridScalar = 0.25D;
             this.trackEditorG5.GridSnap = true;
             this.trackEditorG5.InPlayback = false;
@@ -8175,6 +8236,8 @@
             this.trackEditorG5.Location = new System.Drawing.Point(0, 20);
             this.trackEditorG5.Margin = new System.Windows.Forms.Padding(0);
             this.trackEditorG5.MidiPlaybackPosition = 0;
+            this.trackEditorG5.MP3PlaybackOffset = 0;
+            this.trackEditorG5.MP3PlaybackStream = null;
             this.trackEditorG5.Name = "trackEditorG5";
             this.trackEditorG5.NoteSnapG5 = true;
             this.trackEditorG5.NoteSnapG6 = true;
@@ -8187,6 +8250,7 @@
             this.trackEditorG5.Size = new System.Drawing.Size(1101, 117);
             this.trackEditorG5.TabIndex = 8;
             this.trackEditorG5.ViewLyrics = false;
+            this.trackEditorG5.WaveViewer = null;
             this.trackEditorG5.DragDrop += new System.Windows.Forms.DragEventHandler(this.trackEditorG5_DragDrop);
             this.trackEditorG5.DragEnter += new System.Windows.Forms.DragEventHandler(this.trackEditorG5_DragEnter);
             this.trackEditorG5.Enter += new System.EventHandler(this.trackEditorG5_Enter);
@@ -8292,6 +8356,7 @@
             this.trackEditorG6.Editor5 = null;
             this.trackEditorG6.EditorPro = null;
             this.trackEditorG6.EditorType = ProUpgradeEditor.Common.TrackEditor.EEditorType.None;
+            this.trackEditorG6.EnableRenderMP3Wave = false;
             this.trackEditorG6.GridScalar = 0.25D;
             this.trackEditorG6.GridSnap = true;
             this.trackEditorG6.InPlayback = false;
@@ -8301,6 +8366,8 @@
             this.trackEditorG6.Location = new System.Drawing.Point(0, 20);
             this.trackEditorG6.Margin = new System.Windows.Forms.Padding(0);
             this.trackEditorG6.MidiPlaybackPosition = 0;
+            this.trackEditorG6.MP3PlaybackOffset = 0;
+            this.trackEditorG6.MP3PlaybackStream = null;
             this.trackEditorG6.Name = "trackEditorG6";
             this.trackEditorG6.NoteSnapG5 = true;
             this.trackEditorG6.NoteSnapG6 = true;
@@ -8313,6 +8380,7 @@
             this.trackEditorG6.Size = new System.Drawing.Size(1101, 117);
             this.trackEditorG6.TabIndex = 9;
             this.trackEditorG6.ViewLyrics = false;
+            this.trackEditorG6.WaveViewer = null;
             this.trackEditorG6.Load += new System.EventHandler(this.trackEditorG6_Load);
             this.trackEditorG6.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDropEditorPro);
             this.trackEditorG6.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnterEditorPro);
@@ -8556,7 +8624,7 @@
             this.zipFileToolStripMenuItem,
             this.tabVToolStripMenuItem});
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this.importToolStripMenuItem.Text = "&Import";
             // 
             // cONPackageToolStripMenuItem
@@ -8572,6 +8640,21 @@
             this.zipFileToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.zipFileToolStripMenuItem.Text = "Zip File";
             this.zipFileToolStripMenuItem.Click += new System.EventHandler(this.zipFileToolStripMenuItem_Click);
+            // 
+            // tabVToolStripMenuItem
+            // 
+            this.tabVToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.midiExportToolStripMenuItem});
+            this.tabVToolStripMenuItem.Name = "tabVToolStripMenuItem";
+            this.tabVToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.tabVToolStripMenuItem.Text = "Tab Exporter";
+            // 
+            // midiExportToolStripMenuItem
+            // 
+            this.midiExportToolStripMenuItem.Name = "midiExportToolStripMenuItem";
+            this.midiExportToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.midiExportToolStripMenuItem.Text = "Midi Export XML";
+            this.midiExportToolStripMenuItem.Click += new System.EventHandler(this.midiExportToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
@@ -8630,21 +8713,6 @@
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.aboutToolStripMenuItem.Text = "&About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
-            // 
-            // tabVToolStripMenuItem
-            // 
-            this.tabVToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.midiExportToolStripMenuItem});
-            this.tabVToolStripMenuItem.Name = "tabVToolStripMenuItem";
-            this.tabVToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.tabVToolStripMenuItem.Text = "Tab Exporter";
-            // 
-            // midiExportToolStripMenuItem
-            // 
-            this.midiExportToolStripMenuItem.Name = "midiExportToolStripMenuItem";
-            this.midiExportToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.midiExportToolStripMenuItem.Text = "Midi Export XML";
-            this.midiExportToolStripMenuItem.Click += new System.EventHandler(this.midiExportToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -9366,7 +9434,7 @@
         private System.Windows.Forms.GroupBox groupBox43;
         private System.Windows.Forms.Button buttonRefresh108Events;
         private System.Windows.Forms.CheckBox checkBoxShow108;
-        private System.Windows.Forms.ListBox list108;
+        private System.Windows.Forms.ListBox comboBox180;
         private System.Windows.Forms.GroupBox groupBox44;
         private System.Windows.Forms.CheckBox checkChordNameEb;
         private System.Windows.Forms.CheckBox checkChordNameD;
@@ -9442,6 +9510,10 @@
         private System.Windows.Forms.RadioButton radioGridWholeNote;
         private System.Windows.Forms.ToolStripMenuItem tabVToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem midiExportToolStripMenuItem;
+        private System.Windows.Forms.Button buttonFixOverlappingNotes;
+        private System.Windows.Forms.Button buttonSelectForward;
+        private System.Windows.Forms.Button buttonSelectBack;
+        private System.Windows.Forms.Button buttonFindNoteInMP3;
         
 
     }

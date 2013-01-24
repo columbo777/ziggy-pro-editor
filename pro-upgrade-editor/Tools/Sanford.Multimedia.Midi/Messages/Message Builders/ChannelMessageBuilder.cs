@@ -37,9 +37,9 @@ using System.Collections;
 
 namespace Sanford.Multimedia.Midi
 {
-	/// <summary>
-	/// Provides functionality for building ChannelMessages.
-	/// </summary>
+    /// <summary>
+    /// Provides functionality for building ChannelMessages.
+    /// </summary>
     public class ChannelMessageBuilder : IMessageBuilder
     {
         #region ChannelMessageBuilder Members
@@ -112,7 +112,7 @@ namespace Sanford.Multimedia.Midi
         public static void Clear()
         {
             messageCache.Clear();
-        }        
+        }
 
         #endregion
 
@@ -242,7 +242,7 @@ namespace Sanford.Multimedia.Midi
             result = (ChannelMessage)messageCache[message];
 
             // If the message does not exist.
-            if(result == null)
+            if (result == null)
             {
                 result = new ChannelMessage(message);
 

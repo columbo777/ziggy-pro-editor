@@ -8,24 +8,32 @@ namespace ProUpgradeEditor.Common
 {
     public class GuitarArpeggio : GuitarModifier
     {
-        public GuitarArpeggio(GuitarTrack track, MidiEvent downEvent, MidiEvent upEvent) : 
+        public GuitarArpeggio(GuitarMessageList track, MidiEvent downEvent, MidiEvent upEvent) :
             base(track, downEvent, upEvent, GuitarModifierType.Arpeggio, GuitarMessageType.GuitarArpeggio) { }
-
-
-        public static GuitarArpeggio CreateArpeggio(GuitarTrack track, GuitarDifficulty difficulty, TickPair ticks)
+        public GuitarArpeggio(GuitarMessageList track, TickPair ticks) :
+            base(track, null, null, GuitarModifierType.Arpeggio, GuitarMessageType.GuitarArpeggio)
+        {
+            SetTicks(ticks);
+        }
+        public static GuitarArpeggio GetArpeggio(GuitarMessageList track, GuitarDifficulty difficulty, TickPair ticks)
         {
             GuitarArpeggio ret = null;
             var d1 = Utility.GetArpeggioData1(difficulty);
 
-            if(!d1.IsNull())
+            if (!d1.IsNull())
             {
-                var ev = track.Insert(d1, 100, 0, ticks);
-                
-                if (ev.IsNull==false)
-                {
-                    ret = new GuitarArpeggio(track, ev.Down, ev.Up);
-                    track.Messages.Add(ret);
-                }
+                ret = new GuitarArpeggio(track, ticks);
+            }
+            return ret;
+        }
+        public static GuitarArpeggio CreateArpeggio(GuitarMessageList track, GuitarDifficulty difficulty, TickPair ticks)
+        {
+            var ret = GetArpeggio(track, difficulty, ticks);
+            if (ret != null)
+            {
+                ret.CreateEvents();
+
+                track.Add(ret);
             }
             return ret;
         }

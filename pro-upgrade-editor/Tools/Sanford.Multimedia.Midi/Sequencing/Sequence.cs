@@ -103,7 +103,7 @@ namespace Sanford.Multimedia.Midi
 
         public event ProgressChangedEventHandler SaveProgressChanged;
 
-        
+
 
         // Construction
 
@@ -120,7 +120,7 @@ namespace Sanford.Multimedia.Midi
                 properties.Format = 1;
             }
             InitializeBackgroundWorkers();
-        }        
+        }
 
         /// <summary>
         /// Initializes a new instance of the Sequence class with the specified
@@ -138,7 +138,7 @@ namespace Sanford.Multimedia.Midi
             Load(fileName);
         }
 
-        
+
 
         private void InitializeBackgroundWorkers()
         {
@@ -154,13 +154,13 @@ namespace Sanford.Multimedia.Midi
         }
 
         public Track[] Tracks { get { return tracks.ToArray(); } }
-        
+
         public void Load(string fileName)
         {
             var stream = new FileStream(fileName, FileMode.Open,
                 FileAccess.Read, FileShare.Read);
 
-            using(stream)
+            using (stream)
             {
                 var newProperties = new MidiFileProperties();
                 var reader = new TrackReader();
@@ -168,7 +168,7 @@ namespace Sanford.Multimedia.Midi
 
                 newProperties.Read(stream);
 
-                for(int i = 0; i < newProperties.TrackCount; i++)
+                for (int i = 0; i < newProperties.TrackCount; i++)
                 {
                     reader.Read(stream);
                     reader.Track.Sequence = this;
@@ -209,9 +209,9 @@ namespace Sanford.Multimedia.Midi
             {
                 dirty = value;
 
-                foreach (var t in tracks) 
-                { 
-                    t.Dirty = value; 
+                foreach (var t in tracks)
+                {
+                    t.Dirty = value;
                 }
             }
         }
@@ -227,13 +227,13 @@ namespace Sanford.Multimedia.Midi
             var stream = new FileStream(fileName, FileMode.Create,
                 FileAccess.Write, FileShare.None);
 
-            using(stream)
+            using (stream)
             {
                 properties.Write(stream);
 
                 var writer = new TrackWriter();
 
-                foreach(Track trk in tracks)
+                foreach (Track trk in tracks)
                 {
                     writer.Track = trk;
                     writer.Write(stream);
@@ -248,7 +248,7 @@ namespace Sanford.Multimedia.Midi
 
         public void SaveAsyncCancel()
         {
-          
+
             saveWorker.CancelAsync();
         }
 
@@ -266,9 +266,9 @@ namespace Sanford.Multimedia.Midi
         {
             int length = 0;
 
-            foreach(Track t in this)
+            foreach (Track t in this)
             {
-                if(t.Length > length)
+                if (t.Length > length)
                 {
                     length = t.Length;
                 }
@@ -281,7 +281,7 @@ namespace Sanford.Multimedia.Midi
         {
             EventHandler<AsyncCompletedEventArgs> handler = LoadCompleted;
 
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, new AsyncCompletedEventArgs(e.Error, e.Cancelled, null));
             }
@@ -291,7 +291,7 @@ namespace Sanford.Multimedia.Midi
         {
             ProgressChangedEventHandler handler = LoadProgressChanged;
 
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, e);
             }
@@ -304,7 +304,7 @@ namespace Sanford.Multimedia.Midi
             FileStream stream = new FileStream(fileName, FileMode.Open,
                 FileAccess.Read, FileShare.Read);
 
-            using(stream)
+            using (stream)
             {
                 MidiFileProperties newProperties = new MidiFileProperties();
                 TrackReader reader = new TrackReader();
@@ -314,7 +314,7 @@ namespace Sanford.Multimedia.Midi
 
                 float percentage;
 
-                for(int i = 0; i < newProperties.TrackCount && !loadWorker.CancellationPending; i++)
+                for (int i = 0; i < newProperties.TrackCount && !loadWorker.CancellationPending; i++)
                 {
                     reader.Read(stream);
                     reader.Track.Sequence = this;
@@ -326,7 +326,7 @@ namespace Sanford.Multimedia.Midi
                     loadWorker.ReportProgress((int)(100 * percentage));
                 }
 
-                if(loadWorker.CancellationPending)
+                if (loadWorker.CancellationPending)
                 {
                     e.Cancel = true;
                 }
@@ -335,14 +335,14 @@ namespace Sanford.Multimedia.Midi
                     properties = newProperties;
                     tracks = newTracks;
                 }
-            }            
+            }
         }
 
         private void OnSaveCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             EventHandler<AsyncCompletedEventArgs> handler = SaveCompleted;
 
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, new AsyncCompletedEventArgs(e.Error, e.Cancelled, null));
             }
@@ -352,7 +352,7 @@ namespace Sanford.Multimedia.Midi
         {
             ProgressChangedEventHandler handler = SaveProgressChanged;
 
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, e);
             }
@@ -365,7 +365,7 @@ namespace Sanford.Multimedia.Midi
             FileStream stream = new FileStream(fileName, FileMode.Create,
                 FileAccess.Write, FileShare.None);
 
-            using(stream)
+            using (stream)
             {
                 properties.Write(stream);
 
@@ -373,7 +373,7 @@ namespace Sanford.Multimedia.Midi
 
                 float percentage;
 
-                for(int i = 0; i < tracks.Count && !saveWorker.CancellationPending; i++)
+                for (int i = 0; i < tracks.Count && !saveWorker.CancellationPending; i++)
                 {
                     writer.Track = tracks[i];
                     writer.Write(stream);
@@ -383,14 +383,14 @@ namespace Sanford.Multimedia.Midi
                     saveWorker.ReportProgress((int)(100 * percentage));
                 }
 
-                if(saveWorker.CancellationPending)
+                if (saveWorker.CancellationPending)
                 {
                     e.Cancel = true;
                 }
             }
         }
 
-        
+
 
         // Properties
 
@@ -407,7 +407,7 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-               
+
 
                 return tracks[index];
             }
@@ -420,7 +420,7 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-               
+
                 return properties.Division;
             }
         }
@@ -485,7 +485,7 @@ namespace Sanford.Multimedia.Midi
         public void MoveTrack(int startIndex, int destIndex)
         {
             var track = tracks[startIndex];
-            
+
             tracks.Remove(track);
 
             if (destIndex >= tracks.Count)
@@ -546,7 +546,7 @@ namespace Sanford.Multimedia.Midi
             return ret;
         }
 
-        
+
 
         // IEnumerable<Track> Members
 
@@ -555,7 +555,7 @@ namespace Sanford.Multimedia.Midi
             return tracks.GetEnumerator();
         }
 
-        
+
 
         // IEnumerable Members
 
@@ -564,7 +564,7 @@ namespace Sanford.Multimedia.Midi
             return tracks.GetEnumerator();
         }
 
-        
+
 
         // IComponent Members
 
@@ -582,7 +582,7 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
-        
+
 
         // IDisposable Members
 
@@ -592,11 +592,11 @@ namespace Sanford.Multimedia.Midi
             saveWorker.Dispose();
 
             EventHandler handler = Disposed;
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, EventArgs.Empty);
             }
         }
-        
+
     }
 }

@@ -19,7 +19,7 @@
             {
                 components.Dispose();
             }
-            
+
         }
 
         #region Component Designer generated code
@@ -60,7 +60,7 @@
 
         #endregion
 
-        
+
 
     }
 }

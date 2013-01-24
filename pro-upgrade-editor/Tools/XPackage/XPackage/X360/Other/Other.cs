@@ -1,12 +1,16 @@
 ﻿// NOTE This class is protected under GPL License as well as terms and conditions.
-/* */ // Most notably, you must not obfuscate/protect this code, you must include an open source
-/* */ // to your project that uses this code, and you must also not make profit on it.
-/* */ // For more details, access:
+/* */
+// Most notably, you must not obfuscate/protect this code, you must include an open source
+/* */
+// to your project that uses this code, and you must also not make profit on it.
+/* */
+// For more details, access:
 // *http://www.gnu.org/
 // *License included in the library source
 // *License located at X360.XPackage.Resources.GPL30
 // *X360.XAbout.GNUProtected for GNU and TaC (Terms and Conditions)
-/* */ // You agree to these terms when you use this code.
+/* */
+// You agree to these terms when you use this code.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +26,7 @@ using X360.IO;
 
 namespace X360.Other
 {
-    
+
     internal static class ByteArrayExtentsion
     {
         public static string HexString(this byte[] x)
@@ -34,10 +38,10 @@ namespace X360.Other
     /// <summary>
     /// X360 Log
     /// </summary>
-    
+
     public sealed class LogRecord
     {
-        
+
         List<string> xLog = new List<string>();
 
         /// <summary>
@@ -57,7 +61,8 @@ namespace X360.Other
         /// <summary>
         /// Initializes a log
         /// </summary>
-        public LogRecord() { //Control.CheckForIllegalCrossThreadCalls = false; 
+        public LogRecord()
+        { //Control.CheckForIllegalCrossThreadCalls = false; 
         }
 
         internal void DoLog(object xInput) { DoLog((string)xInput); }
@@ -77,10 +82,10 @@ namespace X360.Other
     /// <summary>
     /// Various Function Exceptions
     /// </summary>
-    
+
     public static class VariousExcepts
     {
-        
+
         static readonly Exception xByteInput = new Exception("Invalid input");
         /// <summary>
         /// Invalid byte input exception
@@ -123,28 +128,28 @@ namespace X360.Other
         FATX,
     }
 
-    
+
     internal static class Constants
     {
-        
+
         public const ushort FATX16End = 0xFFFF;
-        
+
         public const uint STFSEnd = 0xFFFFFF;
-        
+
         public const uint FATX32End = 0xFFFFFFFF;
-        
+
         public static readonly uint[] BlockLevel = new uint[] { 0xAA, 0x70E4 };
-        
+
         public static readonly uint[] SVODBL = new uint[] { 0xCC, 0xA1C4 };
 
         // For future use?
-        
+
         internal static readonly byte[] _1BLKey = new byte[] { 0xDD, 0x88, 0xAD, 0x0C,
             0x9E, 0xD6, 0x69, 0xE7, 0xB5, 0x67, 0x94, 0xFB, 0x68, 0x56, 0x3E, 0xFA };
-        
+
         internal static readonly byte[] XEX1Key = new byte[] { 0xA2, 0x6C, 0x10, 0xF7,
             0x1F, 0xD9, 0x35, 0xE9, 0x8B, 0x99, 0x92, 0x2C, 0xE9, 0x32, 0x15, 0x72 };
-        
+
         internal static readonly byte[] XEX2Key = new byte[] { 0x20, 0xB1, 0x85, 0xA5,
             0x9D, 0x28, 0xFD, 0xC3, 0x40, 0x58, 0x3F, 0xBB, 0x08, 0x96, 0xBF, 0x91 };
     }
@@ -152,7 +157,7 @@ namespace X360.Other
     /// <summary>
     /// General assembly functions
     /// </summary>
-    
+
     public static class AssemblyFunctions
     {
         /// <summary>
@@ -171,7 +176,7 @@ namespace X360.Other
     /// <summary>
     /// Various programming functions
     /// </summary>
-    
+
     public static class VariousFunctions
     {
         /// <summary>
@@ -386,7 +391,8 @@ namespace X360.Other
         {
             if (xInput.Length >= xOutput.Length)
                 Array.Copy(xInput, 0, xOutput, 0, xOutput.Length);
-            else Array.Copy(xInput, 0, xOutput, 0, xInput.Length);
+            else
+                Array.Copy(xInput, 0, xOutput, 0, xInput.Length);
         }
 
         internal static string xGetUnusedFile(string xIn)
@@ -443,7 +449,7 @@ namespace X360.Other
             return xin.Substring(idx + 1, xin.Length - idx - 1);
         }
 
-        internal static int xPathCount(this string xin) 
+        internal static int xPathCount(this string xin)
         { return xin.Split(new char[] { '/' }).Length; }
 
 
@@ -483,7 +489,7 @@ namespace X360.Other
             return false;
         }
 
-        
+
 
         /// <summary>
         /// Attempts to find the type of the file
@@ -518,9 +524,11 @@ namespace X360.Other
                         }
                         break;
 
-                    case (uint)AllMagic.Music: { xReturn = XboxFileType.Music; } break;
+                    case (uint)AllMagic.Music: { xReturn = XboxFileType.Music; }
+                        break;
 
-                    case (uint)AllMagic.XDBF: { xReturn = XboxFileType.GPD; } break;
+                    case (uint)AllMagic.XDBF: { xReturn = XboxFileType.GPD; }
+                        break;
 
                     case 0:
                         {
@@ -533,9 +541,11 @@ namespace X360.Other
                         }
                         break;
 
-                    case (uint)AllMagic.XSF: { xReturn = XboxFileType.GDF; } break;
+                    case (uint)AllMagic.XSF: { xReturn = XboxFileType.GDF; }
+                        break;
 
-                    default: break;
+                    default:
+                        break;
                 }
                 if (xReturn == XboxFileType.None)
                 {
@@ -560,15 +570,20 @@ namespace X360.Other
                                             if (xIO.ReadUInt32() == (uint)AllMagic.FATX)
                                                 xReturn = XboxFileType.FATX;
                                         }
-                                        else xReturn = XboxFileType.GDF;
+                                        else
+                                            xReturn = XboxFileType.GDF;
                                     }
-                                    else xReturn = XboxFileType.FATX;
+                                    else
+                                        xReturn = XboxFileType.FATX;
                                 }
-                                else xReturn = XboxFileType.GDF;
+                                else
+                                    xReturn = XboxFileType.GDF;
                             }
-                            else xReturn = XboxFileType.GDF;
+                            else
+                                xReturn = XboxFileType.GDF;
                         }
-                        else xReturn = XboxFileType.GDF;
+                        else
+                            xReturn = XboxFileType.GDF;
                     }
                     catch { }
                 }
@@ -613,7 +628,7 @@ namespace X360.Other
     /// <summary>
     /// General Time Stamps used
     /// </summary>
-    
+
     public static class TimeStamps
     {
         /// <summary>
@@ -686,7 +701,7 @@ namespace X360.Other
     /// <summary>
     /// Conversion of bytes for imaging
     /// </summary>
-    
+
     public static class Imaging
     {
         /// <summary>
@@ -760,16 +775,16 @@ namespace X360.Other
         XEX2 = 0x58455832,
     }
 
-    
+
     internal static class BitConv
     {
         // USED INTERNALLY, no size or position checks
 
-        public static unsafe ushort ToUInt16(byte* value,int index, bool BigEndian)
+        public static unsafe ushort ToUInt16(byte* value, int index, bool BigEndian)
         {
             var v = new byte[2];
             v[0] = value[index];
-            v[1] = value[index+1];
+            v[1] = value[index + 1];
             if (BigEndian)
                 v.EndianConvert();
             fixed (byte* pbyte = &v[0])
@@ -781,7 +796,7 @@ namespace X360.Other
             var v = new byte[4];
             for (int x = 0; x < 4; x++)
             {
-                v[x] = value[index+x];
+                v[x] = value[index + x];
             }
             if (BigEndian)
                 v.EndianConvert();

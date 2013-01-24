@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("")]
 [assembly: AssemblyCopyright("Leslie Sanford 2006")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]		
+[assembly: AssemblyCulture("")]
 
 //
 // Version information for an assembly consists of the following four values:

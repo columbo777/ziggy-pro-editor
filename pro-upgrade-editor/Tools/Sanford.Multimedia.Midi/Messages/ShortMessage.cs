@@ -36,21 +36,21 @@ using System;
 
 namespace Sanford.Multimedia.Midi
 {
-	/// <summary>
-	/// Represents the basic class for all MIDI short messages.
-	/// </summary>
+    /// <summary>
+    /// Represents the basic class for all MIDI short messages.
+    /// </summary>
     /// <remarks>
     /// MIDI short messages represent all MIDI messages except meta messages
     /// and system exclusive messages. This includes channel messages, system
     /// realtime messages, and system common messages.
     /// </remarks>
-	public abstract class ShortMessage : IMidiMessage
-	{
+    public abstract class ShortMessage : IMidiMessage
+    {
         #region ShortMessage Members
 
         #region Constants
 
-        public const int DataMaxValue= 127;
+        public const int DataMaxValue = 127;
 
         public const int StatusMaxValue = 255;
 
@@ -141,9 +141,9 @@ namespace Sanford.Multimedia.Midi
         {
             get;
         }
-   
+
         #endregion
 
         #endregion
-	}
+    }
 }

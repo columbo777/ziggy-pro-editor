@@ -33,11 +33,11 @@ namespace ProUpgradeEditor.UI
         private InputDevice inDevice = null;
 
 
-        
+
 
         bool ConnectMidiDevice(int device, bool silent)
         {
-            
+
 
             bool ret = false;
             try
@@ -51,7 +51,7 @@ namespace ProUpgradeEditor.UI
                 {
                     try
                     {
-                        
+
                         inDevice = new InputDevice(device, SynchronizationContext.Current);
                         inDevice.SysExMessageReceived += new EventHandler<SysExMessageEventArgs>(inDevice_SysExMessageReceived);
                         inDevice.StartRecording();
@@ -62,7 +62,7 @@ namespace ProUpgradeEditor.UI
                     {
                         if (ex.Message.ToLower().Contains("in use"))
                         {
-                            
+
                             ShutDownMidiDevice();
 
                             try
@@ -110,7 +110,7 @@ namespace ProUpgradeEditor.UI
             {
                 CheckInstrumentNote(e);
             }
-                
+
         }
 
         void CheckInstrumentNote(SysExMessageEventArgs e)
@@ -333,17 +333,17 @@ namespace ProUpgradeEditor.UI
         public bool MidiPlaybackInProgress
         {
             get { return EditorPro.InPlayback; }
-            set {  EditorPro.InPlayback = value; }
+            set { EditorPro.InPlayback = value; }
         }
 
         public int MidiPlaybackPosition
         {
-            get { return midiPlaybackSequencer == null ? 0 : midiPlaybackSequencer.Position; }
-            set 
-            { 
-                if (midiPlaybackSequencer != null) 
-                { 
-                    midiPlaybackSequencer.Position = value; 
+            get { return midiPlaybackSequencer == null ? EditorPro.MidiPlaybackPosition : midiPlaybackSequencer.Position; }
+            set
+            {
+                if (midiPlaybackSequencer != null)
+                {
+                    midiPlaybackSequencer.Position = value;
                 }
                 EditorPro.MidiPlaybackPosition = value;
                 EditorG5.MidiPlaybackPosition = value;
@@ -393,7 +393,7 @@ namespace ProUpgradeEditor.UI
                 if (MidiPlaybackInProgress)
                 {
                     ipos = (int)MidiPlaybackPosition;
-                
+
                     var pos = ProGuitarTrack.TickToTime(ipos);
 
                     EditorPro.PlaybackPosition = pos;
@@ -429,8 +429,9 @@ namespace ProUpgradeEditor.UI
                 timerMidiPlayback.Enabled = false;
                 StopMidiPlayback();
             }
-            catch{}
-            try{
+            catch { }
+            try
+            {
                 if (midiPlaybackSequencer != null)
                 {
                     midiPlaybackSequencer.Dispose();
@@ -481,11 +482,11 @@ namespace ProUpgradeEditor.UI
             }
 
             float volume = 1.0f;
-            public int Volume 
+            public int Volume
             {
-                get 
-                { 
-                    return (int)(volume * 100.0f); 
+                get
+                {
+                    return (int)(volume * 100.0f);
                 }
                 set
                 {
@@ -581,7 +582,7 @@ namespace ProUpgradeEditor.UI
             public void Cleanup()
             {
                 Stop();
-                
+
                 if (mainOutputStream != null)
                 {
                     CloseCurrentFile();
@@ -617,19 +618,19 @@ namespace ProUpgradeEditor.UI
                 finally { mainOutputStream = null; }
             }
         }
-        
+
         naudioPlayer mp3Player = new naudioPlayer();
-        
+
 
         bool playbackSequencerAttached = false;
-        
+
         void PlayMidiFromSelection()
         {
             try
             {
                 if (EditorPro.Sequence == null)
                     return;
-                
+
                 if (!CreateMidiPlaybackDeviceIfNull())
                     return;
 
@@ -642,10 +643,10 @@ namespace ProUpgradeEditor.UI
                 {
                     this.midiPlaybackSequencer.PlayingCompleted += new EventHandler(midiPlaybackSequencer_PlayingCompleted);
                     this.midiPlaybackSequencer.ChannelMessagePlayed += new EventHandler<ChannelMessageEventArgs>(midiPlaybackSequencer_ChannelMessagePlayed);
-                    
+
                     this.midiPlaybackSequencer.SysExMessagePlayed += new EventHandler<SysExMessageEventArgs>(midiPlaybackSequencer_SysExMessagePlayed);
-                    
-                    
+
+
                     playbackSequencerAttached = true;
                 }
 
@@ -669,13 +670,13 @@ namespace ProUpgradeEditor.UI
                 var mainTrack = EditorPro.GuitarTrack.GetTrack();
                 if (mainTrack != null)
                 {
-                    
+
                     midiPlaybackSequence.AddTempo(EditorPro.GuitarTrack.GetTempoTrack());
                     Track t = new Track(FileType.Pro, mainTrack.Name);
 
-                    foreach (var gc in EditorPro.GuitarTrack.Messages.Chords.Where(x=> x.IsPureArpeggioHelper==false).ToList())
+                    foreach (var gc in EditorPro.GuitarTrack.Messages.Chords.Where(x => x.IsPureArpeggioHelper == false).ToList())
                     {
-                        foreach(var cn in gc.Notes.Where(x=> x.IsArpeggioNote==false && x.TickLength > 0 && x.Data2 >= 100).ToList())
+                        foreach (var cn in gc.Notes.Where(x => x.IsArpeggioNote == false && x.TickLength > 0 && x.Data2 >= 100).ToList())
                         {
                             t.Insert(gc.DownTick - Utility.ScollToSelectionOffset, new ChannelMessage(ChannelCommand.NoteOn, cn.Data1, cn.Data2));
                             t.Insert(gc.UpTick - 1 - Utility.ScollToSelectionOffset, new ChannelMessage(ChannelCommand.NoteOff, cn.Data1, 0));
@@ -693,7 +694,7 @@ namespace ProUpgradeEditor.UI
                     }
                 }
 
-                
+
                 midiPlaybackSequencer.Start();
 
                 MidiPlaybackPosition = pos;
@@ -703,10 +704,11 @@ namespace ProUpgradeEditor.UI
 
                 timerMidiPlayback.Enabled = true;
 
-                
-                
+
+
             }
-            catch {
+            catch
+            {
                 MidiPlaybackInProgress = false;
                 timerMidiPlayback.Enabled = false;
             }
@@ -726,7 +728,7 @@ namespace ProUpgradeEditor.UI
 
         private bool LoadSongMP3Playback()
         {
-            
+
             try
             {
                 if (SelectedSong != null)
@@ -735,7 +737,7 @@ namespace ProUpgradeEditor.UI
                         File.Exists(SelectedSong.SongMP3Location))
                     {
                         mp3Player.Load(SelectedSong.SongMP3Location, this.Handle);
-                        
+
                         currentMp3PlaybackTime = 0;
                     }
                 }
@@ -746,9 +748,9 @@ namespace ProUpgradeEditor.UI
         }
 
         double currentMp3PlaybackMidiStartTime = 0;
-        double currentMp3PlaybackTime=0;
+        double currentMp3PlaybackTime = 0;
         DateTime timeStartMp3Playback = DateTime.Now;
-        
+
 
         private bool BeginSongMP3Playback()
         {
@@ -764,8 +766,8 @@ namespace ProUpgradeEditor.UI
                     {
                         waitSecs = ((double)SelectedSong.SongMP3PlaybackOffset) / 1000.0;
                     }
-                    
-                    currentMp3PlaybackTime = EditorPro.GuitarTrack.TickToTime( MidiPlaybackPosition);
+
+                    currentMp3PlaybackTime = EditorPro.GuitarTrack.TickToTime(MidiPlaybackPosition);
 
                     var d = currentMp3PlaybackTime + waitSecs;
 
@@ -779,7 +781,7 @@ namespace ProUpgradeEditor.UI
                     }
                 }
             }
-            catch {  }
+            catch { }
             return started;
         }
 
@@ -796,7 +798,7 @@ namespace ProUpgradeEditor.UI
             {
                 OnSysex(e);
             }
-            
+
         }
 
         void OnSysex(SysExMessageEventArgs e)
@@ -826,7 +828,7 @@ namespace ProUpgradeEditor.UI
             catch { }
         }
 
-        
+
 
         void midiPlaybackSequencer_ChannelMessagePlayed(object sender, ChannelMessageEventArgs e)
         {
@@ -849,7 +851,7 @@ namespace ProUpgradeEditor.UI
             }
         }
 
-        
+
         void OnChannelMessagePlay(ChannelMessageEventArgs e)
         {
             try
@@ -858,7 +860,7 @@ namespace ProUpgradeEditor.UI
                     midiPlaybackDevice.IsDisposed)
                     return;
 
-                if (e.Message.Data1.GetData1Difficulty(true) == 
+                if (e.Message.Data1.GetData1Difficulty(true) ==
                     EditorPro.CurrentDifficulty)
                 {
                     if (e.Message.MidiChannel == Utility.ChannelArpeggio)
@@ -869,7 +871,7 @@ namespace ProUpgradeEditor.UI
                     {
                         data2 = midiPlaybackDeviceVolume;
                     }
-                    midiPlaybackDevice.Send(new ChannelMessage(e.Message.Command, getTunedNote(e), data2));
+                    midiPlaybackDevice.Send(new ChannelMessage(e.Message.Command, GetTunedNote(e.Message.Data1, e.Message.Data2), data2));
                     if (e.Message.Command == ChannelCommand.NoteOff ||
                         e.Message.Data2 == 0)
                     {
@@ -883,11 +885,25 @@ namespace ProUpgradeEditor.UI
             catch { }
         }
 
-        private int getTunedNote(ChannelMessageEventArgs e)
+        public void PlayMidiNote(int midiNote, int waitMS = 500)
+        {
+            try
+            {
+                if (CreateMidiPlaybackDeviceIfNull())
+                {
+                    midiPlaybackDevice.Send(new ChannelMessage(ChannelCommand.NoteOn, midiNote, 100));
+                    Thread.Sleep(waitMS);
+                    midiPlaybackDevice.Send(new ChannelMessage(ChannelCommand.NoteOff, midiNote, 0));
+                }
+            }
+            catch { }
+
+        }
+        public int GetTunedNote(int data1, int data2)
         {
 
             //E3/68 - B2/63 - G2/59 - D2/54 - A1/49 - E1/44
-            var ns = e.Message.Data1.GetNoteString6();
+            var ns = data1.GetNoteString6();
             var note = 0;
             switch (ns)
             {
@@ -911,7 +927,7 @@ namespace ProUpgradeEditor.UI
                     break;
             }
 
-            int tunedNote = note + (e.Message.Data2 - 100);
+            int tunedNote = note + (data2 - 100);
 
             var sci = SelectedSong;
             if (sci != null)
@@ -1001,19 +1017,19 @@ namespace ProUpgradeEditor.UI
             }
 
             ShutDownMidiDevice();
-            
+
             var itm = comboMidiDevice.SelectedItem as MidiOutputListItem;
             if (itm == null)
                 return;
 
             midiDeviceIndex = itm.index;
-            
+
             if (!CreateMidiPlaybackDeviceIfNull())
             {
                 midiDeviceIndex = 0;
                 CreateMidiPlaybackDeviceIfNull();
             }
-           
+
         }
 
         private void UpdateMidiInstrument(bool loading)
@@ -1053,7 +1069,7 @@ namespace ProUpgradeEditor.UI
                 if (CreateMidiPlaybackDeviceIfNull())
                 {
                     ChangeInstrument(instrument);
-                    
+
                     midiPlaybackDevice.Send(new ChannelMessage(ChannelCommand.NoteOn, 44, 100));
 
                     Thread.Sleep(500);
@@ -1087,12 +1103,24 @@ namespace ProUpgradeEditor.UI
                     {
                         switch (x)
                         {
-                            case 0: note = 44; break;
-                            case 1: note = 49; break;
-                            case 2: note = 54; break;
-                            case 3: note = 59; break;
-                            case 4: note = 63; break;
-                            case 5: note = 68; break;
+                            case 0:
+                                note = 44;
+                                break;
+                            case 1:
+                                note = 49;
+                                break;
+                            case 2:
+                                note = 54;
+                                break;
+                            case 3:
+                                note = 59;
+                                break;
+                            case 4:
+                                note = 63;
+                                break;
+                            case 5:
+                                note = 68;
+                                break;
                         }
                         note += fret;
 
@@ -1222,7 +1250,7 @@ namespace ProUpgradeEditor.UI
                 comboMidiDevice.EndUpdate();
             }
             catch { }
-            return comboMidiDevice.Items.Count>0;
+            return comboMidiDevice.Items.Count > 0;
         }
     }
 }

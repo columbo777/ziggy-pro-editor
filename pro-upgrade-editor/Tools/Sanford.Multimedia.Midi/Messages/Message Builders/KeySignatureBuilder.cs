@@ -113,10 +113,10 @@ namespace Sanford.Multimedia.Midi
         public void Build()
         {
             byte[] data = new byte[MetaMessage.KeySigLength];
-            
+
             unchecked
             {
-                switch(Key)
+                switch (Key)
                 {
                     case Key.CFlatMajor:
                         data[0] = (byte)-7;

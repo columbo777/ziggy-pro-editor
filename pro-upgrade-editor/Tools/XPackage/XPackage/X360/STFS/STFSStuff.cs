@@ -1,12 +1,16 @@
 ﻿// NOTE This class is protected under GPL License as well as terms and conditions.
-/* */ // Most notably, you must not obfuscate/protect this code, you must include an open source
-/* */ // to your project that uses this code, and you must also not make profit on it.
-/* */ // For more details, access:
+/* */
+// Most notably, you must not obfuscate/protect this code, you must include an open source
+/* */
+// to your project that uses this code, and you must also not make profit on it.
+/* */
+// For more details, access:
 // *http://www.gnu.org/
 // *License included in the library source
 // *License located at X360.XPackage.Resources.GPL30
 // *X360.XAbout.GNUProtected for GNU and TaC (Terms and Conditions)
-/* */ // You agree to these terms when you use this code.
+/* */
+// You agree to these terms when you use this code.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -252,9 +256,9 @@ namespace X360.STFS
         /// <summary>Unsuccessful function run</summary>
         public static Exception Unsuccessful { get { return xUnsuccess; } }
         /// <summary>File in use</summary>
-        public static Exception InUse { get { return xInUse; }}
+        public static Exception InUse { get { return xInUse; } }
         /// <summary>Game package, not STFS</summary>
-        public static Exception Game { get { return xGame; }}
+        public static Exception Game { get { return xGame; } }
         /// <summary>Theme error</summary>
         public static Exception ThemeError { get { return xTheme; } }
         /// <summary>Contains Invalid characters</summary>
@@ -339,7 +343,7 @@ namespace X360.STFS
             {
                 RSACryptoServiceProvider x = new RSACryptoServiceProvider();
                 x.ImportParameters(xK);
-                
+
             }
             catch (Exception x) { throw x; }
             xV = true;
@@ -349,13 +353,13 @@ namespace X360.STFS
         /// Import RSA attributes from an Xbox360 Keyvault for CON
         /// </summary>
         /// <param name="xKV"></param>
-        public RSAParams(DJsIO xKV) 
-        { 
+        public RSAParams(DJsIO xKV)
+        {
 
-            XLoadCON(xKV); 
+            XLoadCON(xKV);
         }
 
-        
+
 
         /// <summary>
         /// Impor RSA attributes from an Xbox360 Keyvault location for Con
@@ -382,7 +386,7 @@ namespace X360.STFS
                 case StrongSigned.LIVE:
                     xReader = new DJsIO(XPackage.Resources.XK4, true);
                     break;
-                    
+
                 case StrongSigned.PIRS:
                     xReader = new DJsIO(XPackage.Resources.XK5, true);
                     break;
@@ -402,7 +406,8 @@ namespace X360.STFS
             xReader.Dispose();
             if (xTypeIn == StrongSigned.LIVE)
                 xM = PackageMagic.LIVE;
-            else xM = PackageMagic.PIRS;
+            else
+                xM = PackageMagic.PIRS;
             xV = true;
         }
     }
@@ -429,7 +434,7 @@ namespace X360.STFS
         public ItemType ThisType { get { return xThisType; } }
         /// <summary>Returns if this is verified or invalid</summary>
         public bool IsValid { get { return xValid; } }
-        
+
         internal Verified(ItemType xType, bool xCheck, long xInLoc, long xVerifLoc)
         {
             xValid = xCheck;

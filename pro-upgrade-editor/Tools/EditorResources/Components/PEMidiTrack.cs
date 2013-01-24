@@ -86,11 +86,11 @@ namespace EditorResources.Components
                                 x.Button.Tag != null && ((Point)x.Button.Tag).Distance(e.Location) > 3)
                             {
                                 x.Button.DoDragDrop(new PETrackDifficulty(this, x.Difficulty), DragDropEffects.All);
-                                ItemDifficultyBeginDrag.IfObjectNotNull(bd => bd(this,x.Difficulty, null));
+                                ItemDifficultyBeginDrag.IfObjectNotNull(bd => bd(this, x.Difficulty, null));
                             }
-                            
+
                         };
-                        
+
                         x.Button.AllowDrop = true;
 
                         x.Button.DragEnter += new DragEventHandler(Button_DragEnter);
@@ -100,7 +100,7 @@ namespace EditorResources.Components
                 setDifficulty(GuitarDifficulty.Expert);
                 Track = track;
 
-                
+
                 labelTrackName.AllowDrop = true;
                 labelTrackName.DragEnter += new DragEventHandler(panelTrackName_DragEnter);
                 labelTrackName.DragDrop += new DragEventHandler(panelTrackName_DragDrop);
@@ -125,7 +125,7 @@ namespace EditorResources.Components
                 this.DoDragDrop(this, DragDropEffects.All);
                 ItemBeginDrag.IfObjectNotNull(bd => bd(this, null));
             }
-            
+
         }
 
 
@@ -159,7 +159,7 @@ namespace EditorResources.Components
 
         void Button_DragDrop(object sender, DragEventArgs e)
         {
-            
+
             var dropDiff = e.GetDropObject<PEMidiTrack.PETrackDifficulty>();
             if (dropDiff != null)
             {
@@ -193,7 +193,7 @@ namespace EditorResources.Components
         public Track Track
         {
             get { return track; }
-            set 
+            set
             {
                 this.track = value;
                 Refresh();
@@ -215,11 +215,11 @@ namespace EditorResources.Components
                 return Color.WhiteSmoke;
             }
         }
-        public GuitarDifficulty SelectedDifficulty 
+        public GuitarDifficulty SelectedDifficulty
         {
-            get 
+            get
             {
-                if(!DifficultyButtons.Any(x => x.Button.BackColor == SelectedButtonBackColor))
+                if (!DifficultyButtons.Any(x => x.Button.BackColor == SelectedButtonBackColor))
                 {
                     DifficultyButtons.Single(x => x.Difficulty == GuitarDifficulty.Expert).Button.BackColor = SelectedButtonBackColor;
                 }
@@ -232,9 +232,9 @@ namespace EditorResources.Components
             }
         }
 
-        DifficultyButton[] DifficultyButtons 
-        { 
-            get 
+        DifficultyButton[] DifficultyButtons
+        {
+            get
             {
                 return new DifficultyButton[] 
                 { 

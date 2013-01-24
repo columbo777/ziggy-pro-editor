@@ -91,7 +91,7 @@ namespace ProUpgradeEditor.Common
         {
             return new Vector2(a.X * b.X, a.Y * b.Y);
         }
-        
+
 
         public static bool PointInBox(Vector2 v, Vector2 boxMin, Vector2 boxMax)
         {
@@ -131,9 +131,11 @@ namespace ProUpgradeEditor.Common
         {
             var n = (b - a).Normal;
             float t = n.Dot(v - a);
-            if (t < 0) return a;
+            if (t < 0)
+                return a;
             float d = (b - a).Length;
-            if (t > d) return b;
+            if (t > d)
+                return b;
             return a + n * t;
         }
     }

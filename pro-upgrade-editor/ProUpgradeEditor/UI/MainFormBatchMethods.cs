@@ -252,14 +252,14 @@ namespace ProUpgradeEditor.UI
                         {
                             if (File.Exists(item.G6FileName))
                             {
-                                
+
                                 var destFile = Path.Combine(destFolder, Path.GetFileName(item.G6FileName));
 
                                 if (!TryCopyFile(item.G6FileName, destFile))
                                 {
                                     WriteBatchResult("Unable to overwrite: " + item.ToString());
                                 }
-                                
+
 
                             }
                         }
@@ -358,7 +358,7 @@ namespace ProUpgradeEditor.UI
 
             if (!EditorG5.IsLoaded || !EditorPro.IsLoaded)
                 return false;
-            
+
             try
             {
                 var g5Track = EditorG5.GuitarTrack;
@@ -516,20 +516,20 @@ namespace ProUpgradeEditor.UI
                 {
                     Set108Events(config);
                 }
-                
+
             }
             catch { ret = false; }
 
             ret = true;
-            
+
             return ret;
         }
 
 
         private void GenerateDifficultiesForTrack(
-            Track trackG5, 
-            Track trackG6, 
-            GuitarDifficulty guitarDifficulties, 
+            Track trackG5,
+            Track trackG6,
+            GuitarDifficulty guitarDifficulties,
             GenDiffConfig config)
         {
             if (guitarDifficulties.IsExpert())
@@ -540,94 +540,183 @@ namespace ProUpgradeEditor.UI
             if (guitarDifficulties.IsUnknownOrNone())
                 return;
 
-            var diffs = guitarDifficulties.GetDifficulties().Where(x=> x.IsEasyMediumHard());
+            var diffs = guitarDifficulties.GetDifficulties().Where(x => x.IsEasyMediumHard());
 
             EditorPro.SetTrack(trackG6);
             EditorG5.SetTrack(trackG5);
 
-            foreach(var diff in diffs)
+
+            foreach (var diff in diffs)
             {
-                EditorPro.CurrentDifficulty = diff;
+                var sourceDifficulty =
+                    diff == GuitarDifficulty.Easy ? GuitarDifficulty.Medium :
+                    diff == GuitarDifficulty.Medium ? GuitarDifficulty.Hard :
+                    GuitarDifficulty.Expert;
 
-                EditorPro.Messages.Chords.ToList().ForEach(x => EditorPro.RemoveMessage(x));
+                var sourceMessages = EditorPro.GuitarTrack.GetMessages(sourceDifficulty);
 
-                GenDiffNotes(diff, config);
+                var mess6 = EditorPro.GuitarTrack.GetMessages(diff);
+                var mess5 = EditorG5.GuitarTrack.GetMessages(diff);
+
+                GenDiffNotes(mess5, mess6, sourceMessages, diff, config);
+
+                sourceMessages = mess6;
             }
 
         }
 
-        private void GenDiffNotes(GuitarDifficulty targetDifficulty, GenDiffConfig config)
+        private void GenDiffNotes(GuitarMessageList mess5, GuitarMessageList targetMess, GuitarMessageList sourceMess, GuitarDifficulty targetDifficulty, GenDiffConfig config)
         {
-            var sourceDifficulty =
-                targetDifficulty == GuitarDifficulty.Easy ? GuitarDifficulty.Medium :
-                targetDifficulty == GuitarDifficulty.Medium ? GuitarDifficulty.Hard :
-                GuitarDifficulty.Expert;
-            
-            EditorPro.CurrentDifficulty = sourceDifficulty;
 
-            var sourceChords = EditorPro.GuitarTrack.Messages.Chords.ToList();
-            var sourceArp = EditorPro.GuitarTrack.Messages.Arpeggios.ToList();
 
-            EditorPro.CurrentDifficulty = targetDifficulty;
-            EditorG5.CurrentDifficulty = targetDifficulty;
+            targetMess.Remove(targetMess.Chords.ToList());
 
-            var target5 = EditorG5.Messages.Chords.ToList();
-            sourceChords = sourceChords.Where(c => target5.AnyBetweenTick(c.TickPair.Expand(-1))).ToList();
+            var sourceChords = sourceMess.Chords;
 
-            if (targetDifficulty.IsHard())
+            if (targetDifficulty == GuitarDifficulty.Hard)
             {
-                ProGuitarTrack.Remove(ProGuitarTrack.Messages.Arpeggios.ToList());
+                targetMess.Remove(targetMess.Arpeggios.ToList());
+            }
 
-                foreach (var arp in sourceArp.Where(x => sourceChords.AnyBetweenTick(x.TickPair)))
+            var chords = sourceChords.Where(x => x.IsPureArpeggioHelper == false).ToList();
+            CreateChords(mess5, targetMess, targetDifficulty, chords);
+
+            if (targetDifficulty == GuitarDifficulty.Hard)
+            {
+                foreach (var arp in sourceMess.Arpeggios.Where(x => targetMess.Chords.AnyBetweenTick(x.TickPair)))
                 {
-                    GuitarArpeggio.CreateArpeggio(ProGuitarTrack, targetDifficulty, arp.TickPair);
+                    targetMess.Add(GuitarArpeggio.CreateArpeggio(targetMess, targetDifficulty, arp.TickPair));
+                }
+            }
+        }
+
+        private void CreateChords(GuitarMessageList mess5, GuitarMessageList targetMess, GuitarDifficulty targetDifficulty, IEnumerable<GuitarChord> chords)
+        {
+
+            GuitarChord lastChord = null;
+
+            foreach (var sc in mess5.Chords)
+            {
+                var tempo = targetMess.Tempos.GetTempo(sc.DownTick);
+
+                if (lastChord != null && sc.StartTime < lastChord.EndTime)
+                    continue;
+
+                var c = CreateChordAtDifficulty(mess5, chords, targetMess, targetDifficulty, sc);
+                if (c != null)
+                {
+                    lastChord = c;
                 }
 
-                foreach(var sc in sourceChords)
-                {
-                    GuitarChord.CreateChord(
-                        ProGuitarTrack, 
-                        targetDifficulty, 
-                        sc.TickPair,
-                        sc.NoteFrets, sc.NoteChannels, 
-                        sc.IsSlide, sc.IsSlideReversed, sc.IsHammeron, sc.StrumMode);
-                };
             }
-            else
-            {
-                sourceChords.Where(x=> x.IsPureArpeggioHelper==false).ToList().ForEach(sc=>
-                {
-                    var frets = Utility.Null6;
-                    var channels = Utility.Null6;
-                    int noteCount = 0;
-                    
-                    var nc = sc.NoteChannels;
-                    var nf = sc.NoteFrets;
+        }
 
-                    for(int x=0;x<6;x++)
+        private GuitarChord CreateChordAtDifficulty(GuitarMessageList mess5, IEnumerable<GuitarChord> chords,
+            GuitarMessageList mess, GuitarDifficulty targetDifficulty, GuitarChord sc)
+        {
+            GuitarChord ret = null;
+
+            var g6c = chords.GetBetweenTick(sc.TickPair);
+            if (!g6c.Any())
+            {
+                var last = mess.Chords.LastOrDefault();
+                if (last != null)
+                {
+                    if (sc.TickPair.Down - Utility.TickCloseWidth > last.UpTick)
                     {
-                        if(nc[x].IsNull()==false &&
-                           nc[x] != Utility.ChannelArpeggio)
+                        var tickPair = sc.TickPair;
+                        g6c = chords.GetBetweenTick(tickPair.Offset(-Utility.TickCloseWidth));
+                        if (!g6c.Any())
                         {
-                            frets[x] = nf[x];
-                            channels[x] = nc[x];
+                            tickPair = sc.TickPair;
+                            g6c = chords.GetBetweenTick(tickPair.Offset(Utility.TickCloseWidth));
+
+                        }
+                    }
+                }
+            }
+
+            if (g6c.Any())
+            {
+                var gc = g6c.First();
+
+                var frets = Utility.Null6;
+                var channels = Utility.Null6;
+                int noteCount = 0;
+
+                var notesOverZero = gc.Notes.Where(x => x.NoteFretDown > 0);
+
+                if (targetDifficulty == GuitarDifficulty.Easy)
+                {
+                    if (notesOverZero.Any())
+                    {
+                        var note = notesOverZero.OrderBy(x => x.NoteString).First();
+                        frets[note.NoteString] = note.NoteFretDown;
+                        channels[note.NoteString] = note.Channel;
+                        noteCount = 1;
+                    }
+                    else
+                    {
+
+                        var note = gc.Notes.OrderBy(x => x.NoteString).First();
+                        frets[note.NoteString] = note.NoteFretDown;
+                        channels[note.NoteString] = note.Channel;
+                        noteCount = 1;
+                    }
+                }
+                else if (targetDifficulty == GuitarDifficulty.Medium)
+                {
+                    if (notesOverZero.Count() > 1)
+                    {
+                        var noz = notesOverZero.OrderBy(x => x.NoteString).ToArray();
+                        var note1 = noz[0];
+                        frets[note1.NoteString] = note1.NoteFretDown;
+                        channels[note1.NoteString] = note1.Channel;
+
+                        var note2 = noz[1];
+                        frets[note2.NoteString] = note2.NoteFretDown;
+                        channels[note2.NoteString] = note2.Channel;
+                        noteCount = 2;
+                    }
+                    else if (notesOverZero.Count() > 0)
+                    {
+                        var note1 = notesOverZero.OrderBy(x => x.NoteString).First();
+                        frets[note1.NoteString] = note1.NoteFretDown;
+                        channels[note1.NoteString] = note1.Channel;
+                        noteCount = 1;
+                    }
+                    else
+                    {
+                        var note = gc.Notes.OrderBy(x => x.NoteString).First();
+                        frets[note.NoteString] = note.NoteFretDown;
+                        channels[note.NoteString] = note.Channel;
+                        noteCount = 1;
+                    }
+                }
+                else if (targetDifficulty == GuitarDifficulty.Hard)
+                {
+                    foreach (var note in gc.Notes)
+                    {
+                        if (note.Channel != Utility.ChannelArpeggio)
+                        {
+                            frets[note.NoteString] = note.NoteFretDown;
+                            channels[note.NoteString] = note.Channel;
                             noteCount++;
                         }
-                        if(noteCount == 1 && targetDifficulty.IsEasy())
-                            break;
-                        else if(noteCount == 2 && targetDifficulty.IsMedium())
-                            break;
                     }
-                    if(noteCount>0)
-                    {
-                        GuitarChord.CreateChord(
-                            ProGuitarTrack, 
-                            targetDifficulty, 
-                            sc.TickPair,
-                            frets, channels, sc.IsSlide, sc.IsSlideReversed, sc.IsHammeron);
-                    }
-                });
+                }
+
+                if (noteCount > 0)
+                {
+                    ret = GuitarChord.CreateChord(
+                        mess,
+                        targetDifficulty,
+                        sc.TickPair,
+                        frets, channels, gc.IsSlide, gc.IsSlideReversed, gc.IsHammeron);
+
+                }
             }
+            return ret;
         }
 
         public void RefreshTracks()
@@ -681,19 +770,6 @@ namespace ProUpgradeEditor.UI
                             if (!OpenSongCacheItem(item))
                             {
                                 WriteBatchResult("Unable to open: " + item.ToString());
-                                continue;
-                            }
-
-
-                            if (!Set108Events(new GenDiffConfig(item, false, false, false, false, true)))
-                            {
-                                WriteBatchResult("Set 108 Events Failed: " + item.ToString());
-                                continue;
-                            }
-
-                            if (!CopyBigRockEnding())
-                            {
-                                WriteBatchResult("Failed Adding Big Rock Ending: " + item.ToString());
                                 continue;
                             }
 
@@ -848,10 +924,15 @@ namespace ProUpgradeEditor.UI
                 }
                 else
                 {
+
                     string dtaSongID = string.Empty;
                     try
                     {
-                        dtaSongID = DTAGetSongID(upgradeDTA.Data);
+                        var songIDList = LoadDTAFile(upgradeDTA.Data);
+                        if (songIDList.Any())
+                        {
+                            songIDList.GetSongIDs().FirstOrDefault().GetIfNotNull(x => dtaSongID = x.Value);
+                        }
                     }
                     catch { }
 
@@ -1044,7 +1125,7 @@ namespace ProUpgradeEditor.UI
                 {
                     var pk = Package.Load(ReadFileBytes(item.G6ConFile));
                     CheckConPackage(pk, ref fileErrors, item);
-                   
+
                 }
             }
             catch (Exception ex)
@@ -1107,7 +1188,7 @@ namespace ProUpgradeEditor.UI
             try
             {
 
-                foreach(var track in sq)
+                foreach (var track in sq)
                 {
                     if (track.Name.IsEmpty())
                     {
@@ -1129,7 +1210,7 @@ namespace ProUpgradeEditor.UI
                 foreach (Track t in sq)
                 {
                     var name = t.Name;
-                    if(name.IsGuitarTrackName6())
+                    if (name.IsGuitarTrackName6())
                     {
                         foundGuitarTrack = true;
                     }
@@ -1141,15 +1222,15 @@ namespace ProUpgradeEditor.UI
                     {
                         foundGuitar22 = true;
                     }
-                    if(name.IsBassTrackName22())
+                    if (name.IsBassTrackName22())
                     {
                         foundBass22 = true;
                     }
-                    if(name.IsGuitarTrackName17())
+                    if (name.IsGuitarTrackName17())
                     {
                         foundGuitar17 = true;
                     }
-                    if(name.IsBassTrackName17())
+                    if (name.IsBassTrackName17())
                     {
                         foundBass17 = true;
                     }
@@ -1159,7 +1240,7 @@ namespace ProUpgradeEditor.UI
                 {
                     fileErrors.Add("No pro guitar track in midi file: " + proName);
                 }
-                if (foundBassTrack == false && (item != null && item.HasBass==true))
+                if (foundBassTrack == false && (item != null && item.HasBass == true))
                 {
                     fileErrors.Add("No pro bass track in midi file: " + proName);
                 }
@@ -1181,7 +1262,7 @@ namespace ProUpgradeEditor.UI
                     var trackName = t.Name;
 
                     EditorPro.SetTrack6(sq, t, GuitarDifficulty.Expert);
-                    
+
 
                     var h108 = ProGuitarTrack.Messages.HandPositions;
 
@@ -1228,7 +1309,7 @@ namespace ProUpgradeEditor.UI
                     for (int tx = 0; tx < 4; tx++)
                     {
                         EditorPro.CurrentDifficulty = (GuitarDifficulty)(((int)GuitarDifficulty.Easy) << tx);
-                        
+
 
                         if (!EditorPro.GuitarTrack.Messages.Chords.Any())
                         {
@@ -1319,7 +1400,7 @@ namespace ProUpgradeEditor.UI
                             }
 
                             bool arpeggioMissingChords = false;
-                            
+
                             foreach (var mod in EditorPro.GuitarTrack.Messages.Arpeggios.ToList())
                             {
                                 var chords = EditorPro.GuitarTrack.Messages.Chords.GetBetweenTick(
@@ -1329,18 +1410,18 @@ namespace ProUpgradeEditor.UI
                                 {
                                     arpeggioMissingChords = true;
                                 }
-                                
+
                             }
 
                             if (arpeggioMissingChords)
                             {
                                 fileErrors.Add(trackName + " Arpeggio found with no chords: " + EditorPro.CurrentDifficulty.ToString());
                             }
-                            
+
                             bool modWithNoNotes =
                                 EditorPro.GuitarTrack.Messages.SingleStringTremelos.Any(x =>
                                     !EditorPro.GuitarTrack.Messages.Chords.GetBetweenTick(new TickPair(x.DownTick, x.UpTick)).Any());
-                            
+
                             if (modWithNoNotes)
                             {
                                 fileErrors.Add(trackName + " Single string tremelo with no notes: " + EditorPro.CurrentDifficulty.ToString());
@@ -1348,7 +1429,7 @@ namespace ProUpgradeEditor.UI
 
                             modWithNoNotes = EditorPro.GuitarTrack.Messages.MultiStringTremelos.Any(x =>
                                     !EditorPro.GuitarTrack.Messages.Chords.GetBetweenTick(new TickPair(x.DownTick, x.UpTick)).Any());
-                            
+
                             if (modWithNoNotes)
                             {
                                 fileErrors.Add(trackName + " Multi string tremelo with no notes: " + EditorPro.CurrentDifficulty.ToString());
@@ -1404,7 +1485,7 @@ namespace ProUpgradeEditor.UI
                                 {
                                     hasMixedXNotes = true;
                                 }
-                                if (Utility.IsCloseTick( gc.UpTick, gc.DownTick))
+                                if (Utility.IsCloseTick(gc.UpTick, gc.DownTick))
                                 {
                                     hasShortChord = true;
                                 }
@@ -1460,7 +1541,8 @@ namespace ProUpgradeEditor.UI
                             }
 
                             if (EditorG5.IsLoaded &&
-                                EditorPro.CurrentDifficulty == GuitarDifficulty.Expert)
+                                EditorPro.CurrentDifficulty == GuitarDifficulty.Expert &&
+                                EditorPro.IsEditingGuitar)
                             {
 
                                 if (t.Name.IsBassTrackName6() && (item != null && item.CopyGuitarToBass == false))
@@ -1492,17 +1574,17 @@ namespace ProUpgradeEditor.UI
                                     }
                                 }
                             }
-                            
+
                         }
 
                     }//end for each difficulty 
 
                     bool foundName = false;
                     string name = "";
-                    
+
                     MidiEvent nameEvent = null;
                     var extraNames = new List<MidiEvent>();
-                    foreach (var meta in ProGuitarTrack.GetTrack().Meta.Where(x=> x.MetaType == MetaType.TrackName))
+                    foreach (var meta in ProGuitarTrack.GetTrack().Meta.Where(x => x.MetaType == MetaType.TrackName))
                     {
                         if (foundName)
                         {

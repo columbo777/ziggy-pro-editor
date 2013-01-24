@@ -38,11 +38,11 @@ using System.Runtime.InteropServices;
 
 namespace Sanford.Multimedia.Midi
 {
-	/// <summary>
-	/// Builds a pointer to a MidiHeader structure.
-	/// </summary>
-	internal class MidiHeaderBuilder
-	{
+    /// <summary>
+    /// Builds a pointer to a MidiHeader structure.
+    /// </summary>
+    internal class MidiHeaderBuilder
+    {
         // The length of the system exclusive buffer.
         private int bufferLength;
 
@@ -58,10 +58,10 @@ namespace Sanford.Multimedia.Midi
         /// <summary>
         /// Initializes a new instance of the MidiHeaderBuilder.
         /// </summary>
-		public MidiHeaderBuilder()
-		{
+        public MidiHeaderBuilder()
+        {
             BufferLength = 1;
-		}
+        }
 
         #region Methods
 
@@ -79,7 +79,7 @@ namespace Sanford.Multimedia.Midi
             header.flags = 0;
 
             // Write data to the MidiHeader.
-            for(int i = 0; i < BufferLength; i++)
+            for (int i = 0; i < BufferLength; i++)
             {
                 Marshal.WriteByte(header.data, i, data[i]);
             }
@@ -88,7 +88,7 @@ namespace Sanford.Multimedia.Midi
             {
                 result = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(MidiHeader)));
             }
-            catch(Exception)
+            catch (Exception)
             {
                 Marshal.FreeHGlobal(header.data);
 
@@ -99,7 +99,7 @@ namespace Sanford.Multimedia.Midi
             {
                 Marshal.StructureToPtr(header, result, false);
             }
-            catch(Exception)
+            catch (Exception)
             {
                 Marshal.FreeHGlobal(header.data);
                 Marshal.FreeHGlobal(result);
@@ -122,12 +122,12 @@ namespace Sanford.Multimedia.Midi
                 return;
 
             // If this is a start system exclusive message.
-            if(message.SysExType == SysExType.Start)
+            if (message.SysExType == SysExType.Start)
             {
                 BufferLength = message.Length;
 
                 // Copy entire message.
-                for(int i = 0; i < BufferLength; i++)
+                for (int i = 0; i < BufferLength; i++)
                 {
                     data[i] = message[i];
                 }
@@ -138,7 +138,7 @@ namespace Sanford.Multimedia.Midi
                 BufferLength = message.Length - 1;
 
                 // Copy all but the first byte of message.
-                for(int i = 0; i < BufferLength; i++)
+                for (int i = 0; i < BufferLength; i++)
                 {
                     data[i] = message[i + 1];
                 }
@@ -149,7 +149,7 @@ namespace Sanford.Multimedia.Midi
         {
             if (events.Count == 0)
                 return;
-            
+
 
             BufferLength = events.Count;
 
@@ -163,7 +163,7 @@ namespace Sanford.Multimedia.Midi
         {
             #region Require
 
-            if(!built)
+            if (!built)
             {
                 throw new InvalidOperationException("Cannot destroy MidiHeader");
             }
@@ -219,5 +219,5 @@ namespace Sanford.Multimedia.Midi
         }
 
         #endregion
-	}
+    }
 }

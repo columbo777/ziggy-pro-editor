@@ -10,7 +10,7 @@ namespace ProUpgradeEditor.Common
 
     public enum GuitarModifierType
     {
-        Invalid=0,
+        Invalid = 0,
         Arpeggio,
         BigRockEnding,
         Powerup,
@@ -64,14 +64,14 @@ namespace ProUpgradeEditor.Common
             }
             return ret;
         }
-        public static IEnumerable<int> GetData1ForModifierType(this GuitarModifierType type, 
-            GuitarDifficulty difficulty=GuitarDifficulty.All, bool isPro=true)
+        public static IEnumerable<int> GetData1ForModifierType(this GuitarModifierType type,
+            GuitarDifficulty difficulty = GuitarDifficulty.All, bool isPro = true)
         {
             var ret = new List<int>();
             switch (type)
             {
-                
-                
+
+
                 case GuitarModifierType.Arpeggio:
                     {
                         ret.AddRange(Utility.AllArpeggioData1);
@@ -109,7 +109,7 @@ namespace ProUpgradeEditor.Common
                         ret.AddRange(Utility.SingleStringTremeloData1.MakeEnumerable());
                     }
                     break;
-                
+
             }
             return ret;
         }
@@ -119,7 +119,7 @@ namespace ProUpgradeEditor.Common
     {
         public ChordModifierType ModifierType;
 
-        public ChordModifier(GuitarTrack track, MidiEvent downEvent, MidiEvent upEvent, ChordModifierType type, GuitarMessageType gt) :
+        public ChordModifier(GuitarMessageList track, MidiEvent downEvent, MidiEvent upEvent, ChordModifierType type, GuitarMessageType gt) :
             base(track, new MidiEventPair(track, downEvent, upEvent), gt)
         {
             if (type == ChordModifierType.Invalid)
@@ -137,9 +137,9 @@ namespace ProUpgradeEditor.Common
             this.ModifierType = type;
         }
 
-        
 
-        public static ChordModifier GetModifier(GuitarTrack track, TickPair ticks,
+
+        public static ChordModifier GetModifier(GuitarMessageList track, TickPair ticks,
             ChordModifierType type, GuitarMessageType gt, GuitarDifficulty difficulty = GuitarDifficulty.Expert)
         {
             var ret = new ChordModifier(track, null, null, type, gt);
@@ -148,7 +148,7 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
-        public static ChordModifier CreateModifier(GuitarTrack track, TickPair ticks,
+        public static ChordModifier CreateModifier(GuitarMessageList track, TickPair ticks,
             ChordModifierType type, bool createMidi, GuitarDifficulty difficulty = GuitarDifficulty.Expert)
         {
             ChordModifier ret = null;
@@ -194,31 +194,31 @@ namespace ProUpgradeEditor.Common
     {
         public GuitarModifierType ModifierType;
 
-        public GuitarModifier(GuitarTrack track, MidiEvent downEvent, MidiEvent upEvent, GuitarModifierType type, GuitarMessageType mt) : 
+        public GuitarModifier(GuitarMessageList track, MidiEvent downEvent, MidiEvent upEvent, GuitarModifierType type, GuitarMessageType mt) :
             base(track, new MidiEventPair(track, downEvent, upEvent), mt)
         {
             this.ModifierType = type;
         }
 
 
-        public static GuitarModifier GetModifier(GuitarTrack track, TickPair ticks,
+        public static GuitarModifier GetModifier(GuitarMessageList track, TickPair ticks,
             GuitarModifierType type, GuitarMessageType mt,
             GuitarDifficulty difficulty = GuitarDifficulty.Expert)
         {
             var ret = new GuitarModifier(track, null, null, type, mt);
             ret.SetTicks(ticks);
-            
+
             return ret;
         }
 
-        public static GuitarModifier CreateModifier(GuitarTrack track, TickPair ticks,
-            GuitarModifierType type, bool createMidi, GuitarDifficulty difficulty=GuitarDifficulty.Expert)
+        public static GuitarModifier CreateModifier(GuitarMessageList track, TickPair ticks,
+            GuitarModifierType type, bool createMidi, GuitarDifficulty difficulty = GuitarDifficulty.Expert)
         {
             GuitarModifier ret = null;
 
-            switch(type)
+            switch (type)
             {
-                
+
                 case GuitarModifierType.Arpeggio:
                     {
                         ret = GuitarArpeggio.CreateArpeggio(track, difficulty, ticks);
@@ -241,7 +241,7 @@ namespace ProUpgradeEditor.Common
                     break;
                 case GuitarModifierType.MultiStringTremelo:
                     {
-                        ret = GuitarMultiStringTremelo.CreateMultiStringTremelo(track,ticks);
+                        ret = GuitarMultiStringTremelo.CreateMultiStringTremelo(track, ticks);
                     }
                     break;
                 case GuitarModifierType.SingleStringTremelo:
@@ -249,7 +249,7 @@ namespace ProUpgradeEditor.Common
                         ret = GuitarSingleStringTremelo.CreateSingleStringTremelo(track, ticks);
                     }
                     break;
-                
+
             }
 
             return ret;

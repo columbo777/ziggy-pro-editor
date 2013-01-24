@@ -17,7 +17,7 @@ namespace Sanford.Multimedia.Midi
             {
                 return Meta.FirstOrDefault(x => x.MetaMessage.MetaType == MetaType.TrackName);
             }
-            
+
             return null;
         }
 
@@ -37,14 +37,14 @@ namespace Sanford.Multimedia.Midi
                 else { return name ?? ""; }
                 return "(no name)";
             }
-            set 
+            set
             {
                 if (!string.IsNullOrEmpty(value))
                 {
                     name = value ?? "";
 
                     var tn = getNameEvent();
-                    
+
                     if (tn != null)
                     {
                         Remove(tn);
@@ -52,9 +52,9 @@ namespace Sanford.Multimedia.Midi
 
                     var mb = new MetaTextBuilder(MetaType.TrackName, name);
                     mb.Build();
-                     
+
                     Insert(0, mb.Result);
-                    
+
                 }
             }
         }
@@ -82,7 +82,7 @@ namespace Sanford.Multimedia.Midi
                 evNew.Next = null;
                 tail = evNew;
 
-                
+
             }
 
             endOfTrackMidiEvent.SetAbsoluteTicks(Length);
@@ -114,12 +114,12 @@ namespace Sanford.Multimedia.Midi
 
         // Construction
 
-        public Track(FileType fileType, string name=null)
+        public Track(FileType fileType, string name = null)
         {
             this.FileType = fileType;
             endOfTrackMidiEvent = new MidiEvent(this, Length, MetaMessage.EndOfTrackMessage);
             this.Name = name;
-            
+
         }
 
         public override string ToString()
@@ -140,10 +140,10 @@ namespace Sanford.Multimedia.Midi
             {
                 return Iterator();
             }
-           
+
         }
 
-        
+
         public IEnumerable<MidiEvent> Meta
         {
             get
@@ -152,7 +152,7 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
-        
+
         public IEnumerable<MidiEvent> TimeSig
         {
             get
@@ -170,7 +170,7 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
-        
+
         public IEnumerable<MidiEvent> ChanMessages
         {
             get
@@ -183,7 +183,7 @@ namespace Sanford.Multimedia.Midi
 
 
 
-        
+
         public MidiEvent Insert(int position, IMidiMessage message)
         {
             var newMidiEvent = new MidiEvent(this, position, message);
@@ -199,7 +199,7 @@ namespace Sanford.Multimedia.Midi
                 newMidiEvent.Previous = tail;
                 tail.Next = newMidiEvent;
                 tail = newMidiEvent;
-                
+
             }
             else
             {
@@ -264,12 +264,12 @@ namespace Sanford.Multimedia.Midi
                 return;
             if (ev == endOfTrackMidiEvent)
                 return;
-            
+
             this.dirty = true;
 
             ev.Deleted = true;
-            
-            
+
+
 
             if (ev.Previous != null)
             {
@@ -295,7 +295,7 @@ namespace Sanford.Multimedia.Midi
             ev.Next = ev.Previous = null;
             count--;
         }
-     
+
 
         public void Move(MidiEvent e, int newPosition)
         {
@@ -305,43 +305,43 @@ namespace Sanford.Multimedia.Midi
             MidiEvent previous = e.Previous;
             MidiEvent next = e.Next;
 
-            if(e.Previous != null && e.Previous.AbsoluteTicks > newPosition)
+            if (e.Previous != null && e.Previous.AbsoluteTicks > newPosition)
             {
                 e.Previous.Next = e.Next;
 
-                if(e.Next != null)
+                if (e.Next != null)
                 {
                     e.Next.Previous = e.Previous;
                 }
 
-                while(previous != null && previous.AbsoluteTicks > newPosition)
+                while (previous != null && previous.AbsoluteTicks > newPosition)
                 {
                     next = previous;
                     previous = previous.Previous;
-                }                
+                }
             }
-            else if(e.Next != null && e.Next.AbsoluteTicks < newPosition)
+            else if (e.Next != null && e.Next.AbsoluteTicks < newPosition)
             {
                 e.Next.Previous = e.Previous;
 
-                if(e.Previous != null)
+                if (e.Previous != null)
                 {
                     e.Previous.Next = e.Next;
                 }
 
-                while(next != null && next.AbsoluteTicks < newPosition)
+                while (next != null && next.AbsoluteTicks < newPosition)
                 {
                     previous = next;
                     next = next.Next;
                 }
             }
 
-            if(previous != null)
+            if (previous != null)
             {
                 previous.Next = e;
             }
 
-            if(next != null)
+            if (next != null)
             {
                 next.Previous = e;
             }
@@ -350,14 +350,14 @@ namespace Sanford.Multimedia.Midi
             e.Next = next;
             e.SetAbsoluteTicks(newPosition);
 
-            if(newPosition < head.AbsoluteTicks)
+            if (newPosition < head.AbsoluteTicks)
             {
                 head = e;
             }
 
-            if(newPosition > tail.AbsoluteTicks)
+            if (newPosition > tail.AbsoluteTicks)
             {
-                tail = e;                
+                tail = e;
             }
 
             endOfTrackMidiEvent.SetAbsoluteTicks(Length);
@@ -404,7 +404,7 @@ namespace Sanford.Multimedia.Midi
             {
                 return;
             }
-            else if (trkCount==1)
+            else if (trkCount == 1)
             {
                 return;
             }
@@ -412,7 +412,7 @@ namespace Sanford.Multimedia.Midi
             count += trkCount;
 
             MidiEvent a = head;
-            
+
             MidiEvent current = null;
 
             var v = trk.ToArray();
@@ -431,7 +431,8 @@ namespace Sanford.Multimedia.Midi
                 {
                     b = v[++i];
                 }
-                else b = null;
+                else
+                    b = null;
             }
 
             head = current;
@@ -457,7 +458,8 @@ namespace Sanford.Multimedia.Midi
                         {
                             b = v[++i];
                         }
-                        else b = null;
+                        else
+                            b = null;
                     }
                 }
             }
@@ -479,7 +481,8 @@ namespace Sanford.Multimedia.Midi
                 {
                     b = v[++i];
                 }
-                else b = null;
+                else
+                    b = null;
             }
 
             tail = current;
@@ -488,7 +491,7 @@ namespace Sanford.Multimedia.Midi
             endOfTrackMidiEvent.Previous = tail;
 
             safeTrackName();
-            
+
         }
 
         void safeTrackName()

@@ -34,9 +34,9 @@ namespace Sanford.Multimedia.Midi
         protected virtual void OnSysExMessageReceived(SysExMessageEventArgs e)
         {
             EventHandler<SysExMessageEventArgs> handler = SysExMessageReceived;
-            if(context == null)
+            if (context == null)
                 context = SynchronizationContext.Current;
-            if(handler != null && context != null)
+            if (handler != null && context != null)
             {
                 context.Post(delegate(object dummy)
                 {

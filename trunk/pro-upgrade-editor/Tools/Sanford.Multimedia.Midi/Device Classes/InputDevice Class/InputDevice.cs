@@ -46,15 +46,15 @@ namespace Sanford.Multimedia.Midi
     {
         protected override void Dispose(bool disposing)
         {
-            if(disposing)
+            if (disposing)
             {
-                lock(lockObject)
+                lock (lockObject)
                 {
                     Reset();
 
                     int result = midiInClose(handle);
 
-                    if(result == MidiDeviceException.MMSYSERR_NOERROR)
+                    if (result == MidiDeviceException.MMSYSERR_NOERROR)
                     {
                         delegateQueue.Dispose();
                     }
@@ -85,7 +85,7 @@ namespace Sanford.Multimedia.Midi
         #region Win32 Midi Input Error Function
 
         [DllImport("winmm.dll")]
-        private static extern int midiInGetErrorText(int errCode, 
+        private static extern int midiInGetErrorText(int errCode,
             StringBuilder errMsg, int sizeOfErrMsg);
 
         #endregion
@@ -95,7 +95,7 @@ namespace Sanford.Multimedia.Midi
         // Error message.
         private StringBuilder errMsg = new StringBuilder(128);
 
-        #endregion 
+        #endregion
 
         #region Construction
 
@@ -106,7 +106,8 @@ namespace Sanford.Multimedia.Midi
         /// <param name="errCode">
         /// The error code.
         /// </param>
-        public InputDeviceException(int errCode) : base(errCode)
+        public InputDeviceException(int errCode)
+            : base(errCode)
         {
             // Get error message.
             midiInGetErrorText(errCode, errMsg, errMsg.Capacity);

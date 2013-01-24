@@ -41,11 +41,11 @@ using System.Threading;
 
 namespace Sanford.Multimedia.Midi
 {
-	/// <summary>
-	/// Represents a device capable of sending MIDI messages.
-	/// </summary>
-	public sealed class OutputDevice : OutputDeviceBase
-	{
+    /// <summary>
+    /// Represents a device capable of sending MIDI messages.
+    /// </summary>
+    public sealed class OutputDevice : OutputDeviceBase
+    {
         #region Win32 Midi Output Functions and Constants
 
         [DllImport("winmm.dll")]
@@ -55,46 +55,47 @@ namespace Sanford.Multimedia.Midi
         [DllImport("winmm.dll")]
         private static extern int midiOutClose(IntPtr handle);
 
-        #endregion 
+        #endregion
 
         private MidiOutProc midiOutProc;
 
         private bool runningStatusEnabled = false;
 
-        private int runningStatus = 0;        
+        private int runningStatus = 0;
 
         #region Construction
 
         /// <summary>
         /// Initializes a new instance of the OutputDevice class.
         /// </summary>
-        public OutputDevice(int deviceID, SynchronizationContext context) : base(deviceID)
+        public OutputDevice(int deviceID, SynchronizationContext context)
+            : base(deviceID)
         {
             this.context = context;
             midiOutProc = HandleMessage;
 
             int result = midiOutOpen(out hndle, deviceID, midiOutProc, 0, CALLBACK_FUNCTION);
 
-            if(result != MidiDeviceException.MMSYSERR_NOERROR)
+            if (result != MidiDeviceException.MMSYSERR_NOERROR)
             {
                 throw new OutputDeviceException(result);
             }
         }
 
-        #endregion     
-   
+        #endregion
+
         protected override void Dispose(bool disposing)
         {
-            if(disposing)
+            if (disposing)
             {
-                lock(lockObject)
+                lock (lockObject)
                 {
                     Reset();
 
                     // Close the OutputDevice.
                     int result = midiOutClose(Handle);
 
-                    if(result != MidiDeviceException.MMSYSERR_NOERROR)
+                    if (result != MidiDeviceException.MMSYSERR_NOERROR)
                     {
                         // Throw an exception.
                         throw new OutputDeviceException(result);
@@ -123,14 +124,14 @@ namespace Sanford.Multimedia.Midi
         {
             #region Guard
 
-            if(IsDisposed)
+            if (IsDisposed)
             {
                 return;
             }
 
             #endregion
 
-            Dispose(true);            
+            Dispose(true);
         }
 
         /// <summary>
@@ -140,7 +141,7 @@ namespace Sanford.Multimedia.Midi
         {
             #region Require
 
-            if(IsDisposed)
+            if (IsDisposed)
             {
                 throw new ObjectDisposedException(this.GetType().Name);
             }
@@ -156,20 +157,20 @@ namespace Sanford.Multimedia.Midi
         {
             #region Require
 
-            if(IsDisposed)
+            if (IsDisposed)
             {
                 throw new ObjectDisposedException(this.GetType().Name);
             }
 
             #endregion
 
-            lock(lockObject)
+            lock (lockObject)
             {
                 // If running status is enabled.
-                if(runningStatusEnabled)
+                if (runningStatusEnabled)
                 {
                     // If the message's status value matches the running status.
-                    if(message.Status == runningStatus)
+                    if (message.Status == runningStatus)
                     {
                         // Send only the two data bytes without the status byte.
                         Send(message.Message >> 8);
@@ -205,7 +206,7 @@ namespace Sanford.Multimedia.Midi
         {
             #region Require
 
-            if(IsDisposed)
+            if (IsDisposed)
             {
                 throw new ObjectDisposedException(this.GetType().Name);
             }
@@ -238,7 +239,7 @@ namespace Sanford.Multimedia.Midi
                 runningStatus = 0;
             }
         }
-        
+
         #endregion
     }
 
@@ -253,7 +254,7 @@ namespace Sanford.Multimedia.Midi
         #region Win32 Midi Output Error Function
 
         [DllImport("winmm.dll")]
-        private static extern int midiOutGetErrorText(int errCode, 
+        private static extern int midiOutGetErrorText(int errCode,
             StringBuilder message, int sizeOfMessage);
 
         #endregion
@@ -261,7 +262,7 @@ namespace Sanford.Multimedia.Midi
         #region Fields
 
         // The error message.
-        private StringBuilder message = new StringBuilder(128);        
+        private StringBuilder message = new StringBuilder(128);
 
         #endregion
 
@@ -274,7 +275,8 @@ namespace Sanford.Multimedia.Midi
         /// <param name="errCode">
         /// The error code.
         /// </param>
-        public OutputDeviceException(int errCode) : base(errCode)
+        public OutputDeviceException(int errCode)
+            : base(errCode)
         {
             // Get error message.
             midiOutGetErrorText(errCode, message, message.Capacity);
@@ -293,7 +295,7 @@ namespace Sanford.Multimedia.Midi
             {
                 return message.ToString();
             }
-        }        
+        }
 
         #endregion
 

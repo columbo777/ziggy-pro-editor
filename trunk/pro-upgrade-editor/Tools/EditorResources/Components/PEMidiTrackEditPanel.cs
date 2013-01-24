@@ -33,7 +33,7 @@ namespace EditorResources.Components
                 var ret = new List<PEMidiTrack>();
                 if (panelTracks != null)
                 {
-                    
+
                     foreach (var c in panelTracks.Controls)
                     {
                         var pc = c as PEMidiTrack;
@@ -110,7 +110,7 @@ namespace EditorResources.Components
         public event TrackEditPanelEventHandler TrackClicked;
 
 
-        void CreatePanelTracks(Sequence seq, bool forceRefresh=false)
+        void CreatePanelTracks(Sequence seq, bool forceRefresh = false)
         {
 
             bool refresh = false;
@@ -261,7 +261,7 @@ namespace EditorResources.Components
                     }
                     else
                     {
-                        
+
                         if (this.Sequence == o.Track.Sequence)
                         {
                             this.Sequence.MoveTrack(o.Track.GetTrackIndex(), GetInsertAt());
@@ -336,7 +336,7 @@ namespace EditorResources.Components
             dragItem = null;
         }
 
-        
+
 
         void peTrack_DifficultyItemDropped(PEMidiTrack sender, GuitarDifficulty difficulty, DragEventArgs e)
         {
@@ -373,7 +373,7 @@ namespace EditorResources.Components
                 });
 
             this.SelectedDifficulty = difficulty;
-            
+
             TrackClicked.IfObjectNotNull(x => x(this, track.Sequence, track, difficulty));
         }
 
@@ -508,7 +508,7 @@ namespace EditorResources.Components
 
         public IEnumerable<TrackDifficulty> TrackDifficulties
         {
-            get { return panelTracks.Controls.ToEnumerable<PEMidiTrack>().Select(x=> new TrackDifficulty(x.Track.Name, x.SelectedDifficulty)); }
+            get { return panelTracks.Controls.ToEnumerable<PEMidiTrack>().Select(x => new TrackDifficulty(x.Track.Name, x.SelectedDifficulty)); }
         }
 
         private void buttonRename_Click(object sender, EventArgs e)
@@ -516,9 +516,9 @@ namespace EditorResources.Components
             if (SelectedTrack != null && textBoxTrackName.Text.Length > 0)
             {
                 DoRequestBackup();
-                
+
                 SelectedTrack.Track.Name = textBoxTrackName.Text;
-                CreatePanelTracks(this.sequence,true);
+                CreatePanelTracks(this.sequence, true);
             }
         }
 
@@ -596,7 +596,7 @@ namespace EditorResources.Components
                 panel = TrackList.Last();
             if (panel != null)
             {
-                if (panelTracks.PointToClient(MousePosition).Y 
+                if (panelTracks.PointToClient(MousePosition).Y
                     <= panel.Top + panel.Height / 2)
                     ret = panel.Top;
                 else
@@ -618,7 +618,7 @@ namespace EditorResources.Components
                     <= panel.Top + panel.Height / 2)
                     ret = panel.TabIndex;
                 else
-                    ret = panel.TabIndex+1;
+                    ret = panel.TabIndex + 1;
             }
             return ret;
         }

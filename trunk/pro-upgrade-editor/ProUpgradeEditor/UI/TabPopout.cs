@@ -11,14 +11,14 @@ namespace ProUpgradeEditor.UI
 {
     public partial class TabPopout : Form
     {
-        
+
         public TabPopout(TabPage page)
         {
             InitializeComponent();
 
             //this.Controls.Add(page);
-            
-            
+
+
         }
     }
 }

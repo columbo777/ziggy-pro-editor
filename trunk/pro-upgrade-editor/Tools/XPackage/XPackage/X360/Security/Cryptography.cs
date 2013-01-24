@@ -1,12 +1,16 @@
 ﻿// NOTE This class is protected under GPL License as well as terms and conditions.
-/* */ // Most notably, you must not obfuscate/protect this code, you must include an open source
-/* */ // to your project that uses this code, and you must also not make profit on it.
-/* */ // For more details, access:
+/* */
+// Most notably, you must not obfuscate/protect this code, you must include an open source
+/* */
+// to your project that uses this code, and you must also not make profit on it.
+/* */
+// For more details, access:
 // *http://www.gnu.org/
 // *License included in the library source
 // *License located at X360.XPackage.Resources.GPL30
 // *X360.XAbout.GNUProtected for GNU and TaC (Terms and Conditions)
-/* */ // You agree to these terms when you use this code.
+/* */
+// You agree to these terms when you use this code.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -146,7 +150,7 @@ namespace X360.Security.Cryptography
         /// Initializes this class with a specified ASCII string key
         /// </summary>
         /// <param name="xKey"></param>
-        public RC4(string xKey) { KeyASCII = xKey;}
+        public RC4(string xKey) { KeyASCII = xKey; }
 
         /// <summary>
         /// Gets or sets the key as an ASCII string
@@ -246,7 +250,7 @@ namespace X360.Security.Cryptography
             RC4 xrc4 = new RC4(xKey);
             return xrc4.RunAlgorithm(xData);
         }
-        
+
         /// <summary>
         /// Runs a Kerberos RC4 encryption on the specified data
         /// </summary>
@@ -310,7 +314,8 @@ namespace X360.Security.Cryptography
                 {
                     if ((crc & 1) == 1)
                         crc = (crc >> 1) ^ Polynomial;
-                    else crc >>= 1;
+                    else
+                        crc >>= 1;
                 }
                 crctable[i] = (int)crc;
             }
@@ -412,7 +417,8 @@ namespace X360.Security.Cryptography
                 xCurrent = xSpot;
                 if (xSpot == 5)
                     xSpot = 3;
-                else xSpot = 5;
+                else
+                    xSpot = 5;
             }
             return xPiece;
         }

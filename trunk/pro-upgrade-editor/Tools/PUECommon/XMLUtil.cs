@@ -120,7 +120,7 @@ namespace ProUpgradeEditor.Common
             var val = GetNodeValue(rootNode, xpath);
             bool ret = defaultValue;
             if (string.IsNullOrEmpty(val) ||
-                bool.TryParse(val, out ret)==false)
+                bool.TryParse(val, out ret) == false)
             {
                 ret = defaultValue;
             }
@@ -148,7 +148,7 @@ namespace ProUpgradeEditor.Common
                 {
                     n.InnerText = value;
                 }
-                
+
             }
             return ret;
         }
@@ -205,7 +205,7 @@ namespace ProUpgradeEditor.Common
                 parentNode.Attributes[name].Value = value;
                 return parentNode.Attributes[name];
             }
-            
+
         }
 
         public static List<XmlNode> GetNodeList(XmlNode rootNode, string xpath)
@@ -225,6 +225,6 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
-        
+
     }
 }

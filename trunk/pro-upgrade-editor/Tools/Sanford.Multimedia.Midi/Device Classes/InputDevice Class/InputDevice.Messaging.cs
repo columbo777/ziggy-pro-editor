@@ -44,29 +44,29 @@ namespace Sanford.Multimedia.Midi
     {
         private void HandleMessage(IntPtr handle, int msg, int instance, int param1, int param2)
         {
-            if(msg == MIM_OPEN)
+            if (msg == MIM_OPEN)
             {
             }
-            else if(msg == MIM_CLOSE)
+            else if (msg == MIM_CLOSE)
             {
             }
-            else if(msg == MIM_DATA)
-            {
-                delegateQueue.Post(HandleShortMessage, param1);
-            }
-            else if(msg == MIM_MOREDATA)
+            else if (msg == MIM_DATA)
             {
                 delegateQueue.Post(HandleShortMessage, param1);
             }
-            else if(msg == MIM_LONGDATA)
+            else if (msg == MIM_MOREDATA)
+            {
+                delegateQueue.Post(HandleShortMessage, param1);
+            }
+            else if (msg == MIM_LONGDATA)
             {
                 delegateQueue.Post(HandleSysExMessage, new IntPtr(param1));
             }
-            else if(msg == MIM_ERROR)
+            else if (msg == MIM_ERROR)
             {
                 delegateQueue.Post(HandleInvalidShortMessage, param1);
             }
-            else if(msg == MIM_LONGERROR)
+            else if (msg == MIM_LONGERROR)
             {
                 delegateQueue.Post(HandleInvalidSysExMessage, new IntPtr(param1));
             }
@@ -77,7 +77,7 @@ namespace Sanford.Multimedia.Midi
             int message = (int)state;
             int status = ShortMessage.UnpackStatus(message);
 
-            if(status >= (int)ChannelCommand.NoteOff &&
+            if (status >= (int)ChannelCommand.NoteOff &&
                 status <= (int)ChannelCommand.PitchWheel +
                 ChannelMessage.MidiChannelMaxValue)
             {
@@ -86,7 +86,7 @@ namespace Sanford.Multimedia.Midi
 
                 OnChannelMessageReceived(new ChannelMessageEventArgs(cmBuilder.Result));
             }
-            else if(status == (int)SysCommonType.MidiTimeCode ||
+            else if (status == (int)SysCommonType.MidiTimeCode ||
                 status == (int)SysCommonType.SongPositionPointer ||
                 status == (int)SysCommonType.SongSelect ||
                 status == (int)SysCommonType.TuneRequest)
@@ -100,7 +100,7 @@ namespace Sanford.Multimedia.Midi
             {
                 SysRealtimeMessageEventArgs e = null;
 
-                switch((SysRealtimeType)status)
+                switch ((SysRealtimeType)status)
                 {
                     case SysRealtimeType.ActiveSense:
                         e = SysRealtimeMessageEventArgs.ActiveSense;
@@ -137,20 +137,20 @@ namespace Sanford.Multimedia.Midi
 
         private void HandleSysExMessage(object state)
         {
-            lock(lockObject)
+            lock (lockObject)
             {
                 IntPtr headerPtr = (IntPtr)state;
 
                 MidiHeader header = (MidiHeader)Marshal.PtrToStructure(headerPtr, typeof(MidiHeader));
 
-                if(!resetting)
+                if (!resetting)
                 {
-                    for(int i = 0; i < header.bytesRecorded; i++)
+                    for (int i = 0; i < header.bytesRecorded; i++)
                     {
                         sysExData.Add(Marshal.ReadByte(header.data, i));
                     }
 
-                    if(sysExData[0] == 0xF0 && sysExData[sysExData.Count - 1] == 0xF7)
+                    if (sysExData[0] == 0xF0 && sysExData[sysExData.Count - 1] == 0xF7)
                     {
                         SysExMessage message = new SysExMessage(sysExData.ToArray());
 
@@ -161,7 +161,7 @@ namespace Sanford.Multimedia.Midi
 
                     int result = AddSysExBuffer();
 
-                    if(result != DeviceException.MMSYSERR_NOERROR)
+                    if (result != DeviceException.MMSYSERR_NOERROR)
                     {
                         Exception ex = new InputDeviceException(result);
 
@@ -180,13 +180,13 @@ namespace Sanford.Multimedia.Midi
 
         private void HandleInvalidSysExMessage(object state)
         {
-            lock(lockObject)
+            lock (lockObject)
             {
                 IntPtr headerPtr = (IntPtr)state;
 
                 MidiHeader header = (MidiHeader)Marshal.PtrToStructure(headerPtr, typeof(MidiHeader));
 
-                if(!resetting)
+                if (!resetting)
                 {
                     byte[] data = new byte[header.bytesRecorded];
 
@@ -196,7 +196,7 @@ namespace Sanford.Multimedia.Midi
 
                     int result = AddSysExBuffer();
 
-                    if(result != DeviceException.MMSYSERR_NOERROR)
+                    if (result != DeviceException.MMSYSERR_NOERROR)
                     {
                         Exception ex = new InputDeviceException(result);
 
@@ -212,7 +212,7 @@ namespace Sanford.Multimedia.Midi
         {
             int result = midiInUnprepareHeader(Handle, headerPtr, SizeOfMidiHeader);
 
-            if(result != DeviceException.MMSYSERR_NOERROR)
+            if (result != DeviceException.MMSYSERR_NOERROR)
             {
                 Exception ex = new InputDeviceException(result);
 
@@ -243,7 +243,7 @@ namespace Sanford.Multimedia.Midi
             result = midiInPrepareHeader(Handle, headerPtr, SizeOfMidiHeader);
 
             // If the header was perpared successfully.
-            if(result == DeviceException.MMSYSERR_NOERROR)
+            if (result == DeviceException.MMSYSERR_NOERROR)
             {
                 bufferCount++;
 
@@ -251,7 +251,7 @@ namespace Sanford.Multimedia.Midi
                 result = midiInAddBuffer(Handle, headerPtr, SizeOfMidiHeader);
 
                 // If the buffer could not be added.
-                if(result != MidiDeviceException.MMSYSERR_NOERROR)
+                if (result != MidiDeviceException.MMSYSERR_NOERROR)
                 {
                     // Unprepare header - there's a chance that this will fail 
                     // for whatever reason, but there's not a lot that can be

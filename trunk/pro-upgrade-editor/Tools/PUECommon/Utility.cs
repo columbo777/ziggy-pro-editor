@@ -23,8 +23,8 @@ namespace ProUpgradeEditor.Common
     {
         public static int ScollToSelectionOffset = 300;
 
-        public static int[] Null6 { get { return new int[]{ Int32.MinValue, Int32.MinValue, Int32.MinValue, Int32.MinValue, Int32.MinValue, Int32.MinValue }; } }
-        
+        public static int[] Null6 { get { return new int[] { Int32.MinValue, Int32.MinValue, Int32.MinValue, Int32.MinValue, Int32.MinValue, Int32.MinValue }; } }
+
         public const int ChannelStrumLow = 15;
         public const int ChannelStrumMid = 14;
         public const int ChannelStrumHigh = 13;
@@ -34,7 +34,7 @@ namespace ProUpgradeEditor.Common
         public const int ChannelArpeggio = 1;
         public const int ChannelStringBend = 2;
         public const int ChannelDefault = 0;
-        
+
         public const int SingleStringTremeloData1 = 127;
         public const int MultiStringTremeloData1 = 126;
 
@@ -48,7 +48,7 @@ namespace ProUpgradeEditor.Common
         public const int MediumSoloData1_G5 = 79;
         public const int EasySoloData1_G5 = 67;
 
-        
+
 
         public static readonly int[] SoloData1_G5 = new int[] { EasySoloData1_G5, MediumSoloData1_G5, HardSoloData1_G5, ExpertSoloData1_G5 };
 
@@ -56,10 +56,10 @@ namespace ProUpgradeEditor.Common
 
         public const int ExpertStrumData1 = 105;
         public const int ExpertArpeggioData1 = 104;
-        
+
         public const int ExpertSlideData1 = 103;
         public const int ExpertHammeronData1 = 102;
-        
+
 
         public const int ExpertData1HighE = 101;
         public const int ExpertData1B = 100;
@@ -85,7 +85,7 @@ namespace ProUpgradeEditor.Common
         public const int HardData1D = 74;
         public const int HardData1A = 73;
         public const int HardData1LowE = 72;
-        
+
         public const int MediumData1G5 = 75;
         public const int MediumData1D5 = 74;
         public const int MediumData1A5 = 73;
@@ -112,7 +112,7 @@ namespace ProUpgradeEditor.Common
         public const int EasyData1D = 26;
         public const int EasyData1A = 25;
         public const int EasyData1LowE = 24;
-        
+
         public const int ChordNameHiddenData1 = 17;
         public const int ChordNameEbData1 = 15;
         public const int ChordNameDData1 = 14;
@@ -140,15 +140,14 @@ namespace ProUpgradeEditor.Common
             ExpertHammeronData1, HardHammeronData1, MediumHammeronData1, EasyHammeronData1,
         };
 
-        public static GuitarDifficulty[] EasyMediumHardExpert = 
-        { GuitarDifficulty.Easy, GuitarDifficulty.Medium, GuitarDifficulty.Hard, GuitarDifficulty.Expert };
+        public static GuitarDifficulty[] EasyMediumHardExpert = { GuitarDifficulty.Easy, GuitarDifficulty.Medium, GuitarDifficulty.Hard, GuitarDifficulty.Expert };
 
 
         public static int MinimumNoteWidth = 0;
 
         public static string XNoteText = "x";
         public static int XNoteTextYOffset = 0;
-        
+
         public static int XNoteTextXOffset = 0;
 
         public static int NoteTextYOffset = -1;
@@ -277,7 +276,7 @@ namespace ProUpgradeEditor.Common
 
         public static int GridSnapDistance = 4;
         public static int NoteSnapDistance = 4;
-        
+
         public static int NoteCloseWidth = 8;
 
         public static int TickCloseWidth = 10;
@@ -291,7 +290,7 @@ namespace ProUpgradeEditor.Common
         public static int SelectorHeight = 8;
         public static int ShowSelectorDist = 20;
         public static int ShowSelectorEnableDist = 10;
-        
+
         public static int gridSnapCursorSize = 6;
         public static int noteBoundWidth = 1;
 
@@ -302,27 +301,27 @@ namespace ProUpgradeEditor.Common
         public static SolidBrush fretBrush = new SolidBrush(Color.Black);
         public static SolidBrush BackgroundBrush = new SolidBrush(Color.White);
 
-        public static SolidBrush G5GreenNoteBrush = new SolidBrush(Color.FromArgb(defaultAlpha,Color.Green));
-        public static SolidBrush G5RedNoteBrush = new SolidBrush(Color.FromArgb(defaultAlpha,255, 120, 120));
-        public static SolidBrush G5YellowNoteBrush = new SolidBrush(Color.FromArgb(defaultAlpha,Color.Yellow));
-        public static SolidBrush G5BlueNoteBrush = new SolidBrush(Color.FromArgb(defaultAlpha,Color.Blue));
-        public static SolidBrush G5OragneNoteBrush = new SolidBrush(Color.FromArgb(defaultAlpha,Color.Orange));
+        public static SolidBrush G5GreenNoteBrush = new SolidBrush(Color.FromArgb(defaultAlpha, Color.Green));
+        public static SolidBrush G5RedNoteBrush = new SolidBrush(Color.FromArgb(defaultAlpha, 255, 120, 120));
+        public static SolidBrush G5YellowNoteBrush = new SolidBrush(Color.FromArgb(defaultAlpha, Color.Yellow));
+        public static SolidBrush G5BlueNoteBrush = new SolidBrush(Color.FromArgb(defaultAlpha, Color.Blue));
+        public static SolidBrush G5OragneNoteBrush = new SolidBrush(Color.FromArgb(defaultAlpha, Color.Orange));
 
-        
+
         public static Pen beatPen = new Pen(Color.FromArgb(defaultAlpha, 200, 200, 200));
         public static Pen barPen = new Pen(Color.FromArgb(defaultAlpha, 120, 120, 120));
         public static Pen linePen = new Pen(Color.FromArgb(255, Color.Black));
         public static Pen linePen22 = new Pen(Color.FromArgb(255, Color.Black));
-        public static Pen selectedPen = new Pen(Color.FromArgb(defaultAlpha,Color.Red));
+        public static Pen selectedPen = new Pen(Color.FromArgb(defaultAlpha, Color.Red));
 
-        public static Pen slidePen = new Pen(Color.FromArgb(defaultAlpha,Color.Green), 2.0f);
-        public static Pen hammerOnPen = new Pen(Color.FromArgb(defaultAlpha,Color.Blue), 2.0f);
-        public static Pen noteBoundPen = new Pen(Color.FromArgb(defaultAlpha,Color.Black));
+        public static Pen slidePen = new Pen(Color.FromArgb(defaultAlpha, Color.Green), 2.0f);
+        public static Pen hammerOnPen = new Pen(Color.FromArgb(defaultAlpha, Color.Blue), 2.0f);
+        public static Pen noteBoundPen = new Pen(Color.FromArgb(defaultAlpha, Color.Black));
 
-        public static SolidBrush gridSnapCursorBrush = new SolidBrush(Color.FromArgb(defaultAlpha,0,0,0));
-        
+        public static SolidBrush gridSnapCursorBrush = new SolidBrush(Color.FromArgb(defaultAlpha, 0, 0, 0));
 
-        public static Pen rectSelectionPen = new Pen(Color.FromArgb(defaultAlpha,Color.Red), 2.0f);
+
+        public static Pen rectSelectionPen = new Pen(Color.FromArgb(defaultAlpha, Color.Red), 2.0f);
         public static SolidBrush noteBGBrushShadow = new SolidBrush(Color.FromArgb(defaultAlpha, 100, 100, 100));
         public static SolidBrush noteBGBrushSel = new SolidBrush(Color.FromArgb(defaultAlpha, 255, 0, 0));
         public static SolidBrush noteSingleStringTremeloBrush = new SolidBrush(Color.FromArgb(defaultAlpha, 120, 240, 100));
@@ -343,11 +342,7 @@ namespace ProUpgradeEditor.Common
         public static SolidBrush SelectedTextEventBrush = new SolidBrush(Color.FromArgb(120, 200, 0, 150));
 
 
-        public static int[] ChordNameEvents
-        {
-            get
-            {
-                return new int[] 
+        public static int[] ChordNameEvents = new int[] 
                 { 
                     ChordNameHiddenData1,
                     ChordNameEbData1,
@@ -363,8 +358,7 @@ namespace ProUpgradeEditor.Common
                     ChordNameFData1,
                     ChordNameEData1
                 };
-            }
-        }
+
 
         public static GuitarDifficulty GetDifficulty(int data1, bool isPro)
         {
@@ -447,17 +441,17 @@ namespace ProUpgradeEditor.Common
 
                 if (data1 == ExpertSoloData1_G5)
                     return GuitarDifficulty.All;
-                
+
                 if (data1 == SoloData1)
                     return GuitarDifficulty.All;
 
                 if (data1 == PowerupData1)
                     return GuitarDifficulty.All;
 
-                if(BigRockEndingData1.Contains(data1))
+                if (BigRockEndingData1.Contains(data1))
                     return GuitarDifficulty.All;
             }
-            
+
             return GuitarDifficulty.Unknown;
         }
 
@@ -565,7 +559,7 @@ namespace ProUpgradeEditor.Common
                     return -1;
                 }
             }
-            
+
             else
             {
                 return -1;
@@ -681,7 +675,7 @@ namespace ProUpgradeEditor.Common
         public static int GetNoteString(int data1)
         {
             int ret = -1;
-            
+
             if (ExpertData1Strings.Contains(data1))
             {
                 ret = data1 - ExpertData1LowE;
@@ -720,7 +714,7 @@ namespace ProUpgradeEditor.Common
             {
                 ret = data1 - EasyData1LowE5;
             }
-            
+
             return ret;
         }
 
@@ -737,7 +731,7 @@ namespace ProUpgradeEditor.Common
 
         public static GuitarDifficulty GetStringDifficulty5(int data1)
         {
-            if(EasyData1StringsG5.Contains(data1))
+            if (EasyData1StringsG5.Contains(data1))
                 return GuitarDifficulty.Easy;
             if (MediumData1StringsG5.Contains(data1))
                 return GuitarDifficulty.Medium;
@@ -793,9 +787,9 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
-        
 
- 
+
+
         public static SolidBrush G5Brush(int noteString)
         {
             SolidBrush nb = null;
@@ -814,9 +808,9 @@ namespace ProUpgradeEditor.Common
 
 
         public static double timeScalar = 300.0;
-        public static double timeScalarZoomSpeed = 5;
-        public static double timeScalarMax = 5000.0;
-        public static double timeScalarMin = 1.0;
+        public static double timeScalarZoomSpeed = 20;
+        public static double timeScalarMax = 50000.0;
+        public static double timeScalarMin = 0.10;
 
         public static double ScaleUp(double value)
         {

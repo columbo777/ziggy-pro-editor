@@ -39,8 +39,8 @@ namespace Sanford.Multimedia.Midi
     /// <summary>
     /// Provides functionality for building tempo messages.
     /// </summary>
-	public class TempoChangeBuilder : IMessageBuilder
-	{
+    public class TempoChangeBuilder : IMessageBuilder
+    {
         #region TempoChangeBuilder Members
 
         #region Constants
@@ -61,7 +61,7 @@ namespace Sanford.Multimedia.Midi
         // Indicates whether the tempo property has been changed since
         // the last time the message was built.
         private bool changed = true;
-        
+
         #endregion
 
         #region Construction
@@ -89,8 +89,8 @@ namespace Sanford.Multimedia.Midi
         /// </remarks>
         public TempoChangeBuilder(MetaMessage e)
         {
-            Initialize(e);            
-		}
+            Initialize(e);
+        }
 
         #endregion
 
@@ -107,17 +107,17 @@ namespace Sanford.Multimedia.Midi
         /// </exception>
         public void Initialize(MetaMessage e)
         {
-            
+
             int t = 0;
 
             var b = e.GetBytes();
             // If this platform uses little endian byte order.
-            if(BitConverter.IsLittleEndian)
+            if (BitConverter.IsLittleEndian)
             {
                 int d = b.Length - 1;
-                
+
                 // Pack tempo.
-                for(int i = 0; i < e.Length; i++)
+                for (int i = 0; i < e.Length; i++)
                 {
                     t |= b[d] << (Shift * i);
                     d--;
@@ -125,12 +125,12 @@ namespace Sanford.Multimedia.Midi
             }
             // Else this platform uses big endian byte order.
             else
-            {        
+            {
                 // Pack tempo.
-                for(int i = 0; i < e.Length; i++)
+                for (int i = 0; i < e.Length; i++)
                 {
                     t |= b[i] << (Shift * i);
-                }                    
+                }
             }
 
             tempo = t;
@@ -154,7 +154,7 @@ namespace Sanford.Multimedia.Midi
             }
             set
             {
-                
+
                 tempo = value;
 
                 changed = true;
@@ -174,7 +174,7 @@ namespace Sanford.Multimedia.Midi
 
         #endregion
 
-        #endregion        
+        #endregion
 
         #region IMessageBuilder Members
 
@@ -185,17 +185,17 @@ namespace Sanford.Multimedia.Midi
         {
             // If the tempo has been changed since the last time the message 
             // was built.
-            if(changed)
+            if (changed)
             {
                 byte[] data = new byte[MetaMessage.TempoLength];
 
                 // If this platform uses little endian byte order.
-                if(BitConverter.IsLittleEndian)
+                if (BitConverter.IsLittleEndian)
                 {
                     int d = data.Length - 1;
 
                     // Unpack tempo.
-                    for(int i = 0; i < data.Length; i++)
+                    for (int i = 0; i < data.Length; i++)
                     {
                         data[d] = (byte)(tempo >> (Shift * i));
                         d--;
@@ -205,7 +205,7 @@ namespace Sanford.Multimedia.Midi
                 else
                 {
                     // Unpack tempo.
-                    for(int i = 0; i < data.Length; i++)
+                    for (int i = 0; i < data.Length; i++)
                     {
                         data[i] = (byte)(tempo >> (Shift * i));
                     }

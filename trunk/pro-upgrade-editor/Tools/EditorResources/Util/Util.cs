@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace EditorResources
 {
-    
+
     public static class Util
     {
         public static void WriteDebug(string str)

@@ -50,7 +50,7 @@ namespace ProUpgradeEditor
                 using (var stream = PEResources.ResourceManager.GetStream(name))
                 {
                     ret = new byte[stream.Length];
-                    stream.Position=0;
+                    stream.Position = 0;
                     stream.Read(ret, 0, (int)stream.Length);
                 }
             }

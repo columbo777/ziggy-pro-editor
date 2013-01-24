@@ -13,7 +13,7 @@ namespace Sanford.Multimedia.Midi
         private Track track = new Track(FileType.Unknown);
 
         private Track newTrack = new Track(FileType.Unknown);
-        
+
         private ChannelMessageBuilder cmBuilder = new ChannelMessageBuilder();
 
         private SysCommonMessageBuilder scBuilder = new SysCommonMessageBuilder();
@@ -39,15 +39,15 @@ namespace Sanford.Multimedia.Midi
         public List<IMidiMessage> Read(Stream strm)
         {
             newTrack = new Track(FileType.Unknown);
-            
-            
+
+
             stream = strm;
             FindTrack();
 
             int trackLength = GetTrackLength();
             trackData = new byte[trackLength];
 
-            
+
 
             int result = strm.Read(trackData, 0, trackLength);
 
@@ -60,10 +60,10 @@ namespace Sanford.Multimedia.Midi
 
             var ret = ParseTrackData();
 
-            
+
             track = newTrack;
 
-           
+
             return ret;
         }
 
@@ -146,15 +146,15 @@ namespace Sanford.Multimedia.Midi
                 var m = ParseMessage();
                 if (m != null)
                 {
-                    
+
                     ret.Add(m);
                 }
             }
-            
+
             return ret;
         }
 
-        
+
         private IMidiMessage ParseMessage()
         {
             IMidiMessage ret = null;
@@ -164,13 +164,13 @@ namespace Sanford.Multimedia.Midi
                 ChannelMessage.MidiChannelMaxValue)
             {
                 ret = ParseChannelMessage();
-                
+
             }
             // Else if this is a meta message.
             else if (status == 0xFF)
             {
                 ret = ParseMetaMessage();
-                
+
             }
             // Else if this is the start of a system exclusive message.
             else if (status == (int)SysExType.Start)
@@ -199,7 +199,7 @@ namespace Sanford.Multimedia.Midi
 
         private ChannelMessage ParseChannelMessage()
         {
-            
+
             if (trackIndex >= trackData.Length)
             {
                 throw new MidiFileException("End of track unexpectedly reached.");
@@ -219,7 +219,7 @@ namespace Sanford.Multimedia.Midi
                 }
 
                 cmBuilder.Data2 = trackData[trackIndex];
-                
+
                 trackIndex++;
             }
 
@@ -228,7 +228,7 @@ namespace Sanford.Multimedia.Midi
             runningStatus = status;
             return cmBuilder.Result;
         }
-        
+
         private MetaMessage ParseMetaMessage()
         {
             MetaMessage ret = null;
@@ -252,7 +252,7 @@ namespace Sanford.Multimedia.Midi
                 {
                     newTrack.EndOfTrackOffset = ticks - previousTicks;
                 }
-                
+
                 trackIndex++;
             }
 
@@ -262,7 +262,7 @@ namespace Sanford.Multimedia.Midi
                 Array.Copy(trackData, trackIndex, data, 0, data.Length);
 
                 ret = new MetaMessage(type, data);
-                newTrack.Insert(ticks, ret);  
+                newTrack.Insert(ticks, ret);
 
                 trackIndex += data.Length;
 
@@ -447,5 +447,5 @@ namespace Sanford.Multimedia.Midi
         }
     }
 
-	
+
 }

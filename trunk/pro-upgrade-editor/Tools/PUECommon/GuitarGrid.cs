@@ -55,7 +55,7 @@ namespace ProUpgradeEditor.Common
 
         public TimeUnit GetTimeUnitFromGridScalar(double scalar)
         {
-            return (TimeUnit)Math.Round(1.0/scalar);
+            return (TimeUnit)Math.Round(1.0 / scalar);
         }
 
         public TimeUnit GetTimeUnitFromTimeSignature(GuitarTimeSignature timeSig)
@@ -74,7 +74,7 @@ namespace ProUpgradeEditor.Common
             double nextBeat = 0.0;
             int measureNumber = 0;
             double quarterCount = 0;
-            
+
             foreach (var tempo in editor.Messages.Tempos)
             {
                 var scale = 1.0 / ((int)unit).ToDouble();
@@ -96,7 +96,7 @@ namespace ProUpgradeEditor.Common
                         var divisionTicks = beatTicks / division;
 
                         var isWhole = Math.IEEERemainder(quarterCount.Round(4), 4.0).Round(4) == 0.0;
-                        quarterCount += scale*4;
+                        quarterCount += scale * 4;
 
                         var p = new GridPoint()
                         {

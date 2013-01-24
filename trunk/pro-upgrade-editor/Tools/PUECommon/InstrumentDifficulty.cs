@@ -31,7 +31,7 @@ namespace ProUpgradeEditor.Common
             if (diff == InstrumentDifficulty.Warmup)
                 return Utility.DTADifficultyWarmup;
             if (diff == InstrumentDifficulty.Apprentice)
-                return Utility.DTADifficultyApprentice; 
+                return Utility.DTADifficultyApprentice;
             if (diff == InstrumentDifficulty.Solid)
                 return Utility.DTADifficultySolid;
             if (diff == InstrumentDifficulty.Moderate)
@@ -45,7 +45,7 @@ namespace ProUpgradeEditor.Common
         }
         public static InstrumentDifficulty MapDifficulty(string diff)
         {
-            if(string.IsNullOrEmpty(diff))
+            if (string.IsNullOrEmpty(diff))
                 return InstrumentDifficulty.NOPART;
 
             int iDiff = diff.ToInt(0);

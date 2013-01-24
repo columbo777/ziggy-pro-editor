@@ -66,7 +66,7 @@ namespace Sanford.Multimedia.Midi
 
         public void Process(ChannelMessage message)
         {
-            switch(message.Command)
+            switch (message.Command)
             {
                 case ChannelCommand.Controller:
                     controllerMessages[message.MidiChannel, message.Data1] = message;
@@ -94,11 +94,11 @@ namespace Sanford.Multimedia.Midi
         {
             ArrayList chasedMessages = new ArrayList();
 
-            for(int c = 0; c <= ChannelMessage.MidiChannelMaxValue; c++)
+            for (int c = 0; c <= ChannelMessage.MidiChannelMaxValue; c++)
             {
-                for(int n = 0; n <= ShortMessage.DataMaxValue; n++)
+                for (int n = 0; n <= ShortMessage.DataMaxValue; n++)
                 {
-                    if(controllerMessages[c, n] != null)
+                    if (controllerMessages[c, n] != null)
                     {
                         chasedMessages.Add(controllerMessages[c, n]);
 
@@ -106,28 +106,28 @@ namespace Sanford.Multimedia.Midi
                     }
                 }
 
-                if(programChangeMessages[c] != null)
+                if (programChangeMessages[c] != null)
                 {
                     chasedMessages.Add(programChangeMessages[c]);
 
                     programChangeMessages[c] = null;
                 }
 
-                if(pitchBendMessages[c] != null)
+                if (pitchBendMessages[c] != null)
                 {
                     chasedMessages.Add(pitchBendMessages[c]);
 
                     pitchBendMessages[c] = null;
                 }
 
-                if(channelPressureMessages[c] != null)
+                if (channelPressureMessages[c] != null)
                 {
                     chasedMessages.Add(channelPressureMessages[c]);
 
                     channelPressureMessages[c] = null;
                 }
 
-                if(polyPressureMessages[c] != null)
+                if (polyPressureMessages[c] != null)
                 {
                     chasedMessages.Add(polyPressureMessages[c]);
 
@@ -140,9 +140,9 @@ namespace Sanford.Multimedia.Midi
 
         public void Reset()
         {
-            for(int c = 0; c <= ChannelMessage.MidiChannelMaxValue; c++)
+            for (int c = 0; c <= ChannelMessage.MidiChannelMaxValue; c++)
             {
-                for(int n = 0; n <= ShortMessage.DataMaxValue; n++)
+                for (int n = 0; n <= ShortMessage.DataMaxValue; n++)
                 {
                     controllerMessages[c, n] = null;
                 }
@@ -158,7 +158,7 @@ namespace Sanford.Multimedia.Midi
         {
             EventHandler<ChasedEventArgs> handler = Chased;
 
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, e);
             }

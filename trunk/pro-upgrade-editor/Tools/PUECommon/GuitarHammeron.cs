@@ -12,18 +12,18 @@ namespace ProUpgradeEditor.Common
     public class GuitarHammeron : ChordModifier
     {
 
-        public GuitarHammeron(GuitarTrack track, MidiEvent downEvent = null, MidiEvent upEvent = null)
+        public GuitarHammeron(GuitarMessageList track, MidiEvent downEvent = null, MidiEvent upEvent = null)
             : base(track, downEvent, upEvent, ChordModifierType.Hammeron, GuitarMessageType.GuitarHammeron)
         {
-            
+
         }
 
-        public static GuitarHammeron CreateHammeron(GuitarTrack track,
+        public static GuitarHammeron CreateHammeron(GuitarMessageList track,
             TickPair ticks, GuitarDifficulty difficulty = GuitarDifficulty.Unknown)
         {
             GuitarHammeron ret = null;
             if (difficulty.IsUnknownOrNone())
-                difficulty = track.CurrentDifficulty;
+                difficulty = track.Owner.CurrentDifficulty;
 
             var d1 = Utility.GetHammeronData1(difficulty);
             if (d1 != -1)
@@ -33,7 +33,7 @@ namespace ProUpgradeEditor.Common
 
                 ret = new GuitarHammeron(track, ev.Down, ev.Up);
             }
-            track.Messages.Add(ret);
+            track.Add(ret);
             return ret;
         }
 

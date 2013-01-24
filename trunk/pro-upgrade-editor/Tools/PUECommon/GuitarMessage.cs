@@ -24,6 +24,7 @@ namespace ProUpgradeEditor.Common
         GuitarTimeSignature,
         GuitarArpeggio,
         GuitarBigRockEnding,
+        GuitarBigRockEndingSubMessage,
         GuitarSingleStringTremelo,
         GuitarMultiStringTremelo,
         GuitarSlide,
@@ -64,13 +65,13 @@ namespace ProUpgradeEditor.Common
         public GuitarTempoList(TrackEditor owner)
             : base(owner)
         {
-            
+
         }
 
 
         public GuitarTempo GetTempo(int tick)
         {
-            return itemList.SingleByDownTick(tick < 0 ? 0 : tick > itemList.Last().DownTick ? itemList.Last().DownTick: tick );
+            return this.SingleByDownTick(tick < 0 ? 0 : tick > itemList.Last().DownTick ? itemList.Last().DownTick : tick);
         }
 
     }
@@ -88,7 +89,7 @@ namespace ProUpgradeEditor.Common
 
     public class MidiEventProps
     {
-        public GuitarTrack OwnerTrack { get; set; }
+        public GuitarMessageList Owner { get; set; }
 
         public int Data2 { get; set; }
 
@@ -114,14 +115,14 @@ namespace ProUpgradeEditor.Common
 
         }
 
-        public MidiEventProps(GuitarTrack owner)
+        public MidiEventProps(GuitarMessageList owner)
         {
             resetProps(owner);
         }
 
-        private void resetProps(GuitarTrack owner)
+        private void resetProps(GuitarMessageList owner)
         {
-            OwnerTrack = owner;
+            Owner = owner;
             Data1 = Int32.MinValue;
             Data2 = Int32.MinValue;
             Channel = Int32.MinValue;
@@ -132,11 +133,11 @@ namespace ProUpgradeEditor.Common
             _eventPair = new MidiEventPair(owner);
         }
 
-        public MidiEventProps CloneToMemory(GuitarTrack owner)
+        public MidiEventProps CloneToMemory(GuitarMessageList owner)
         {
             var ret = new MidiEventProps(owner);
             ret.setEventPair(EventPair.CloneToMemory(owner));
-            ret.OwnerTrack = OwnerTrack;
+            ret.Owner = Owner;
             ret.Data1 = Data1;
             ret.Data2 = Data2;
             ret.Channel = Channel;
@@ -147,12 +148,12 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
-        public MidiEventProps(GuitarTrack owner, MidiEvent down, MidiEvent up)
+        public MidiEventProps(GuitarMessageList owner, MidiEvent down, MidiEvent up)
             : this(owner, new MidiEventPair(owner, down, up))
         {
 
         }
-        public MidiEventProps(GuitarTrack owner, MidiEventPair pair)
+        public MidiEventProps(GuitarMessageList owner, MidiEventPair pair)
             : this(owner)
         {
             setEventPair(pair);
@@ -179,7 +180,7 @@ namespace ProUpgradeEditor.Common
 
         public void SetUpdatedEventPair(MidiEventPair pair)
         {
-            resetProps(OwnerTrack);
+            resetProps(Owner);
             setEventPair(pair);
         }
 
@@ -215,27 +216,27 @@ namespace ProUpgradeEditor.Common
         protected bool selected;
 
 
-        public GuitarMessage(GuitarTrack owner, MidiEvent downEvent, MidiEvent upEvent, GuitarMessageType type)
+        public GuitarMessage(GuitarMessageList owner, MidiEvent downEvent, MidiEvent upEvent, GuitarMessageType type)
             : this(owner, new MidiEventPair(owner, downEvent, upEvent), type)
         {
 
         }
 
-        public GuitarMessage(GuitarTrack owner, MidiEventProps props, GuitarMessageType type)
+        public GuitarMessage(GuitarMessageList owner, MidiEventProps props, GuitarMessageType type)
         {
             this.props = props.CloneToMemory(owner);
             this.messageType = type;
         }
 
-        public GuitarMessage(GuitarTrack track, MidiEventPair pair, GuitarMessageType type)
+        public GuitarMessage(GuitarMessageList list, MidiEventPair pair, GuitarMessageType type)
         {
             this.messageType = type;
-            this.props = new MidiEventProps(track, pair);
+            this.props = new MidiEventProps(list, pair);
         }
 
         public virtual void UpdateEvents()
         {
-            if (OwnerTrack != null)
+            if (Owner != null)
             {
                 RemoveEvents();
 
@@ -253,8 +254,22 @@ namespace ProUpgradeEditor.Common
                 !props.Channel.IsNull() &&
                  props.TickPair.IsValid)
             {
+                if (Owner != null)
+                {
+                    var list = Owner.GetMessageListForType(messageType);
+                    if (list != null)
+                    {
+                        var between = list.List.GetBetweenTick(props.TickPair);
+                        if (between.Any())
+                        {
+                            Owner.Remove(between);
+                        }
+                    }
+                }
                 props.SetUpdatedEventPair(
-                    OwnerTrack.Insert(props.Data1, props.Data2, props.Channel, props.TickPair));
+                    Owner.Insert(props.Data1, props.Data2, props.Channel, props.TickPair));
+
+                IsDeleted = false;
             }
         }
 
@@ -272,10 +287,9 @@ namespace ProUpgradeEditor.Common
         }
 
 
-
-        public GuitarTrack OwnerTrack
+        public GuitarMessageList Owner
         {
-            get { return props.OwnerTrack; }
+            get { return props.Owner; }
         }
 
 
@@ -365,9 +379,9 @@ namespace ProUpgradeEditor.Common
         {
             if (UpEvent != null && UpEvent.Deleted == false)
             {
-                if (OwnerTrack != null)
+                if (Owner != null)
                 {
-                    OwnerTrack.Remove(UpEvent);
+                    Owner.Remove(UpEvent);
                 }
                 SetUpEvent(null);
 
@@ -378,9 +392,9 @@ namespace ProUpgradeEditor.Common
         {
             if (DownEvent != null && DownEvent.Deleted == false)
             {
-                if (OwnerTrack != null)
+                if (Owner != null)
                 {
-                    OwnerTrack.Remove(DownEvent);
+                    Owner.Remove(DownEvent);
                 }
                 SetDownEvent(null);
             }
@@ -388,7 +402,7 @@ namespace ProUpgradeEditor.Common
 
         public virtual void SnapEvents()
         {
-            var newTicks = OwnerTrack.Owner.SnapLeftRightTicks(TickPair);
+            var newTicks = Owner.Owner.SnapLeftRightTicks(TickPair, new TrackEditor.SnapConfig(true, true, true));
             if (newTicks.CompareTo(TickPair) != 0)
             {
                 SetTicks(newTicks);
@@ -463,7 +477,7 @@ namespace ProUpgradeEditor.Common
         {
             get
             {
-                return OwnerTrack.TickToTime(DownTick);
+                return Owner.Owner.GuitarTrack.TickToTime(DownTick);
             }
         }
 
@@ -471,7 +485,7 @@ namespace ProUpgradeEditor.Common
         {
             get
             {
-                return OwnerTrack.TickToTime(UpTick);
+                return Owner.Owner.GuitarTrack.TickToTime(UpTick);
             }
         }
 
@@ -538,7 +552,7 @@ namespace ProUpgradeEditor.Common
         {
             get
             {
-                return Utility.GetDifficulty(Data1, OwnerTrack.IsPro);
+                return Utility.GetDifficulty(Data1, Owner.Owner.IsPro);
             }
         }
 
@@ -633,6 +647,7 @@ namespace ProUpgradeEditor.Common
                     return GuitarMessageType.GuitarArpeggio;
                 else if (this is GuitarBigRockEnding)
                     return GuitarMessageType.GuitarBigRockEnding;
+
                 else if (this is GuitarSingleStringTremelo)
                     return GuitarMessageType.GuitarSingleStringTremelo;
                 else if (this is GuitarMultiStringTremelo)

@@ -8,10 +8,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace XPackage {
+namespace XPackage
+{
     using System;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -22,51 +23,61 @@ namespace XPackage {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
-        
+    internal class Resources
+    {
+
         private static global::System.Resources.ResourceManager resourceMan;
-        
+
         private static global::System.Globalization.CultureInfo resourceCulture;
-        
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources() {
+        internal Resources()
+        {
         }
-        
+
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
-            get {
-                if (object.ReferenceEquals(resourceMan, null)) {
+        internal static global::System.Resources.ResourceManager ResourceManager
+        {
+            get
+            {
+                if (object.ReferenceEquals(resourceMan, null))
+                {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("XPackage.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-        
+
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
-            get {
+        internal static global::System.Globalization.CultureInfo Culture
+        {
+            get
+            {
                 return resourceCulture;
             }
-            set {
+            set
+            {
                 resourceCulture = value;
             }
         }
-        
-        internal static System.Drawing.Bitmap dash {
-            get {
+
+        internal static System.Drawing.Bitmap dash
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("dash", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to                     GNU GENERAL PUBLIC LICENSE
         ///                       Version 3, 29 June 2007
@@ -83,119 +94,153 @@ namespace XPackage {
         ///  The licenses for most software and other practical works are designed
         ///to [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string GPL30 {
-            get {
+        internal static string GPL30
+        {
+            get
+            {
                 return ResourceManager.GetString("GPL30", resourceCulture);
             }
         }
-        
-        internal static byte[] KV {
-            get {
+
+        internal static byte[] KV
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("KV", resourceCulture);
                 return ((byte[])(obj));
             }
         }
-        
-        internal static System.Drawing.Bitmap Locked {
-            get {
+
+        internal static System.Drawing.Bitmap Locked
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("Locked", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
-        internal static System.Drawing.Bitmap NoImage {
-            get {
+
+        internal static System.Drawing.Bitmap NoImage
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("NoImage", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
-        internal static System.Drawing.Icon paw {
-            get {
+
+        internal static System.Drawing.Icon paw
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("paw", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
-        
-        internal static byte[] proconfile {
-            get {
+
+        internal static byte[] proconfile
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("proconfile", resourceCulture);
                 return ((byte[])(obj));
             }
         }
-        
-        internal static System.Drawing.Bitmap rockband {
-            get {
+
+        internal static System.Drawing.Bitmap rockband
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("rockband", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
-        internal static System.Drawing.Bitmap rockband2 {
-            get {
+
+        internal static System.Drawing.Bitmap rockband2
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("rockband2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
-        internal static byte[] song_ids {
-            get {
+
+        internal static byte[] song_ids
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("song_ids", resourceCulture);
                 return ((byte[])(obj));
             }
         }
-        
-        internal static byte[] upgrades {
-            get {
+
+        internal static byte[] upgrades
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("upgrades", resourceCulture);
                 return ((byte[])(obj));
             }
         }
-        
-        internal static byte[] XK0 {
-            get {
+
+        internal static byte[] XK0
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("XK0", resourceCulture);
                 return ((byte[])(obj));
             }
         }
-        
-        internal static byte[] XK1 {
-            get {
+
+        internal static byte[] XK1
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("XK1", resourceCulture);
                 return ((byte[])(obj));
             }
         }
-        
-        internal static byte[] XK2 {
-            get {
+
+        internal static byte[] XK2
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("XK2", resourceCulture);
                 return ((byte[])(obj));
             }
         }
-        
-        internal static byte[] XK3 {
-            get {
+
+        internal static byte[] XK3
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("XK3", resourceCulture);
                 return ((byte[])(obj));
             }
         }
-        
-        internal static byte[] XK4 {
-            get {
+
+        internal static byte[] XK4
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("XK4", resourceCulture);
                 return ((byte[])(obj));
             }
         }
-        
-        internal static byte[] XK5 {
-            get {
+
+        internal static byte[] XK5
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("XK5", resourceCulture);
                 return ((byte[])(obj));
             }
         }
-        
-        internal static byte[] XK6 {
-            get {
+
+        internal static byte[] XK6
+        {
+            get
+            {
                 object obj = ResourceManager.GetObject("XK6", resourceCulture);
                 return ((byte[])(obj));
             }

@@ -36,11 +36,11 @@ using System;
 
 namespace Sanford.Multimedia.Midi
 {
-	/// <summary>
-	/// Provides functionality for building song position pointer messages.
-	/// </summary>
-	public class SongPositionPointerBuilder : IMessageBuilder
-	{
+    /// <summary>
+    /// Provides functionality for building song position pointer messages.
+    /// </summary>
+    public class SongPositionPointerBuilder : IMessageBuilder
+    {
         #region SongPositionPointerBuilder Members
 
         #region Constants
@@ -151,7 +151,7 @@ namespace Sanford.Multimedia.Midi
             {
                 SongPosition = value / (tickScale * TicksPer16thNote);
             }
-        }        
+        }
 
         /// <summary>
         /// Gets or sets the PulsesPerQuarterNote object.
@@ -183,7 +183,7 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                return (builder.Data2 << Shift) | builder.Data1;                
+                return (builder.Data2 << Shift) | builder.Data1;
             }
             set
             {

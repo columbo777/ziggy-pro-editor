@@ -41,9 +41,9 @@ namespace Sanford.Multimedia.Midi
     {
         public override IntPtr Handle
         {
-            get 
-            { 
-                return handle; 
+            get
+            {
+                return handle;
             }
         }
 
@@ -57,7 +57,7 @@ namespace Sanford.Multimedia.Midi
             {
                 #region Require
 
-                if(value < 1)
+                if (value < 1)
                 {
                     throw new ArgumentOutOfRangeException();
                 }

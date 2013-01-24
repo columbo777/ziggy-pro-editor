@@ -14,7 +14,7 @@ namespace ProUpgradeEditor.Common
     public interface ISpecializedList : IEnumerable
     {
         void Add(GuitarMessage mess);
-        void AddGuitarMessageRange(IEnumerable<GuitarMessage> mess);
+
         void Remove(GuitarMessage mess);
         IEnumerable<GuitarMessage> List { get; }
     }
@@ -47,23 +47,15 @@ namespace ProUpgradeEditor.Common
 
         public virtual void RemoveRange(IEnumerable<T> mess)
         {
-            foreach (var gm in mess)
+            foreach (var gm in mess.ToList())
             {
                 this.internalRemove(gm);
             }
         }
 
-        public virtual void AddGuitarMessageRange(IEnumerable<GuitarMessage> mess)
-        {
-            foreach (var gm in mess)
-            {
-                this.internalInsert(gm as T);
-            }
-        }
-
         public virtual void AddRange(IEnumerable<T> mess)
         {
-            foreach (var gm in mess)
+            foreach (var gm in mess.ToList())
             {
                 this.internalInsert(gm as T);
             }
@@ -76,7 +68,7 @@ namespace ProUpgradeEditor.Common
 
         SpecializedMessageList()
         {
-            
+
         }
 
         public virtual int GetIndexFromTick(int itemTick)
@@ -97,7 +89,7 @@ namespace ProUpgradeEditor.Common
                 }
                 else
                 {
-                    return itemList.FindLastIndex(x => x.DownTick < itemTick)+1;
+                    return itemList.FindLastIndex(x => x.DownTick < itemTick) + 1;
                 }
             }
         }
@@ -120,7 +112,7 @@ namespace ProUpgradeEditor.Common
                 }
                 else
                 {
-                    return itemList.FindLastIndex(x => x.StartTime < time)+1;
+                    return itemList.FindLastIndex(x => x.StartTime < time) + 1;
                 }
             }
         }

@@ -14,13 +14,13 @@ namespace ProUpgradeEditor.Common
         {
             get
             {
-                return OwnerTrack.IsPro ?
+                return Owner.Owner.IsPro ?
                     Utility.GetNoteString(Data1) :
                     Utility.GetNoteString5(Data1);
             }
             set
             {
-                if (OwnerTrack.IsPro)
+                if (Owner.Owner.IsPro)
                 {
                     Data1 = Utility.GetStringLowE(Utility.GetStringDifficulty6(Data1)) + value;
                 }
@@ -33,22 +33,23 @@ namespace ProUpgradeEditor.Common
             }
         }
 
-        public GuitarNote(GuitarTrack track, MidiEvent downEvent = null, MidiEvent upEvent = null)
+        public GuitarNote(GuitarMessageList track, MidiEvent downEvent = null, MidiEvent upEvent = null)
             : base(track, downEvent, upEvent, GuitarMessageType.GuitarNote)
         {
-            
+
         }
 
-        public GuitarNote CloneToMemory(GuitarTrack track)
+        public GuitarNote CloneToMemory(GuitarMessageList list)
         {
-            return GetNote(track, Difficulty, this.TickPair, NoteString, NoteFretDown, IsTapNote, IsArpeggioNote, IsXNote);
+            return GetNote(list, Difficulty, this.TickPair, NoteString, NoteFretDown, IsTapNote, IsArpeggioNote, IsXNote);
         }
 
-        public static GuitarNote GetNote(GuitarTrack track, GuitarDifficulty diff, 
+        public static GuitarNote GetNote(GuitarMessageList list, GuitarDifficulty diff,
             TickPair ticks, int noteString, int noteFret, bool isTap, bool isArpeggio, bool isX)
         {
-            var ret = new GuitarNote(track);
-            if (track.IsPro)
+            var ret = new GuitarNote(list);
+
+            if (list.Owner.IsPro)
             {
                 ret.Data1 = Utility.GetStringLowE(diff) + noteString;
             }
@@ -56,7 +57,7 @@ namespace ProUpgradeEditor.Common
             {
                 ret.Data1 = Utility.GetStringLowE5(diff) + noteString;
             }
-            
+
             ret.Data2 = noteFret + 100;
 
             if (isX)
@@ -81,38 +82,38 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
-        public static GuitarNote CreateNote(GuitarTrack track, GuitarDifficulty diff, TickPair ticks, 
+        public static GuitarNote CreateNote(GuitarMessageList list, GuitarDifficulty diff, TickPair ticks,
             int noteString, int noteFret, bool isTap, bool isArpeggio, bool isX)
         {
-            var ret = GetNote(track, diff, ticks, noteString, noteFret, isTap, isArpeggio, isX);
+            var ret = GetNote(list, diff, ticks, noteString, noteFret, isTap, isArpeggio, isX);
 
-            var ev = track.Insert(ret.Data1, ret.Data2, ret.Channel, ticks);
+            var ev = list.Insert(ret.Data1, ret.Data2, ret.Channel, ticks);
 
             ret.SetDownEvent(ev.Down);
             ret.SetUpEvent(ev.Up);
 
-            track.Messages.Add(ret);
+            list.Add(ret);
 
             return ret;
         }
 
-        public int NoteFretDown 
-        { 
-            get 
-            { 
-                return Data2-100;
-            } 
-            set 
-            { 
+        public int NoteFretDown
+        {
+            get
+            {
+                return Data2 - 100;
+            }
+            set
+            {
                 Data2 = value + 100;
-            } 
+            }
         }
 
         public bool IsTapNote
         {
             get { return Channel == Utility.ChannelTap; }
         }
-        
+
         public bool IsArpeggioNote { get { return Channel == Utility.ChannelArpeggio; } }
 
         public bool IsXNote
@@ -120,12 +121,10 @@ namespace ProUpgradeEditor.Common
             get { return Channel == Utility.ChannelX; }
         }
 
-        
-
         public override string ToString()
         {
-            return base.ToString() + 
-                " String: " + NoteString + " Arp: " + this.IsArpeggioNote.ToString() + " X: " + 
+            return base.ToString() +
+                " String: " + NoteString + " Arp: " + this.IsArpeggioNote.ToString() + " X: " +
                 this.IsXNote + " Tap: " + this.IsTapNote;
         }
     }

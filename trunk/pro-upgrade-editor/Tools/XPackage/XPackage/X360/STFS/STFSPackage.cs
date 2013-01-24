@@ -70,7 +70,8 @@ namespace X360.STFS
             {
                 if (value)
                     xFlag = (byte)(((FolderFlag ? 1 : 0) << 7) | (1 << 6) | (int)xNameLength);
-                else xFlag = (byte)(((FolderFlag ? 1 : 0) << 7) | (0 << 6) | (int)xNameLength);
+                else
+                    xFlag = (byte)(((FolderFlag ? 1 : 0) << 7) | (0 << 6) | (int)xNameLength);
             }
         }
         byte xNameLength
@@ -96,11 +97,11 @@ namespace X360.STFS
         /// <summary>
         /// Offset in the package
         /// </summary>
-        public long DirectoryOffset { get { return xDirectoryOffset; }}
+        public long DirectoryOffset { get { return xDirectoryOffset; } }
         /// <summary>
         /// Is a folder
         /// </summary>
-        public bool FolderFlag { get { return ((xFlag >> 7) & 1) == 1; }}
+        public bool FolderFlag { get { return ((xFlag >> 7) & 1) == 1; } }
         /// <summary>
         /// Entry name
         /// </summary>
@@ -109,7 +110,7 @@ namespace X360.STFS
             get { return xName; }
             set
             {
-                if(!VariousFunctions.IsValidXboxName(value))
+                if (!VariousFunctions.IsValidXboxName(value))
                 {
                     throw new Exception("err name");
                 }
@@ -142,7 +143,7 @@ namespace X360.STFS
                 xEntryID = xID;
                 xFileIO.Position = 0x28;
                 xFlag = xFileIO.ReadByte();
-                
+
                 if (xNameLength > 0x28)
                     xNameLength = 0x28;
 
@@ -184,7 +185,8 @@ namespace X360.STFS
             xFolderPointer = xFolder;
             if (NameIn.Length >= 0x28)
                 xName = NameIn.Substring(0, 0x28);
-            else xName = NameIn;
+            else
+                xName = NameIn;
             xFlag = (byte)(((xIsFolder ? 1 : 0) << 7) | xName.Length);
             DateTime x = DateTime.Now;
             xCreated = TimeStamps.FatTimeInt(x);
@@ -331,7 +333,8 @@ namespace X360.STFS
                         xReturn = xAbove.Name + "/" + xReturn;
                         currfold = xAbove.xFolderPointer;
                     }
-                    else return null;
+                    else
+                        return null;
                 }
                 return xReturn;
             }
@@ -345,7 +348,7 @@ namespace X360.STFS
     public sealed class FileEntry : ItemEntry
     {
         internal FileEntry(ItemEntry xEntry) : base(xEntry) { }
-        
+
         internal FileEntry(string NameIn, int SizeIn, bool xIsFolder, ushort xID, ushort xFolder, STFSPackage xPackageIn)
             : base(NameIn, SizeIn, xIsFolder, xID, xFolder, xPackageIn) { }
 
@@ -354,7 +357,7 @@ namespace X360.STFS
         //[CompilerGenerated]
         internal DJsIO RealStream = null;
 
-        internal bool Opened { get { return xBlocks != null && xBlocks.Length > 0; }}
+        internal bool Opened { get { return xBlocks != null && xBlocks.Length > 0; } }
 
         internal bool ReadBlocks()
         {
@@ -423,7 +426,7 @@ namespace X360.STFS
                         foreach (uint x in x2)
                             xPackage.XTakeHash(xPackage.GenerateBaseOffset((x * Constants.BlockLevel[1]), TreeLevel.L1),
                                 xPackage.GenerateHashOffset((x * Constants.BlockLevel[1]), TreeLevel.L2), 0x1000);
-                    }    
+                    }
                 }
                 if (SignTypeOrNull != null)
                     xPackage.xWriteHeader(SignTypeOrNull);
@@ -432,8 +435,8 @@ namespace X360.STFS
             }
             //catch 
             //{
-              //  ClearBlocks();
-                //return (xPackage.xActive = false);
+            //  ClearBlocks();
+            //return (xPackage.xActive = false);
             //}
         }
 
@@ -472,9 +475,9 @@ namespace X360.STFS
             }
             //catch
             //{
-              //  if (xIO != null)
-               //     xIO.Dispose();
-               // return xPackage.xActive = false;
+            //  if (xIO != null)
+            //     xIO.Dispose();
+            // return xPackage.xActive = false;
             //}
         }
 
@@ -509,7 +512,7 @@ namespace X360.STFS
         {
             if (!Opened)
                 ReadBlocks();
-           
+
             ////try
             {
                 // Allocates new blocks for new data
@@ -544,7 +547,8 @@ namespace X360.STFS
                     xPackage.xIO.Position = xPackage.GenerateDataOffset(xBlocks[i].ThisBlock);
                     if (i < (xBlockCount - 1))
                         xIOOut.Write(xPackage.xIO.ReadBytes(0x1000));
-                    else xIOOut.Write(xPackage.xIO.ReadBytes((((Size - 1) % 0x1000) + 1)));
+                    else
+                        xIOOut.Write(xPackage.xIO.ReadBytes((((Size - 1) % 0x1000) + 1)));
                 }
                 xIOOut.Flush();
                 ClearBlocks();
@@ -552,8 +556,8 @@ namespace X360.STFS
             }
             //catch
             //{
-             //   ClearBlocks();
-              //  return false;
+            //   ClearBlocks();
+            //  return false;
             //}
         }
         internal bool xExtractMS(Stream s)
@@ -564,7 +568,7 @@ namespace X360.STFS
             {
                 // Gets data and writes it
                 s.Seek(0, SeekOrigin.Begin);
-                
+
                 for (uint i = 0; i < xBlockCount; i++)
                 {
                     xPackage.xIO.Position = xPackage.GenerateDataOffset(xBlocks[i].ThisBlock);
@@ -585,12 +589,12 @@ namespace X360.STFS
                 return true;
             }
             //catch
-           // {
+            // {
             //    ClearBlocks();
-             //   return false;
+            //   return false;
             //}
         }
-        
+
 
         public byte[] ExtractBytes()
         {
@@ -613,7 +617,7 @@ namespace X360.STFS
         {
             bool xReturn = false;
             var ms = new MemoryStream();
-            
+
             xReturn = xExtractMS(ms);
             if (ms != null)
             {
@@ -635,7 +639,7 @@ namespace X360.STFS
                 List<BlockRecord> x = xBlocks.ToList();
                 List<BlockRecord> xdel = null;
                 if (y > xBlocks.Length)// Allocates data for blocks needed
-                    x.AddRange(xPackage.xAllocateBlocks((uint)(y - xBlocks.Length), 0)); 
+                    x.AddRange(xPackage.xAllocateBlocks((uint)(y - xBlocks.Length), 0));
                 else
                 {
                     xdel = new List<BlockRecord>();
@@ -735,9 +739,9 @@ namespace X360.STFS
             }
             //catch
             //{
-              //  if (xIO != null)
-                //    xIO.Dispose();
-                //return xPackage.xActive = false;
+            //  if (xIO != null)
+            //    xIO.Dispose();
+            //return xPackage.xActive = false;
             //}
         }
 
@@ -782,7 +786,7 @@ namespace X360.STFS
             if (!Opened && !ReadBlocks())
                 return null;
             DJsIO xIO = new DJsIO(ExtractBytes(), BigEndian);
-            
+
             ClearBlocks();
             return xIO;
         }
@@ -797,7 +801,7 @@ namespace X360.STFS
             if (!xPackage.ActiveCheck())
                 return null;
             DJsIO xReturn = new DJsIO(ExtractBytes(), BigEndian);
-                
+
             xPackage.xActive = false;
             return xReturn;
         }
@@ -872,7 +876,7 @@ namespace X360.STFS
             return true;
         }
 
-        
+
 
         /// <summary>
         /// Grabs the subfolders
@@ -922,7 +926,7 @@ namespace X360.STFS
             return xReturn.ToArray();
         }
     }
-    
+
     /// <summary>
     /// Class for STFS Licenses
     /// </summary>
@@ -968,7 +972,8 @@ namespace X360.STFS
             {
                 if (xfirst)
                     xID = -1;
-                else xID = 0;
+                else
+                    xID = 0;
                 xInt1 = 0;
                 xInt2 = 0;
                 return true;
@@ -1111,7 +1116,7 @@ namespace X360.STFS
         /// <summary>
         /// Package type
         /// </summary>
-        public PackageType ThisType { get { return xThisType; } set { xThisType = value; }}
+        public PackageType ThisType { get { return xThisType; } set { xThisType = value; } }
         /// <summary>
         /// STFS Licenses
         /// </summary>
@@ -1119,7 +1124,7 @@ namespace X360.STFS
         /// <summary>
         /// STFS Licenses
         /// </summary>
-        public long RecordedContentSize { get { return xContentSize; }}
+        public long RecordedContentSize { get { return xContentSize; } }
         /// <summary>
         /// Series ID
         /// </summary>
@@ -1131,7 +1136,7 @@ namespace X360.STFS
         /// <summary>
         /// Console ID (creator)
         /// </summary>
-        public long SaveConsoleID 
+        public long SaveConsoleID
         {
             get { return xSaveConsoleID; }
             set
@@ -1258,16 +1263,17 @@ namespace X360.STFS
             xMagic = MagicType;
             xIO.Position = 0x22C;
             //if (xPackage != null)
-                //xPackage.AddToLog("Reading Liscenses");
+            //xPackage.AddToLog("Reading Liscenses");
             xLisc = new List<STFSLicense>();
             for (int i = 0; i < 0x10; i++)
                 xLisc.Add(new STFSLicense(xIO.ReadInt64(), xIO.ReadInt32(), xIO.ReadInt32(), i == 0));
             //if (xPackage != null)
-                //xPackage.AddToLog("Reading Package locks");
+            //xPackage.AddToLog("Reading Package locks");
             xIO.Position = 0x344;
             //if (xPackage != null)
-                //xPackage.AddToLog("Reading Header Values");
-            xThisType = (PackageType)xIO.ReadUInt32(); ;
+            //xPackage.AddToLog("Reading Header Values");
+            xThisType = (PackageType)xIO.ReadUInt32();
+            ;
             MetaDataVersion = xIO.ReadUInt32();
             xContentSize = xIO.ReadInt64();
             MediaID = xIO.ReadUInt32();
@@ -1303,14 +1309,16 @@ namespace X360.STFS
             xIO.Position = 0x171A;
             if (xSize < 0x4000)
                 xPackageImage = xIO.ReadBytes(xSize);
-            else xPackageImage = xIO.ReadBytes(0x4000);
+            else
+                xPackageImage = xIO.ReadBytes(0x4000);
             // Content Image
             xIO.Position = 0x1716;
             xSize = xIO.ReadInt32();
             xIO.Position = 0x571A;
             if (xSize < 0x4000)
                 xContentImage = xIO.ReadBytes(xSize);
-            else xContentImage = xIO.ReadBytes(0x4000);
+            else
+                xContentImage = xIO.ReadBytes(0x4000);
             xLoaded = true;
         }
 
@@ -1453,7 +1461,7 @@ namespace X360.STFS
         /// <param name="xDesired"></param>
         public void SetLanguage(Languages xDesired)
         {
-            xCurrent = xDesired;   
+            xCurrent = xDesired;
         }
 
         /// <summary>
@@ -1540,7 +1548,7 @@ namespace X360.STFS
         internal List<FileEntry> xFileDirectory = new List<FileEntry>();
         //[CompilerGenerated]
         internal List<FolderEntry> xFolderDirectory = new List<FolderEntry>();
-        
+
         public DJsIO xIO;
         //[CompilerGenerated]
         internal STFSDescriptor xSTFSStruct;
@@ -1553,10 +1561,10 @@ namespace X360.STFS
         //[CompilerGenerated]
         FolderEntry xroot;
         // used to preserve the old table
-        
-        
-        
-        
+
+
+
+
         /// <summary>
         /// Package read correctly
         /// </summary>
@@ -1564,8 +1572,8 @@ namespace X360.STFS
         /// <summary>
         /// Log of library production
         /// </summary>
-        public LogRecord Log { get { return xLog; }}
-        bool IsLogged { get { return (xLog != null); }}
+        public LogRecord Log { get { return xLog; } }
+        bool IsLogged { get { return (xLog != null); } }
         /// <summary>
         /// The STFS struct of the package
         /// </summary>
@@ -1573,7 +1581,7 @@ namespace X360.STFS
         /// <summary>
         /// Header metadata
         /// </summary>
-        public HeaderData Header { get { return xHeader; }}
+        public HeaderData Header { get { return xHeader; } }
         /// <summary>
         /// Root Directory of package
         /// </summary>
@@ -1582,7 +1590,7 @@ namespace X360.STFS
         public string DLCName { get; internal set; }
 
         uint xNewEntBlckCnt(uint xCount)
-        { 
+        {
             uint x = (uint)(xFileDirectory.Count + xFolderDirectory.Count + xCount);
             if (x != 0)
                 return (uint)(((x - 1) / 0x40) + 1);
@@ -1657,7 +1665,7 @@ namespace X360.STFS
         /// Adds to log
         /// </summary>
         /// <param name="xInput"></param>
-        
+
         /// <summary>
         /// Checks to see if the package was parsed
         /// </summary>
@@ -1694,9 +1702,9 @@ namespace X360.STFS
                 throw STFSExcepts.InvalBlock;
             for (uint i = 0; i < xCount; i++)
             {
-                
+
                 //if (!xBlockList.ContainsBlock(xBlock))
-                    xBlockList.Add(xBlock);
+                xBlockList.Add(xBlock);
                 //else break; // If it contains, it's just going to loop
                 if (xBlock.NextBlock == Constants.STFSEnd)
                     break; // Stop means stop
@@ -1720,8 +1728,8 @@ namespace X360.STFS
         internal bool XTakeHash(long xRead, long xWrite, int xSize)
         {
             //try { 
-            return XTakeHash(ref xIO, xRead, xWrite, xSize, ref xIO); 
-        //}catch { return false; }
+            return XTakeHash(ref xIO, xRead, xWrite, xSize, ref xIO);
+            //}catch { return false; }
         }
 
         /// <summary>
@@ -1735,8 +1743,8 @@ namespace X360.STFS
         bool XTakeHash(long xRead, long xWrite, int xSize, ref DJsIO io)
         {
             //try { 
-            return XTakeHash(ref io, xRead, xWrite, xSize, ref io); 
-        //}           catch { return false; }
+            return XTakeHash(ref io, xRead, xWrite, xSize, ref io);
+            //}           catch { return false; }
         }
 
         /// <summary>
@@ -1797,7 +1805,7 @@ namespace X360.STFS
                 {
                     if (v.IsDeleted)
                         continue;
-                    
+
                     xFile.Position = 0x40 * xCurEnt;
                     // Reorders the folders to current entry
                     // Note: Don't have to do this, but I think it's sexy to handle folders at top of directory
@@ -1864,25 +1872,25 @@ namespace X360.STFS
                 xIO.Flush();
                 return true;
             }
-           // //catch { return false; }
+            // //catch { return false; }
         }
 
         static int BlockRemainderSTFS(long length)
         {
-        
+
             if (length == 0)
                 return 0;
             if (length > 0xFFFFFFFF)
                 return 0;
             return (int)(length % 0x1000);
-            
+
         }
         internal bool xWriteTo(MemoryStream ms, BlockRecord[] xBlocks)
         {
-            
+
             //try
             {
-                
+
                 ms.Seek(0, SeekOrigin.Begin);
                 var br = new BinaryReader(ms);
 
@@ -1955,7 +1963,7 @@ namespace X360.STFS
             //AddToLog("Adding new entry table to package");
             if (!xWriteTo(ref xEntFile, xEntAlloc))
             {
-                
+
                 return (xActive = false);
             }
             xEntFile.Close();
@@ -1990,13 +1998,13 @@ namespace X360.STFS
         /// <returns></returns>
         bool xWriteDescriptor(ref DJsIO io)
         {
-                //AddToLog("Writing new Descriptor");
-                io.Position = 0x379;
-                xSTFSStruct.xDirectoryBlockCount = (ushort)xCurEntBlckCnt;
-                io.Write(xSTFSStruct.GetData());
-                io.Flush();
-                
-                return true;
+            //AddToLog("Writing new Descriptor");
+            io.Position = 0x379;
+            xSTFSStruct.xDirectoryBlockCount = (ushort)xCurEntBlckCnt;
+            io.Write(xSTFSStruct.GetData());
+            io.Flush();
+
+            return true;
         }
 
         /// <summary>
@@ -2125,7 +2133,7 @@ namespace X360.STFS
             foreach (FolderEntry x in xFolderDirectory)
                 x.xPackage = this;
         }
-        
+
         /// <summary>
         /// Writes hash tables
         /// </summary>
@@ -2189,7 +2197,8 @@ namespace X360.STFS
             x.Position = 0x340;
             if (xSTFSStruct.ThisType == STFSType.Type0)
                 x.Write((int)0xAD0E);
-            else x.Write((int)0x971A);
+            else
+                x.Write((int)0x971A);
             // Fills to bottom of header
             x.Position = x.Length;
             x.Write(new byte[(0x8E6 + (xSTFSStruct.BaseBlock - 0xA000))]);
@@ -2201,13 +2210,15 @@ namespace X360.STFS
                 xLocale = GenerateBaseOffset(0, TreeLevel.L0);
             else if (xSTFSStruct.xBlockCount <= Constants.BlockLevel[1])
                 xLocale = GenerateBaseOffset(0, TreeLevel.L1);
-            else xLocale = GenerateBaseOffset(0, TreeLevel.L2);
+            else
+                xLocale = GenerateBaseOffset(0, TreeLevel.L2);
             XTakeHash(ref xIO, xLocale, 0x381, 0x1000, ref x);
             //AddToLog("Writing Header hash");
             int xSize = 0;
             if (xSTFSStruct.BaseBlock == 0xA000)
                 xSize = 0x9CBC;
-            else xSize = 0xACBC; // b000
+            else
+                xSize = 0xACBC; // b000
             XTakeHash(0x344, 0x32C, xSize, ref x);
             //AddToLog("Signing Header");
             x.Position = 0x22C;
@@ -2233,9 +2244,9 @@ namespace X360.STFS
             xIO.Position = 0;
             xIO.Write(x.ReadStream());
             xIO.Flush();
-            
+
             x.Close();
-            
+
             return true;
         }
 
@@ -2329,7 +2340,7 @@ namespace X360.STFS
             return null;
         }
 
-        
+
         /// <summary>
         /// Adds a file to the package
         /// </summary>
@@ -2413,20 +2424,20 @@ namespace X360.STFS
         /// <returns></returns>
         string dlcname()
         {
-            
+
             xIO.Position = 0x32C;
             return xIO.ReadBytes(0x14).HexString() + ((byte)(xHeader.TitleID >> 16)).ToString("X2");
-        
+
         }
 
         enum SwitchType { None, Allocate, Delete }
 
         void SwitchNWrite(BlockRecord RecIn, SwitchType Change)
         {
-            
+
 
             bool canswitch = (xSTFSStruct.ThisType == STFSType.Type1);
-            
+
             BlockRecord current = xSTFSStruct.TopRecord;
             long[] pos = new long[] { 0, 0, 0 };
             // Grab base starting points
@@ -2439,7 +2450,7 @@ namespace X360.STFS
                 pos[1] = xSTFSStruct.GenerateHashOffset(RecIn.ThisBlock, TreeLevel.L1) + 0x14;
             }
             pos[2] = xSTFSStruct.GenerateHashOffset(RecIn.ThisBlock, TreeLevel.L0) + 0x14;
-            
+
             long len = GenerateDataOffset(RecIn.ThisBlock) + 0x1000;
             if (xIO.Length < len)
                 xIO.SetLength(len);
@@ -2455,12 +2466,13 @@ namespace X360.STFS
 
                 xIO.Position = pos[0];
                 current = new BlockRecord(xIO.ReadUInt32());
-               
+
                 if (Change != SwitchType.None)
                 {
                     if (Change == SwitchType.Allocate)
                         current.BlocksFree--; // Takes away a free block
-                    else current.BlocksFree++; // Adds a free block
+                    else
+                        current.BlocksFree++; // Adds a free block
                     xIO.Position = pos[0];
                     xIO.Write(current.Flags);
                     xIO.Flush();
@@ -2469,7 +2481,7 @@ namespace X360.STFS
             // Follows same pattern
             if (pos[1] != 0)
             {
-                
+
 
                 if (canswitch)
                     pos[1] += (current.Index << 0xC);
@@ -2477,18 +2489,19 @@ namespace X360.STFS
 
                 xIO.Position = pos[1];
                 current = new BlockRecord(xIO.ReadUInt32());
-                
+
                 if (Change != SwitchType.None)
                 {
                     if (Change == SwitchType.Allocate)
                         current.BlocksFree--; // Takes away a free block
-                    else current.BlocksFree++; // Adds a free block
+                    else
+                        current.BlocksFree++; // Adds a free block
                     xIO.Position = pos[1];
                     xIO.Write(current.Flags);
                     xIO.Flush();
                 }
             }
-           
+
             if (canswitch)
                 pos[2] += (current.Index << 0xC);
             // ---------------------
@@ -2497,7 +2510,8 @@ namespace X360.STFS
             {
                 if (RecIn.Status == HashStatus.Old)
                     RecIn.Status = HashStatus.Reused;
-                else RecIn.Status = HashStatus.New;
+                else
+                    RecIn.Status = HashStatus.New;
             }
             else if (Change == SwitchType.Delete)
                 RecIn.MarkOld();
@@ -2562,7 +2576,8 @@ namespace X360.STFS
             {
                 if ((i + 1) < xRecs.Length)
                     xRecs[i].NextBlock = xRecs[i + 1].ThisBlock;
-                else xRecs[i].NextBlock = Constants.STFSEnd;
+                else
+                    xRecs[i].NextBlock = Constants.STFSEnd;
                 SwitchNWrite(xRecs[i], SwitchType.Allocate);
             }
             return true;
@@ -2625,7 +2640,7 @@ namespace X360.STFS
         #endregion
 
         #region Package initialization
-       
+
         /// <summary>
         /// Initializes a package parse from an already accessed file
         /// </summary>
@@ -2646,7 +2661,8 @@ namespace X360.STFS
                 PackageMagic xMagic = PackageMagic.Unknown;
                 if (Enum.IsDefined(typeof(PackageMagic), xBuff))
                     xMagic = (PackageMagic)xBuff;
-                else throw new Exception("Invalid Package");
+                else
+                    throw new Exception("Invalid Package");
                 xHeader = new HeaderData(this, xMagic);
                 if ((xIO.Length % 0x1000) != 0)
                 {
@@ -2660,7 +2676,7 @@ namespace X360.STFS
                     xHeader.ThisType == PackageType.SocialTitle)
                     throw STFSExcepts.Game;
                 //AddToLog("Getting Package Structure");
-                
+
                 xSTFSStruct = new STFSDescriptor(this);
                 //AddToLog("Reading Entry table");
                 xFileBlocks = new BlockRecord[0];
@@ -2688,7 +2704,8 @@ namespace X360.STFS
                             continue;
                         if (!xItem.FolderFlag)
                             xFileDirectory.Add(new FileEntry(xItem));
-                        else xFolderDirectory.Add(new FolderEntry(xItem));
+                        else
+                            xFolderDirectory.Add(new FolderEntry(xItem));
                         xEntryID++;
                     }
                 }
@@ -2696,10 +2713,10 @@ namespace X360.STFS
                 xActive = false;
             }
             ////catch (Exception x) { xIO = null; throw x; }
-            
+
         }
 
-        
+
 
         public STFSPackage(byte[] data, LogRecord LogIn)
             : this(
@@ -2724,7 +2741,7 @@ namespace X360.STFS
             ////try
             {
                 //AddToLog("Setting Package variables");
-                
+
                 xroot = new FolderEntry("", 0, 0xFFFF, 0xFFFF, this);
                 if (xSession.HeaderData.ThisType == PackageType.GamesOnDemand ||
                     xSession.HeaderData.ThisType == PackageType.HDDInstalledGame ||
@@ -2742,7 +2759,7 @@ namespace X360.STFS
                 {
                     DirectoryBlockz.Add(new BlockRecord());
                     DirectoryBlockz[DirectoryBlockz.Count - 1].ThisBlock = xcurblock++;
-                    
+
                 }
                 xFileBlocks = DirectoryBlockz.ToArray();
                 xWriteChain(xFileBlocks);
@@ -2764,7 +2781,7 @@ namespace X360.STFS
                     if (x.xthispath.xPathCount() > 1)
                         pointer = xGetParentFolder(x.Path).EntryID;
 
-                    xFileDirectory.Add(new FileEntry(x.Name, 
+                    xFileDirectory.Add(new FileEntry(x.Name,
                         (int)x.GetLength(), false, xCurID++, pointer, this));
 
                     var xAlloc = new List<BlockRecord>();
@@ -2772,7 +2789,7 @@ namespace X360.STFS
                     {
                         xAlloc.Add(new BlockRecord());
                         xAlloc[xAlloc.Count - 1].ThisBlock = xcurblock++;
-                        
+
                     }
                     xFileDirectory[xFileDirectory.Count - 1].xBlockCount = (uint)xAlloc.Count;
                     xFileDirectory[xFileDirectory.Count - 1].xStartBlock = xAlloc[0].ThisBlock;
@@ -2813,7 +2830,7 @@ namespace X360.STFS
                 ret = xIO.GetBytes();
                 xIO.Close();
                 //VariousFunctions.MoveFile(xIO.FileNameLong, xOutPath);
-                
+
                 xActive = false;
             }
             ////catch (Exception x) { xFileDirectory = null; xFolderDirectory = null; xIO.Dispose(); throw x; }
@@ -2825,9 +2842,9 @@ namespace X360.STFS
         /// <param name="xIn"></param>
         protected STFSPackage(ref STFSPackage xIn) { xActive = true; SetSamePackage(ref xIn); xActive = false; }
         #endregion
-        
+
         #region Public Methods
-        
+
         /// <summary>
         /// Updates the information in the header
         /// </summary>
@@ -2863,7 +2880,7 @@ namespace X360.STFS
             //catch (Exception x) { xActive = false; throw x; }
         }
 
-        
+
         /// <summary>
         /// Returns a List of details containing the package
         /// </summary>
@@ -2958,7 +2975,8 @@ namespace X360.STFS
                     xLocale = GenerateBaseOffset(0, 0);
                 else if (xBlockCount <= Constants.BlockLevel[1])
                     xLocale = GenerateBaseOffset(0, TreeLevel.L1);
-                else xLocale = GenerateBaseOffset(0, TreeLevel.L2);
+                else
+                    xLocale = GenerateBaseOffset(0, TreeLevel.L2);
                 xIO.Position = 0x381;
                 byte[] xHash = xIO.ReadBytes(20);
                 xReturn.Add(new Verified(ItemType.Master, XVerifyHash(xLocale, 0x1000, ref xHash), xLocale, (0x381)));
@@ -2967,7 +2985,8 @@ namespace X360.STFS
                 int xSize = 0;
                 if (xSTFSStruct.BaseBlock == 0xA000)
                     xSize = 0x9CBC;
-                else xSize = 0xACBC; // b000
+                else
+                    xSize = 0xACBC; // b000
                 xIO.Position = 0x32C;
                 xHash = xIO.ReadBytes(20);
                 xReturn.Add(new Verified(ItemType.Header, XVerifyHash(0x344, xSize, ref xHash), 0x344, 0x32C));
@@ -3000,7 +3019,7 @@ namespace X360.STFS
             //catch { xActive = false; throw STFSExcepts.General; }
         }
 
-        
+
         /// <summary>
         /// Adds a folder to the package via the root
         /// </summary>
@@ -3027,7 +3046,7 @@ namespace X360.STFS
                         throw new Exception("Err name stfs");
                     }
                 }
-                
+
                 string foldtoadd = folds[folds.Count - 1];
                 folds.RemoveAt(folds.Count - 1);
 
@@ -3239,7 +3258,7 @@ namespace X360.STFS
         /// <returns></returns>
         public bool MakeFile(string Name, DJsIO xIOIn, ushort FolderID, AddType xType)
         {
-            
+
             foreach (FileEntry x in xFileDirectory)
             {
                 if (x.FolderPointer == FolderID && x.Name.ToLower() == Name.ToLower())
@@ -3250,8 +3269,8 @@ namespace X360.STFS
                 }
             }
             //try { 
-            return xAddFile(xIOIn, Name, FolderID); 
-        //}catch { return (xActive = false); }
+            return xAddFile(xIOIn, Name, FolderID);
+            //}catch { return (xActive = false); }
         }
 
         /// <summary>
@@ -3289,10 +3308,11 @@ namespace X360.STFS
             }
             else if (xType == AddType.Inject)
                 return z.xInject(xIOIn);
-            else return z.xReplace(xIOIn);
+            else
+                return z.xReplace(xIOIn);
         }
-        
-        
+
+
         /// <summary>
         /// Backs up this package to a specific location
         /// </summary>
@@ -3313,7 +3333,7 @@ namespace X360.STFS
 
         public byte[] RebuildPackageInMemory(RSAParams xParams)
         {
-            
+
             var cstfs = new CreateSTFS();
             cstfs.HeaderData = xHeader;
             cstfs.STFSType = xSTFSStruct.ThisType;
@@ -3328,11 +3348,11 @@ namespace X360.STFS
             var xreturn = new STFSPackage(cstfs, xParams, out ret, xLog);
             if (xreturn.ParseSuccess)
             {
-                
+
                 return ret;
             }
             xreturn.xIO.Close();
-           
+
             return null;
         }
         /// <summary>
@@ -3353,20 +3373,20 @@ namespace X360.STFS
         /// <summary>
         /// File location
         /// </summary>
-        public string FileNameLong { get { return xIO.FileNameLong; }}
+        public string FileNameLong { get { return xIO.FileNameLong; } }
         /// <summary>
         /// File Name
         /// </summary>
-        public string FileNameShort { get { return xIO.FileNameShort; }}
+        public string FileNameShort { get { return xIO.FileNameShort; } }
         /// <summary>
         /// File Path
         /// </summary>
-        public string FilePath { get { return xIO.FilePath; }}
+        public string FilePath { get { return xIO.FilePath; } }
         /// <summary>
         /// File Extension
         /// </summary>
-        public string FileExtension { get { return xIO.FileExtension; }}
-        
+        public string FileExtension { get { return xIO.FileExtension; } }
+
         /// <summary>
         /// Close the IO
         /// </summary>
@@ -3386,12 +3406,12 @@ namespace X360.STFS
     static class extenz
     {
         public static uint[] Reverse(this uint[] xIn)
-         {
-             List<uint> xreturn = new List<uint>(xIn);
-             xreturn.Reverse();
-             xIn = xreturn.ToArray();
-             return xIn;
-         }
+        {
+            List<uint> xreturn = new List<uint>(xIn);
+            xreturn.Reverse();
+            xIn = xreturn.ToArray();
+            return xIn;
+        }
 
         public static string LastValue(this string[] xIn)
         {

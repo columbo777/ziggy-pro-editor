@@ -103,8 +103,8 @@ namespace MidiViewer
             public int OffsetX { get; set; }
             public int OffsetY { get; set; }
 
-            double zoomX=0;
-            double zoomY=0;
+            double zoomX = 0;
+            double zoomY = 0;
             public double ZoomX
             {
                 get { return zoomX; }
@@ -129,7 +129,7 @@ namespace MidiViewer
                 this.Image = img;
                 this.bmp = img;
             }
-            
+
             protected override void Dispose(bool disposing)
             {
                 if (disposing)
@@ -171,7 +171,7 @@ namespace MidiViewer
         {
             Image bmp;
             public static int Data1TextWidth = 30;
-            
+
             int data1TextSpacing;
 
 
@@ -194,7 +194,7 @@ namespace MidiViewer
             public Data1Renderer(string name)
                 : base()
             {
-                
+
                 this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 
                 this.Name = name;
@@ -276,21 +276,21 @@ namespace MidiViewer
 
             bmpRenderer = new BmpRenderer("bmpRenderer", SmoothingMode.None);
             bmpRenderer.Location = new Point(Data1Renderer.Data1TextWidth, 0);
-            
+
             bmpRenderer.SizeMode = PictureBoxSizeMode.Normal;
-            
+
             this.contentPanel.Controls.Add(bmpRenderer);
             bmpRenderer.Dock = DockStyle.Fill;
 
             data1Renderer = new Data1Renderer("data1Renderer");
 
-            data1Renderer.InitData1Renderer(this,contentPanel, bmpRenderer);
+            data1Renderer.InitData1Renderer(this, contentPanel, bmpRenderer);
             data1Renderer.Location = new Point(0, 0);
             data1Renderer.Dock = DockStyle.Left;
             data1Renderer.SizeMode = PictureBoxSizeMode.Normal;
             this.contentPanel.Controls.Add(data1Renderer);
-            
-            
+
+
             data1Renderer.BringToFront();
         }
 
@@ -306,14 +306,14 @@ namespace MidiViewer
             {
                 g.FillRectangle(Brushes.White, 0, 0, memoryBmp.Width, memoryBmp.Height);
 
-                using(var p = new Pen(Color.Black))
+                using (var p = new Pen(Color.Black))
                 {
-                    
-                    
-                    
+
+
+
                 }
             }
-            
+
             this.bmpRenderer.SetImage(memoryBmp);
             UpdateZoom();
         }
@@ -343,7 +343,7 @@ namespace MidiViewer
                 try
                 {
                     this.sequence = f.LoadSequenceFile();
-                    
+
                     LoadSequence();
                 }
                 catch { }
@@ -368,7 +368,7 @@ namespace MidiViewer
 
         private void checkMidiChannelClick(object sender, EventArgs e)
         {
-            
+
         }
 
         private void hScrollBar1_ValueChanged(object sender, EventArgs e)
@@ -389,7 +389,7 @@ namespace MidiViewer
         private void MidiViewer_Load(object sender, EventArgs e)
         {
             listMessages.Items.Add("All Channel Commands");
-            
+
             listMessages.Items.Add("Meta KeySignature");
             listMessages.Items.Add("Meta Tempo");
             listMessages.Items.Add("Meta TimeSignature");
@@ -405,7 +405,7 @@ namespace MidiViewer
 
         IEnumerable<CheckBox> CheckBoxes
         {
-            get { return groupBox1.Controls.ToEnumerable<CheckBox>().Where(x=> x != null); }
+            get { return groupBox1.Controls.ToEnumerable<CheckBox>().Where(x => x != null); }
         }
 
         private void CheckAllChannels()
@@ -617,8 +617,8 @@ namespace MidiViewer
             data1Renderer.OffsetY = contentPanel.VerticalScroll.Value;
             data1Renderer.ZoomX = 0;
             data1Renderer.ZoomY = ((double)trackBarVZoom.Value) / 100.0;
-            
-            
+
+
             data1Renderer.Invalidate();
             bmpRenderer.Invalidate();
         }

@@ -656,6 +656,6 @@
         private System.Windows.Forms.ListBox listMessages;
         private System.Windows.Forms.TrackBar trackBarHZoom;
         private System.Windows.Forms.TrackBar trackBarVZoom;
-        
+
     }
 }

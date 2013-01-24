@@ -20,8 +20,8 @@ using System.Diagnostics;
 
 namespace ProUpgradeEditor.UI
 {
-    
-    partial class MainForm 
+
+    partial class MainForm
     {
         SettingMgr settings;
 
@@ -38,9 +38,9 @@ namespace ProUpgradeEditor.UI
 
         public string DefaultConFileLocation
         {
-            get 
-            { 
-                return textBoxDefaultCONFileLocation.Text.AppendSlashIfMissing(); 
+            get
+            {
+                return textBoxDefaultCONFileLocation.Text.AppendSlashIfMissing();
             }
             set
             {
@@ -85,8 +85,8 @@ namespace ProUpgradeEditor.UI
 
         class SongCacheList : List<SongCacheItem>
         {
-            
-            public SongListSortMode SortMode {get;set;}
+
+            public SongListSortMode SortMode { get; set; }
             public bool SortAscending { get; set; }
             public string SongListFilter { get; set; }
 
@@ -158,7 +158,7 @@ namespace ProUpgradeEditor.UI
             {
                 get { return listBoxSongList.SelectedItems.ToEnumerable<SongCacheItem>().ToList(); }
             }
-            
+
             public void PopulateList()
             {
                 if (this.Contains(SelectedSong) == false)
@@ -262,6 +262,7 @@ namespace ProUpgradeEditor.UI
             public static UtilProperty[] GetInitialProperties()
             {
                 return new UtilProperty[]{
+                    new UtilProperty("Enable Render MP3 Wave", false),
                     new UtilProperty( "Show Measure Numbers", true),
                     new UtilProperty( "Show Tempos", true),
                     new UtilProperty( "Show Time Signatures", true),
@@ -410,7 +411,7 @@ namespace ProUpgradeEditor.UI
             for (int x = 0; x < items.Length; x++)
             {
                 var item = items[x];
-                int itemY = itemPadding + (itemHeight + itemPadding) * (x+2);
+                int itemY = itemPadding + (itemHeight + itemPadding) * (x + 2);
 
                 var lb = new Label();
                 lb.Location = new Point(itemPadding, itemY);
@@ -492,7 +493,7 @@ namespace ProUpgradeEditor.UI
 
                     var tb = new CheckBox();
                     lb.Width += 100;
-                    tb.Location = new Point(lb.Location.X +lb.Width+ itemPadding, itemY);
+                    tb.Location = new Point(lb.Location.X + lb.Width + itemPadding, itemY);
                     tb.Name = "tb" + x;
                     tb.Size = new System.Drawing.Size(20, itemHeight);
                     tb.Checked = item.Data.ToString().ToBool();
@@ -504,7 +505,7 @@ namespace ProUpgradeEditor.UI
                         if (itm.Data.ToString().ToBool() != tb.Checked)
                         {
                             itm.Data = tb.Checked;
-                            
+
                             OnUtilPropertyChange(itm);
                         }
                     });
@@ -517,14 +518,14 @@ namespace ProUpgradeEditor.UI
                     bt.Tag = item;
                     bt.TabIndex = tabIndex++;
                     panel6.Controls.Add(bt);
-                 
+
                     bt.Click += new EventHandler(delegate(object ob, EventArgs eg)
                     {
                         var itm = tb.Tag as UtilProperty;
                         itm.Data = itm.OriginalData;
-                        
+
                         tb.Checked = itm.Data.ToString().ToBool();
-                        
+
                         OnUtilPropertyChange(itm);
                     });
                 }
@@ -663,7 +664,7 @@ namespace ProUpgradeEditor.UI
                     });
 
                     {
-                        
+
                         var itmp = tb.Tag as UtilProperty;
                         if (itmp.Type == PropertyType.Pen)
                         {
@@ -712,6 +713,9 @@ namespace ProUpgradeEditor.UI
                                 OnUtilPropertyChange(itm);
                             }
 
+                            EditorPro.Invalidate();
+                            EditorG5.Invalidate();
+
                         });
                     }
 
@@ -722,11 +726,11 @@ namespace ProUpgradeEditor.UI
                 totalHeight = itemY + itemHeight + itemPadding * 2;
             }
             panel6.Height = totalHeight + 80;
-            
 
-            int overFlow = totalHeight + itemHeight*10 - panel7.Height;
-            
-            
+
+            int overFlow = totalHeight + itemHeight * 10 - panel7.Height;
+
+
             this.vScrollBar1.Value = 0;
             this.vScrollBar1.Maximum = overFlow;
             this.vScrollBar1.SmallChange = itemHeight / 4;
@@ -741,8 +745,8 @@ namespace ProUpgradeEditor.UI
             {
                 panel6.Location = new Point(panel6.Location.X, pTop - vScrollBar1.Value);
             });
-            
-            
+
+
         }
 
 
@@ -751,98 +755,170 @@ namespace ProUpgradeEditor.UI
         {
             switch (p.Description)
             {
-                
-                case "Background Brush": { Utility.BackgroundBrush = (SolidBrush)p.Data; } break;
+                case "Enable Render MP3 Wave": { EditorPro.EnableRenderMP3Wave = (bool)p.Data; }
+                    break;
+                case "Background Brush": { Utility.BackgroundBrush = (SolidBrush)p.Data; }
+                    break;
 
-                case "G5 Green Note": { Utility.G5GreenNoteBrush = (SolidBrush)p.Data; } break; // Color.Green),
-                case "G5 Red Note": { Utility.G5RedNoteBrush = (SolidBrush)p.Data; } break; // Color.FromArgb(255, 120, 120)),
-                case "G5 Yellow Note": { Utility.G5YellowNoteBrush = (SolidBrush)p.Data; } break; // Color.Yellow),
-                case "G5 Blue Note": { Utility.G5BlueNoteBrush = (SolidBrush)p.Data; } break; // Color.Blue),
-                case "G5 Orange Note": { Utility.G5OragneNoteBrush = (SolidBrush)p.Data; } break; // Color.Orange),
-                
-                case "G5 Line Pen": { Utility.linePen = (Pen)p.Data; } break; // Color.Black),
-                case "Pro Line Pen": { Utility.linePen22 = (Pen)p.Data; } break; // Color.Red),
-                case "Selected Pen": { Utility.selectedPen = (Pen)p.Data; } break; // Color.Red),
-                case "Beat Pen": { Utility.beatPen = (Pen)p.Data; } break; // Color.FromArgb(180, 180, 180)),
+                case "G5 Green Note": { Utility.G5GreenNoteBrush = (SolidBrush)p.Data; }
+                    break; // Color.Green),
+                case "G5 Red Note": { Utility.G5RedNoteBrush = (SolidBrush)p.Data; }
+                    break; // Color.FromArgb(255, 120, 120)),
+                case "G5 Yellow Note": { Utility.G5YellowNoteBrush = (SolidBrush)p.Data; }
+                    break; // Color.Yellow),
+                case "G5 Blue Note": { Utility.G5BlueNoteBrush = (SolidBrush)p.Data; }
+                    break; // Color.Blue),
+                case "G5 Orange Note": { Utility.G5OragneNoteBrush = (SolidBrush)p.Data; }
+                    break; // Color.Orange),
 
-                case "Slide": { Utility.slidePen = (Pen)p.Data; } break; // Color.Green),
-                case "Hammeron": { Utility.hammerOnPen = (Pen)p.Data; } break; // Color.Blue),
-                case "Note Bounds": { Utility.noteBoundPen = (Pen)p.Data; } break; // Color.Black),
-                case "Grid Snap Pointer Color": { Utility.gridSnapCursorBrush = (SolidBrush)p.Data; } break;
-                case "Grid Snap Pointer Size": { Utility.gridSnapCursorSize = (int)p.Data; } break;
+                case "G5 Line Pen": { Utility.linePen = (Pen)p.Data; }
+                    break; // Color.Black),
+                case "Pro Line Pen": { Utility.linePen22 = (Pen)p.Data; }
+                    break; // Color.Red),
+                case "Selected Pen": { Utility.selectedPen = (Pen)p.Data; }
+                    break; // Color.Red),
+                case "Beat Pen": { Utility.beatPen = (Pen)p.Data; }
+                    break; // Color.FromArgb(180, 180, 180)),
+
+                case "Slide": { Utility.slidePen = (Pen)p.Data; }
+                    break; // Color.Green),
+                case "Hammeron": { Utility.hammerOnPen = (Pen)p.Data; }
+                    break; // Color.Blue),
+                case "Note Bounds": { Utility.noteBoundPen = (Pen)p.Data; }
+                    break; // Color.Black),
+                case "Grid Snap Pointer Color": { Utility.gridSnapCursorBrush = (SolidBrush)p.Data; }
+                    break;
+                case "Grid Snap Pointer Size": { Utility.gridSnapCursorSize = (int)p.Data; }
+                    break;
 
                 //case "Note Height": { Utility.NoteHeight = (int)p.Data; } break; //"12"),
 
-                case "Note Text Color": { Utility.fretBrush = (SolidBrush)p.Data; } break; // Color.Black),
+                case "Note Text Color": { Utility.fretBrush = (SolidBrush)p.Data; }
+                    break; // Color.Black),
 
-                case "Note Background Shadow": { Utility.noteBGBrushShadow = (SolidBrush)p.Data; } break; // Color.FromArgb(100, 100, 100)),
-                case "Selected Note Background": { Utility.noteBGBrushSel = (SolidBrush)p.Data; } break; // Color.FromArgb(255, 0, 0)),
-                case "Single String Tremelo": { Utility.noteSingleStringTremeloBrush = (SolidBrush)p.Data; } break; // Color.FromArgb(120, 240, 100)),
-                case "Multi String Tremelo": { Utility.noteMultiStringTremeloBrush = (SolidBrush)p.Data; } break; // Color.FromArgb(120, 240, 190)),
+                case "Note Background Shadow": { Utility.noteBGBrushShadow = (SolidBrush)p.Data; }
+                    break; // Color.FromArgb(100, 100, 100)),
+                case "Selected Note Background": { Utility.noteBGBrushSel = (SolidBrush)p.Data; }
+                    break; // Color.FromArgb(255, 0, 0)),
+                case "Single String Tremelo": { Utility.noteSingleStringTremeloBrush = (SolidBrush)p.Data; }
+                    break; // Color.FromArgb(120, 240, 100)),
+                case "Multi String Tremelo": { Utility.noteMultiStringTremeloBrush = (SolidBrush)p.Data; }
+                    break; // Color.FromArgb(120, 240, 190)),
 
-                case "Note Background": { Utility.noteBGBrush = (SolidBrush)p.Data; } break; // Color.FromArgb(252, 183, 180)),
-                case "Note Tap": { Utility.noteTapBrush = (SolidBrush)p.Data; } break; // Color.FromArgb(242, 223, 220)),
-                case "Note X": { Utility.noteXBrush = (SolidBrush)p.Data; } break; // Color.FromArgb(152, 152, 247)),
-                case "Note Arpeggio": { Utility.noteArpeggioBrush = (SolidBrush)p.Data; } break; // Color.FromArgb(159, 253, 222)),
-                case "Note Powerup": { Utility.notePowerupBrush = (SolidBrush)p.Data; } break; // Color.FromArgb(242, 253, 200)),
-                case "Note Solo": { Utility.noteSoloBrush = (SolidBrush)p.Data; } break; // Color.FromArgb(202, 203, 250)),
-                case "Note Big Rock Ending": { Utility.noteBREBrush = (SolidBrush)p.Data; } break; // Color.FromArgb(152, 203, 250)),
-                case "Note Strum": { Utility.noteStrumBrush = (SolidBrush)p.Data; } break; // Color.FromArgb(180, 180, 255)),
+                case "Note Background": { Utility.noteBGBrush = (SolidBrush)p.Data; }
+                    break; // Color.FromArgb(252, 183, 180)),
+                case "Note Tap": { Utility.noteTapBrush = (SolidBrush)p.Data; }
+                    break; // Color.FromArgb(242, 223, 220)),
+                case "Note X": { Utility.noteXBrush = (SolidBrush)p.Data; }
+                    break; // Color.FromArgb(152, 152, 247)),
+                case "Note Arpeggio": { Utility.noteArpeggioBrush = (SolidBrush)p.Data; }
+                    break; // Color.FromArgb(159, 253, 222)),
+                case "Note Powerup": { Utility.notePowerupBrush = (SolidBrush)p.Data; }
+                    break; // Color.FromArgb(242, 253, 200)),
+                case "Note Solo": { Utility.noteSoloBrush = (SolidBrush)p.Data; }
+                    break; // Color.FromArgb(202, 203, 250)),
+                case "Note Big Rock Ending": { Utility.noteBREBrush = (SolidBrush)p.Data; }
+                    break; // Color.FromArgb(152, 203, 250)),
+                case "Note Strum": { Utility.noteStrumBrush = (SolidBrush)p.Data; }
+                    break; // Color.FromArgb(180, 180, 255)),
 
-                case "Bar Pen": { Utility.barPen = (Pen)p.Data; } break; //1"),
-                case "Draw Beat": { Utility.DrawBeat = (int)p.Data; } break; //1"),
-                case "Rectangle Select Pen": { Utility.rectSelectionPen = (Pen)p.Data; } break;
+                case "Bar Pen": { Utility.barPen = (Pen)p.Data; }
+                    break; //1"),
+                case "Draw Beat": { Utility.DrawBeat = (int)p.Data; }
+                    break; //1"),
+                case "Rectangle Select Pen": { Utility.rectSelectionPen = (Pen)p.Data; }
+                    break;
 
-                case "X Note Text": { Utility.XNoteText = (string)p.Data; } break; //x"),
-                case "X Note Text Y Offset": { Utility.XNoteTextYOffset = (int)p.Data; } break; //-2"),
-                case "X Note Text X Offset": { Utility.XNoteTextXOffset = (int)p.Data; } break; //-2"),
-                case "Note Text Y Offset": { Utility.NoteTextYOffset = (int)p.Data; } break; //-1"),
-                case "Note Text X Offset": { Utility.NoteTextXOffset = (int)p.Data; } break; //1"),
+                case "X Note Text": { Utility.XNoteText = (string)p.Data; }
+                    break; //x"),
+                case "X Note Text Y Offset": { Utility.XNoteTextYOffset = (int)p.Data; }
+                    break; //-2"),
+                case "X Note Text X Offset": { Utility.XNoteTextXOffset = (int)p.Data; }
+                    break; //-2"),
+                case "Note Text Y Offset": { Utility.NoteTextYOffset = (int)p.Data; }
+                    break; //-1"),
+                case "Note Text X Offset": { Utility.NoteTextXOffset = (int)p.Data; }
+                    break; //1"),
 
 
-                case "Arpeggio Helper Prefix": { Utility.ArpeggioHelperPrefix = (string)p.Data; } break; //("),
-                case "Arpeggio Helper Suffix": { Utility.ArpeggioHelperSuffix = (string)p.Data; } break; //)"),
-                
-                case "Max Backups": { Utility.MaxBackups = (int)p.Data; } break; //20"),
+                case "Arpeggio Helper Prefix": { Utility.ArpeggioHelperPrefix = (string)p.Data; }
+                    break; //("),
+                case "Arpeggio Helper Suffix": { Utility.ArpeggioHelperSuffix = (string)p.Data; }
+                    break; //)"),
 
-                case "Default CON File Extension": { Utility.DefaultCONFileExtension = (string)p.Data; } break; // "pro"),
-                case "Default PRO File Extension": { Utility.DefaultPROFileExtension = (string)p.Data; } break; // "_pro.mid"),
-                
-                case "Stored Chord Prefix": { Utility.StoredChordPrefix = (string)p.Data; } break; // "["),
-                case "Stored Chord Note Separator": { Utility.StoredChordNoteSeparator = (string)p.Data; } break; // " - "),
-                case "Stored Chord Empty Note": { Utility.StoredChordEmptyNote = (string)p.Data; } break; // "_"),
-                case "Stored Chord Suffix": { Utility.StoredChordSuffix = (string)p.Data; } break; // "]  "),
-                case "Stored Chord Slide": { Utility.StoredChordSlide = (string)p.Data; } break; // "[S]"),
-                case "Stored Chord Reverse": { Utility.StoredChordReverse = (string)p.Data; } break; // "[R]"),
-                case "Stored Chord Hammeron": { Utility.StoredChordHammeron = (string)p.Data; } break; // "[H]"),
-                case "Stored Chord Tap": { Utility.StoredChordTap = (string)p.Data; } break; // "[T]"),
-                case "Stored Chord X Note": { Utility.StoredChordXNote = (string)p.Data; } break; // "[X]"),
-                case "Stored Chord Strum Low": { Utility.StoredChordStrumLow = (string)p.Data; } break; // "[SL]"),
-                case "Stored Chord Strum Med": { Utility.StoredChordStrumMed = (string)p.Data; } break; // "[SM]"),
-                case "Stored Chord Strum High": { Utility.StoredChordStrumHigh = (string)p.Data; } break; // "[SH]"),
+                case "Max Backups": { Utility.MaxBackups = (int)p.Data; }
+                    break; //20"),
 
-                case "Dummy Tempo": { Utility.DummyTempo = (int)p.Data; } break; //, "405405"),
+                case "Default CON File Extension": { Utility.DefaultCONFileExtension = (string)p.Data; }
+                    break; // "pro"),
+                case "Default PRO File Extension": { Utility.DefaultPROFileExtension = (string)p.Data; }
+                    break; // "_pro.mid"),
 
-                case "Gap For 108 Note": { Utility.LargestGapFor108Note = (int)p.Data; } break; //, "8"),
+                case "Stored Chord Prefix": { Utility.StoredChordPrefix = (string)p.Data; }
+                    break; // "["),
+                case "Stored Chord Note Separator": { Utility.StoredChordNoteSeparator = (string)p.Data; }
+                    break; // " - "),
+                case "Stored Chord Empty Note": { Utility.StoredChordEmptyNote = (string)p.Data; }
+                    break; // "_"),
+                case "Stored Chord Suffix": { Utility.StoredChordSuffix = (string)p.Data; }
+                    break; // "]  "),
+                case "Stored Chord Slide": { Utility.StoredChordSlide = (string)p.Data; }
+                    break; // "[S]"),
+                case "Stored Chord Reverse": { Utility.StoredChordReverse = (string)p.Data; }
+                    break; // "[R]"),
+                case "Stored Chord Hammeron": { Utility.StoredChordHammeron = (string)p.Data; }
+                    break; // "[H]"),
+                case "Stored Chord Tap": { Utility.StoredChordTap = (string)p.Data; }
+                    break; // "[T]"),
+                case "Stored Chord X Note": { Utility.StoredChordXNote = (string)p.Data; }
+                    break; // "[X]"),
+                case "Stored Chord Strum Low": { Utility.StoredChordStrumLow = (string)p.Data; }
+                    break; // "[SL]"),
+                case "Stored Chord Strum Med": { Utility.StoredChordStrumMed = (string)p.Data; }
+                    break; // "[SM]"),
+                case "Stored Chord Strum High": { Utility.StoredChordStrumHigh = (string)p.Data; }
+                    break; // "[SH]"),
 
-                case "Trainer Color": { Utility.TrainerBrush = (SolidBrush)p.Data;} break;
-                case "Sel. Trainer Color": { Utility.SelectedTrainerBrush = (SolidBrush)p.Data;} break;
-                case "Text Event Color": { Utility.TextEventBrush = (SolidBrush)p.Data;} break;
-                case "Sel. Text Event Color": { Utility.SelectedTextEventBrush = (SolidBrush)p.Data;} break;
-                  
-                case "Text Event Begin": { Utility.TextEventBeginTag = (string)p.Data; } break;
-                case "Text Event End": { Utility.TextEventEndTag = (string)p.Data; } break;
-                case "ProG Trainer Begin": {  Utility.SongTrainerBeginPGText = (string)p.Data; } break;
-                case "ProB Trainer Begin": {  Utility.SongTrainerBeginPBText = (string)p.Data; } break;
-                case "ProG Trainer Norm": {  Utility.SongTrainerNormPGText = (string)p.Data; } break;
-                case "ProB Trainer Norm": {  Utility.SongTrainerNormPBText = (string)p.Data; } break;
-                case "ProG Trainer End": {  Utility.SongTrainerEndPGText = (string)p.Data; } break;
-                case "ProB Trainer End": {  Utility.SongTrainerEndPBText = (string)p.Data; } break;
-                   
-                case "ProG Trainer": { Utility.SongTrainerPGText = (string)p.Data; } break;
-                case "ProB Trainer": {  Utility.SongTrainerPBText = (string)p.Data; } break;
-                case "Trainer Norm Offset": { Utility.SongTrainerNormOffset = (double)p.Data; } break;
-                case "View Lyrics in G5 Editor": { trackEditorG5.ViewLyrics = (bool)p.Data; trackEditorG5.Invalidate(); } break;
+                case "Dummy Tempo": { Utility.DummyTempo = (int)p.Data; }
+                    break; //, "405405"),
+
+                case "Gap For 108 Note": { Utility.LargestGapFor108Note = (int)p.Data; }
+                    break; //, "8"),
+
+                case "Trainer Color": { Utility.TrainerBrush = (SolidBrush)p.Data; }
+                    break;
+                case "Sel. Trainer Color": { Utility.SelectedTrainerBrush = (SolidBrush)p.Data; }
+                    break;
+                case "Text Event Color": { Utility.TextEventBrush = (SolidBrush)p.Data; }
+                    break;
+                case "Sel. Text Event Color": { Utility.SelectedTextEventBrush = (SolidBrush)p.Data; }
+                    break;
+
+                case "Text Event Begin": { Utility.TextEventBeginTag = (string)p.Data; }
+                    break;
+                case "Text Event End": { Utility.TextEventEndTag = (string)p.Data; }
+                    break;
+                case "ProG Trainer Begin": { Utility.SongTrainerBeginPGText = (string)p.Data; }
+                    break;
+                case "ProB Trainer Begin": { Utility.SongTrainerBeginPBText = (string)p.Data; }
+                    break;
+                case "ProG Trainer Norm": { Utility.SongTrainerNormPGText = (string)p.Data; }
+                    break;
+                case "ProB Trainer Norm": { Utility.SongTrainerNormPBText = (string)p.Data; }
+                    break;
+                case "ProG Trainer End": { Utility.SongTrainerEndPGText = (string)p.Data; }
+                    break;
+                case "ProB Trainer End": { Utility.SongTrainerEndPBText = (string)p.Data; }
+                    break;
+
+                case "ProG Trainer": { Utility.SongTrainerPGText = (string)p.Data; }
+                    break;
+                case "ProB Trainer": { Utility.SongTrainerPBText = (string)p.Data; }
+                    break;
+                case "Trainer Norm Offset": { Utility.SongTrainerNormOffset = (double)p.Data; }
+                    break;
+                case "View Lyrics in G5 Editor": { trackEditorG5.ViewLyrics = (bool)p.Data; trackEditorG5.Invalidate(); }
+                    break;
                 case "Show Measure Numbers": { Utility.ShowMeasureNumbers = (bool)p.Data; EditorPro.Invalidate(); }
                     break;
                 case "Show Tempos": { Utility.ShowTempos = (bool)p.Data; EditorPro.Invalidate(); }
@@ -854,7 +930,8 @@ namespace ProUpgradeEditor.UI
 
                 default:
                     {
-                        switch(p.Type){
+                        switch (p.Type)
+                        {
                             case PropertyType.Integer:
                                 settings.SetValue("Util_" + p.Description, (int)p.Data);
                                 break;
@@ -865,9 +942,9 @@ namespace ProUpgradeEditor.UI
                                 settings.SetValue("Util_" + p.Description, (string)p.Data);
                                 break;
                         }
-                        
+
                     }
-                       break;
+                    break;
             }
             EditorG5.Invalidate();
             EditorPro.Invalidate();
@@ -884,9 +961,9 @@ namespace ProUpgradeEditor.UI
                 }
             }
 
-            settings.SetValue("SC_NextID", maxSongID+1);
+            settings.SetValue("SC_NextID", maxSongID + 1);
 
-            return maxSongID+1;
+            return maxSongID + 1;
         }
 
         class MidiInputListItem
@@ -917,7 +994,7 @@ namespace ProUpgradeEditor.UI
             }
             settings.LoadSettings();
 
-            
+
 
             checkBoxAutoSelectNext.Checked = settings.GetValueBool("checkBoxAutoSelectNext", true);
             checkBatchOpenWhenCompleted.Checked = settings.GetValueBool("checkBatchOpenWhenCompleted", true);
@@ -932,8 +1009,6 @@ namespace ProUpgradeEditor.UI
 
             textBoxZoom.Text = settings.GetValue("textBoxZoom", textBoxZoom.Text);
             Utility.timeScalarZoomSpeed = settings.GetValue("timeScalarZoomSpeed", Utility.timeScalarZoomSpeed.ToStringEx()).ToDouble(10);
-            Utility.timeScalarMin = settings.GetValue("timeScalarMin", Utility.timeScalarMin.ToStringEx()).ToDouble(1.0);
-            Utility.timeScalarMax = settings.GetValue("timeScalarMax", Utility.timeScalarMax.ToStringEx()).ToDouble(999.0);
 
             checkUseDefaultFolders.Checked = settings.GetValueBool("useDefaultFolders", true);
             checkBoxInitSelectedTrackOnly.Checked = settings.GetValueBool("checkBoxInitSelectedTrackOnly", false);
@@ -995,7 +1070,7 @@ namespace ProUpgradeEditor.UI
             checkBoxChordStrum.Checked = settings.GetValueBool("checkBoxChordStrum", false);
             checkBoxMidiInputStartup.Checked = settings.GetValueBool("checkBoxMidiInputStartup", true);
             checkView5Button.Checked = settings.GetValueBool("checkView5Button", true);
-            
+
             Utility.NoteCloseWidth = settings.GetValueInt("textBoxNoteCloseDist", 8);
             textBoxNoteCloseDist.Text = Utility.NoteCloseWidth.ToString();
             checkBoxBatchCheckCON.Checked = settings.GetValueBool("checkBoxBatchCheckCON", true);
@@ -1051,15 +1126,15 @@ namespace ProUpgradeEditor.UI
 
             SongList = new SongCacheList(listBoxSongLibrary);
 
-            
+
             var snglist = XMLUtil.GetNodeList(settings.XMLRoot, "docLib/song");
             if (snglist != null)
             {
                 var lst = new List<SongCacheItem>();
-                
+
                 foreach (XmlNode song in snglist)
                 {
-                    
+
                     var sc = new SongCacheItem();
                     sc.SongName = XMLUtil.GetNodeValue(song, "@name");
                     sc.G5FileName = XMLUtil.GetNodeValue(song, "@G5FileName");
@@ -1093,8 +1168,8 @@ namespace ProUpgradeEditor.UI
                     sc.DTASongShortName = XMLUtil.GetNodeValue(song, "@DTASongShortName");
 
 
-                    sc.SongMP3Location = XMLUtil.GetNodeValue(song, "@SongMP3Location","");
-                    sc.SongMP3PlaybackOffset = XMLUtil.GetNodeValue(song, "@SongMP3PlaybackOffset","").ToInt();
+                    sc.SongMP3Location = XMLUtil.GetNodeValue(song, "@SongMP3Location", "");
+                    sc.SongMP3PlaybackOffset = XMLUtil.GetNodeValue(song, "@SongMP3PlaybackOffset", "").ToInt();
                     sc.EnableSongMP3Playback = XMLUtil.GetNodeValueBool(song, "@EnableSongMP3Playback", false);
 
                     sc.EnableSongMidiPlayback = XMLUtil.GetNodeValueBool(song, "@EnableSongMidiPlayback", true);
@@ -1138,9 +1213,9 @@ namespace ProUpgradeEditor.UI
                     catch { }
 
 
-                    
+
                     lst.Add(sc);
-                    
+
                 }
                 lst.Sort();
                 SongList.AddRange(lst);
@@ -1231,7 +1306,7 @@ namespace ProUpgradeEditor.UI
                     try
                     {
                         var caps = InputDevice.GetDeviceCapabilities(x);
-                        comboBoxMidiInput.Items.Add(new MidiInputListItem() { index=x, Caps = caps });
+                        comboBoxMidiInput.Items.Add(new MidiInputListItem() { index = x, Caps = caps });
                     }
                     catch { }
                 }
@@ -1262,7 +1337,7 @@ namespace ProUpgradeEditor.UI
 
         private void SaveSettingConfiguration()
         {
-            
+
             settings.SetValue("checkBoxAutoSelectNext", checkBoxAutoSelectNext.Checked);
             settings.SetValue("checkBatchOpenWhenCompleted", checkBatchOpenWhenCompleted.Checked);
             settings.SetValue("lastg5FileName", FileNameG5);
@@ -1284,8 +1359,6 @@ namespace ProUpgradeEditor.UI
 
             settings.SetValue("textBoxZoom", textBoxZoom.Text);
             settings.SetValue("timeScalarZoomSpeed", Utility.timeScalarZoomSpeed.ToStringEx());
-            settings.SetValue("timeScalarMin", Utility.timeScalarMin.ToStringEx());
-            settings.SetValue("timeScalarMax", Utility.timeScalarMax.ToStringEx());
 
             settings.SetValue("checkKeepSelection", checkKeepSelection.Checked);
             settings.SetValue("checkBoxClearAfterNote", checkBoxClearAfterNote.Checked);
@@ -1472,7 +1545,7 @@ namespace ProUpgradeEditor.UI
                 {
                     docLibSong = XMLUtil.GetNode(docLibRoot, string.Format("song[@name='{0}']", sc.SongName));
                 }
-                
+
                 if (docLibSong == null)
                     docLibSong = XMLUtil.AddNode(docLibRoot, "song");
 
@@ -1524,10 +1597,10 @@ namespace ProUpgradeEditor.UI
                 XMLUtil.AddAttribute(docLibSong, "AutoGenBassHard", sc.AutoGenBassHard.ToString());
                 XMLUtil.AddAttribute(docLibSong, "AutoGenBassMedium", sc.AutoGenBassMedium.ToString());
                 XMLUtil.AddAttribute(docLibSong, "AutoGenBassEasy", sc.AutoGenBassEasy.ToString());
-                
+
             }
 
-            
+
 
             foreach (UtilProperty prop in Properties)
             {

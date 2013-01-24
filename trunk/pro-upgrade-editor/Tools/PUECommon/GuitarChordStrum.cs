@@ -8,15 +8,15 @@ using Sanford.Multimedia.Midi;
 
 namespace ProUpgradeEditor.Common
 {
-    
+
     public class GuitarChordStrum : ChordModifier
     {
-        public GuitarChordStrum(GuitarTrack track, MidiEvent downEvent, MidiEvent upEvent, ChordModifierType type = ChordModifierType.Invalid)
+        public GuitarChordStrum(GuitarMessageList track, MidiEvent downEvent, MidiEvent upEvent, ChordModifierType type = ChordModifierType.Invalid)
             : base(track, downEvent, upEvent, type, GuitarMessageType.GuitarChordStrum)
         {
         }
 
-        public static GuitarChordStrum CreateStrum(GuitarTrack track, GuitarDifficulty difficulty, ChordStrum strum, TickPair ticks)
+        public static GuitarChordStrum CreateStrum(GuitarMessageList track, GuitarDifficulty difficulty, ChordStrum strum, TickPair ticks)
         {
             GuitarChordStrum ret = null;
             var d1 = Utility.GetStrumData1(difficulty);
@@ -25,7 +25,7 @@ namespace ProUpgradeEditor.Common
                 var ev = track.Insert(d1, 100, strum.GetChannelFromChordStrum(), ticks);
                 ret = new GuitarChordStrum(track, ev.Down, ev.Up, strum.GetModifierType());
 
-                track.Messages.Add(ret);
+                track.Add(ret);
             }
             return ret;
         }

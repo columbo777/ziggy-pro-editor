@@ -18,7 +18,7 @@ namespace EditorResources.Components
     {
         public PEPanel()
         {
-            
+
             InitializeComponent();
         }
     }

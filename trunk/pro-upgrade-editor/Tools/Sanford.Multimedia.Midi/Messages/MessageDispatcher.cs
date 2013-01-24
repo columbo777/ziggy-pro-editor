@@ -68,14 +68,14 @@ namespace Sanford.Multimedia.Midi
         {
             #region Require
 
-            if(message == null)
+            if (message == null)
             {
                 throw new ArgumentNullException("message");
             }
 
             #endregion
 
-            switch(message.MessageType)
+            switch (message.MessageType)
             {
                 case MessageType.Channel:
                     OnChannelMessageDispatched(new ChannelMessageEventArgs((ChannelMessage)message));
@@ -94,7 +94,7 @@ namespace Sanford.Multimedia.Midi
                     break;
 
                 case MessageType.SystemRealtime:
-                    switch(((SysRealtimeMessage)message).SysRealtimeType)
+                    switch (((SysRealtimeMessage)message).SysRealtimeType)
                     {
                         case SysRealtimeType.ActiveSense:
                             OnSysRealtimeMessageDispatched(SysRealtimeMessageEventArgs.ActiveSense);
@@ -133,7 +133,7 @@ namespace Sanford.Multimedia.Midi
         {
             EventHandler<ChannelMessageEventArgs> handler = ChannelMessageDispatched;
 
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, e);
             }
@@ -143,7 +143,7 @@ namespace Sanford.Multimedia.Midi
         {
             EventHandler<SysExMessageEventArgs> handler = SysExMessageDispatched;
 
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, e);
             }
@@ -153,7 +153,7 @@ namespace Sanford.Multimedia.Midi
         {
             EventHandler<SysCommonMessageEventArgs> handler = SysCommonMessageDispatched;
 
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, e);
             }
@@ -163,7 +163,7 @@ namespace Sanford.Multimedia.Midi
         {
             EventHandler<SysRealtimeMessageEventArgs> handler = SysRealtimeMessageDispatched;
 
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, e);
             }
@@ -173,7 +173,7 @@ namespace Sanford.Multimedia.Midi
         {
             EventHandler<MetaMessageEventArgs> handler = MetaMessageDispatched;
 
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, e);
             }

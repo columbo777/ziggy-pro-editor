@@ -57,7 +57,7 @@ namespace X360.IO.FATXExtensions
         }
     }
 
-    
+
 
     /// <summary>
     /// Class to hold IO extensions
@@ -69,13 +69,13 @@ namespace X360.IO.FATXExtensions
         /// </summary>
         public static int BlockRemainderFATX(this DJsIO y, FATXPartition xPartition)
         {
-            
+
             if (y.IOType == DataType.Drive)
                 return 0;
             if (y.Length == 0)
                 return 0;
             return (int)(((y.Length - 1) % xPartition.xBlockSize) + 1);
-            
+
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace X360.IO.FATXExtensions
         /// </summary>
         public static uint BlockCountFATX(this DJsIO y, FATXPartition xPartition)
         {
-            
+
             {
                 if (y.IOType == DataType.Drive)
                     return 0;
@@ -108,7 +108,7 @@ namespace X360.IO.STFSExtensions
         /// </summary>
         public static uint BlockCountSTFS(this DJsIO y)
         {
-            
+
             {
                 if (y.IOType == DataType.Drive)
                     return 0;
@@ -118,13 +118,13 @@ namespace X360.IO.STFSExtensions
             }
             //throw x
         }
-        
+
         /// <summary>
         /// Returns the amount of data in the last block
         /// </summary>
         public static int BlockRemainderSTFS(this DJsIO y)
         {
-            
+
             {
                 if (y.IOType == DataType.Drive)
                     return 0;
@@ -155,7 +155,7 @@ namespace X360.IO.SearchExtensions
         /// <returns></returns>
         public static long[] SearchBinary(this DJsIO y, byte[] xData, bool xStopWhenFound)
         {
-            
+
             byte[] xbuff;
             List<long> xReturn = new List<long>();
             for (long i = y.Position; i < y.Length; i++)
@@ -172,7 +172,7 @@ namespace X360.IO.SearchExtensions
                 }
             }
             return xReturn.ToArray();
-            
+
         }
 
         /// <summary>
@@ -200,7 +200,8 @@ namespace X360.IO.SearchExtensions
             byte[] xbuff;
             if (y.IsBigEndian)
                 xbuff = Encoding.BigEndianUnicode.GetBytes(xData);
-            else xbuff = Encoding.Unicode.GetBytes(xData);
+            else
+                xbuff = Encoding.Unicode.GetBytes(xData);
             return SearchBinary(y, xbuff, xStopWhenFound);
         }
     }
@@ -219,8 +220,8 @@ namespace X360.IO.ExtraExtensions
         /// <returns></returns>
         public static Image ImageFromStream(this DJsIO y)
         {
-             { return Image.FromStream((Stream)y.xStream); }
-            
+            { return Image.FromStream((Stream)y.xStream); }
+
         }
 
         /// <summary>
@@ -263,7 +264,7 @@ namespace X360.IO
     /// <summary>
     /// String type
     /// </summary>
-    public enum StringForm : byte 
+    public enum StringForm : byte
     {
         /// <summary>
         /// ACSII String
@@ -272,34 +273,38 @@ namespace X360.IO
         /// <summary>
         /// Unicode String
         /// </summary>
-        Unicode = 2 }
+        Unicode = 2
+    }
 
     /// <summary>
     /// File Type
     /// </summary>
     public enum DJFileMode : byte
-    { 
+    {
         /// <summary>
         /// Create a file
         /// </summary>
-        Create, 
+        Create,
         /// <summary>
         /// Open a file
         /// </summary>
-        Open }
+        Open
+    }
 
     /// <summary>
     /// Pad direction
     /// </summary>
-    public enum PadLocale : byte { 
+    public enum PadLocale : byte
+    {
         /// <summary>
         /// Pad to the left
         /// </summary>
-        Left, 
+        Left,
         /// <summary>
         /// Pad to the right
         /// </summary>
-        Right }
+        Right
+    }
 
     /// <summary>
     /// Generic pad types
@@ -319,41 +324,44 @@ namespace X360.IO
     /// <summary>
     /// How to read  a string
     /// </summary>
-    public enum StringRead : byte {
+    public enum StringRead : byte
+    {
         /// <summary>
         /// Defined length
         /// </summary>
-        Defined, 
+        Defined,
         /// <summary>
         /// Read to null
         /// </summary>
-        ToNull, 
+        ToNull,
         /// <summary>
         /// Reads a string with a byte size in front of it
         /// </summary>
-        PrecedingLength }
-    
+        PrecedingLength
+    }
+
     /// <summary>
     /// IO Type
     /// </summary>
-    public enum DataType : byte {
+    public enum DataType : byte
+    {
         /// <summary>
         /// No specific type
         /// </summary>
-        None, 
+        None,
         FatXFile,
         /// <summary>
         /// Memory IO
         /// </summary>
-        Memory, 
+        Memory,
         /// <summary>
         /// File IO
         /// </summary>
-        File, 
+        File,
         /// <summary>
         /// Device IO
         /// </summary>
-        Drive, 
+        Drive,
         /// <summary>
         /// 
         /// </summary>
@@ -395,33 +403,33 @@ namespace X360.IO
         /// <summary>
         /// Not accessed
         /// </summary>
-        public static Exception AccessError { get { return xAccessError; }}
+        public static Exception AccessError { get { return xAccessError; } }
         /// <summary>
         /// Invalid directory index
         /// </summary>
-        public static Exception DirectError { get { return xDirectoryErr; }}
+        public static Exception DirectError { get { return xDirectoryErr; } }
         /// <summary>
         /// Position error
         /// </summary>
-        public static Exception PositionError { get { return xPosition; }}
+        public static Exception PositionError { get { return xPosition; } }
         /// <summary>
         /// Index out of bounds
         /// </summary>
-        public static Exception Index { get { return xIndex; }}
+        public static Exception Index { get { return xIndex; } }
         /// <summary>
         /// Path unexistant
         /// </summary>
-        public static Exception DoesntExist { get { return xNoExist; }}
+        public static Exception DoesntExist { get { return xNoExist; } }
         /// <summary>
         /// Cannot create path or file
         /// </summary>
-        public static Exception CreateError { get { return xCreateError; }}
+        public static Exception CreateError { get { return xCreateError; } }
         /// <summary>
         /// Returns this when one of the files in a multifile IO could not be accessed
         /// </summary>
-        public static Exception MultiAccessError { get { return xMultiAccessError; }}
+        public static Exception MultiAccessError { get { return xMultiAccessError; } }
     }
-    
+
     /// <summary>
     /// Object for generic IO
     /// </summary>
@@ -484,7 +492,7 @@ namespace X360.IO
         /// The type of this instance
         /// </summary>
         //[CompilerGenerated]
-        public DataType IOType { get { return xThisData; }}
+        public DataType IOType { get { return xThisData; } }
         /// <summary>
         /// This type of IO
         /// </summary>
@@ -580,12 +588,12 @@ namespace X360.IO
             IsBigEndian = BigEndian;
             //try
             {
-                
+
                 xThisData = DataType.FatXFile;
-                
+
                 Position = 0;
             }
-            
+
         }
 
         /// <summary>
@@ -615,10 +623,11 @@ namespace X360.IO
         /// Makes a temporary file stream
         /// </summary>
         /// <param name="BigEndian"></param>
-        public DJsIO(bool BigEndian) : this()
+        public DJsIO(bool BigEndian)
+            : this()
         {
             IsBigEndian = BigEndian;
-            
+
             //xFile = string.Copy(VariousFunctions.GetTempFileLocale());
             //XSetStream(DJFileMode.Create);
         }
@@ -633,21 +642,21 @@ namespace X360.IO
 
         public byte[] GetBytes()
         {
-            
+
             var startPos = xStream.Position;
             xStream.Position = 0;
 
-            
+
             var b = new byte[xStream.Length];
             xStream.Read(b, 0, b.Length);
             xStream.Position = startPos;
 
-            
+
             xStream.Position = startPos;
 
             return b;
         }
-        
+
         #endregion
 
         #region Reading
@@ -658,7 +667,7 @@ namespace X360.IO
         /// <returns></returns>
         public virtual byte[] ReadBytes(int xSize)
         {
-            
+
             var xbuff = new byte[xSize];
             if (xStream.CanRead)
             {
@@ -672,9 +681,9 @@ namespace X360.IO
             byte[] xbuff = new byte[xSize];
             //xStream.Read(xbuff, 0, xSize);
             xbuff = this.ReadBytes(xSize);
-            
+
             return xbuff;
-     
+
         }
 
         /// <summary>
@@ -684,7 +693,7 @@ namespace X360.IO
         public short ReadInt16()
         {
             //{
-                return ReadInt16(IsBigEndian); 
+            return ReadInt16(IsBigEndian);
             //}//throw x
         }
 
@@ -695,12 +704,12 @@ namespace X360.IO
         /// <returns></returns>
         public short ReadInt16(bool BigEndian)
         {
-//            try
+            //            try
             {
                 byte[] buff = ReadBytes(2);
                 return BitConv.ToInt16(buff, BigEndian);
             }
-  //          //throw x
+            //          //throw x
         }
 
         /* See note at bottom */
@@ -711,8 +720,8 @@ namespace X360.IO
         public uint ReadUInt24()
         {
             //{ 
-                return ReadUInt24(IsBigEndian); 
-        //}//throw x
+            return ReadUInt24(IsBigEndian);
+            //}//throw x
         }
 
         /// <summary>
@@ -722,7 +731,7 @@ namespace X360.IO
         /// <returns></returns>
         public uint ReadUInt24(bool BigEndian)
         {
-//            try
+            //            try
             {
                 byte[] xData = ReadBytes(3);
                 if (BigEndian)
@@ -730,7 +739,7 @@ namespace X360.IO
                 return ((uint)xData[2] << 16 | (uint)xData[1] << 8 |
                     (uint)xData[0]);
             }
-           // //throw x
+            // //throw x
         }
 
         /* See note at bottom */
@@ -741,7 +750,7 @@ namespace X360.IO
         public ulong ReadUInt40()
         {
             //{ 
-                return ReadUInt40(IsBigEndian); 
+            return ReadUInt40(IsBigEndian);
             //}//throw x
         }
 
@@ -752,14 +761,14 @@ namespace X360.IO
         /// <returns></returns>
         public ulong ReadUInt40(bool BigEndian)
         {
-            
-                byte[] xData = ReadBytes(5);
-                if (BigEndian)
-                    xData.EndianConvert();
-                return ((ulong)xData[4] << 32 | (ulong)xData[3] << 24 |
-                    (ulong)xData[2] << 16 | (ulong)xData[1] << 8 |
-                    (ulong)xData[0]);
-            
+
+            byte[] xData = ReadBytes(5);
+            if (BigEndian)
+                xData.EndianConvert();
+            return ((ulong)xData[4] << 32 | (ulong)xData[3] << 24 |
+                (ulong)xData[2] << 16 | (ulong)xData[1] << 8 |
+                (ulong)xData[0]);
+
         }
 
         /* See note at bottom */
@@ -769,8 +778,8 @@ namespace X360.IO
         /// <returns></returns>
         public ulong ReadUInt48()
         {
-            return ReadUInt48(IsBigEndian); 
-        
+            return ReadUInt48(IsBigEndian);
+
         }
 
         /* See note at bottom */
@@ -780,14 +789,14 @@ namespace X360.IO
         /// <returns></returns>
         public ulong ReadUInt48(bool BigEndian)
         {
-            
-                byte[] xData = ReadBytes(6);
-                if (BigEndian)
-                    xData.EndianConvert();
-                return ((ulong)xData[5] << 40 | (ulong)xData[4] << 32 |
-                    (ulong)xData[3] << 24 | (ulong)xData[2] << 16 |
-                    (ulong)xData[1] << 8 | (ulong)xData[0]);
-            
+
+            byte[] xData = ReadBytes(6);
+            if (BigEndian)
+                xData.EndianConvert();
+            return ((ulong)xData[5] << 40 | (ulong)xData[4] << 32 |
+                (ulong)xData[3] << 24 | (ulong)xData[2] << 16 |
+                (ulong)xData[1] << 8 | (ulong)xData[0]);
+
         }
 
         /* See note at bottom */
@@ -808,7 +817,7 @@ namespace X360.IO
         /// <returns></returns>
         public ulong ReadUInt56(bool BigEndian)
         {
-            
+
             {
                 byte[] xData = ReadBytes(7);
                 if (BigEndian)
@@ -837,7 +846,7 @@ namespace X360.IO
         /// <returns></returns>
         public int ReadInt32(bool BigEndian)
         {
-            
+
             {
                 byte[] buff = ReadBytes(4);
                 return BitConv.ToInt32(buff, BigEndian);
@@ -861,7 +870,7 @@ namespace X360.IO
         /// <returns></returns>
         public long ReadInt64(bool BigEndian)
         {
-            
+
             {
                 byte[] buff = ReadBytes(8);
                 return BitConv.ToInt64(buff, BigEndian);
@@ -887,7 +896,7 @@ namespace X360.IO
         public sbyte ReadSByte()
         {
             return (sbyte)ReadByte();
-            
+
         }
 
         /// <summary>
@@ -906,7 +915,7 @@ namespace X360.IO
         /// <returns></returns>
         public float ReadSingle(bool BigEndian)
         {
-            
+
             {
                 byte[] buff = ReadBytes(4);
                 return BitConv.ToSingle(buff, BigEndian);
@@ -930,7 +939,7 @@ namespace X360.IO
         /// <returns></returns>
         public double ReadDouble(bool BigEndian)
         {
-            
+
             {
                 byte[] buff = ReadBytes(8);
                 return BitConv.ToDouble(buff, BigEndian);
@@ -954,7 +963,7 @@ namespace X360.IO
         /// <returns></returns>
         public ushort ReadUInt16(bool BigEndian)
         {
-            
+
             {
                 byte[] buff = ReadBytes(2);
                 return BitConv.ToUInt16(buff, BigEndian);
@@ -976,10 +985,10 @@ namespace X360.IO
         /// Reads an unsigned 32-bit (4 bytes) integer to a specified endian
         /// </summary>
         /// <returns></returns>
-        
+
         public uint ReadUInt32(bool BigEndian)
         {
-            
+
             {
                 byte[] buff = ReadBytes(4);
                 return BitConv.ToUInt32(buff, BigEndian);
@@ -1003,7 +1012,7 @@ namespace X360.IO
         /// <returns></returns>
         public ulong ReadUInt64(bool BigEndian)
         {
-            
+
             {
                 byte[] buff = ReadBytes(8);
                 return BitConv.ToUInt64(buff, BigEndian);
@@ -1074,7 +1083,7 @@ namespace X360.IO
         /// <returns></returns>
         public string ReadLine(StringForm xType, short BreakIndicator, bool BigEndian)
         {
-            
+
             {
                 List<byte> buffer = new List<byte>();
                 if (xType == StringForm.Unicode)
@@ -1093,7 +1102,8 @@ namespace X360.IO
                     }
                     if (BigEndian)
                         return Encoding.BigEndianUnicode.GetString(buffer.ToArray());
-                    else return Encoding.Unicode.GetString(buffer.ToArray());
+                    else
+                        return Encoding.Unicode.GetString(buffer.ToArray());
                 }
                 else
                 {
@@ -1188,7 +1198,7 @@ namespace X360.IO
         {
             if (!Enum.IsDefined(typeof(StringForm), xStringType) || !Enum.IsDefined(typeof(StringRead), xRead))
                 throw new Exception("Invalid parameters");
-//            try
+            //            try
             {
                 if (xRead == StringRead.ToNull)
                 {
@@ -1212,7 +1222,8 @@ namespace X360.IO
                         }
                         if (BigEndian)
                             return Encoding.BigEndianUnicode.GetString(buffer.ToArray()).Replace(PadType.Null.ToString(), "");
-                        else return Encoding.Unicode.GetString(buffer.ToArray()).Replace(PadType.Null.ToString(), "");
+                        else
+                            return Encoding.Unicode.GetString(buffer.ToArray()).Replace(PadType.Null.ToString(), "");
                     }
                     else
                     {
@@ -1243,7 +1254,8 @@ namespace X360.IO
                     {
                         if (xStringType == StringForm.ASCII)
                             Buffer.AddRange(ReadBytes(2));
-                        else Buffer.Add(ReadByte());
+                        else
+                            Buffer.Add(ReadByte());
                     }
                     if (xStringType == StringForm.ASCII)
                         return Encoding.ASCII.GetString(Buffer.ToArray()).Replace(PadType.Null.ToString(), "");
@@ -1251,7 +1263,8 @@ namespace X360.IO
                     {
                         if (BigEndian)
                             return Encoding.BigEndianUnicode.GetString(Buffer.ToArray()).Replace(PadType.Null.ToString(), "");
-                        else return Encoding.Unicode.GetString(Buffer.ToArray()).Replace(PadType.Null.ToString(), "");
+                        else
+                            return Encoding.Unicode.GetString(Buffer.ToArray()).Replace(PadType.Null.ToString(), "");
                     }
                 }
                 else
@@ -1263,12 +1276,13 @@ namespace X360.IO
                     {
                         if (BigEndian)
                             return Encoding.BigEndianUnicode.GetString(buff).Replace(PadType.Null.ToString(), "");
-                        else return Encoding.Unicode.GetString(buff).Replace(PadType.Null.ToString(), "");
+                        else
+                            return Encoding.Unicode.GetString(buff).Replace(PadType.Null.ToString(), "");
                     }
                 }
-                
+
             }
-           // //throw x
+            // //throw x
         }
 
         /// <summary>
@@ -1299,26 +1313,26 @@ namespace X360.IO
         public virtual byte[] ReadStream()
         {
             long posbefore = Position;
-            Position=0;
+            Position = 0;
             var ret = ReadBytes((int)Length);
-            
+
             Position = posbefore;
 
             return ret;
         }
 
-//            try
-           /* {
-                byte[] xReturn = new byte[Length];
-                long posbefore = Position;
-                Position = 0;
-                for (long i = 0; i < xReturn.Length; i++)
-                    xReturn[i] = ReadByte();
-                Position = posbefore;
-                return xReturn;
-            }*/
-            ////throw x
-        
+        //            try
+        /* {
+             byte[] xReturn = new byte[Length];
+             long posbefore = Position;
+             Position = 0;
+             for (long i = 0; i < xReturn.Length; i++)
+                 xReturn[i] = ReadByte();
+             Position = posbefore;
+             return xReturn;
+         }*/
+        ////throw x
+
         #endregion
 
         #region Writing
@@ -1328,7 +1342,7 @@ namespace X360.IO
         /// <param name="xIn"></param>
         public virtual void Write(byte[] xIn)
         {
-           // try
+            // try
             {
                 if (xThisData == DataType.Real)
                 {
@@ -1337,10 +1351,10 @@ namespace X360.IO
                 }
                 else if (xThisData == DataType.Memory)
                 {
-//                    try
+                    //                    try
                     {
                         //foreach (byte x in xIn)
-                         //   xStream.WriteByte(x);
+                        //   xStream.WriteByte(x);
 
                         xStream.Write(xIn, 0, (int)xIn.Length);
 
@@ -1372,7 +1386,7 @@ namespace X360.IO
                 else if (xThisData != DataType.Drive)
                     xStream.Write(xIn, 0, xIn.Length);
             }
-           // //throw x
+            // //throw x
         }
 
         public void unbufferedwrite(byte[] xIn)
@@ -1388,7 +1402,7 @@ namespace X360.IO
         public void Write(short xIn)
         {
             //{ 
-                Write(BitConv.GetBytes(xIn, IsBigEndian)); 
+            Write(BitConv.GetBytes(xIn, IsBigEndian));
             //}//throw x
         }
 
@@ -1421,7 +1435,7 @@ namespace X360.IO
         public void Write(int xIn, bool BigEndian)
         {
             { Write(BitConv.GetBytes(xIn, BigEndian)); }
-            
+
         }
 
         /// <summary>
@@ -1583,7 +1597,7 @@ namespace X360.IO
         /// <param name="BigEndian"></param>
         public void WriteUInt24(uint xIn, bool BigEndian)
         {
-            
+
             {
                 List<byte> xList = BitConv.GetBytes(xIn, false).ToList<byte>();
                 xList.RemoveAt(3);
@@ -1611,7 +1625,7 @@ namespace X360.IO
         /// <param name="BigEndian"></param>
         public void WriteUInt40(ulong xIn, bool BigEndian)
         {
-            
+
             {
                 List<byte> xList = BitConv.GetBytes(xIn, false).ToList<byte>();
                 xList.RemoveAt(5);
@@ -1641,7 +1655,7 @@ namespace X360.IO
         /// <param name="BigEndian"></param>
         public void WriteUInt48(ulong xIn, bool BigEndian)
         {
-            
+
             {
                 List<byte> xList = BitConv.GetBytes(xIn, false).ToList<byte>();
                 xList.RemoveAt(6);
@@ -1670,7 +1684,7 @@ namespace X360.IO
         /// <param name="BigEndian"></param>
         public void WriteUInt56(ulong xIn, bool BigEndian)
         {
-            
+
             {
                 List<byte> xList = BitConv.GetBytes(xIn, BigEndian).ToList<byte>();
                 xList.RemoveAt(7);
@@ -1687,7 +1701,7 @@ namespace X360.IO
         /// <param name="xIn"></param>
         public void Write(string xIn)
         {
-             Write(Encoding.ASCII.GetBytes(xIn.ToCharArray()));
+            Write(Encoding.ASCII.GetBytes(xIn.ToCharArray()));
         }
 
         /// <summary>
@@ -1697,16 +1711,17 @@ namespace X360.IO
         /// <param name="xType"></param>
         public void Write(string xIn, StringForm xType)
         {
-            
-                if (xType == StringForm.ASCII)
-                    Write(xIn);
+
+            if (xType == StringForm.ASCII)
+                Write(xIn);
+            else
+            {
+                if (IsBigEndian)
+                    Write(Encoding.BigEndianUnicode.GetBytes(xIn.ToCharArray()));
                 else
-                {
-                    if (IsBigEndian)
-                        Write(Encoding.BigEndianUnicode.GetBytes(xIn.ToCharArray()));
-                    else Write(Encoding.Unicode.GetBytes(xIn.ToCharArray()));
-                }
-            
+                    Write(Encoding.Unicode.GetBytes(xIn.ToCharArray()));
+            }
+
         }
 
         /// <summary>
@@ -1726,9 +1741,9 @@ namespace X360.IO
             {
                 xIn = xIn.PadRight(xDesiredSize, PadChar);
             }
-            else 
-            { 
-                xIn = xIn.PadLeft(xDesiredSize, PadChar); 
+            else
+            {
+                xIn = xIn.PadLeft(xDesiredSize, PadChar);
             }
 
             if (xType == StringForm.ASCII)
@@ -1747,8 +1762,8 @@ namespace X360.IO
                     Write(Encoding.Unicode.GetBytes(xIn.ToCharArray()));
                 }
             }
-            
-           
+
+
         }
 
         /// <summary>
@@ -1757,16 +1772,16 @@ namespace X360.IO
         /// <param name="xIn"></param>
         public void WriteHexString(string xIn)
         {
-            Write(xIn.HexToBytes()); 
+            Write(xIn.HexToBytes());
         }
 
         /// <summary>
         /// Writes a byte (8-bits)
         /// </summary>
         /// <param name="xIn"></param>
-        public void Write(byte xIn) 
-        { 
-            Write(new byte[]{ xIn }); 
+        public void Write(byte xIn)
+        {
+            Write(new byte[] { xIn });
         }
 
         /// <summary>
@@ -1775,7 +1790,7 @@ namespace X360.IO
         /// <param name="xIn"></param>
         public void WriteFileTime(DateTime xIn)
         {
-            Write(xIn.ToFileTime()); 
+            Write(xIn.ToFileTime());
         }
 
         /// <summary>
@@ -1783,13 +1798,13 @@ namespace X360.IO
         /// </summary>
         public virtual void Flush()
         {
-            
-                if (xThisData == DataType.File)
-                    xStream.Flush();
 
-                if (xThisData == DataType.Memory)
-                    xStream.Flush();
-            
+            if (xThisData == DataType.File)
+                xStream.Flush();
+
+            if (xThisData == DataType.Memory)
+                xStream.Flush();
+
         }
         #endregion
 
@@ -1797,19 +1812,20 @@ namespace X360.IO
         /// <summary>
         /// Returns the stream length
         /// </summary>
-        public virtual long Length 
-        { 
-            get { return xStream.Length; } }
+        public virtual long Length
+        {
+            get { return xStream.Length; }
+        }
 
         /// <summary>
         /// Gets a text based size for users
         /// </summary>
-        public string LengthFriendly 
-        { 
-            get 
-            { 
-                return VariousFunctions.GetFriendlySize(Length); 
-            } 
+        public string LengthFriendly
+        {
+            get
+            {
+                return VariousFunctions.GetFriendlySize(Length);
+            }
         }
 
         /// <summary>
@@ -1860,7 +1876,7 @@ namespace X360.IO
                 return false;
             if (xThisData != DataType.Real)
             {
-                xStream.Dispose(); 
+                xStream.Dispose();
                 //catch { return false; }
                 if (xThisData == DataType.File && DeleteFile)
                     VariousFunctions.DeleteFile(FileNameLong);
@@ -1886,7 +1902,7 @@ namespace X360.IO
                     XSetStream(DJFileMode.Open);
                 else if (xThisData == DataType.Drive)
                 {
-                    
+
                 }
             }
             return Accessed;
@@ -1935,9 +1951,9 @@ namespace X360.IO
     //[DebuggerStepThrough]
     public sealed class DriveIO : DJsIO
     {
-        
+
         public Drive xDrive;
-        
+
         void driveset(ref Drive xIn, bool BigEndian)
         {
             IsBigEndian = BigEndian;
@@ -1952,9 +1968,9 @@ namespace X360.IO
         /// </summary>
         /// <param name="xIn"></param>
         /// <param name="BigEndian"></param>
-        public DriveIO(Drive xIn, bool BigEndian) 
-        { 
-            driveset(ref xIn, BigEndian); 
+        public DriveIO(Drive xIn, bool BigEndian)
+        {
+            driveset(ref xIn, BigEndian);
         }
 
         /// <summary>
@@ -1962,8 +1978,8 @@ namespace X360.IO
         /// </summary>
         /// <param name="xIn"></param>
         /// <param name="BigEndian"></param>
-        public DriveIO(ref Drive xIn, bool BigEndian) 
-        { 
+        public DriveIO(ref Drive xIn, bool BigEndian)
+        {
             driveset(ref xIn, BigEndian);
         }
 
@@ -1983,30 +1999,30 @@ namespace X360.IO
             // Set Position to sector beginning
             if (leftover != 0)
                 Position = pos - leftover;
-            
+
             // Get size of our buffer relative to starting sector
             int size = xIn.Length + leftover;
-            
+
             int count = (int)((((size - 1) / xDrive.Geometry.BytesPerSector) + 1));
-            
+
             // For some reason, my IO doesn't want to write just one sector
             if (count == 1)
                 count++;
-            
+
             // Read the sectors needed to write
             size = (int)(count * xDrive.Geometry.BytesPerSector);
-            
+
             byte[] buffer = new byte[size];
-            
+
             xStream.Read(buffer, 0, size);
-            
+
             Array.Copy(xIn, 0, buffer, leftover, xIn.Length);
-            
+
             // Go back to original position (automatically aligns to sector start even when it says it isn't v.v)
             Position = pos - leftover;
-            
+
             xStream.Write(buffer, 0, buffer.Length);
-            
+
             xStream.Position = pos + xIn.Length;
         }
 
@@ -2024,7 +2040,7 @@ namespace X360.IO
             if (leftover != 0)
                 Position = pos - leftover;
 
-            int size = 
+            int size =
                 (int)(((((xSize + leftover) - 1) / xDrive.Geometry.BytesPerSector) + 1)
                 * xDrive.Geometry.BytesPerSector);
 
@@ -2040,7 +2056,7 @@ namespace X360.IO
         /// <summary>
         /// Grabs the length of the stream
         /// </summary>
-        public override long Length { get { return xDrive.Geometry.DiskSize; }}
+        public override long Length { get { return xDrive.Geometry.DiskSize; } }
 
         /// <summary>
         /// DOES NOT WORK IN THIS CLASS
@@ -2091,7 +2107,7 @@ namespace X360.IO
         //[CompilerGenerated]
         public FileEntry xFileEnt;
         //[CompilerGenerated]
-        public STFSPackage xRef { get { return xFileEnt.xPackage; }}
+        public STFSPackage xRef { get { return xFileEnt.xPackage; } }
         //[CompilerGenerated]
         int pos = 0;
         //[CompilerGenerated]
@@ -2368,7 +2384,7 @@ namespace X360.IO
         /// <returns></returns>
         public override bool SetLength(long xLen) { return false; }
     }
-    
+
     /// <summary>
     /// IO to handle a multifile IO to act as one file
     /// </summary>
@@ -2381,7 +2397,7 @@ namespace X360.IO
         long size = 0;
         //[CompilerGenerated]
         int idx = 0;
-        
+
         DJsIO xIO { get { return xIOz[idx]; } }
         //[CompilerGenerated]
         long fileloc = 0;
@@ -2398,7 +2414,7 @@ namespace X360.IO
             if (Files == null || Files.Length == 0)
                 throw IOExcepts.MultiAccessError;
             List<DJsIO> xios = new List<DJsIO>();
-            
+
             {
                 foreach (string x in Files)
                 {
@@ -2409,7 +2425,7 @@ namespace X360.IO
                 }
                 xIOz = xios;
             }
-            
+
             xThisData = DataType.MultiFile;
         }
 
@@ -2459,7 +2475,7 @@ namespace X360.IO
         /// </summary>
         public override long Position
         {
-            get { return fileloc+xIO.Position; }
+            get { return fileloc + xIO.Position; }
             set
             {
                 try
@@ -2476,10 +2492,10 @@ namespace X360.IO
                     }
 
                     fileloc = currOffset;
-                    xIO.Position = value-fileloc;
-                    
+                    xIO.Position = value - fileloc;
+
                 }
-                catch 
+                catch
                 {
                 }
             }
@@ -2590,7 +2606,8 @@ namespace X360.IO
     /// <summary>
     /// Type of device
     /// </summary>
-    public enum DeviceType {
+    public enum DeviceType
+    {
         /// <summary>
         /// Physical type
         /// </summary>
@@ -2598,13 +2615,14 @@ namespace X360.IO
         /// <summary>
         /// Logical type
         /// </summary>
-        LogicalDrive }
+        LogicalDrive
+    }
 
     /// <summary>
     /// Class for Accessing Drives
     /// </summary>
     //[DebuggerStepThrough]
-    public  class Drive
+    public class Drive
     {
         #region Imports
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -2641,7 +2659,7 @@ namespace X360.IO
         /// <summary>
         /// This geometry
         /// </summary>
-        public DiskGeometry Geometry{ get { return xGeom; } }
+        public DiskGeometry Geometry { get { return xGeom; } }
         /// <summary>
         /// This type
         /// </summary>
@@ -2802,7 +2820,7 @@ namespace X360.IO
                 xSFH.Close();
                 xSFH = null;
             }
-                //}catch { }
+            //}catch { }
             xSFH = CreateFile(@"\\.\" + DeviceName.ToUpper(),
                  FileAccess.ReadWrite,
                  FileShare.ReadWrite,

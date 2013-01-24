@@ -9,16 +9,16 @@ namespace ProUpgradeEditor.Common
 {
     public class GuitarSingleStringTremelo : GuitarModifier
     {
-        public GuitarSingleStringTremelo(GuitarTrack track, MidiEvent downEvent, MidiEvent upEvent) : 
+        public GuitarSingleStringTremelo(GuitarMessageList track, MidiEvent downEvent, MidiEvent upEvent) :
             base(track, downEvent, upEvent, GuitarModifierType.SingleStringTremelo, GuitarMessageType.GuitarSingleStringTremelo) { }
 
-        public static GuitarSingleStringTremelo CreateSingleStringTremelo(GuitarTrack track, TickPair ticks)
+        public static GuitarSingleStringTremelo CreateSingleStringTremelo(GuitarMessageList track, TickPair ticks)
         {
             var ev = track.Insert(Utility.SingleStringTremeloData1, 100, Utility.ChannelDefault, ticks);
 
             var ret = new GuitarSingleStringTremelo(track, ev.Down, ev.Up);
 
-            track.Messages.Add(ret);
+            track.Add(ret);
 
             return ret;
         }

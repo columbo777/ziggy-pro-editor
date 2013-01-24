@@ -23,7 +23,9 @@ namespace ProUpgradeEditor
 
         public DeletableEntity()
         {
-            isNew = false; isUpdated = false; isDeleted = false;
+            isNew = false;
+            isUpdated = false;
+            isDeleted = false;
         }
 
         public virtual bool IsUpdated

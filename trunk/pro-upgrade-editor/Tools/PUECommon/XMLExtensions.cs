@@ -49,7 +49,7 @@ namespace ProUpgradeEditor.Common
         {
             return XMLUtil.AddAttribute(node, name, value);
         }
-        
+
         public static XmlNode GetNode(this XmlNode node, string name) { return XMLUtil.GetNode(node, name); }
 
         public static XmlNode AddNode(this XmlNode node, string name, string text, bool addIfExists = true, bool setValueIfExists = true)

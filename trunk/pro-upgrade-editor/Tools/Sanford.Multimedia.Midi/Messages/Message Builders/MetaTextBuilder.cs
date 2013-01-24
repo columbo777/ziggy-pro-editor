@@ -37,11 +37,11 @@ using System.Text;
 
 namespace Sanford.Multimedia.Midi
 {
-	/// <summary>
-	/// Provides functionality for building meta text messages.
-	/// </summary>
-	public class MetaTextBuilder : IMessageBuilder
-	{
+    /// <summary>
+    /// Provides functionality for building meta text messages.
+    /// </summary>
+    public class MetaTextBuilder : IMessageBuilder
+    {
         public static MetaMessage Create(MetaType type, string str)
         {
             var tb = new MetaTextBuilder(type, str);
@@ -127,7 +127,7 @@ namespace Sanford.Multimedia.Midi
         {
             #region Require
 
-            if(!IsTextType(type))
+            if (!IsTextType(type))
             {
                 throw new ArgumentException("Not text based meta message type.",
                     "message");
@@ -187,7 +187,7 @@ namespace Sanford.Multimedia.Midi
         {
             #region Require
 
-            if(!IsTextType(type))
+            if (!IsTextType(type))
             {
                 throw new ArgumentException("Not text based meta message type.",
                     "message");
@@ -197,7 +197,7 @@ namespace Sanford.Multimedia.Midi
 
             this.type = type;
 
-            if(text != null)
+            if (text != null)
             {
                 this.text = text;
             }
@@ -207,7 +207,7 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
-        
+
         /// <summary>
         /// Initializes a new instance of the MetaMessageTextBuilder class with the
         /// specified MetaMessage.
@@ -252,10 +252,10 @@ namespace Sanford.Multimedia.Midi
         /// If the MetaMessage is not a text based type, an exception will be 
         /// thrown.
         /// </remarks>
-		public MetaTextBuilder(MetaMessage message)
+        public MetaTextBuilder(MetaMessage message)
         {
             Initialize(message);
-		}
+        }
 
         #endregion
 
@@ -274,7 +274,7 @@ namespace Sanford.Multimedia.Midi
         {
             #region Require
 
-            if(!IsTextType(message.MetaType))
+            if (!IsTextType(message.MetaType))
             {
                 throw new ArgumentException("Not text based meta message.",
                     "message");
@@ -303,7 +303,7 @@ namespace Sanford.Multimedia.Midi
         {
             bool result;
 
-            if(type == MetaType.Copyright || 
+            if (type == MetaType.Copyright ||
                 type == MetaType.CuePoint ||
                 type == MetaType.DeviceName ||
                 type == MetaType.InstrumentName ||
@@ -338,7 +338,7 @@ namespace Sanford.Multimedia.Midi
             }
             set
             {
-                if(value != null)
+                if (value != null)
                 {
                     text = value;
                 }
@@ -367,7 +367,7 @@ namespace Sanford.Multimedia.Midi
             {
                 #region Require
 
-                if(!IsTextType(value))
+                if (!IsTextType(value))
                 {
                     throw new ArgumentException("Not text based meta message type.",
                         "message");
@@ -405,7 +405,7 @@ namespace Sanford.Multimedia.Midi
         {
             // If the text has changed since the last time this method was 
             // called.
-            if(changed)
+            if (changed)
             {
                 //
                 // Build text MetaMessage.

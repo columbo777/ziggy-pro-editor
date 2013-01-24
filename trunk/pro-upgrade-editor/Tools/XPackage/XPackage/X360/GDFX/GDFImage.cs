@@ -1,12 +1,16 @@
 ﻿// NOTE This class is protected under GPL License as well as terms and conditions.
-/* */ // Most notably, you must not obfuscate/protect this code, you must include an open source
-/* */ // to your project that uses this code, and you must also not make profit on it.
-/* */ // For more details, access:
+/* */
+// Most notably, you must not obfuscate/protect this code, you must include an open source
+/* */
+// to your project that uses this code, and you must also not make profit on it.
+/* */
+// For more details, access:
 // *http://www.gnu.org/
 // *License included in the library source
 // *License located at X360.XPackage.Resources.GPL30
 // *X360.XAbout.GNUProtected for GNU and TaC (Terms and Conditions)
-/* */ // You agree to these terms when you use this code.
+/* */
+// You agree to these terms when you use this code.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +39,7 @@ namespace X360.GDFX
         /// <summary>
         /// Not a GDFX image
         /// </summary>
-        public static Exception NotGDF { get { return xNotGDF; }}
+        public static Exception NotGDF { get { return xNotGDF; } }
     }
 
     /// <summary>
@@ -93,7 +97,7 @@ namespace X360.GDFX
         /// </summary>
         Normal = 0x80
     }
-    
+
     /// <summary>
     /// Object to hold a GDF entry
     /// </summary>
@@ -251,7 +255,8 @@ namespace X360.GDFX
                 {
                     if (i < (ct - 1))
                         xref.xIO.Write(xIO.ReadBytes(GDFImage.blocksize));
-                    else xref.xIO.Write(xIO.ReadBytes((int)(((xIO.Length - 1) % GDFImage.blocksize) + 1)));
+                    else
+                        xref.xIO.Write(xIO.ReadBytes((int)(((xIO.Length - 1) % GDFImage.blocksize) + 1)));
                 }
                 xref.xIO.Position = (entryoffset + 4);
                 xref.xIO.Write((int)xIO.Length, false);
@@ -270,7 +275,7 @@ namespace X360.GDFX
         internal GDFFolder(GDFEntry xIn) : base(xIn) { }
 
         internal GDFFolder(int size, uint xBlock, GDFImage Ref) { xSize = size; xStartBlock = xBlock; xref = Ref; }
-        
+
         /// <summary>
         /// Reads the folder
         /// </summary>
@@ -413,7 +418,7 @@ namespace X360.GDFX
         /// <param name="Deviation"></param>
         public GDFImage(string FileLocation, uint Deviation) :
             this(new DJsIO(FileLocation, DJFileMode.Open, true), Deviation) { }
-        
+
         /// <summary>
         /// Grabs an image from an IO and specified Deviation
         /// </summary>
@@ -424,7 +429,7 @@ namespace X360.GDFX
             if (!xIOIn.Accessed)
                 throw IOExcepts.AccessError;
             xIOIn.Position = 0;
-            
+
             if (xIOIn.ReadUInt32() == (uint)AllMagic.XSF)
             {
                 xIOIn.Position = baseoffset = 0x10000;
@@ -467,7 +472,7 @@ namespace X360.GDFX
         // Implement later
         internal GDFImage(CreateGDF xSession, bool AllocateSecuritySector, string OutLocale)
         {
-            
+
         }
 
         internal long GenerateDataOffset(uint xBlock)
@@ -506,7 +511,8 @@ namespace X360.GDFX
             {
                 if ((x.EntryAttributes & GDFAttributes.Directory) == GDFAttributes.Directory)
                     xReturn.xFolders.Add(new GDFFolder(x));
-                else xReturn.xFiles.Add(new GDFFile(x));
+                else
+                    xReturn.xFiles.Add(new GDFFile(x));
             }
             return xReturn;
         }

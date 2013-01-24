@@ -1,12 +1,16 @@
 ﻿// NOTE This class is protected under GPL License as well as terms and conditions.
-/* */ // Most notably, you must not obfuscate/protect this code, you must include an open source
-/* */ // to your project that uses this code, and you must also not make profit on it.
-/* */ // For more details, access:
+/* */
+// Most notably, you must not obfuscate/protect this code, you must include an open source
+/* */
+// to your project that uses this code, and you must also not make profit on it.
+/* */
+// For more details, access:
 // *http://www.gnu.org/
 // *License included in the library source
 // *License located at X360.XPackage.Resources.GPL30
 // *X360.XAbout.GNUProtected for GNU and TaC (Terms and Conditions)
-/* */ // You agree to these terms when you use this code.
+/* */
+// You agree to these terms when you use this code.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,15 +41,15 @@ namespace X360.SVOD
         static readonly Exception xAccess = new Exception("Could not access all files");
 
         /// <summary>Data file error</summary>
-        public static Exception Size { get { return xSize; }}
+        public static Exception Size { get { return xSize; } }
         /// <summary>Unknown error</summary>
-        public static Exception Unknown { get { return xUnknown; }}
+        public static Exception Unknown { get { return xUnknown; } }
         /// <summary>Count error</summary>
-        public static Exception Count { get { return xCount; }}
+        public static Exception Count { get { return xCount; } }
         /// <summary>Stream access error</summary>
-        public static Exception Access { get { return xAccess; }}
+        public static Exception Access { get { return xAccess; } }
     }
-    
+
     /// <summary>
     /// SVOD Handler
     /// </summary>
@@ -68,12 +72,12 @@ namespace X360.SVOD
 
         bool dataloaded { get { return xDataFiles != null; } }
         /// <summary>Header information</summary>
-        public HeaderData Header { get { return xHeaderData; }}
+        public HeaderData Header { get { return xHeaderData; } }
         /// <summary>Tells if package is valid</summary>
-        public bool IsValid { get { return xHeaderData != null; }}
+        public bool IsValid { get { return xHeaderData != null; } }
         /// <summary>Package deviation</summary>
         public uint Deviation { get { return xDeviation; } }
-        
+
         bool ActiveCheck()
         {
             if (xActive)
@@ -97,7 +101,7 @@ namespace X360.SVOD
                 if (xDataPath[xDataPath.Length - 1] == '/')
                     xDataPath = xDataPath.Substring(0, xDataPath.Length - 1);
             }
-            
+
             IO = xHeaderIO;
             xHeaderIO.Position = 0;
             xHeaderIO.IsBigEndian = true;
@@ -378,7 +382,8 @@ namespace X360.SVOD
                 case 1:
                     xOffset += (0x14 * (xLocaleBlock / 0xCC));
                     break;
-                default: return long.MaxValue;
+                default:
+                    return long.MaxValue;
             }
             return xOffset;
         }

@@ -1,12 +1,16 @@
 ﻿// NOTE This class is protected under GPL License as well as terms and conditions.
-/* */ // Most notably, you must not obfuscate/protect this code, you must include an open source
-/* */ // to your project that uses this code, and you must also not make profit on it.
-/* */ // For more details, access:
+/* */
+// Most notably, you must not obfuscate/protect this code, you must include an open source
+/* */
+// to your project that uses this code, and you must also not make profit on it.
+/* */
+// For more details, access:
 // *http://www.gnu.org/
 // *License included in the library source
 // *License located at X360.XPackage.Resources.GPL30
 // *X360.XAbout.GNUProtected for GNU and TaC (Terms and Conditions)
-/* */ // You agree to these terms when you use this code.
+/* */
+// You agree to these terms when you use this code.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -118,26 +122,26 @@ namespace X360.STFS
         /// Block count of file
         /// </summary>
         /// <returns></returns>
-        public uint BlockCount() 
+        public uint BlockCount()
         {
             if (filelocale == null)
             {
-                return CreateTools.BlockCount(FileData); 
+                return CreateTools.BlockCount(FileData);
             }
-            return CreateTools.BlockCount(filelocale); 
+            return CreateTools.BlockCount(filelocale);
         }
 
         /// <summary>
         /// Grabs the length of the item
         /// </summary>
         /// <returns></returns>
-        public int GetLength() 
+        public int GetLength()
         {
             if (filelocale == null)
             {
                 return FileData.Length;
             }
-            return (int)new FileInfo(filelocale).Length; 
+            return (int)new FileInfo(filelocale).Length;
         }
 
         internal CFileEntry(byte[] xFile, string path, CreateSTFS xCreate)
@@ -159,7 +163,7 @@ namespace X360.STFS
             : base(path, ref xCreate) { }
 
         internal CFolderEntry(string path, ref CreateSTFS xCreate)
-            : base(path, ref xCreate){ }
+            : base(path, ref xCreate) { }
 
         /// <summary>
         /// Grabs the files under the directory
@@ -268,7 +272,8 @@ namespace X360.STFS
         /// <summary>
         /// Light
         /// </summary>
-        Light }
+        Light
+    }
 
     /// <summary>
     /// Theme Params
@@ -355,7 +360,8 @@ namespace X360.STFS
             {
                 if (value == STFSType.Type0 || value == STFSType.Type1)
                     xStruct = value;
-                else xStruct = STFSType.Type0;
+                else
+                    xStruct = STFSType.Type0;
             }
         }
         internal uint[] BlockStep

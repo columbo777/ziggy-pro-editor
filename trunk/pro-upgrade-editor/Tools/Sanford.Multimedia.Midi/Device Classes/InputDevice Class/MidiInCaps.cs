@@ -49,12 +49,12 @@ namespace Sanford.Multimedia.Midi
         /// Manufacturer identifier of the device driver for the Midi output 
         /// device. 
         /// </summary>
-        public short mid; 
+        public short mid;
 
         /// <summary>
         /// Product identifier of the Midi output device. 
         /// </summary>
-        public short pid; 
+        public short pid;
 
         /// <summary>
         /// Version number of the device driver for the Midi output device. The 
@@ -67,12 +67,12 @@ namespace Sanford.Multimedia.Midi
         /// Product name.
         /// </summary>
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-        public string name;         
+        public string name;
 
         /// <summary>
         /// Optional functionality supported by the device. 
         /// </summary>
-        public int support; 
+        public int support;
 
         #endregion
     }

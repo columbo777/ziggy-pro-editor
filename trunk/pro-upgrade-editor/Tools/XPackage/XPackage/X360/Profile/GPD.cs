@@ -1,12 +1,16 @@
 ﻿// NOTE This class is protected under GPL License as well as terms and conditions.
-/* */ // Most notably, you must not obfuscate/protect this code, you must include an open source
-/* */ // to your project that uses this code, and you must also not make profit on it.
-/* */ // For more details, access:
+/* */
+// Most notably, you must not obfuscate/protect this code, you must include an open source
+/* */
+// to your project that uses this code, and you must also not make profit on it.
+/* */
+// For more details, access:
 // *http://www.gnu.org/
 // *License included in the library source
 // *License located at X360.XPackage.Resources.GPL30
 // *X360.XAbout.GNUProtected for GNU and TaC (Terms and Conditions)
-/* */ // You agree to these terms when you use this code.
+/* */
+// You agree to these terms when you use this code.
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -35,25 +39,25 @@ namespace X360.Profile
         static readonly Exception xNameError = new Exception("GPD does not contain a name");
         //[CompilerGenerated]
         static readonly Exception xInUse = new Exception("Current file is in use");
-        
+
         /// <summary>
         /// Has ID
         /// </summary>
-        public static Exception HasID { get { return xHasID; }}
+        public static Exception HasID { get { return xHasID; } }
         /// <summary>
         /// Not XDBF
         /// </summary>
-        public static Exception IsntXDBF { get { return xIsntXDBF; }}
+        public static Exception IsntXDBF { get { return xIsntXDBF; } }
         /// <summary>
         /// Name Error
         /// </summary>
-        public static Exception NameError { get { return xNameError; }}
+        public static Exception NameError { get { return xNameError; } }
         /// <summary>
         /// Cannot multitask
         /// </summary>
-        public static Exception InUse { get { return xInUse; }}
+        public static Exception InUse { get { return xInUse; } }
     }
-    
+
     /// <summary> ID's found in GPDs </summary>
     public enum GPDIDs : long
     {
@@ -286,7 +290,7 @@ namespace X360.Profile
         /// ID of entry
         /// </summary>
         public long ID { get { return xID; } }
-        internal bool Valid { get { return (xRef != null); }}
+        internal bool Valid { get { return (xRef != null); } }
 
         internal XDBFEntry(GPD GPDRef)
         {
@@ -327,7 +331,7 @@ namespace X360.Profile
         internal long xID;
         //[CompilerGenerated]
         internal long xSync;
-        
+
         /// <summary>
         /// Entry ID
         /// </summary>
@@ -336,7 +340,7 @@ namespace X360.Profile
         /// Sync ID
         /// </summary>
         public long Sync { get { return xSync; } }
-        
+
         internal SyncPair(long xid, long xsync)
         {
             xID = xid;
@@ -357,7 +361,7 @@ namespace X360.Profile
         /// </summary>
         public SyncPair[] SyncPairs { get { return xpairs.ToArray(); } }
 
-        internal RecordEntry(XDBFEntry xEntry) : base(xEntry) {}
+        internal RecordEntry(XDBFEntry xEntry) : base(xEntry) { }
 
         internal bool xLoadDetails()
         {
@@ -506,7 +510,8 @@ namespace X360.Profile
                         }
                         break;
 
-                    default: break;
+                    default:
+                        break;
                 }
             }
         }
@@ -571,7 +576,9 @@ namespace X360.Profile
                         Var2 = xRef.xIO.ReadInt32();
                         break;
 
-                    default: Data = xRef.xIO.ReadBytes(8); break;
+                    default:
+                        Data = xRef.xIO.ReadBytes(8);
+                        break;
                 }
                 if (Var1 > 0)
                     xdata = xRef.xIO.ReadBytes(Var1);
@@ -683,7 +690,8 @@ namespace X360.Profile
                     case SettingType.UInt32:
                         if (xdata.GetType().ToString().ToLower() == "system.uint32")
                             xRef.xIO.Write((uint)xdata);
-                        else xRef.xIO.Write((int)xdata);
+                        else
+                            xRef.xIO.Write((int)xdata);
                         xRef.xIO.Flush();
                         break;
 
@@ -692,7 +700,8 @@ namespace X360.Profile
                         xRef.xIO.Flush();
                         break;
 
-                    default: return true;
+                    default:
+                        return true;
                 }
                 if (xType != SyncType.None)
                     return xRef.UpdateSync(NameSpace.Setting, ID, xType) & xRef.UpdateHeader();
@@ -723,11 +732,11 @@ namespace X360.Profile
         /// <summary>
         /// Last sync'ed entry
         /// </summary>
-        public long Last { get { return xLastSync; }}
+        public long Last { get { return xLastSync; } }
         /// <summary>
         /// Next assignable sync ID
         /// </summary>
-        public long Next { get { return xNext; }}
+        public long Next { get { return xNext; } }
 
         internal SyncEntry(XDBFEntry xEntry) : base(xEntry) { }
 
@@ -780,7 +789,8 @@ namespace X360.Profile
             {
                 if (xLoaded)
                     return xImage;
-                else return XPackage.Resources.NoImage;
+                else
+                    return XPackage.Resources.NoImage;
             }
         }
 
@@ -860,7 +870,7 @@ namespace X360.Profile
         byte[] xData;
         //[CompilerGenerated]
         bool xLoaded = false;
-        
+
         /// <summary>
         /// Binary Data
         /// </summary>
@@ -1024,14 +1034,14 @@ namespace X360.Profile
         //[CompilerGenerated]
         internal List<FreeSpaceEntry> xFreeEnts = new List<FreeSpaceEntry>();
         /// <summary>GPD Images</summary>
-        public ImageEntry[] Images { get { return xImages.ToArray(); }}
+        public ImageEntry[] Images { get { return xImages.ToArray(); } }
         /// <summary>GPD Strings</summary>
-        public StringEntry[] Strings { get { return xStrings.ToArray(); }}
+        public StringEntry[] Strings { get { return xStrings.ToArray(); } }
         /// <summary>GPD Settings</summary>
-        public Setting[] UserSettings { get { return xUserSettings.ToArray(); }}
+        public Setting[] UserSettings { get { return xUserSettings.ToArray(); } }
         /// <summary>GPD Unknown Data</summary>
-        public OtherEntry[] UnknownData { get { return xUnknownData.ToArray(); }}
-        internal int HeaderSize { get { return (0x18 + (xEntryMax * 0x12) + (xFreeMax * 8)); }}
+        public OtherEntry[] UnknownData { get { return xUnknownData.ToArray(); } }
+        internal int HeaderSize { get { return (0x18 + (xEntryMax * 0x12) + (xFreeMax * 8)); } }
         /// <summary>GPD Parsed correctly</summary>
         public bool IsValid { get { return (xIO != null); } }
         /// <summary>GPD Sync Indexes</summary>
@@ -1111,7 +1121,9 @@ namespace X360.Profile
                             {
                                 switch (x.NS)
                                 {
-                                    case NameSpace.Nothing: xEntries.RemoveAt(i--); break;
+                                    case NameSpace.Nothing:
+                                        xEntries.RemoveAt(i--);
+                                        break;
 
                                     case NameSpace.Achievement:
                                         {
@@ -1160,7 +1172,10 @@ namespace X360.Profile
                                         }
                                         break;
 
-                                    default: xEntries.RemoveAt(i--); xEntryCurrent--; break;
+                                    default:
+                                        xEntries.RemoveAt(i--);
+                                        xEntryCurrent--;
+                                        break;
                                 }
                             }
                             break;
@@ -1347,7 +1362,7 @@ namespace X360.Profile
         {
             if (!ParseCheck())
                 return null;
-            foreach(StringEntry x in xStrings)
+            foreach (StringEntry x in xStrings)
             {
                 if (x.ID != xID)
                     continue;
@@ -1357,7 +1372,7 @@ namespace X360.Profile
             xActive = false;
             return null;
         }
-            
+
         /// <summary>
         /// Grabs an image via ID
         /// </summary>
@@ -1394,7 +1409,8 @@ namespace X360.Profile
             List<XDBFEntry> xents = GetEntries();
             if (xents.Count < xEntryMax)
                 return xReturn;
-            else return -1;
+            else
+                return -1;
         }
 
         int sortbyid(XDBFEntry x1, XDBFEntry x2) { return x1.ID.CompareTo(x2.ID); }
@@ -1571,7 +1587,8 @@ namespace X360.Profile
                     int xsize;
                     if (xNS != NameSpace.Achievement)
                         xsize = 0x10;
-                    else xsize = (0x10 * xAchievements.Count);
+                    else
+                        xsize = (0x10 * xAchievements.Count);
                     int pos = AllocateData(xsize);
                     if (pos == -1)
                         return false;
@@ -1615,7 +1632,8 @@ namespace X360.Profile
             }
             if (xType == SyncType.Server)
                 xIndexRecords[idx1].xpairs.Add(new SyncPair(ID, curnext++));
-            else xIndexRecords[idx1].xpairs.Add(new SyncPair(ID, 0));
+            else
+                xIndexRecords[idx1].xpairs.Add(new SyncPair(ID, 0));
             if (xIndexRecords[idx1].xUpdate())
             {
                 xSyncs[idx2].xNext = curnext;
@@ -1681,7 +1699,8 @@ namespace X360.Profile
                         return false;
                     }
 
-                default: return false;
+                default:
+                    return false;
             }
         }
 
@@ -1738,7 +1757,8 @@ namespace X360.Profile
                             {
                                 if (i == 0)
                                     xType = SettingType.Double;
-                                else xIO.Write((double)Data);
+                                else
+                                    xIO.Write((double)Data);
                             }
                             break;
 
@@ -1770,7 +1790,8 @@ namespace X360.Profile
                             {
                                 if (i == 0)
                                     xType = SettingType.Int64;
-                                else xIO.Write((long)Data);
+                                else
+                                    xIO.Write((long)Data);
                             }
                             break;
 
@@ -1778,7 +1799,8 @@ namespace X360.Profile
                             {
                                 if (i == 0)
                                     xType = SettingType.DateTime;
-                                else xIO.Write(((DateTime)Data).ToFileTime());
+                                else
+                                    xIO.Write(((DateTime)Data).ToFileTime());
                             }
                             break;
 
@@ -1819,7 +1841,8 @@ namespace X360.Profile
                             }
                             break;
 
-                        default: return (xActive = false);
+                        default:
+                            return (xActive = false);
                     }
                     if (i == 0)
                     {
@@ -1840,7 +1863,8 @@ namespace X360.Profile
                         xIO.Write((byte)xType);
                         xIO.Write(new byte[7]);
                     }
-                    else xIO.Flush();
+                    else
+                        xIO.Flush();
                 }
                 XDBFEntry xent = new XDBFEntry(NameSpace.Setting, ID, (int)pos, xSize, this);
                 if (!xent.Valid)

@@ -1,12 +1,16 @@
 ﻿// NOTE This class is protected under GPL License as well as terms and conditions.
-/* */ // Most notably, you must not obfuscate/protect this code, you must include an open source
-/* */ // to your project that uses this code, and you must also not make profit on it.
-/* */ // For more details, access:
+/* */
+// Most notably, you must not obfuscate/protect this code, you must include an open source
+/* */
+// to your project that uses this code, and you must also not make profit on it.
+/* */
+// For more details, access:
 // *http://www.gnu.org/
 // *License included in the library source
 // *License located at X360.XPackage.Resources.GPL30
 // *X360.XAbout.GNUProtected for GNU and TaC (Terms and Conditions)
-/* */ // You agree to these terms when you use this code.
+/* */
+// You agree to these terms when you use this code.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,11 +30,11 @@ namespace X360.Media
     {
         //[CompilerGenerated]
         static readonly Exception xNotMusic = new Exception("Invalid music package input");
-        
+
         /// <summary>
         /// Not a music package
         /// </summary>
-        public static Exception NotMusic { get { return xNotMusic; }}
+        public static Exception NotMusic { get { return xNotMusic; } }
     }
 
     /// <summary>
@@ -46,27 +50,27 @@ namespace X360.Media
         /// Song title
         /// </summary>
         //[CompilerGenerated]
-        public string Song { get { return so; }}
+        public string Song { get { return so; } }
         /// <summary>
         /// Artist
         /// </summary>
         //[CompilerGenerated]
-        public string Artist { get { return ar; }}
+        public string Artist { get { return ar; } }
         /// <summary>
         /// Album
         /// </summary>
         //[CompilerGenerated]
-        public string Album { get { return al; }}
+        public string Album { get { return al; } }
         /// <summary>
         /// Genre
         /// </summary>
         //[CompilerGenerated]
-        public string Genre { get { return ge; }}
+        public string Genre { get { return ge; } }
         /// <summary>
         /// Size of file
         /// </summary>
         //[CompilerGenerated]
-        public long WMASize { get { return (IO.Length - 0xD08); }}
+        public long WMASize { get { return (IO.Length - 0xD08); } }
         //[CompilerGenerated]
         bool xActive = false;
 
@@ -133,20 +137,20 @@ namespace X360.Media
         /// Extracts the file via end user location
         /// </summary>
         /// <returns></returns>
-      /*  public bool ExtractWMA()
-        {
-            if (xActive)
-                return false;
-            xActive = true;
-            try
-            {
-                DJsIO xIO = new DJsIO(DJFileMode.Create, "Save Where?", "Windows Music File|*.wma", true);
-                if (!xIO.Accessed)
-                    return (xActive = false);
-                xExtract(ref xIO);
-                return !(xActive = false);
-            }
-            catch { xActive = false; throw STFSExcepts.WriteError; }
-        }*/
+        /*  public bool ExtractWMA()
+          {
+              if (xActive)
+                  return false;
+              xActive = true;
+              try
+              {
+                  DJsIO xIO = new DJsIO(DJFileMode.Create, "Save Where?", "Windows Music File|*.wma", true);
+                  if (!xIO.Accessed)
+                      return (xActive = false);
+                  xExtract(ref xIO);
+                  return !(xActive = false);
+              }
+              catch { xActive = false; throw STFSExcepts.WriteError; }
+          }*/
     }
 }

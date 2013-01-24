@@ -65,10 +65,10 @@ namespace Sanford.Multimedia.Midi
 
         public void Process(ChannelMessage message)
         {
-            switch(message.Command)
+            switch (message.Command)
             {
                 case ChannelCommand.NoteOn:
-                    if(message.Data2 > 0)
+                    if (message.Data2 > 0)
                     {
                         noteOnMessage[message.MidiChannel, message.Data1] = message;
                     }
@@ -83,10 +83,10 @@ namespace Sanford.Multimedia.Midi
                     break;
 
                 case ChannelCommand.Controller:
-                    switch(message.Data1)
+                    switch (message.Data1)
                     {
                         case (int)ControllerType.HoldPedal1:
-                            if(message.Data2 > 63)
+                            if (message.Data2 > 63)
                             {
                                 holdPedal1Message[message.MidiChannel] = true;
                             }
@@ -97,7 +97,7 @@ namespace Sanford.Multimedia.Midi
                             break;
 
                         case (int)ControllerType.HoldPedal2:
-                            if(message.Data2 > 63)
+                            if (message.Data2 > 63)
                             {
                                 holdPedal2Message[message.MidiChannel] = true;
                             }
@@ -108,7 +108,7 @@ namespace Sanford.Multimedia.Midi
                             break;
 
                         case (int)ControllerType.SustenutoPedal:
-                            if(message.Data2 > 63)
+                            if (message.Data2 > 63)
                             {
                                 sustenutoMessage[message.MidiChannel] = true;
                             }
@@ -126,11 +126,11 @@ namespace Sanford.Multimedia.Midi
         {
             ArrayList stoppedMessages = new ArrayList();
 
-            for(int c = 0; c <= ChannelMessage.MidiChannelMaxValue; c++)
+            for (int c = 0; c <= ChannelMessage.MidiChannelMaxValue; c++)
             {
-                for(int n = 0; n <= ShortMessage.DataMaxValue; n++)
+                for (int n = 0; n <= ShortMessage.DataMaxValue; n++)
                 {
-                    if(noteOnMessage[c, n] != null)
+                    if (noteOnMessage[c, n] != null)
                     {
                         builder.MidiChannel = c;
                         builder.Command = ChannelCommand.NoteOff;
@@ -143,7 +143,7 @@ namespace Sanford.Multimedia.Midi
                     }
                 }
 
-                if(holdPedal1Message[c])
+                if (holdPedal1Message[c])
                 {
                     builder.MidiChannel = c;
                     builder.Command = ChannelCommand.Controller;
@@ -155,7 +155,7 @@ namespace Sanford.Multimedia.Midi
                     holdPedal1Message[c] = false;
                 }
 
-                if(holdPedal2Message[c])
+                if (holdPedal2Message[c])
                 {
                     builder.MidiChannel = c;
                     builder.Command = ChannelCommand.Controller;
@@ -167,7 +167,7 @@ namespace Sanford.Multimedia.Midi
                     holdPedal2Message[c] = false;
                 }
 
-                if(sustenutoMessage[c])
+                if (sustenutoMessage[c])
                 {
                     builder.MidiChannel = c;
                     builder.Command = ChannelCommand.Controller;
@@ -185,9 +185,9 @@ namespace Sanford.Multimedia.Midi
 
         public void Reset()
         {
-            for(int c = 0; c <= ChannelMessage.MidiChannelMaxValue; c++)
+            for (int c = 0; c <= ChannelMessage.MidiChannelMaxValue; c++)
             {
-                for(int n = 0; n <= ShortMessage.DataMaxValue; n++)
+                for (int n = 0; n <= ShortMessage.DataMaxValue; n++)
                 {
                     noteOnMessage[c, n] = null;
                 }
@@ -202,7 +202,7 @@ namespace Sanford.Multimedia.Midi
         {
             EventHandler<StoppedEventArgs> handler = Stopped;
 
-            if(handler != null)
+            if (handler != null)
             {
                 handler(this, e);
             }

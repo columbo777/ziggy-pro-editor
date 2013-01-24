@@ -11,7 +11,8 @@ namespace EditorResources.Components
 {
     public partial class PEPopupWindow : Form
     {
-        public PEPopupWindow() : base()
+        public PEPopupWindow()
+            : base()
         {
             InitializeComponent();
         }

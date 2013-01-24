@@ -54,7 +54,7 @@ namespace Sanford.Multimedia.Midi
 
             int result = midiInOpen(out handle, deviceID, midiInProc, 0, CALLBACK_FUNCTION);
 
-            if(result == MidiDeviceException.MMSYSERR_NOERROR)
+            if (result == MidiDeviceException.MMSYSERR_NOERROR)
             {
                 delegateQueue = new DelegateQueue();
             }
@@ -66,7 +66,7 @@ namespace Sanford.Multimedia.Midi
 
         ~InputDevice()
         {
-            if(!IsDisposed)
+            if (!IsDisposed)
             {
                 midiInReset(Handle);
                 midiInClose(Handle);

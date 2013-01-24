@@ -20,20 +20,20 @@ namespace X360.FATX
     [Flags]
     public enum FATXAttribute
     {
-        None=0,
+        None = 0,
         Folder = 0x10,
         Invalid = 0xFF,
     }
 
-    
+
     public unsafe struct FATXEntry64
     {
         //[FieldOffset(0)]// max 42, FF = end of directory 1	Size of filename (max. 42)
-        public byte FileNameSize; 
-        
+        public byte FileNameSize;
+
         //[FieldOffset(1)] //1	Attribute as on FAT
         public byte Attribute;
-        
+
         //[FieldOffset(2)]//42	Filename in ASCII, padded with 0xff (not zero-terminated)
         //[MarshalAs(UnmanagedType.ByValArray,SizeConst=42)]
         public fixed byte FileName[42];
@@ -54,7 +54,8 @@ namespace X360.FATX
         public Int32 AccessedDate;
 
 
-        public FATXEntry64(byte[] originalData) : this()
+        public FATXEntry64(byte[] originalData)
+            : this()
         {
             this.originalData = new byte[64];
             for (int x = 0; x < 64; x++)
@@ -63,10 +64,10 @@ namespace X360.FATX
             }
 
             var e = FATXEntry64.Read(originalData);
-            
+
             {
                 this = e;
-                
+
             }
         }
 
@@ -92,7 +93,7 @@ namespace X360.FATX
 
             ret.FileNameSize = b[0];
             ret.Attribute = b[1];
-            fixed(byte* p = b)
+            fixed (byte* p = b)
             {
                 for (int x = 0; x < 42; x++)
                 {
@@ -104,11 +105,11 @@ namespace X360.FATX
                 ret.ModDate = BitConv.ToInt32(p, 52, true);
                 ret.CreateDate = BitConv.ToInt32(p, 56, true);
                 ret.AccessedDate = BitConv.ToInt32(p, 60, true);
-                
+
             }
             return ret;
         }
-        
+
         public bool IsValid
         {
             get
@@ -126,14 +127,14 @@ namespace X360.FATX
                 {
                     return false;
                 }
-                
-                
+
+
 
                 return true;
             }
         }
 
-        
+
         public bool IsFolder
         {
             get
@@ -145,7 +146,7 @@ namespace X360.FATX
             }
         }
 
-        
+
         public bool IsFileNameValid
         {
             get
@@ -156,7 +157,7 @@ namespace X360.FATX
             }
         }
 
-        
+
         public bool IsFile
         {
             get
@@ -164,7 +165,7 @@ namespace X360.FATX
                 return (IsValid && IsFileNameValid && !IsFolder);
             }
         }
-       
+
         public bool IsDeleted
         {
             get
@@ -173,16 +174,16 @@ namespace X360.FATX
             }
         }
 
-        
+
         public string FileNameStr
         {
             get
             {
-                if (FileNameSize == 0 || FileNameSize == 0xE5 || 
+                if (FileNameSize == 0 || FileNameSize == 0xE5 ||
                     FileNameSize == 0xFF || FileNameSize > 42)
                     return null;
 
-                
+
                 var v = new byte[42];
                 fixed (byte* p = FileName)
                 {
@@ -196,10 +197,10 @@ namespace X360.FATX
                     }
                 }
                 return Encoding.UTF8.GetString(v.ToArray()).Trim((char)0);
-               
+
             }
         }
-        
+
     }
     /// <summary>
     /// Generic entry for FATX
@@ -232,7 +233,7 @@ namespace X360.FATX
         //[CompilerGenerated]
         public FATXDrive xDrive;
 
-        
+
         /// <summary>
         /// Entry Size
         /// </summary>
@@ -285,7 +286,7 @@ namespace X360.FATX
                 if (value.Length > 0x2A)
                     value = value.Substring(0, 0x2A);
                 xName = value;
-                
+
                 if (xNLen != 0xE5)
                     xNLen = (byte)value.Length;
             }
@@ -321,18 +322,18 @@ namespace X360.FATX
         public FATXType fatType;
         public FATXEntry64 FatEntry;
 
-        
+
         public FATXEntry(FATXType fatType, long Pos, byte[] xData, ref FATXDrive xdrive)
         {
 
             FatEntry = new FATXEntry64(xData);
-            
+
             this.fatType = fatType;
             this.xDrive = xdrive;
             this.xIsFolder = FatEntry.Attribute != 0xFF && ((FatEntry.Attribute & 0x10) == 0x10);
             this.xName = FatEntry.FileNameStr;
             this.xNLen = FatEntry.FileNameSize;
-            
+
             this.xStartBlock = FatEntry.FirstCluster;
             this.xSize = FatEntry.FileSize;
 
@@ -340,7 +341,7 @@ namespace X360.FATX
             this.xT2 = FatEntry.CreateDate;
             this.xT3 = FatEntry.AccessedDate;
 
-            
+
             this.fatType = fatType;
             xDrive = xdrive;
             xOffset = Pos;
@@ -393,7 +394,7 @@ namespace X360.FATX
             xOffset = xPosition;
             xIsValid = true;
             xDrive = xdrive;
-            
+
 
         }
 
@@ -406,7 +407,7 @@ namespace X360.FATX
         public byte[] GetData()
         {
             List<byte> xArray = new List<byte>();
-            
+
             xArray.Add(xNLen);
             var attr = (byte)((IsFolder ? 1 : 0) << 4);
             xArray.Add(attr);
@@ -414,11 +415,11 @@ namespace X360.FATX
             var name = Encoding.UTF8.GetBytes(xName);
             xArray.AddRange(name);
             var blen = 0x2A - xName.Length;
-            if(blen > 0)
+            if (blen > 0)
             {
-                
+
                 var b = new byte[blen];
-                
+
                 for (int x = 0; x < blen; x++)
                 {
                     b[x] = 0xFF;
@@ -447,7 +448,7 @@ namespace X360.FATX
                 xT2 = X360.Other.TimeStamps.FatTimeInt(DateTime.Now);
                 xT3 = X360.Other.TimeStamps.FatTimeInt(DateTime.Now);
                 byte[] xdata = GetData();
-                
+
                 xDrive.GetIO();
                 xDrive.xIO.Position = xOffset;
                 xDrive.xIO.Write(xdata);
@@ -580,7 +581,7 @@ namespace X360.FATX
             {
                 uint[] curblocks = Partition.xTable.GetBlocks(xStartBlock);
                 var blockCount = xIOIn.BlockCountFATX(Partition);
-                
+
                 uint[] blocks = Partition.xTable.GetNewBlockChain(blockCount, 1);
                 if (blocks.Length == 0)
                     throw new Exception();
@@ -594,7 +595,7 @@ namespace X360.FATX
                     throw new Exception();
                 if (!Partition.WriteAllocTable())
                     throw new Exception();
-                
+
                 base.xStartBlock = blocks[0];
                 base.xSize = (int)xIOIn.Length;
                 xIOIn.Close();
@@ -619,15 +620,15 @@ namespace X360.FATX
                 {
                     return (xDrive.xActive = false);
                 }
-                if(!Partition.xTable.DeleteChain(ref blocks))
+                if (!Partition.xTable.DeleteChain(ref blocks))
                 {
                     return (xDrive.xActive = false);
                 }
-                if(!Partition.WriteAllocTable())
+                if (!Partition.WriteAllocTable())
                 {
                     return (xDrive.xActive = false);
                 }
-                
+
                 xNLen = 0xE5;
 
                 if (!xWriteEntry())
@@ -650,7 +651,7 @@ namespace X360.FATX
                 if (xChain.Length < xct)
                     return false;
                 xDrive.GetIO();
-                
+
                 for (uint i = 0; i < xct - 1; i++)
                 {
                     xDrive.xIO.Position = Partition.BlockToOffset(xChain[(int)i]);
@@ -670,13 +671,13 @@ namespace X360.FATX
         {
             try
             {
-                
+
                 uint[] xChain = Partition.xTable.GetBlocks(xStartBlock);
                 uint xct = (uint)(((xSize - 1) / Partition.xBlockSize) + 1);
                 if (xChain.Length < xct)
                     return null;
-                
-                
+
+
                 FATXStreamIO io = new FATXStreamIO(this, ref xChain, true);
 
                 return io;
@@ -780,7 +781,8 @@ namespace X360.FATX
                     if (xbase != 0xB)
                         throw new Exception();
                 }
-                else throw new Exception();
+                else
+                    throw new Exception();
                 io.Position = 0x395;
                 STFS.STFSDescriptor xDesc = new X360.STFS.STFSDescriptor(Desc, io.ReadUInt32(), io.ReadUInt32(), idx);
                 int pos = (int)xDesc.GenerateDataOffset(xDesc.DirectoryBlock);
@@ -861,7 +863,7 @@ namespace X360.FATX
         public List<FATXFileEntry> xfiles;
         //[CompilerGenerated]
         public List<FATXPartition> xsubparts = new List<FATXPartition>();
-        
+
         /// <summary>
         /// Files
         /// </summary>
@@ -875,7 +877,7 @@ namespace X360.FATX
         /// </summary>
         public FATXPartition[] SubPartitions { get { return xsubparts.ToArray(); } }
 
-        public FATXReadContents() {}
+        public FATXReadContents() { }
     }
 
     /// <summary>
@@ -903,7 +905,7 @@ namespace X360.FATX
         {
             if (xDrive.ActiveCheck())
                 return false;
-            
+
             var xReturn = xDelete();
 
             xDrive.xActive = false;
@@ -966,8 +968,8 @@ namespace X360.FATX
                     for (int x = 0; x < Partition.xEntryCount; x++)
                     {
                         xDrive.xIO.Position = xCurrent + (0x40 * x);
-                        FATXEntry z = new FATXEntry(Partition.FatType, 
-                            (xCurrent + (0x40 * x)), 
+                        FATXEntry z = new FATXEntry(Partition.FatType,
+                            (xCurrent + (0x40 * x)),
                             xDrive.xIO.ReadBytes(0x40),
                             ref xDrive);
 
@@ -993,7 +995,7 @@ namespace X360.FATX
                         if (string.Compare(xEntries[i].Name, this.Name, true) != 0)
                         {
                             var f = new FATXFolderEntry(xEntries[i], Path + "/" + xEntries[i].Name);
-                            
+
                             xreturn.xfolds.Add(f);
                         }
                     }
@@ -1034,14 +1036,14 @@ namespace X360.FATX
                     }
                 }
             }
-            
+
 
             uint[] xBlock = Partition.xTable.GetNewBlockChain(1, 1);
             if (xBlock.Length > 0)
             {
                 // Nulls out a new block and returns the start of the new block
                 xDrive.xIO.Position = Partition.BlockToOffset(xBlock[0]);
-                
+
                 byte[] xnull = new byte[Partition.xBlockSize];
                 for (int x = 0; x < xnull.Length; x++)
                 {
@@ -1096,7 +1098,7 @@ namespace X360.FATX
 
                 var blockCount = xIOIn.BlockCountFATX(Partition);
                 var xnewIndex = xnew + 1;
-                
+
                 uint[] blocks = Partition.xTable.GetNewBlockChain(blockCount, xnewIndex);
                 if (blocks.Length == 0)
                     return (xDrive.xActive = false);
@@ -1104,9 +1106,9 @@ namespace X360.FATX
                 if (!Partition.WriteFile(blocks, ref xIOIn))
                     return (xDrive.xActive = false);
 
-                FATXEntry y = new FATXEntry(FolderName, blocks[0], 
+                FATXEntry y = new FATXEntry(FolderName, blocks[0],
                     (int)xIOIn.Length, xpos, true, ref xDrive);
-                
+
                 //y.FatEntry = new FATXEntry64(xData);
 
                 y.SetAtts(this.Partition);
@@ -1119,7 +1121,7 @@ namespace X360.FATX
                     fileblocks.Add(xnew);
 
                     uint[] xtemp = fileblocks.ToArray();
-                    
+
                     if (!Partition.xTable.WriteChain(ref xtemp))
                         return (xDrive.xActive = false);
                 }
@@ -1179,7 +1181,7 @@ namespace X360.FATX
                 FATXReadContents xconts = xRead();
                 foreach (FATXFileEntry x in xconts.xfiles)
                 {
-                    if (string.Compare(x.Name, FileName, true)==0)
+                    if (string.Compare(x.Name, FileName, true) == 0)
                     {
                         bool xreturn = false;
                         if (xType == AddType.NoOverWrite)
@@ -1214,8 +1216,8 @@ namespace X360.FATX
                 if (!Partition.WriteFile(blocks, ref xIOIn))
                     return (xDrive.xActive = false);
 
-                FATXEntry y = new FATXEntry(FileName, 
-                    blocks[0], (int)xIOIn.Length, 
+                FATXEntry y = new FATXEntry(FileName,
+                    blocks[0], (int)xIOIn.Length,
                     xpos, false, ref xDrive);
 
                 if (!y.xWriteEntry())
@@ -1280,7 +1282,8 @@ namespace X360.FATX
             xOutPath = xOutPath.Replace('\\', '/');
             if (xOutPath[xOutPath.Length - 1] == '/')
                 xOutPath += xName;
-            else xOutPath += "/" + xName;
+            else
+                xOutPath += "/" + xName;
             return (xExtract(xOutPath, IncludeSubFolders) &
                 !(xDrive.xActive = false));
         }
@@ -1337,12 +1340,12 @@ namespace X360.FATX
         /// <summary>
         /// Valid instance
         /// </summary>
-        public bool IsValid 
-        { 
-            get 
-            { 
-                return (xFolders != null && 
-                        xFiles != null && 
+        public bool IsValid
+        {
+            get
+            {
+                return (xFolders != null &&
+                        xFiles != null &&
                         (xFolders.Count + xFiles.Count != 0));
             }
         }
@@ -1353,8 +1356,8 @@ namespace X360.FATX
         public string PartitionName { get { return xName; } }
         #endregion
 
-        public FATXPartition(long xOffset, long xPartitionSize, 
-            FATXDrive xDrive, 
+        public FATXPartition(long xOffset, long xPartitionSize,
+            FATXDrive xDrive,
             string xLocaleName)
         {
 
@@ -1370,16 +1373,16 @@ namespace X360.FATX
                 return;
 
             //if (xDrive.xIO.ReadUInt32() != 0x58544146)
-              //  return;
+            //  return;
             var VolumeID = xDrive.xIO.ReadUInt32(); // Partition ID (884418784)
 
             SectorsPerBlock = xDrive.xIO.ReadUInt32();//Cluster size in (512 byte) sectors
-            
+
             uint blockct = (uint)(xPartitionSize / xBlockSize);
-            
+
             if (blockct < 0xFFF5 && xLocaleName != "Content")
                 FatType = FATXType.FATX16;
-            else 
+            else
                 FatType = FATXType.FATX32;
 
             uint dirblock = (uint)xdrive.xIO.ReadUInt32(); //Number of FAT copies
@@ -1387,7 +1390,7 @@ namespace X360.FATX
             xFATSize = (int)(blockct * (byte)FatType);
             xFATSize += (0x1000 - (xFATSize % 0x1000));
 
-            xTable = new AllocationTable(new DJsIO(true), 
+            xTable = new AllocationTable(new DJsIO(true),
                 (uint)((xPartitionSize - 0x1000 - xFATSize) / xBlockSize), FatType);
 
             xTable.xAllocTable.Position = 0;
@@ -1448,7 +1451,7 @@ namespace X360.FATX
                     continue;
 
                 var x = new FATXPartition(
-                    BlockToOffset(xFiles[i].StartBlock), 
+                    BlockToOffset(xFiles[i].StartBlock),
                     xFiles[i].Size, xdrive, xFiles[i].Name);
 
                 if (!x.IsValid)
@@ -1476,7 +1479,7 @@ namespace X360.FATX
                     return ret;
                 }
             }
-            else if(FatType == FATXType.FATX32)
+            else if (FatType == FATXType.FATX32)
             {
                 if (xBlock == Constants.FATX32End || xBlock == 0 || xBlock >= xTable.BlockCount)
                 {
@@ -1505,7 +1508,7 @@ namespace X360.FATX
                 for (int i = 0; i < xChain.Length; i++)
                 {
                     xdrive.xIO.Position = BlockToOffset(xChain[i]);
-                    
+
                     xIOIn.Position = (i * xBlockSize);
                     var b = xIOIn.ReadBytes(xBlockSize);
 
@@ -1612,17 +1615,18 @@ namespace X360.FATX
                         if (xBlock == Constants.FATX32End)
                             return xReturn.ToArray();
                         break;
-                    default: return xReturn.ToArray();
+                    default:
+                        return xReturn.ToArray();
                 }
                 if (!xReturn.Contains(xBlock))
                     xReturn.Add(xBlock);
-                else 
+                else
                     break;
                 xBlock = GetNextBlock(xBlock);
             }
             return xReturn.ToArray();
         }
-        
+
         public bool WriteChain(ref uint[] xChain)
         {
             if (PartitionType == FATXType.None)
@@ -1635,23 +1639,23 @@ namespace X360.FATX
 
                     bool atEnd = (i == xChain.Length - 1);
 
-                    if(!atEnd)
+                    if (!atEnd)
                     {
-                        if(PartitionType == FATXType.FATX16)
+                        if (PartitionType == FATXType.FATX16)
                         {
-                            uint xc = xChain[i+1];
+                            uint xc = xChain[i + 1];
                             ushort xcs = (ushort)xc;
                             xAllocTable.Write(xcs);
                         }
                         else
                         {
-                            uint xc = xChain[i+1];
+                            uint xc = xChain[i + 1];
                             xAllocTable.Write(xc);
                         }
                     }
                     else
                     {
-                        if(PartitionType == FATXType.FATX16)
+                        if (PartitionType == FATXType.FATX16)
                         {
                             xAllocTable.Write(Constants.FATX16End);
                         }
@@ -1661,12 +1665,12 @@ namespace X360.FATX
                         }
                     }
                 }
-                
+
                 return true;
             }
             catch { return false; }
         }
-        
+
         public uint[] GetNewBlockChain(uint xCount, uint xBlockStart)
         {
             List<uint> xReturn = new List<uint>();
@@ -1678,11 +1682,16 @@ namespace X360.FATX
                 uint xCheck = Constants.FATX32End;
                 switch (PartitionType)
                 {
-                    case FATXType.FATX16: xCheck = xAllocTable.ReadUInt16(); break;
+                    case FATXType.FATX16:
+                        xCheck = xAllocTable.ReadUInt16();
+                        break;
 
-                    case FATXType.FATX32: xCheck = xAllocTable.ReadUInt32(); break;
+                    case FATXType.FATX32:
+                        xCheck = xAllocTable.ReadUInt32();
+                        break;
 
-                    default: break;
+                    default:
+                        break;
                 }
 
                 if (xCheck == 0)

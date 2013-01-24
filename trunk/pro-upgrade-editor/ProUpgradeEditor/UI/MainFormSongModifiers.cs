@@ -36,7 +36,7 @@ namespace ProUpgradeEditor.UI
             {
                 RefreshTrainers();
             }
-            catch{}
+            catch { }
 
         }
 
@@ -44,13 +44,13 @@ namespace ProUpgradeEditor.UI
         {
             RefreshTextEvents();
             RefreshTrainer(GuitarTrainerType.ProGuitar);
-            RefreshTrainer(GuitarTrainerType.ProBass);   
+            RefreshTrainer(GuitarTrainerType.ProBass);
         }
 
         public void RefreshTextEvents()
         {
             EditorPro.ClearTextEventSelection();
-            
+
             listTextEvents.BeginUpdate();
             listTextEvents.Items.Clear();
 
@@ -58,7 +58,7 @@ namespace ProUpgradeEditor.UI
             {
                 foreach (var mev in ProGuitarTrack.Messages.TextEvents)
                 {
-                    if((checkBoxShowTrainersInTextEvents.Checked == true && 
+                    if ((checkBoxShowTrainersInTextEvents.Checked == true &&
                         mev.TrainerType != GuitarTrainerMetaEventType.Unknown) ||
                         mev.TrainerType == GuitarTrainerMetaEventType.Unknown)
                     {
@@ -69,7 +69,7 @@ namespace ProUpgradeEditor.UI
             }
 
             listTextEvents.EndUpdate();
-            
+
             EditorPro.Invalidate();
         }
 
@@ -87,7 +87,7 @@ namespace ProUpgradeEditor.UI
                 {
                     list = listProBassTrainers;
                 }
-                
+
                 if (list != null)
                 {
                     list.BeginUpdate();
@@ -132,7 +132,7 @@ namespace ProUpgradeEditor.UI
 
             var modList = gt.Messages.GetModifiersByType(type).ToList();
 
-            foreach(var obj in modList)
+            foreach (var obj in modList)
             {
                 listBox.Items.Add(new stringObject()
                 {
@@ -304,7 +304,7 @@ namespace ProUpgradeEditor.UI
                 if (obj != null)
                 {
                     gt.Remove(obj);
-                    
+
                     obj.Selected = false;
                 }
 
@@ -316,7 +316,7 @@ namespace ProUpgradeEditor.UI
 
         public GuitarModifier GetSelectedModifier(GuitarModifierType type)
         {
-            
+
             GuitarModifier ret = null;
 
             var gmod = listedModifiers.Single(x => x.modifierType == type);
@@ -338,7 +338,7 @@ namespace ProUpgradeEditor.UI
                 ret = obj;
             }
             return ret;
-            
+
         }
         public void UpdateSelectedModifier(GuitarModifierType type)
         {
@@ -373,7 +373,7 @@ namespace ProUpgradeEditor.UI
                             if (ms.AbsoluteTicks != st ||
                                 me.AbsoluteTicks != ed)
                             {
-                                
+
                                 EditorPro.GuitarTrack.Remove(ms);
                                 obj.SetDownEvent(EditorPro.GuitarTrack.Insert(
                                     st, ms.MidiMessage));

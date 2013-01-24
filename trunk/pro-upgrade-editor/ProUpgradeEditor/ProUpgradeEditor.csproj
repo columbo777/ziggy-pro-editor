@@ -87,12 +87,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="NAudio">
-      <HintPath>..\Tools\NAudio\NAudio.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio.WindowsMediaFormat">
-      <HintPath>..\Tools\NAudio\NAudio.WindowsMediaFormat.dll</HintPath>
-    </Reference>
     <Reference Include="Sanford.Multimedia, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Sanford.Multimedia.dll</HintPath>
@@ -153,6 +147,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\AboutForm.resx">
       <DependentUpon>AboutForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -169,6 +164,7 @@
     </Compile>
     <EmbeddedResource Include="UI\TabPopout.resx">
       <DependentUpon>TabPopout.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">
@@ -363,6 +359,18 @@
     <ProjectReference Include="..\Tools\EditorResources\EditorResources.csproj">
       <Project>{F0F523DA-3085-4BE5-AC09-5F680F0E392E}</Project>
       <Name>EditorResources</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tools\NAudio\NAudio.WindowsMediaFormat\NAudio.WindowsMediaFormat.csproj">
+      <Project>{1868FC77-FD6F-4881-9CF5-DE7451806BFA}</Project>
+      <Name>NAudio.WindowsMediaFormat</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tools\NAudio\NAudio\NAudio.csproj">
+      <Project>{DA4F02E3-0B5E-42CD-B8D9-5583FA51D66E}</Project>
+      <Name>NAudio</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tools\PitchTracker\PitchTracker.csproj">
+      <Project>{5B3976E0-4948-45EF-933F-056172687C7C}</Project>
+      <Name>PitchTracker</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tools\PUECommon\PUECommon.csproj">
       <Project>{7767D3DD-6E1C-419E-9092-F3F3DDDF3D87}</Project>

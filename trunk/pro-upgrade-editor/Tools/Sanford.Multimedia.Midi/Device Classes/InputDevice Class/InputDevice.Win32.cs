@@ -40,7 +40,7 @@ namespace Sanford.Multimedia.Midi
     public partial class InputDevice
     {
         // Represents the method that handles messages from Windows.
-        
+
         #region Win32 MIDI Input Functions and Constants
 
         internal delegate void MidiInProc(
@@ -73,7 +73,7 @@ namespace Sanford.Multimedia.Midi
         internal static extern int midiInStop(
             IntPtr hMidiIn);
 
-        
+
 
         [DllImport("winmm.dll")]
         private static extern int midiInReset(IntPtr handle);
@@ -94,7 +94,7 @@ namespace Sanford.Multimedia.Midi
         private static extern int midiInGetDevCaps(int deviceID,
             ref MidiInCaps caps, int sizeOfMidiInCaps);
 
-        
+
 
         private const int MIDI_IO_STATUS = 0x00000020;
 
@@ -107,6 +107,6 @@ namespace Sanford.Multimedia.Midi
         private const int MIM_MOREDATA = 0x3CC;
         private const int MHDR_DONE = 0x00000001;
 
-        #endregion        
+        #endregion
     }
 }

@@ -1,12 +1,16 @@
 ﻿// NOTE This class is protected under GPL License as well as terms and conditions.
-/* */ // Most notably, you must not obfuscate/protect this code, you must include an open source
-/* */ // to your project that uses this code, and you must also not make profit on it.
-/* */ // For more details, access:
+/* */
+// Most notably, you must not obfuscate/protect this code, you must include an open source
+/* */
+// to your project that uses this code, and you must also not make profit on it.
+/* */
+// For more details, access:
 // *http://www.gnu.org/
 // *License included in the library source
 // *License located at X360.XPackage.Resources.GPL30
 // *X360.XAbout.GNUProtected for GNU and TaC (Terms and Conditions)
-/* */ // You agree to these terms when you use this code.
+/* */
+// You agree to these terms when you use this code.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,23 +69,23 @@ namespace X360.STFS
         /// <summary>
         /// Dash GPD
         /// </summary>
-        public DashGPD UserGPD { get { return xUserGPD; }}
+        public DashGPD UserGPD { get { return xUserGPD; } }
         /// <summary>
         /// Has Dash and Account
         /// </summary>
-        public bool IsValidProfile { get { return (xUserFile != null && xUserFile != null); }}
+        public bool IsValidProfile { get { return (xUserFile != null && xUserFile != null); } }
         /// <summary>
         /// Has Dash GPD
         /// </summary>
-        public bool HasDashGPD { get { return (xUserGPD != null); }}
+        public bool HasDashGPD { get { return (xUserGPD != null); } }
         /// <summary>
         /// Has Account file
         /// </summary>
-        public bool HasValidAccount { get { return (xUserFile != null); }}
+        public bool HasValidAccount { get { return (xUserFile != null); } }
         /// <summary>
         /// Account
         /// </summary>
-        public UserAccount UserFile { get { return xUserFile; }}
+        public UserAccount UserFile { get { return xUserFile; } }
 
         /// <summary>
         /// Initializes an instance
@@ -192,7 +196,7 @@ namespace X360.STFS
         {
             if (!ParseCheck())
                 return false;
-            
+
             bool xreturn = true;
             if (xboth)
             {
@@ -257,7 +261,7 @@ namespace X360.STFS
             return xreturn;
         }
 
-        
+
 
         /// <summary>
         /// Unlocks all achievements either Online or Offline
@@ -373,25 +377,29 @@ namespace X360.STFS
                 {
                     if (Name != "")
                         xUserGPD.AddSetting((long)GPDIDs.GCardName, Name, true, SyncType.Server);
-                    else xUserGPD.DeleteSetting((long)GPDIDs.GCardName);
+                    else
+                        xUserGPD.DeleteSetting((long)GPDIDs.GCardName);
                 }
                 if (Motto != null)
                 {
                     if (Motto != "")
                         xUserGPD.AddSetting((long)GPDIDs.GCardMotto, Motto, true, SyncType.Server);
-                    else xUserGPD.DeleteSetting((long)GPDIDs.GCardMotto);
+                    else
+                        xUserGPD.DeleteSetting((long)GPDIDs.GCardMotto);
                 }
                 if (Location != null)
                 {
                     if (Location != "")
                         xUserGPD.AddSetting((long)GPDIDs.GCardUserLocale, Location, true, SyncType.Server);
-                    else xUserGPD.DeleteSetting((long)GPDIDs.GCardUserLocale);
+                    else
+                        xUserGPD.DeleteSetting((long)GPDIDs.GCardUserLocale);
                 }
                 if (Bio != null)
                 {
                     if (Bio != "")
                         xUserGPD.AddSetting((long)GPDIDs.GCardUserBio, Bio, true, SyncType.Server);
-                    else xUserGPD.DeleteSetting((long)GPDIDs.GCardUserBio);
+                    else
+                        xUserGPD.DeleteSetting((long)GPDIDs.GCardUserBio);
                 }
                 return true;
             }

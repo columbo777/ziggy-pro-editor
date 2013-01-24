@@ -37,10 +37,10 @@ using System.Collections;
 
 namespace Sanford.Multimedia.Midi
 {
-	/// <summary>
-	/// Provides functionality for building SysCommonMessages.
-	/// </summary>
-	public class SysCommonMessageBuilder : IMessageBuilder
+    /// <summary>
+    /// Provides functionality for building SysCommonMessages.
+    /// </summary>
+    public class SysCommonMessageBuilder : IMessageBuilder
     {
         #region SysCommonMessageBuilder Members
 
@@ -111,7 +111,7 @@ namespace Sanford.Multimedia.Midi
         public static void Clear()
         {
             messageCache.Clear();
-        }        
+        }
 
         #endregion
 
@@ -220,7 +220,7 @@ namespace Sanford.Multimedia.Midi
         {
             result = (SysCommonMessage)messageCache[message];
 
-            if(result == null)
+            if (result == null)
             {
                 result = new SysCommonMessage(message);
 

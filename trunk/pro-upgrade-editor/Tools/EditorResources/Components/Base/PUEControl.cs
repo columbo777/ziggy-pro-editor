@@ -39,5 +39,18 @@ namespace EditorResources.Components
                 Util.WriteDebug(str);
             }
         }
+
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            // 
+            // PUEControl
+            // 
+            this.BackColor = System.Drawing.Color.Transparent;
+            this.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
+            this.Name = "PUEControl";
+            this.ResumeLayout(false);
+
+        }
     }
 }

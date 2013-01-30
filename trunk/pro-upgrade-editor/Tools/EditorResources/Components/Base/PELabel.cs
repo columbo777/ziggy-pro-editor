@@ -13,9 +13,9 @@ namespace EditorResources.Components
 {
 
     
-    public partial class PEPanel : Panel
+    public partial class PELabel : Label
     {
-        public PEPanel()
+        public PELabel()
         {
 
             InitializeComponent();

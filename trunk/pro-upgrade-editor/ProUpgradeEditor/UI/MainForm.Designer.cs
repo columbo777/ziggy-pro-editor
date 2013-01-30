@@ -669,6 +669,7 @@
             this.zipFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabVToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.midiExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mergeProMidiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -1029,7 +1030,7 @@
             this.button56.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button56.ImageIndex = 67;
             this.button56.ImageList = this.imageList1;
-            this.button56.Location = new System.Drawing.Point(6, 67);
+            this.button56.Location = new System.Drawing.Point(16, 67);
             this.button56.Name = "button56";
             this.button56.Size = new System.Drawing.Size(134, 24);
             this.button56.TabIndex = 4;
@@ -1048,7 +1049,7 @@
             this.button126.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button126.ImageIndex = 71;
             this.button126.ImageList = this.imageList1;
-            this.button126.Location = new System.Drawing.Point(6, 163);
+            this.button126.Location = new System.Drawing.Point(16, 163);
             this.button126.Name = "button126";
             this.button126.Size = new System.Drawing.Size(134, 24);
             this.button126.TabIndex = 11;
@@ -1104,7 +1105,7 @@
             this.button10.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button10.ImageIndex = 65;
             this.button10.ImageList = this.imageList1;
-            this.button10.Location = new System.Drawing.Point(6, 91);
+            this.button10.Location = new System.Drawing.Point(16, 91);
             this.button10.Name = "button10";
             this.button10.Size = new System.Drawing.Size(134, 24);
             this.button10.TabIndex = 4;
@@ -1122,7 +1123,7 @@
             this.button77.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button77.ImageIndex = 11;
             this.button77.ImageList = this.imageList1;
-            this.button77.Location = new System.Drawing.Point(6, 211);
+            this.button77.Location = new System.Drawing.Point(16, 211);
             this.button77.Name = "button77";
             this.button77.Size = new System.Drawing.Size(134, 24);
             this.button77.TabIndex = 9;
@@ -1160,7 +1161,7 @@
             this.button59.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button59.ImageIndex = 66;
             this.button59.ImageList = this.imageList1;
-            this.button59.Location = new System.Drawing.Point(6, 187);
+            this.button59.Location = new System.Drawing.Point(16, 187);
             this.button59.Name = "button59";
             this.button59.Size = new System.Drawing.Size(134, 24);
             this.button59.TabIndex = 8;
@@ -1203,7 +1204,7 @@
             this.button31.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button31.ImageIndex = 66;
             this.button31.ImageList = this.imageList1;
-            this.button31.Location = new System.Drawing.Point(6, 115);
+            this.button31.Location = new System.Drawing.Point(16, 115);
             this.button31.Name = "button31";
             this.button31.Size = new System.Drawing.Size(134, 24);
             this.button31.TabIndex = 6;
@@ -1222,7 +1223,7 @@
             this.button44.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button44.ImageIndex = 14;
             this.button44.ImageList = this.imageList1;
-            this.button44.Location = new System.Drawing.Point(6, 139);
+            this.button44.Location = new System.Drawing.Point(16, 139);
             this.button44.Name = "button44";
             this.button44.Size = new System.Drawing.Size(134, 24);
             this.button44.TabIndex = 7;
@@ -8511,14 +8512,14 @@
             // newToolStripMenuItem
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.newToolStripMenuItem.Text = "&New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.closeToolStripMenuItem.Text = "&Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
@@ -8529,7 +8530,7 @@
             this.openPro17ToolStripMenuItem,
             this.openConfigurationToolStripMenuItem});
             this.openToolStripMenuItem1.Name = "openToolStripMenuItem1";
-            this.openToolStripMenuItem1.Size = new System.Drawing.Size(110, 22);
+            this.openToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
             this.openToolStripMenuItem1.Text = "&Open";
             // 
             // openToolStripMenuItem
@@ -8564,7 +8565,7 @@
             this.saveConfigurationAsToolStripMenuItem,
             this.saveProXMLToolStripMenuItem});
             this.saveToolStripMenuItem1.Name = "saveToolStripMenuItem1";
-            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(110, 22);
+            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
             this.saveToolStripMenuItem1.Text = "&Save";
             // 
             // saveToolStripMenuItem
@@ -8622,22 +8623,23 @@
             this.importToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.cONPackageToolStripMenuItem,
             this.zipFileToolStripMenuItem,
-            this.tabVToolStripMenuItem});
+            this.tabVToolStripMenuItem,
+            this.mergeProMidiToolStripMenuItem});
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.importToolStripMenuItem.Text = "&Import";
             // 
             // cONPackageToolStripMenuItem
             // 
             this.cONPackageToolStripMenuItem.Name = "cONPackageToolStripMenuItem";
-            this.cONPackageToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.cONPackageToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
             this.cONPackageToolStripMenuItem.Text = "CON Package";
             this.cONPackageToolStripMenuItem.Click += new System.EventHandler(this.cONPackageToolStripMenuItem_Click);
             // 
             // zipFileToolStripMenuItem
             // 
             this.zipFileToolStripMenuItem.Name = "zipFileToolStripMenuItem";
-            this.zipFileToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.zipFileToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
             this.zipFileToolStripMenuItem.Text = "Zip File";
             this.zipFileToolStripMenuItem.Click += new System.EventHandler(this.zipFileToolStripMenuItem_Click);
             // 
@@ -8646,25 +8648,32 @@
             this.tabVToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.midiExportToolStripMenuItem});
             this.tabVToolStripMenuItem.Name = "tabVToolStripMenuItem";
-            this.tabVToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
-            this.tabVToolStripMenuItem.Text = "Tab Exporter";
+            this.tabVToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.tabVToolStripMenuItem.Text = "Web Tab Exporter Site";
             // 
             // midiExportToolStripMenuItem
             // 
             this.midiExportToolStripMenuItem.Name = "midiExportToolStripMenuItem";
-            this.midiExportToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
-            this.midiExportToolStripMenuItem.Text = "Midi Export XML";
+            this.midiExportToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.midiExportToolStripMenuItem.Text = "Import Midi XML";
             this.midiExportToolStripMenuItem.Click += new System.EventHandler(this.midiExportToolStripMenuItem_Click);
+            // 
+            // mergeProMidiToolStripMenuItem
+            // 
+            this.mergeProMidiToolStripMenuItem.Name = "mergeProMidiToolStripMenuItem";
+            this.mergeProMidiToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.mergeProMidiToolStripMenuItem.Text = "Merge Pro Midi";
+            this.mergeProMidiToolStripMenuItem.Click += new System.EventHandler(this.mergeProMidiToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(107, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -9514,6 +9523,7 @@
         private System.Windows.Forms.Button buttonSelectForward;
         private System.Windows.Forms.Button buttonSelectBack;
         private System.Windows.Forms.Button buttonFindNoteInMP3;
+        private System.Windows.Forms.ToolStripMenuItem mergeProMidiToolStripMenuItem;
         
 
     }

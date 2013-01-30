@@ -1518,7 +1518,6 @@ namespace ProUpgradeEditor.UI
                     if (gc != null)
                     {
                         gc.CloneAtTime(EditorPro.Messages, sc.TickPair);
-
                     }
                 }
 
@@ -2902,7 +2901,8 @@ namespace ProUpgradeEditor.UI
 
             }
             else if (tabContainerMain.SelectedTab != null &&
-                tabContainerMain.SelectedTab == tabNoteEditor)
+                tabContainerMain.SelectedTab == tabNoteEditor ||
+                EditorPro.Focused && EditorPro.IsLoaded)
             {
                 if (textBox19.ContainsFocus || textBox20.ContainsFocus || textBox14.ContainsFocus || textBox31.ContainsFocus || textBox32.ContainsFocus || textBox33.ContainsFocus || textBox34.ContainsFocus || textBox35.ContainsFocus || textBox36.ContainsFocus
                     || textBoxPlaceNoteFret.ContainsFocus || comboNoteEditorCopyPatternPreset.ContainsFocus)
@@ -2921,8 +2921,12 @@ namespace ProUpgradeEditor.UI
 
                 else if (e.KeyCode == Keys.Delete)
                 {
-                    ClearHoldBoxes();
-                    PlaceNote(SelectNextEnum.UseConfiguration);
+                    if (EditorPro.IsLoaded && EditorPro.SelectedChords.Any())
+                    {
+                        EditorPro.Messages.Remove(EditorPro.SelectedChords.ToList());
+                    }
+                    HandleSelectNext(SelectNextEnum.ForceSelectNext);
+
                     return true;
                 }
                 else if (e.KeyValue == 189)//minus
@@ -4312,6 +4316,20 @@ namespace ProUpgradeEditor.UI
                                 }
                             }
 
+                            try{
+                                var sids = DTAFile.FromBytes(ReadFileBytes(songsDTAPath)).GetSongIDs();
+                                var ssn = songShortName;
+                                var sid = sids.FirstOrDefault(s => s.SongShortName.EqualsEx(ssn));
+                                if (sid != null)
+                                {
+                                    songID = sid.Value;
+                                    if (songID.IsNotEmpty())
+                                    {
+                                        foundSongID = true;
+                                    }
+                                }
+                            }
+                            catch{}
                             if (!foundSongID && songsDTAPath.FileExists())
                             {
                                 if (ParseSongsDTAForSongID(songShortName, songsDTAPath.ReadFileBytes(), out songID))

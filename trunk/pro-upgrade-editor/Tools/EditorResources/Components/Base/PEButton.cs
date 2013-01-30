@@ -12,12 +12,10 @@ using System.ComponentModel.Design;
 namespace EditorResources.Components
 {
 
-    
-    public partial class PEPanel : Panel
+    public partial class PEButton : Button
     {
-        public PEPanel()
+        public PEButton()
         {
-
             InitializeComponent();
         }
     }

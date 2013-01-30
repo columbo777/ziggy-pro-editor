@@ -64,6 +64,42 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\Base\PESlider.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Components\Base\PESlider.Designer.cs">
+      <DependentUpon>PESlider.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Components\Base\PECheckBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Components\Base\PECheckBox.Designer.cs">
+      <DependentUpon>PECheckBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Components\Base\PEEditBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Components\Base\PEEditBox.Designer.cs">
+      <DependentUpon>PEEditBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Components\Base\PELabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Components\Base\PELabel.Designer.cs">
+      <DependentUpon>PELabel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Components\Base\PEButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Components\Base\PEButton.Designer.cs">
+      <DependentUpon>PEButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Components\Base\PEGroupBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Components\Base\PEGroupBox.Designer.cs">
+      <DependentUpon>PEGroupBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="Components\Base\PUEControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -109,6 +145,13 @@
     <Compile Include="Components\PEWaveViewerControl.Designer.cs">
       <DependentUpon>PEWaveViewerControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Components\PEWebTabImportPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Components\PEWebTabImportPanel.Designer.cs">
+      <DependentUpon>PEWebTabImportPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Components\WebTabTrackProperties.cs" />
     <Compile Include="Util\Util.cs" />
     <Compile Include="Resources.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -119,6 +162,30 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Components\Base\PESlider.resx">
+      <DependentUpon>PESlider.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Components\Base\PECheckBox.resx">
+      <DependentUpon>PECheckBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Components\Base\PEEditBox.resx">
+      <DependentUpon>PEEditBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Components\Base\PELabel.resx">
+      <DependentUpon>PELabel.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Components\Base\PEButton.resx">
+      <DependentUpon>PEButton.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Components\Base\PEGroupBox.resx">
+      <DependentUpon>PEGroupBox.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Components\Base\PUEControl.resx">
+      <DependentUpon>PUEControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Components\PEWaveViewer.resx">
       <DependentUpon>PEWaveViewer.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -142,6 +209,9 @@
     <EmbeddedResource Include="Components\PEPopupWindow.resx">
       <DependentUpon>PEPopupWindow.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Components\PEWebTabImportPanel.resx">
+      <DependentUpon>PEWebTabImportPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PEResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

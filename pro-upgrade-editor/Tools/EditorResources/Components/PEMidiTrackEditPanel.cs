@@ -491,19 +491,27 @@ namespace EditorResources.Components
             }
         }
 
-        void SetSelectedItem(Track item, GuitarDifficulty difficulty)
+        bool SetSelectedItem(Track item, GuitarDifficulty difficulty)
         {
+            bool ret = true;
             if (item != null)
             {
-                SelectedTrack = TrackList.SingleOrDefault(x => x.Track == item);
+                var sel = SelectedTrack;
+                var newSel = TrackList.SingleOrDefault(x => x.Track == item);
+                if (sel == null || sel != newSel)
+                {
+                    ret = true;
+                    SelectedTrack = newSel;
+                }
             }
             else
             {
                 SelectedTrack = null;
             }
             SelectedDifficulty = difficulty;
-
+            
             panelTracks.Invalidate();
+            return ret;
         }
 
         public IEnumerable<TrackDifficulty> TrackDifficulties
@@ -536,26 +544,41 @@ namespace EditorResources.Components
             }
         }
 
+        bool settingTrack = false;
         public void SetTrack(Track track, GuitarDifficulty difficulty)
         {
-            if (track != null)
+            if (!settingTrack)
             {
-                this.sequence = track.Sequence;
-            }
-            else
-            {
-                this.sequence = null;
-            }
-            if (this.sequence == null)
-            {
-                panelTracks.Controls.Clear();
-                SelectedTrack = null;
-                Invalidate();
-            }
-            else
-            {
-                this.CreatePanelTracks(this.sequence);
-                SetSelectedItem(track, difficulty);
+                settingTrack = true;
+                try
+                {
+                    if (track != null)
+                    {
+                        this.sequence = track.Sequence;
+                    }
+                    else
+                    {
+                        this.sequence = null;
+                    }
+                    if (this.sequence == null)
+                    {
+                        panelTracks.Controls.Clear();
+                        SelectedTrack = null;
+                        Invalidate();
+                    }
+                    else
+                    {
+                        this.CreatePanelTracks(this.sequence);
+                        if (SetSelectedItem(track, difficulty))
+                        {
+                            t_TrackClicked(this, track, difficulty);
+                        }
+                    }
+                }
+                finally
+                {
+                    settingTrack = false;
+                }
             }
         }
 

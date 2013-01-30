@@ -10001,6 +10001,56 @@ namespace ProUpgradeEditor.UI
 
         private void ImportTabSiteExportXml(string file)
         {
+            string fileName = string.Empty;
+            ExecAndRestoreTrackDifficulty(delegate()
+            {
+                try
+                {
+                    
+                    var seq = ConvertWebTabToPro(file);
+                    if (seq != null && seq.Count > 1)
+                    {
+                        var popup = new PEPopupWindow();
+                        var tabImport = new PEWebTabImportPanel(seq);
+                        popup.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+                        popup.SetControl(tabImport, EditorPro);
+                        popup.Text = "Web Tab Import";
+                        popup.FormClosed += (sender,e)=>
+                        {
+                            if (popup != null && popup.DialogResult == System.Windows.Forms.DialogResult.OK)
+                            {
+                                seq = tabImport.Sequence;
+
+                                var saveFileName = ShowSaveFileDlg("Save File", file.GetFolderName(), file.GetFileNameWithoutExtension() + Utility.DefaultPROFileExtension);
+                                if (!saveFileName.IsEmpty())
+                                {
+                                    seq.Save(saveFileName);
+
+                                    if (EditorPro.LoadMidi17(saveFileName, ReadFileBytes(saveFileName), false))
+                                    {
+                                        fileName = saveFileName;
+                                    }
+                                }
+                            }
+                        };
+                        popup.Show(this);
+                    }
+                }
+                catch
+                {
+
+                }
+            });
+
+            if (!fileName.IsEmpty())
+            {
+                EditorPro.LoadMidi17(fileName, ReadFileBytes(fileName), false);
+            }
+        }
+
+
+        private Sequence ConvertWebTabToPro(string file)
+        {
             var doc = Encoding.ASCII.GetString(ReadFileBytes(file)).ToXmlDocument();
 
             var seq = new Sequence(FileType.Pro, 480);
@@ -10077,53 +10127,13 @@ namespace ProUpgradeEditor.UI
 
                     }
                 }
-                if (inst.ChanMessages.Count() > 5)
+
+                if (inst != null && inst.ChanMessages != null && inst.ChanMessages.Count() > 5)
                 {
-
-                    var gtickPair = EditorG5.Messages.Chords.GetTickPair();
-
-                    EditorPro.Close();
-
                     seq.Add(inst);
-                    EditorPro.SetTrack6(seq, inst);
-                    EditorPro.CurrentDifficulty = GuitarDifficulty.Easy;
-                    EditorPro.CurrentDifficulty = GuitarDifficulty.Expert;
-                    var proPair = EditorPro.Messages.Chords.GetTickPair();
-
-                    if (Utility.ModifyWebTabScale)
-                    {
-                        var scale = gtickPair.TickLength.ToDouble() / proPair.TickLength.ToDouble();
-
-                        var firstDown = EditorPro.Messages.Chords.First().DownTick;
-
-                        EditorPro.Messages.Chords.ToList().ForEach(x =>
-                        {
-                            var down = gtickPair.Down + ((x.DownTick - firstDown).ToDouble() * scale).Round();
-                            var up = gtickPair.Down + ((x.UpTick - firstDown).ToDouble() * scale).Round();
-                            x.SetTicks(new TickPair(down, up));
-                        });
-
-                        SnapToG5();
-                    }
-
-                    CopySoloDataForCurrentTrack(EditorPro.Messages);
-
-                    CopyPowerupDataForCurrentTrack(EditorPro.Messages);
-
-                    CopyTextEvents(true);
-
-                    CopyBigRockEnding();
-
                 }
             }
-
-            var saveFileName = ShowSaveFileDlg("Save File", file.GetFolderName(), file.GetFileNameWithoutExtension() + Utility.DefaultPROFileExtension);
-            if (!saveFileName.IsEmpty())
-            {
-                seq.Save(saveFileName);
-
-                EditorPro.LoadMidi17(saveFileName, ReadFileBytes(saveFileName), false);
-            }
+            return seq;
         }
 
         private static int calculateTicks(Sequence seq, double division, double duration)
@@ -10278,6 +10288,24 @@ namespace ProUpgradeEditor.UI
                 }
                 catch { }
             }
+        }
+
+        private void mergeProMidiToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ShowOpenMidiFile().IfNotEmpty(fileName =>
+                {
+                    var seq = new Sequence(FileType.Pro);
+                    seq.Load(fileName);
+
+                    for (int x = 1; x < seq.Count; x++)
+                        EditorPro.Sequence.Add(seq[x]);
+
+                    RefreshTracks();
+                });
+            }
+            catch { }
         }
     }
 }

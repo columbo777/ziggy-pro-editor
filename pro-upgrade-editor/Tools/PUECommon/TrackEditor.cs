@@ -263,22 +263,21 @@ namespace ProUpgradeEditor.Common
 
                     if (HScroll != null)
                     {
-                        BeginInvoke(new MethodInvoker(delegate()
+                        
+                        if (value < 0)
+                            value = 0;
+
+                        if (value < HScroll.Maximum)
                         {
-                            if (value < 0)
-                                value = 0;
+                            HScroll.Value = value;
+                        }
+                        else
+                        {
+                            HScroll.Value = HScroll.Maximum;
+                        }
 
-                            if (value < HScroll.Maximum)
-                            {
-                                HScroll.Value = value;
-                            }
-                            else
-                            {
-                                HScroll.Value = HScroll.Maximum;
-                            }
-
-                            Invalidate();
-                        }));
+                        Invalidate();
+                        
                     }
                 }
                 catch { }

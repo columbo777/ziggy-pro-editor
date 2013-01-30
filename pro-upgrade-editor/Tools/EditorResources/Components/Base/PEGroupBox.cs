@@ -13,12 +13,13 @@ namespace EditorResources.Components
 {
 
     
-    public partial class PEPanel : Panel
+    public partial class PEGroupBox : GroupBox
     {
-        public PEPanel()
+        public PEGroupBox()
         {
-
             InitializeComponent();
         }
+
+
     }
 }

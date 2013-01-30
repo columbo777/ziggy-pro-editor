@@ -6,18 +6,14 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
-using System.ComponentModel.Design;
 
 namespace EditorResources.Components
 {
-
     
-    public partial class PEPanel : Panel
+    public partial class PESlider : TrackBar
     {
-        public PEPanel()
+        public PESlider()
         {
-
             InitializeComponent();
         }
     }

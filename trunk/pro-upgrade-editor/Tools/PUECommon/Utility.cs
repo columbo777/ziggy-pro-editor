@@ -142,6 +142,17 @@ namespace ProUpgradeEditor.Common
 
         public static GuitarDifficulty[] EasyMediumHardExpert = { GuitarDifficulty.Easy, GuitarDifficulty.Medium, GuitarDifficulty.Hard, GuitarDifficulty.Expert };
 
+        public static bool HandPositionGenerationEnabled = true;
+        public static bool HandPositionMarkerByDifficulty = false;
+        public static int HandPositionMarkerFirstBeginOffset = 20;
+        public static int HandPositionMarkerFirstEndOffset = 40;
+
+        public static int HandPositionMarkerStartOffset = 0;
+        public static int HandPositionMarkerEndOffset = 0;
+        public static int HandPositionMarkerMaxFret = 17;
+        public static int HandPositionMarkerMinFret = 15;
+
+
 
         public static int MinimumNoteWidth = 0;
 
@@ -194,7 +205,7 @@ namespace ProUpgradeEditor.Common
         public static string StoredChordStrumHigh = "[SH]";
 
         public static int DummyTempo = 405405;
-        public static int LargestGapFor108Note = 5;
+        
 
         public static StringFormat GetStringFormatNoWrap()
         {
@@ -279,7 +290,7 @@ namespace ProUpgradeEditor.Common
 
         public static int NoteCloseWidth = 8;
 
-        public static int TickCloseWidth = 10;
+        public static int TickCloseWidth = 4;
 
         public static bool IsCloseTick(int a, int b)
         {

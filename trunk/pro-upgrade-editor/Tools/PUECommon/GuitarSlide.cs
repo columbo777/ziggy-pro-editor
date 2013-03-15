@@ -25,7 +25,6 @@ namespace ProUpgradeEditor.Common
         }
 
 
-
         public static GuitarSlide CreateSlide(GuitarMessageList list,
             TickPair ticks, bool reversed, GuitarDifficulty difficulty = GuitarDifficulty.Unknown)
         {

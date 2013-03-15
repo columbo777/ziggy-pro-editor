@@ -138,11 +138,14 @@ namespace ProUpgradeEditor.Common
         }
 
 
-
         public static ChordModifier GetModifier(GuitarMessageList track, TickPair ticks,
             ChordModifierType type, GuitarMessageType gt, GuitarDifficulty difficulty = GuitarDifficulty.Expert)
         {
             var ret = new ChordModifier(track, null, null, type, gt);
+            type.GetData1ForChordModifierType(difficulty, track.Owner.IsPro).FirstOrDefault().IfNotNull(d1 => ret.Data1 = d1);
+            ret.Data2 = 100;
+            ret.Channel = (type == ChordModifierType.SlideReverse ? Utility.ChannelSlideReversed : 0);
+
             ret.SetTicks(ticks);
 
             return ret;
@@ -172,17 +175,17 @@ namespace ProUpgradeEditor.Common
                     break;
                 case ChordModifierType.Hammeron:
                     {
-                        ret = GuitarHammeron.CreateHammeron(track, ticks);
+                        ret = GuitarHammeron.CreateHammeron(track, ticks, difficulty);
                     }
                     break;
                 case ChordModifierType.Slide:
                     {
-                        ret = GuitarSlide.CreateSlide(track, ticks, false);
+                        ret = GuitarSlide.CreateSlide(track, ticks, false, difficulty);
                     }
                     break;
                 case ChordModifierType.SlideReverse:
                     {
-                        ret = GuitarSlide.CreateSlide(track, ticks, true);
+                        ret = GuitarSlide.CreateSlide(track, ticks, true, difficulty);
                     }
                     break;
             }

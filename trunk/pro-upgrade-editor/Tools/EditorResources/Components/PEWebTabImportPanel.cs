@@ -205,19 +205,23 @@ namespace EditorResources.Components
 
                             var ev = trackProp.Events.Select(x => x.Clone()).ToList();
                             var scale = trackProp.Scale;
-                            if (scale < 0.1)
-                                scale = 0.1;
+                            if (scale < 0.001)
+                                scale = 0.001;
 
                             var offset = trackProp.Offset;
+                            double offsetMul = 1.0;
                             if (offset < 0)
-                                offset = offset * -1.0;
+                            {
+                                offset = -offset;
+                                offsetMul = -1.0;
+                            }
 
-                            var screenOffset = EditorPro.GetTickFromScreenPoint( EditorPro.GetScreenPointFromTime(offset));
+                            List<AbsoluteMidiEvent> newEv = new List<AbsoluteMidiEvent>();
                             foreach (var m in ev)
                             {
-                                m.Tick = (screenOffset * (trackProp.Offset < 0 ? -1 : 1)) + (m.Tick * scale).Ceiling();
+                                newEv.Add(new AbsoluteMidiEvent() { Tick = ((EditorPro.Editor5.GuitarTrack.TimeToTick(offset) * offsetMul) + (m.Tick * scale)).Round(), Message = m.Message });
                             }
-                            foreach (var m in ev)
+                            foreach (var m in newEv)
                             {
                                 track.Insert(m.Tick, m.Message);
                             }
@@ -249,6 +253,8 @@ namespace EditorResources.Components
                 {
                     TrackProperties.FirstOrDefault(x => x.Track == track.Track).IfObjectNotNull(x => UpdateWebTabTrack(x));
 
+                    if (ProScale.Text.ToDouble().IsNull() || ProScale.Text.ToDouble() < 0.01)
+                        return;
                     UpdateTrack(track.Track);
 
                     EditorPro.SetTrack6(track.Track, GuitarDifficulty.Expert);

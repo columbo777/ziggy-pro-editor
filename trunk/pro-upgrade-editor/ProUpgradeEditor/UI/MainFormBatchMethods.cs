@@ -248,7 +248,7 @@ namespace ProUpgradeEditor.UI
                     else
                     {
                         WriteBatchResult("Processing: " + item.ToString());
-                        if (!string.IsNullOrEmpty(item.G6FileName))
+                        if (!item.G6FileName.IsEmpty())
                         {
                             if (File.Exists(item.G6FileName))
                             {
@@ -374,12 +374,12 @@ namespace ProUpgradeEditor.UI
 
                 if (config.SelectedTrackOnly)
                 {
-                    if (GuitarTrack.GuitarTrackNames6.Contains(proTrack.Name))
+                    if (proTrack.Name.IsGuitarTrackName6())
                     {
                         genGuitar = true;
                         selectedTrackGuitar = true;
                     }
-                    else if (GuitarTrack.BassTrackNames6.Contains(proTrack.Name))
+                    else if (proTrack.Name.IsBassTrackName6())
                     {
                         genBass = true;
                         selectedTrackBass = true;
@@ -515,6 +515,12 @@ namespace ProUpgradeEditor.UI
                 if (config.Generate108Events)
                 {
                     Set108Events(config);
+
+                    try
+                    {
+                        Refresh108EventList();
+                    }
+                    catch { }
                 }
 
             }
@@ -565,44 +571,45 @@ namespace ProUpgradeEditor.UI
 
         }
 
-        private void GenDiffNotes(GuitarMessageList mess5, GuitarMessageList targetMess, GuitarMessageList sourceMess, GuitarDifficulty targetDifficulty, GenDiffConfig config)
+        private void GenDiffNotes(GuitarMessageList mess5, GuitarMessageList mess6, GuitarMessageList sourceMess, GuitarDifficulty targetDifficulty, GenDiffConfig config)
         {
 
 
-            targetMess.Remove(targetMess.Chords.ToList());
+            mess6.Remove(mess6.Chords.ToList());
 
             var sourceChords = sourceMess.Chords;
 
             if (targetDifficulty == GuitarDifficulty.Hard)
             {
-                targetMess.Remove(targetMess.Arpeggios.ToList());
+                mess6.Remove(mess6.Arpeggios.ToList().Where(x=> x.Difficulty == GuitarDifficulty.Hard).ToList());
             }
 
             var chords = sourceChords.Where(x => x.IsPureArpeggioHelper == false).ToList();
-            CreateChords(mess5, targetMess, targetDifficulty, chords);
+            CreateChords(mess5, mess6, targetDifficulty, chords);
 
             if (targetDifficulty == GuitarDifficulty.Hard)
             {
-                foreach (var arp in sourceMess.Arpeggios.Where(x => targetMess.Chords.AnyBetweenTick(x.TickPair)))
+                foreach (var arp in sourceMess.Arpeggios.Where(x => mess6.Chords.AnyBetweenTick(x.TickPair)))
                 {
-                    targetMess.Add(GuitarArpeggio.CreateArpeggio(targetMess, targetDifficulty, arp.TickPair));
+                    mess6.Add(GuitarArpeggio.CreateArpeggio(mess6, targetDifficulty, arp.TickPair));
                 }
             }
         }
 
-        private void CreateChords(GuitarMessageList mess5, GuitarMessageList targetMess, GuitarDifficulty targetDifficulty, IEnumerable<GuitarChord> chords)
+        private void CreateChords(GuitarMessageList mess5, GuitarMessageList mess6, 
+            GuitarDifficulty targetDifficulty, IEnumerable<GuitarChord> sourceChords)
         {
 
             GuitarChord lastChord = null;
 
             foreach (var sc in mess5.Chords)
             {
-                var tempo = targetMess.Tempos.GetTempo(sc.DownTick);
+                var tempo = mess6.Tempos.GetTempo(sc.DownTick);
 
                 if (lastChord != null && sc.StartTime < lastChord.EndTime)
                     continue;
 
-                var c = CreateChordAtDifficulty(mess5, chords, targetMess, targetDifficulty, sc);
+                var c = CreateChordAtDifficulty(mess5, sourceChords, mess6, targetDifficulty, sc);
                 if (c != null)
                 {
                     lastChord = c;
@@ -611,25 +618,25 @@ namespace ProUpgradeEditor.UI
             }
         }
 
-        private GuitarChord CreateChordAtDifficulty(GuitarMessageList mess5, IEnumerable<GuitarChord> chords,
-            GuitarMessageList mess, GuitarDifficulty targetDifficulty, GuitarChord sc)
+        private GuitarChord CreateChordAtDifficulty(GuitarMessageList mess5, IEnumerable<GuitarChord> sourceChords,
+            GuitarMessageList mess6, GuitarDifficulty targetDifficulty, GuitarChord sc)
         {
             GuitarChord ret = null;
 
-            var g6c = chords.GetBetweenTick(sc.TickPair);
+            var g6c = sourceChords.GetBetweenTick(sc.TickPair);
             if (!g6c.Any())
             {
-                var last = mess.Chords.LastOrDefault();
+                var last = mess6.Chords.LastOrDefault();
                 if (last != null)
                 {
                     if (sc.TickPair.Down - Utility.TickCloseWidth > last.UpTick)
                     {
                         var tickPair = sc.TickPair;
-                        g6c = chords.GetBetweenTick(tickPair.Offset(-Utility.TickCloseWidth));
+                        g6c = sourceChords.GetBetweenTick(tickPair.Offset(-Utility.TickCloseWidth));
                         if (!g6c.Any())
                         {
                             tickPair = sc.TickPair;
-                            g6c = chords.GetBetweenTick(tickPair.Offset(Utility.TickCloseWidth));
+                            g6c = sourceChords.GetBetweenTick(tickPair.Offset(Utility.TickCloseWidth));
 
                         }
                     }
@@ -708,8 +715,11 @@ namespace ProUpgradeEditor.UI
 
                 if (noteCount > 0)
                 {
+                    if (gc.IsSlide)
+                    {
+                    }
                     ret = GuitarChord.CreateChord(
-                        mess,
+                        mess6,
                         targetDifficulty,
                         sc.TickPair,
                         frets, channels, gc.IsSlide, gc.IsSlideReversed, gc.IsHammeron);

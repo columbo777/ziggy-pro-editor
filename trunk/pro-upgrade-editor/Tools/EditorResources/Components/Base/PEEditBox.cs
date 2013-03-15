@@ -9,8 +9,8 @@ using System.Windows.Forms;
 
 namespace EditorResources.Components
 {
-    
-    public partial class PECheckBox: CheckBox
+
+    public partial class PECheckBox : CheckBox
     {
         public PECheckBox()
         {

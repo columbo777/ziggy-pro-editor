@@ -68,18 +68,34 @@ namespace Sanford.Multimedia.Midi
         /// <summary>
         /// Initializes a new instance of the OutputDevice class.
         /// </summary>
-        public OutputDevice(int deviceID, SynchronizationContext context)
+         OutputDevice(int deviceID, SynchronizationContext context)
             : base(deviceID)
         {
             this.context = context;
             midiOutProc = HandleMessage;
 
-            int result = midiOutOpen(out hndle, deviceID, midiOutProc, 0, CALLBACK_FUNCTION);
+        }
 
-            if (result != MidiDeviceException.MMSYSERR_NOERROR)
+         bool OpenMidi()
+         {
+             return midiOutOpen(out hndle, base.DeviceID, midiOutProc, 0, CALLBACK_FUNCTION) == MidiDeviceException.MMSYSERR_NOERROR;
+         }
+
+        public static OutputDevice CreateDevice(int deviceID, SynchronizationContext context)
+        {
+            OutputDevice ret = null;
+            try
             {
-                throw new OutputDeviceException(result);
+                ret = new OutputDevice(deviceID, context);
+
+                if (!ret.OpenMidi())
+                {
+                    ret.Dispose();
+                    ret = null;
+                }
             }
+            catch { ret = null; }
+            return ret;
         }
 
         #endregion

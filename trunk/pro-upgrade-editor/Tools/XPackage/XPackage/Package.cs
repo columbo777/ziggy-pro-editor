@@ -12,11 +12,12 @@ namespace XPackage
 
     public class PackageFile
     {
-        FileEntry file;
+        public FileEntry FileEntry { get; internal set; }
+        public PackageFolder Folder { get; internal set; }
 
-        Package package;
+        public Package Package { get; internal set; }
 
-        public string Name { get { return file.Name; } set { file.Name = value; } }
+        public string Name { get { return FileEntry.Name; } set { FileEntry.Name = value; } }
 
         byte[] data;
         public byte[] Data
@@ -29,60 +30,83 @@ namespace XPackage
 
                     try
                     {
-                        package.package.xIO.OpenAgain();
-                        file.xPackage = package.package;
-                        data = file.ExtractBytes();
-                        package.package.xIO.Close();
+                        Package.package.xIO.OpenAgain();
+                        FileEntry.xPackage = Package.package;
+                        data = FileEntry.ExtractBytes(true);
+                        Package.package.xIO.Close();
                     }
                     catch
                     {
-                        package = new Package(package.package,
-                            true);
-                        data = file.ExtractBytes();
+                       
                     }
                 }
                 return data;
             }
+            set
+            {
+                data = value;
+            }
         }
 
-        internal PackageFile(FileEntry file, bool readData = true, Package pk = null)
+        public PackageFile(PackageFolder folder, FileEntry file, bool readData = true, Package pk = null)
         {
-            this.file = file;
-            this.package = pk;
-            if (readData)
-            {
+            this.FileEntry = file;
+            this.Folder = folder;
+            this.Package = pk;
 
-                this.data = file.ExtractBytes();
-
-            }
+           
+                this.data = file.ExtractBytes(readData);
+           
         }
     }
     public class PackageFolder
     {
         public string Name
         {
-            get { return folder.Name; }
+            get { return FolderEntry.Name; }
         }
 
-        FolderEntry folder;
+        public PackageFolder Parent { get; internal set; }
+
+        public IEnumerable<PackageFolder> GetChildFolderByName(string name, bool recursive)
+        {
+            var ret = new List<PackageFolder>();
+            
+            foreach (var folder in Folders)
+            {
+                if (string.Compare(folder.Name, name, true) == 0)
+                    ret.Add(folder);
+
+                if (recursive && folder.Folders.Any())
+                {
+                    ret.AddRange(folder.GetChildFolderByName(name, recursive));
+                }
+            }
+            return ret;
+        }
+        
+
+        public FolderEntry FolderEntry{get;internal set;}
         public List<PackageFile> Files;
         public List<PackageFolder> Folders;
+        public Package Package { get; internal set; }
 
-        internal PackageFolder(FolderEntry entry, bool readData = true, Package pk = null)
+        internal PackageFolder(PackageFolder parent, FolderEntry entry, bool readData = true, Package pk = null)
         {
-            this.folder = entry;
-
+            this.FolderEntry = entry;
+            Parent = parent;
+            Package = pk;
             Files = new List<PackageFile>();
             Folders = new List<PackageFolder>();
 
             foreach (var f in entry.GetSubFiles())
             {
-                Files.Add(new PackageFile(f, readData, pk));
+                Files.Add(new PackageFile(this, f, readData, pk));
             }
 
             foreach (var f in entry.GetSubFolders())
             {
-                Folders.Add(new PackageFolder(f, readData, pk));
+                Folders.Add(new PackageFolder(this, f, readData, pk));
             }
         }
     }
@@ -107,7 +131,7 @@ namespace XPackage
 
         void ReadData(bool readData = true, Package pk = null)
         {
-            rootFolder = new PackageFolder(package.RootDirectory, readData, pk);
+            rootFolder = new PackageFolder(null, package.RootDirectory, readData, pk);
         }
 
         public PackageFolder RootFolder
@@ -145,7 +169,25 @@ namespace XPackage
             }
 
         }
+        void GetSubFilesByName(PackageFolder folder, string fileName, ref List<PackageFile> ret)
+        {
+            
+            foreach (var file in folder.Files)
+            {
+                
+                if (string.Compare(file.Name,fileName,true)==0)
+                {
+                    ret.Add(file);
+                }
+                
+            }
 
+            foreach (var subf in folder.Folders)
+            {
+                GetSubFilesByName(subf, fileName, ref ret);
+            }
+
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -155,6 +197,12 @@ namespace XPackage
         {
             var ret = new List<PackageFile>();
             GetSubFiles(rootFolder, extension, ref ret);
+            return ret;
+        }
+        public IEnumerable<PackageFile> GetFilesByName(string fileName)
+        {
+            var ret = new List<PackageFile>();
+            GetSubFilesByName(rootFolder, fileName, ref ret);
             return ret;
         }
 
@@ -205,7 +253,7 @@ namespace XPackage
             }
             return buffer;
         }
-        public static Package Load(byte[] fileBytes)
+        public static Package Load(byte[] fileBytes, bool loadBytes=false)
         {
             Package ret = null;
             try
@@ -451,7 +499,83 @@ namespace XPackage
             return bytes;
         }
 
+        public static byte[] RebuildPackage(Package package)
+        {
+            byte[] ret = null;
+            try
+            {
 
+                if (package.dj == null || (package.dj != null && package.dj.OpenAgain()))
+                {
+                    try
+                    {
+                        ret = package.package.RebuildPackageInMemory(
+                            new RSAParams(new DJsIO(Resources.KV, true)));
+                    }
+                    finally
+                    {
+                        package.package.CloseIO();
+                    }
+                }
+            }
+            catch { }
+            return ret;
+        }
+
+        public static byte[] AddFileToFolder(Package package, PackageFolder folder, string fileName, byte[] fileContents)
+        {
+            byte[] ret = null;
+            try
+            {
+
+                if (package.dj == null || (package.dj != null && package.dj.OpenAgain()))
+                {
+                    try
+                    {
+                        if (package.package.CanWrite == false)
+                            package.package.OpenAgain();
+
+                        if (package.package.CanWrite)
+                        {
+                            if (package.package.AddFileToFolder(folder.FolderEntry, fileName, fileContents))
+                            {
+                                ret = package.package.RebuildPackageInMemory(
+                                    new RSAParams(new DJsIO(Resources.KV, true)));
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        package.package.CloseIO();
+                    }
+                }
+            }
+            catch { }
+            return ret;
+        }
+
+        public static byte[] RebuildPackageInMemory(Package package)
+        {
+            byte[] ret = null;
+            try
+            {
+
+                if (package.dj == null || (package.dj != null && package.dj.OpenAgain()))
+                {
+                    try
+                    {
+                        ret = package.package.RebuildPackageInMemory(
+                            new RSAParams(new DJsIO(Resources.KV, true)));
+                    }
+                    finally
+                    {
+                        package.package.CloseIO();
+                    }
+                }
+            }
+            catch { }
+            return ret;
+        }
     }
 
 

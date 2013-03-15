@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Linq.Expressions;
 using X360;
+using X360.FATX;
 
 
 namespace ProUpgradeEditor.UI
@@ -1612,11 +1613,13 @@ namespace ProUpgradeEditor.UI
                             true, checkGenDiffCopyGuitarToBass.Checked,
                             checkBoxInitSelectedDifficultyOnly.Checked,
                             checkBoxInitSelectedTrackOnly.Checked,
-                            true);
-
-                if (!Set108Events(genConfig))
+                            Utility.HandPositionGenerationEnabled);
+                if (genConfig.Generate108Events)
                 {
-                    MessageBox.Show("Failed");
+                    if (!Set108Events(genConfig))
+                    {
+                        MessageBox.Show("Failed");
+                    }
                 }
             });
         }
@@ -1715,16 +1718,7 @@ namespace ProUpgradeEditor.UI
         }
 
 
-        class stringObject
-        {
-            public object Obj;
-            public string Name;
 
-            public override string ToString()
-            {
-                return Name;
-            }
-        }
 
 
         public bool ReloadTracks(SelectNextEnum selectNextEnum = SelectNextEnum.ForceKeepSelection)
@@ -1940,29 +1934,7 @@ namespace ProUpgradeEditor.UI
             return ret;
         }
 
-        class MatchingCopyPattern
-        {
-            public int StartTick;
-            public int EndTick;
-            public GuitarChord[] OriginalChords6;
-            public double DeltaTimeStart;
 
-            public List<GuitarChord[]> Matches;
-
-            public MatchingCopyPattern()
-            {
-                Matches = new List<GuitarChord[]>();
-
-
-            }
-        }
-
-        void dotest(GuitarChord ccc)
-        {
-            if (ccc.DownTick == 57600)
-            {
-            }
-        }
         MatchingCopyPattern internalFindMatchingCopyPattern(
             FindMatchingPatternConfig findConfig,
             CopyPatternPreset replaceConfig)
@@ -2111,8 +2083,6 @@ namespace ProUpgradeEditor.UI
             var matches = new List<GuitarChord[]>();
             for (int ci = 0; ci < chords5.Length - mca.Length; ci++)
             {
-                var ccc = chords5[ci];
-                dotest(ccc);
                 for (int mc = 0; mc < mca.Length; mc++)
                 {
                     var cc = chords5[ci + mc];
@@ -2153,39 +2123,37 @@ namespace ProUpgradeEditor.UI
             var goodMatches = new List<GuitarChord[]>();
             foreach (var m in matches)
             {
-
+                var c6 = track6.Messages.Chords.GetBetweenTick(m.GetTickPair()).ToArray();
+                bool matching = true;
                 if (replaceConfig.MatchLengths6)
                 {
-                    int minTick = m.GetMinTick();
-                    int maxTick = m.GetMaxTick();
 
-                    var c6 = track6.Messages.Chords.GetBetweenTick(new TickPair(minTick, maxTick)).ToArray();
                     if (c6.Length == oChords6.Length)
                     {
-                        bool ok = true;
-                        for (int y = 0; y < c6.Length; y++)
+                        for (int x = 0; x < c6.Length; x++)
                         {
-                            var c1 = c6[y];
-                            var c2 = oChords6[y];
-
-                            var timeDiff = Math.Abs(c1.TimeLength - c2.TimeLength);
-
-                            if (timeDiff > (c1.TimeLength / 10.0))
+                            if (!Utility.IsCloseTick(c6[x].TickPair.TickLength, oChords6[x].TickPair.TickLength))
                             {
-                                ok = false;
+                                matching = false;
                                 break;
                             }
                         }
-                        if (!ok)
-                            continue;
                     }
                     else
-                        continue;
+                    {
+                        matching = false;
+                    }
                 }
 
-                goodMatches.Add(m);
+                if (matching)
+                {
+                    goodMatches.Add(c6);
+                }
             }
-            ret.Matches = goodMatches;
+            foreach (var m in goodMatches)
+            {
+                ret.Matches.Add(m);
+            }
             return ret;
         }
 
@@ -2197,8 +2165,7 @@ namespace ProUpgradeEditor.UI
             {
                 if (replaceConfig == null)
                 {
-                    GetSelectedCopyPatternPresetFromScreen().IfObjectNotNull(x =>
-                        replaceConfig = x, Else => replaceConfig = GetNewCopyPatternPresetFromScreen());
+                    replaceConfig = GetNewCopyPatternPresetFromScreen();
                 }
 
                 ret = internalFindMatchingCopyPattern(config, replaceConfig);
@@ -3643,204 +3610,12 @@ namespace ProUpgradeEditor.UI
             return ret;
         }
 
-        public class DTAFileNode
-        {
-            public string Name;
-            public string Value;
-
-            public IEnumerable<DTAFileNode> Children;
-
-            public DTAFileNode(string name, string value)
-            {
-                Name = name;
-                Value = value;
-            }
-        }
 
 
-        public class DTASegment
-        {
-            public List<DTASegment> Children;
-
-            public string Value;
-            public string Name;
-            public DTASegment Parent;
-
-            public DTASegment(DTASegment parent) { Parent = parent; Children = new List<DTASegment>(); }
-            public DTASegment(DTASegment parent, string text)
-                : this(parent)
-            {
-                var first = text.IndexOf(' ');
-                if (first != -1)
-                {
-                    Name = text.SubstringEx(0, first).Trim();
-                    Value = text.SubstringEx(first + 1).Trim();
-                }
-                else
-                {
-                    Name = text.Trim();
-                    Value = text.Trim();
-                }
-            }
-
-            public override string ToString()
-            {
-                return "Name: [" + Name + "] Value: [" + Value + "]";
-            }
-
-            public DTASegment FindFirstSegment(string tag)
-            {
-                DTASegment ret = null;
-
-                if (Name.EqualsEx(tag))
-                {
-                    ret = this;
-                }
-                else
-                {
-                    Children.FirstOrDefault(x => (ret = x.FindFirstSegment(tag)) != null);
-                }
-                return ret;
-            }
-
-            public string SongShortName
-            {
-                get
-                {
-                    var p = this;
-                    while (p.Parent != null)
-                    {
-                        p = p.Parent;
-                    }
-                    return p.Name;
-                }
-            }
-        }
-
-        public class DTAFile : IEnumerable<DTASegment>
-        {
-            public List<DTASegment> Items;
-            public byte[] DTAData;
 
 
-            public IEnumerable<DTASegment> GetSongIDs()
-            {
-                var ret = new List<DTASegment>();
-                var segments = FindSegment("song_id");
-                if (segments.Any())
-                {
-                    ret.AddRange(segments);
-                }
-                return ret;
-            }
-            public IEnumerable<DTASegment> FindSegment(string tag, DTASegment item = null)
-            {
-                var ret = new List<DTASegment>();
-                ret.AddRange(Items.Where(x => x.Name.EqualsEx(tag)));
 
-                Items.ForEach(x => x.FindFirstSegment(tag).IfObjectNotNull(o => ret.Add(o)));
-                return ret;
-            }
 
-            DTAFile() { Items = new List<DTASegment>(); }
-            public DTAFile(byte[] dta)
-                : this()
-            {
-                DTAData = dta;
-                Items.AddRange(ParseBetween(Encoding.ASCII.GetString(dta), '(', ')'));
-            }
-
-            public static DTAFile FromBytes(byte[] dta)
-            {
-                return new DTAFile(dta);
-            }
-
-            public static IEnumerable<DTASegment> ParseString(string str)
-            {
-                var ret = new List<DTASegment>();
-                try
-                {
-                    if (!str.IsEmpty())
-                    {
-                        var items = ParseBetween(str, '(', ')');
-
-                        if (items.Any())
-                        {
-                            ret.AddRange(items);
-                        }
-                    }
-                }
-                catch { }
-                return ret;
-            }
-
-            static string RemoveComments(string str)
-            {
-                var between = str.GetBetweenIndex(new[] { ';' }, new[] { '\n', '\r' });
-                while (between != null && str.IsNotEmpty())
-                {
-                    var l = str.Length;
-                    str = str.SubstringEx(0, between.A) + str.SubstringEx(between.B);
-                    if (str.Length >= l)
-                        break;
-                    between = str.GetBetweenIndex(new[] { ';' }, new[] { '\n', '\r' });
-                }
-                return str;
-            }
-
-            static IEnumerable<DTASegment> ParseBetween(string str, char first, char last, DTASegment parent = null)
-            {
-                var ret = new List<DTASegment>();
-
-                if (!str.IsEmpty())
-                {
-                    str = str.Replace('\r', '\n');
-                    str = str.Replace("\n\n", "\n");
-                    while (str.IndexOf("  ") != -1)
-                    {
-                        str = str.Replace("  ", " ");
-                    }
-                    if (str.IsEmpty())
-                        return ret;
-
-                    str = RemoveComments(str);
-
-                    var start = str.IndexOf(first);
-
-                    var end = str.IndexOfClosing(first, last, start);
-                    if (start != -1 && end != -1)
-                    {
-                        var len = end - start;
-                        if (len > 0)
-                        {
-                            var root = new DTASegment(parent, str.Substring(start + 1, len - 1));
-
-                            ret.Add(root);
-
-                            if (end < str.Length - 1)
-                            {
-                                var remainder = str.Substring(end);
-                                ret.AddRange(ParseBetween(str.Substring(end), first, last, parent));
-                            }
-
-                            root.Children.AddRange(ParseBetween(str.Substring(start + 1, len - 1), first, last, root));
-
-                        }
-                    }
-                }
-                return ret;
-            }
-
-            public IEnumerator<DTASegment> GetEnumerator()
-            {
-                return Items.GetEnumerator();
-            }
-
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-            {
-                return Items.GetEnumerator();
-            }
-        }
 
 
 
@@ -3992,10 +3767,40 @@ namespace ProUpgradeEditor.UI
         }
 
 
-
-        public bool LoadPackageIntoTree(Package package)
+        string treePackageContentsFilePath = "";
+        bool treePackageContentsIsLocal = false;
+        public bool LoadPackageIntoTree(Package package, string filePath, bool isLocalFile)
         {
             bool ret = false;
+
+            treePackageContentsIsLocal = isLocalFile;
+            treePackageContentsFilePath = filePath;
+            treePackageContentsIsFATXFileEntry = false;
+            treePackageContentsFATXFileEntry = null;
+
+            treePackageContents.SuspendLayout();
+            treePackageContents.Nodes.Clear();
+            treePackageContents.Tag = package;
+            try
+            {
+                ret = AddPackageTreeNodes(treePackageContents.Nodes, package.RootFolder);
+            }
+            catch { }
+            treePackageContents.ExpandAll();
+            treePackageContents.ResumeLayout();
+
+            return ret;
+        }
+        FATXFileEntry treePackageContentsFATXFileEntry;
+        bool treePackageContentsIsFATXFileEntry = false;
+        public bool LoadPackageIntoTree(Package package, FATXFileEntry file)
+        {
+            bool ret = false;
+
+            treePackageContentsIsLocal = false;
+            treePackageContentsFilePath = "";
+            treePackageContentsIsFATXFileEntry = true;
+            treePackageContentsFATXFileEntry = file;
 
             treePackageContents.SuspendLayout();
             treePackageContents.Nodes.Clear();
@@ -4316,7 +4121,8 @@ namespace ProUpgradeEditor.UI
                                 }
                             }
 
-                            try{
+                            try
+                            {
                                 var sids = DTAFile.FromBytes(ReadFileBytes(songsDTAPath)).GetSongIDs();
                                 var ssn = songShortName;
                                 var sid = sids.FirstOrDefault(s => s.SongShortName.EqualsEx(ssn));
@@ -4329,7 +4135,7 @@ namespace ProUpgradeEditor.UI
                                     }
                                 }
                             }
-                            catch{}
+                            catch { }
                             if (!foundSongID && songsDTAPath.FileExists())
                             {
                                 if (ParseSongsDTAForSongID(songShortName, songsDTAPath.ReadFileBytes(), out songID))
@@ -5037,7 +4843,27 @@ namespace ProUpgradeEditor.UI
                         location = ShowSaveFileDlg("Save Package As", "", f.Name);
                         if (!string.IsNullOrEmpty(location))
                         {
-                            extracted = TryWriteFile(location, f.Data);
+                            PackageFile pkf = f;
+                            if (f.Data == null)
+                            {
+                                if (f.Package.dj.OpenAgain())
+                                {
+                                    var file = f.Package.package.GetFile(f.Name, f.Folder.FolderEntry.EntryID);
+                                    if (file != null)
+                                    {
+                                        var pk = Package.Load(Package.RebuildPackageInMemory(f.Package), true);
+                                        f.Data = pk.package.GetFiles(f.Folder.FolderEntry.EntryID).Where(x=> 
+                                            string.Compare(x.Name, f.Name,true)==0).FirstOrDefault().ExtractBytes(true);
+                                    }
+                                    f.Package.package.CloseIO();
+                                }
+                            }
+                            if (pkf != null)
+                            {
+                                treePackageContents.SelectedNode.Tag = pkf;
+                                extracted = TryWriteFile(location, pkf.Data);
+                            }
+                            
                         }
                     }
                     else
@@ -5080,7 +4906,8 @@ namespace ProUpgradeEditor.UI
                 if (f != null)
                 {
                     var ext = Path.GetExtension(f.Name);
-                    if (string.Compare(ext, ".dta", StringComparison.OrdinalIgnoreCase) == 0)
+                    if (string.Compare(ext, ".dta", StringComparison.OrdinalIgnoreCase) == 0 ||
+                        string.Compare(ext, ".txt", StringComparison.OrdinalIgnoreCase) == 0)
                     {
 
                         bool opened = false;
@@ -5408,7 +5235,8 @@ namespace ProUpgradeEditor.UI
                         else
                         {
                             var config = new GenDiffConfig(item, true, checkBoxSongLibCopyGuitar.Checked,
-                                false, false, true);
+                                false, false,
+                                Utility.HandPositionGenerationEnabled);
 
                             Debug.WriteLine("gen complete regen");
                             if (!GenerateDifficulties(true, config))

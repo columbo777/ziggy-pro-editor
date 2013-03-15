@@ -1384,7 +1384,10 @@ namespace X360.IO
                     }*/
                 }
                 else if (xThisData != DataType.Drive)
+                {
+                    
                     xStream.Write(xIn, 0, xIn.Length);
+                }
             }
             // //throw x
         }
@@ -1890,8 +1893,10 @@ namespace X360.IO
         /// Reopens the stream
         /// </summary>
         /// <returns></returns>
+        
         public virtual bool OpenAgain()
         {
+            
             if (!Accessed)
             {
                 if (xThisData == DataType.Real)

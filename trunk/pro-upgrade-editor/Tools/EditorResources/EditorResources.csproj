@@ -103,6 +103,8 @@
     <Compile Include="Components\Base\PUEControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Components\DifficultyButton.cs" />
+    <Compile Include="Components\PETrackDifficulty.cs" />
     <Compile Include="Components\PEWaveViewer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -167,6 +169,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Components\Base\PECheckBox.resx">
       <DependentUpon>PECheckBox.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Components\Base\PEEditBox.resx">
       <DependentUpon>PEEditBox.cs</DependentUpon>

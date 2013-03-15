@@ -14,6 +14,7 @@ namespace ProUpgradeEditor.Common
             : base(track, downEvent, upEvent, GuitarMessageType.GuitarHandPosition)
         {
         }
+        
 
         public static GuitarHandPosition CreateEvent(GuitarMessageList track, TickPair ticks, int noteFret)
         {

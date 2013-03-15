@@ -1072,25 +1072,7 @@ namespace ProUpgradeEditor.UI
             RegenDifficultiesClick();
         }
 
-        public class EditorTrackDifficulty
-        {
-            public PEMidiTrackEditPanel TrackPanel;
-            public IEnumerable<TrackDifficulty> Difficulties;
-            public TrackDifficulty SelectedTrackDifficulty;
-            public EditorTrackDifficulty(PEMidiTrackEditPanel trackPanel)
-            {
-                this.TrackPanel = trackPanel;
-                Difficulties = trackPanel.TrackDifficulties.Select(x => new TrackDifficulty(x.Track, x.Difficulty)).ToList();
-                if (trackPanel.SelectedTrack != null && (trackPanel.SelectedTrack.Track != null))
-                {
-                    SelectedTrackDifficulty = new TrackDifficulty(trackPanel.SelectedTrack.Track.Name, trackPanel.SelectedTrack.SelectedDifficulty);
-                }
-                else
-                {
-                    SelectedTrackDifficulty = null;
-                }
-            }
-        }
+
         public DataPair<EditorTrackDifficulty> GetSelectedTrackDifficulties()
         {
             return new DataPair<EditorTrackDifficulty>(new EditorTrackDifficulty(midiTrackEditorPro), new EditorTrackDifficulty(midiTrackEditorG5));
@@ -1185,7 +1167,8 @@ namespace ProUpgradeEditor.UI
                         }
                     }
 
-                    var config = new GenDiffConfig(SelectedSong, true, SelectedSong.CopyGuitarToBass, false, false, true);
+                    var config = new GenDiffConfig(SelectedSong, true, 
+                        SelectedSong.CopyGuitarToBass, false, false, Utility.HandPositionGenerationEnabled);
 
                     if (!GenerateDifficulties(false, config))
                     {
@@ -1250,7 +1233,7 @@ namespace ProUpgradeEditor.UI
                     Package p = Package.Load(selPack, false);
                     if (p != null)
                     {
-                        if (!LoadPackageIntoTree(p))
+                        if (!LoadPackageIntoTree(p, selPack, true))
                         {
                             MessageBox.Show("Unable to read package");
                         }
@@ -1346,7 +1329,7 @@ namespace ProUpgradeEditor.UI
                     var p = Package.Load(SelectedSong.G6ConFile);
                     if (p != null)
                     {
-                        LoadPackageIntoTree(p);
+                        LoadPackageIntoTree(p, SelectedSong.G6ConFile, true);
                         textBoxPackageDTAText.Text = "";
                         tabContainerMain.SelectedTab = tabPackageEditor;
                         tabControl3.SelectedTab = tabPage8;
@@ -1418,7 +1401,7 @@ namespace ProUpgradeEditor.UI
 
                         if (SaveProFile(fileName, false))
                         {
-                            var config = new GenDiffConfig(null, true, false, false, false, true);
+                            var config = new GenDiffConfig(null, true, false, false, false, Utility.HandPositionGenerationEnabled);
                             if (GenerateDifficulties(false, config))
                             {
                                 ReloadTracks();
@@ -2364,7 +2347,8 @@ namespace ProUpgradeEditor.UI
                 var genConfig = new GenDiffConfig(SelectedSong, true,
                     SelectedSong == null ? checkGenDiffCopyGuitarToBass.Checked : SelectedSong.CopyGuitarToBass,
                     checkBoxInitSelectedDifficultyOnly.Checked,
-                    checkBoxInitSelectedTrackOnly.Checked, true);
+                    checkBoxInitSelectedTrackOnly.Checked,
+                    Utility.HandPositionGenerationEnabled);
 
                 GenerateDifficulties(false, genConfig);
             });
@@ -2818,13 +2802,7 @@ namespace ProUpgradeEditor.UI
             click_FindPreviousStoredChordMatch();
         }
 
-        public class StoredChordSearchConfig
-        {
-            public bool SearchByNoteType;
-            public bool MatchAllFrets;
-            public bool SearchByNoteFret;
-            public bool SearchByNoteStrum;
-        }
+
 
         public StoredChordSearchConfig GetStoredChordSearchConfigFromScreen()
         {
@@ -3592,20 +3570,8 @@ namespace ProUpgradeEditor.UI
             {
                 EditorPro.ClearSelection();
 
-                var gc1 = EditorPro.GetStaleChord(result[0], false);
-
-                SetSelectedChord(gc1, false);
-                foreach (var gc in result)
-                {
-                    gc1 = EditorPro.GetStaleChord(gc, false);
-                    if (gc1 != null)
-                    {
-                        gc1.Selected = true;
-                    }
-                }
-
+                result.ForEach(x => x.Selected = true);
                 ScrollToSelection();
-                EditorPro.Invalidate();
             }
         }
 
@@ -3617,23 +3583,10 @@ namespace ProUpgradeEditor.UI
 
             if (result != null && result.Length > 0)
             {
-                var gc1 = EditorPro.GetStaleChord(result[0], false);
-
-                SetSelectedChord(gc1, false);
-                if (result.Count() > 1)
-                {
-                    foreach (var gc in result)
-                    {
-                        gc1 = EditorPro.GetStaleChord(gc, false);
-                        if (gc1 != null)
-                        {
-                            gc1.Selected = true;
-                        }
-                    }
-                }
-
-                ScrollToSelection();
-                EditorPro.Invalidate();
+                EditorPro.ClearSelection();
+                result.ForEach(x => x.Selected = true);
+                EditorPro.ScrollToSelection();
+                
             }
         }
 
@@ -4058,177 +4011,9 @@ namespace ProUpgradeEditor.UI
             RefreshUSBSongs();
         }
 
-        public class USBDriveEntry
-        {
-            FATXFolderEntry entry;
-            FATXReadContents contents;
-
-            string name;
-
-            public USBDriveEntry(string name, FATXReadContents contents, FATXFolderEntry entry)
-            {
-                this.entry = entry;
-                this.name = name;
-                this.contents = contents;
-            }
-
-            public FATXFolderEntry Entry
-            {
-                get { return this.entry; }
-            }
-
-            public FATXReadContents Contents
-            {
-                get { return this.contents; }
-            }
-
-            public string Name
-            {
-                get { return this.name; }
-            }
-
-            public override string ToString()
-            {
-                return this.name;
-            }
-        }
-
-        public class USBDrive
-        {
-            DeviceReturn device;
-            string name;
-
-            bool opened = false;
-            FATXDrive drive = null;
-
-            public bool IsOpen
-            {
-                get { return opened; }
-            }
 
 
-            public bool Open()
-            {
-                if (!opened)
-                {
-                    try
-                    {
-                        drive = new FATXDrive(device);
 
-                        RefreshPartitions();
-
-                        opened = true;
-                        return true;
-                    }
-                    catch { }
-                }
-
-                return false;
-            }
-
-            public void Close()
-            {
-                if (opened)
-                {
-                    try
-                    {
-                        drive.Close();
-                        drive = null;
-                    }
-                    catch { drive = null; }
-                    opened = false;
-                }
-            }
-
-            public USBDrive(DeviceReturn device)
-            {
-                this.device = device;
-
-                if (Open())
-                {
-                    try
-                    {
-                        this.name = Drive.DriveName;
-
-                        RefreshPartitions();
-                    }
-                    catch { }
-                    finally { this.Close(); }
-                }
-            }
-
-            public FATXFolderEntry GetFolder(FATXFolderEntry e)
-            {
-                return GetFolder(e.Path);
-            }
-
-            public FATXFolderEntry GetFolder(string path)
-            {
-                if (drive != null)
-                {
-                    bool o = Open();
-
-                    var ret = drive.GetFolder(path);
-
-                    if (o)
-                        Close();
-
-                    return ret;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-
-            public FATXFolderEntry GetFolder(TreeNode node)
-            {
-                if (node.Tag is FATXFolderEntry)
-                    return GetFolder(node.Tag as FATXFolderEntry);
-                else
-                    return null;
-            }
-
-
-            public void RefreshPartitions()
-            {
-                folders = new USBDriveEntry[0];
-
-                var fld = new List<USBDriveEntry>();
-                foreach (var p in drive.Partitions)
-                {
-                    FATXFolderEntry fe;
-                    FATXReadContents readContents = drive.ReadToFolder(
-                        p.PartitionName, out fe);
-
-                    var entry = new USBDriveEntry(p.PartitionName, readContents, fe);
-
-                    fld.Add(entry);
-                }
-                this.folders = fld.ToArray();
-            }
-
-            public override string ToString()
-            {
-                return this.name;
-            }
-
-            public FATXDrive Drive
-            {
-                get
-                {
-                    return drive;
-                }
-            }
-            USBDriveEntry[] folders;
-            public USBDriveEntry[] Folders
-            {
-                get
-                {
-                    return folders;
-                }
-            }
-        }
 
         public void RefreshUSBList()
         {
@@ -4314,159 +4099,12 @@ namespace ProUpgradeEditor.UI
             }
         }
 
-        public class ListViewColumnSorter : IComparer
-        {
-            enum USBColumns
-            {
-                Name = 0,
 
-                Size,
-                UpdateDate,
-                CreateDate,
-            }
-
-
-            /// <summary>
-            /// Specifies the column to be sorted
-            /// </summary>
-            private int ColumnToSort;
-            /// <summary>
-            /// Specifies the order in which to sort (i.e. 'Ascending').
-            /// </summary>
-            private SortOrder OrderOfSort;
-            /// <summary>
-            /// Case insensitive comparer object
-            /// </summary>
-            private CaseInsensitiveComparer ObjectCompare;
-
-            /// <summary>
-            /// Class constructor.  Initializes various elements
-            /// </summary>
-            public ListViewColumnSorter()
-            {
-                // Initialize the column to '0'
-                ColumnToSort = 0;
-
-                // Initialize the sort order to 'none'
-                OrderOfSort = SortOrder.None;
-
-                // Initialize the CaseInsensitiveComparer object
-                ObjectCompare = new CaseInsensitiveComparer();
-            }
-
-            /// <summary>
-            /// This method is inherited from the IComparer interface.  It compares the two objects passed using a case insensitive comparison.
-            /// </summary>
-            /// <param name="x">First object to be compared</param>
-            /// <param name="y">Second object to be compared</param>
-            /// <returns>The result of the comparison. "0" if equal, negative if 'x' is less than 'y' and positive if 'x' is greater than 'y'</returns>
-            public int Compare(object x, object y)
-            {
-                int compareResult;
-                ListViewItem listviewX, listviewY;
-
-                // Cast the objects to be compared to ListViewItem objects
-                listviewX = (ListViewItem)x;
-                listviewY = (ListViewItem)y;
-
-                var sc = listviewX.SubItems[ColumnToSort];
-
-                // Compare the two items
-                if (ColumnToSort == (int)USBColumns.Name)
-                {
-                    compareResult = ObjectCompare.Compare(listviewX.SubItems[ColumnToSort].Text, listviewY.SubItems[ColumnToSort].Text);
-                }
-                else if (ColumnToSort == (int)USBColumns.Size)
-                {
-                    if (listviewX.Tag != null &&
-                        listviewY.Tag != null)
-                    {
-                        compareResult = ObjectCompare.Compare(
-                            (listviewX.Tag as FATXFileEntry).Size,
-                            (listviewY.Tag as FATXFileEntry).Size);
-                    }
-                    else
-                    {
-                        compareResult = 0;
-
-                    }
-                }
-                else if (ColumnToSort == (int)USBColumns.UpdateDate)
-                {
-                    compareResult = ObjectCompare.Compare(
-                        (listviewX.SubItems[ColumnToSort].Text).ToDateTime(),
-                        (listviewY.SubItems[ColumnToSort].Text).ToDateTime());
-                }
-                else if (ColumnToSort == (int)USBColumns.CreateDate)
-                {
-                    compareResult = ObjectCompare.Compare(
-                        (listviewX.SubItems[ColumnToSort].Text).ToDateTime(),
-                        (listviewY.SubItems[ColumnToSort].Text).ToDateTime());
-                }
-                else
-                {
-                    compareResult = 0;
-                }
-
-                // Calculate correct return value based on object comparison
-                if (OrderOfSort == SortOrder.Ascending)
-                {
-                    // Ascending sort is selected, return normal result of compare operation
-                    return compareResult;
-                }
-                else if (OrderOfSort == SortOrder.Descending)
-                {
-                    // Descending sort is selected, return negative result of compare operation
-                    return (-compareResult);
-                }
-                else
-                {
-                    // Return '0' to indicate they are equal
-                    return 0;
-                }
-            }
-
-            /// <summary>
-            /// Gets or sets the number of the column to which to apply the sorting operation (Defaults to '0').
-            /// </summary>
-            public int SortColumn
-            {
-                set
-                {
-                    ColumnToSort = value;
-                }
-                get
-                {
-                    return ColumnToSort;
-                }
-            }
-
-            /// <summary>
-            /// Gets or sets the order of sorting to apply (for example, 'Ascending' or 'Descending').
-            /// </summary>
-            public SortOrder Order
-            {
-                set
-                {
-                    OrderOfSort = value;
-                }
-                get
-                {
-                    return OrderOfSort;
-                }
-            }
-
-        }
         ListViewColumnSorter sorter;
 
         int nextTimerID = 123;
 
-        class ThreadTimer
-        {
-            public System.Threading.Timer timer;
-            public int TimerID;
-            public int TimerGroupID;
-        }
+
 
 
         List<ThreadTimer> threadTimers = new List<ThreadTimer>();
@@ -4534,16 +4172,7 @@ namespace ProUpgradeEditor.UI
             return false;
         }
 
-        class ThreadedTimerParam
-        {
-            public SynchronizationContext Context;
-            public object Param;
-            public int TimerID;
-            public int TimerGroupID;
-            public int NumTotalTicks;
-            public Action<object> Func;
-            public Action<object> EndFunc;
-        }
+
 
         void OnThreadedTimerTick(object o)
         {
@@ -5551,7 +5180,7 @@ namespace ProUpgradeEditor.UI
             RefreshUSB();
         }
 
-        void AddFileToUSB(string fileName, TreeNode folderNode = null)
+        void AddFileToUSB(string fileName)
         {
             if (SelectedUSB.Open())
             {
@@ -5790,9 +5419,11 @@ namespace ProUpgradeEditor.UI
                         foreach (ListViewItem li in listUSBFileView.SelectedItems)
                         {
                             var f = li.Tag as FATXFileEntry;
-
-                            if (string.Compare(f.Name, fl.Name, true) == 0)
-                                ret.Add(fl);
+                            if (f != null)
+                            {
+                                if (string.Compare(f.Name, fl.Name, true) == 0)
+                                    ret.Add(fl);
+                            }
                         }
                     }
                 }
@@ -6061,21 +5692,15 @@ namespace ProUpgradeEditor.UI
                 var files = SelectedUSBFiles;
                 if (files.Count == 1)
                 {
-
-                    Package p = Package.Load(files[0].GetFatXStream(), false);
-
                     try
                     {
-                        //Package p = Package.Load(bytes);
-                        // if (p != null)
-                        {
-                            LoadPackageIntoTree(p);
+                        var file = files[0];
+                        var p = Package.Load(file.GetFatXStream(), false);
+                        LoadPackageIntoTree(p, file);
 
-                            textBoxPackageDTAText.Text = "";
-                            tabContainerMain.SelectedTab = tabPackageEditor;
-                            tabControl3.SelectedTab = tabPage8;
-                        }
-
+                        textBoxPackageDTAText.Text = "";
+                        tabContainerMain.SelectedTab = tabPackageEditor;
+                        tabControl3.SelectedTab = tabPage8;
                     }
                     catch { }
 
@@ -6294,6 +5919,7 @@ namespace ProUpgradeEditor.UI
 
             if (tn != null && tn.Tag != null && tn.Tag is FATXFolderEntry)
             {
+                treeUSBContents.SelectedNode = tn;
 
                 if (e.Data.GetDataPresent(DataFormats.FileDrop, false) == true)
                 {
@@ -6303,7 +5929,7 @@ namespace ProUpgradeEditor.UI
                     {
                         if (File.Exists(file))
                         {
-                            AddFileToUSB(file, tn);
+                            AddFileToUSB(file);
                         }
                         else if (Directory.Exists(file))
                         {
@@ -6318,72 +5944,84 @@ namespace ProUpgradeEditor.UI
                     object o = e.Data.GetData(DataFormats.Serializable, false);
                     if (o != null)
                     {
-                        ListViewItem item = o as ListViewItem;
+                        var item = o as ListViewItem;
+
                         if (item != null && item.Tag != null &&
                             listUSBFileView.Items.Contains(item) &&
                             item.Tag is FATXFileEntry)
                         {
-                            var fe = item.Tag as FATXFileEntry;
-
-                            if (SelectedUSB.Open())
-                            {
-                                treeUSBContents.BeginUpdate();
-
-                                try
-                                {
-                                    var fileFolderNode = listUSBFileView.Tag as TreeNode;
-
-                                    FATXFolderEntry xfolder;
-                                    var contents = SelectedUSB.Drive.ReadToFolder(
-                                        GetUSBTreeNodePath(fileFolderNode), out xfolder);
-
-                                    if (xfolder != null && contents != null)
-                                    {
-                                        bool found = false;
-                                        foreach (var file in contents.Files)
-                                        {
-                                            if (string.Compare(file.Name, fe.Name, true) == 0)
-                                            {
-                                                fe = file;
-                                                found = true;
-                                                break;
-                                            }
-                                        }
-                                        if (found)
-                                        {
-                                            item.Tag = fe;
-
-                                            var b = fe.xExtractBytes();
-                                            if (b != null)
-                                            {
-
-                                                var folder = tn.Tag as FATXFolderEntry;
-                                                if (folder != null)
-                                                {
-                                                    FATXFolderEntry xfolder2;
-                                                    var contents2 = SelectedUSB.Drive.ReadToFolder(
-                                                        GetUSBTreeNodePath(tn), out xfolder2);
-
-                                                    if (xfolder2.AddFile(item.Text, b, AddType.NoOverWrite))
-                                                    {
-
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                catch { }
-                                treeUSBContents.EndUpdate();
-
-                                SelectedUSB.Close();
-                            }
-                            RefreshUSB();
+                            var fileEntry = item.Tag as FATXFileEntry;
+                            item.Tag = WriteUSBFile(tn.Tag as FATXFolderEntry, fileEntry.Name, fileEntry);
                         }
                     }
                 }
 
             }
+        }
+
+        private FATXFileEntry WriteUSBFile(FATXEntry folderEntry, string fileName, FATXFileEntry fileEntry)
+        {
+            FATXFileEntry ret = null;
+            if (SelectedUSB.Open())
+            {
+                treeUSBContents.BeginUpdate();
+
+                try
+                {
+                    var fileFolderNode = listUSBFileView.Tag as TreeNode;
+
+                    FATXFolderEntry xfolder;
+                    var contents = SelectedUSB.Drive.ReadToFolder(
+                        GetUSBTreeNodePath(fileFolderNode), out xfolder);
+
+                    if (xfolder != null && contents != null)
+                    {
+                        bool found = false;
+                        foreach (var file in contents.Files)
+                        {
+                            if (string.Compare(file.Name, fileEntry.Name, true) == 0)
+                            {
+                                fileEntry = file;
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found)
+                        {
+                            
+                            var b = fileEntry.xExtractBytes();
+                            if (b != null)
+                            {
+                                FATXFolderEntry xfolder2;
+                                FATXEntry parent = folderEntry.Parent;
+                                var path = folderEntry.Name;
+                                while (parent != null)
+                                {
+                                    path = parent.Name+"/"+ path;
+                                    parent = parent.Parent;
+                                }
+
+                                var contents2 = SelectedUSB.Drive.ReadToFolder(
+                                    path, out xfolder2);
+
+                                
+                                if (xfolder2.AddFile(fileName, b, AddType.Replace))
+                                {
+                                    contents2 = SelectedUSB.Drive.ReadToFolder(path, out xfolder2);
+                                    ret = contents2.Files.Where(x => string.Compare(x.Name, fileName, true) == 0).FirstOrDefault();
+                                }
+                                
+                            }
+                        }
+                    }
+                }
+                catch { }
+                treeUSBContents.EndUpdate();
+
+                SelectedUSB.Close();
+            }
+            RefreshUSB();
+            return ret;
         }
 
         void treeUSBContents_DragOver(object sender, DragEventArgs e)
@@ -7032,7 +6670,7 @@ namespace ProUpgradeEditor.UI
                     var p = Package.Load(SelectedSong.G6ConFile);
                     if (p != null)
                     {
-                        LoadPackageIntoTree(p);
+                        LoadPackageIntoTree(p, SelectedSong.G6ConFile, true);
 
                         textBoxPackageDTAText.Text = "";
                     }
@@ -7401,50 +7039,9 @@ namespace ProUpgradeEditor.UI
             AddSelectedCopyPatternPreset();
         }
 
-        public class FindMatchingPatternConfig
-        {
-            public bool FindNext;
-            public bool FindPrevious;
-            public bool FirstMatchOnly;
 
-            public FindMatchingPatternConfig(bool findNext, bool findPrevious, bool firstMatchOnly)
-            {
-                this.FindNext = findNext;
-                this.FindPrevious = findPrevious;
-                this.FirstMatchOnly = firstMatchOnly;
-            }
-        }
 
-        public class CopyPatternPreset
-        {
-            public int ID;
-            public string Name;
-            public bool ForwardOnly;
-            public bool MatchLengths5;
-            public bool MatchLengths6;
-            public bool MatchSpacing;
-            public bool MatchBeat;
-            public bool KeepLengths;
-            public bool FirstMatchOnly;
-            public bool RemoveExisting;
 
-            public override string ToString()
-            {
-                return Name;
-            }
-            public void CopyTo(CopyPatternPreset item)
-            {
-                item.Name = Name;
-                item.ForwardOnly = ForwardOnly;
-                item.MatchLengths5 = MatchLengths5;
-                item.MatchLengths6 = MatchLengths6;
-                item.MatchSpacing = MatchSpacing;
-                item.MatchBeat = MatchBeat;
-                item.KeepLengths = KeepLengths;
-                item.FirstMatchOnly = FirstMatchOnly;
-                item.RemoveExisting = RemoveExisting;
-            }
-        }
 
         public List<CopyPatternPreset> GetCopyPatternPresetsFromScreen()
         {
@@ -7628,70 +7225,71 @@ namespace ProUpgradeEditor.UI
         {
             try
             {
-                if (EditorPro.IsLoaded)
+                if (!EditorPro.IsLoaded)
+                    return;
+
+                var ssc = SelectedStoredChord;
+                if (ssc == null)
+                    return;
+
+                var selected = EditorPro.SelectedChords.ToArray();
+
+                if (selected == null || selected.Length == 0)
+                    return;
+
+                var mcp = new MatchingCopyPattern()
                 {
-                    var ssc = SelectedStoredChord;
-                    if (ssc == null)
+                    DeltaTimeStart = 0,
+
+                };
+
+                mcp.OriginalChords6 = selected;
+
+                var matchingChords = FindStoredChordMatches();
+                if (matchingChords == null || matchingChords.Count == 0)
+                    return;
+
+                if (matchingChords.Count > 100)
+                {
+                    var mb = MessageBox.Show(string.Format("There are currently {0} matching chords, Continue?",
+                        matchingChords.Count),
+                        "Warning", MessageBoxButtons.YesNo);
+                    if (mb == System.Windows.Forms.DialogResult.No)
                         return;
+                }
 
-                    var selected = EditorPro.SelectedChords.ToArray();
+                EditorPro.BackupSequence();
 
-                    if (selected == null || selected.Length == 0)
-                        return;
-
-                    var mcp = new MatchingCopyPattern()
-                    {
-                        DeltaTimeStart = 0,
-
-                    };
-
-                    mcp.OriginalChords6 = selected;
-
-                    var matchingChords = FindStoredChordMatches();
-                    if (matchingChords == null || matchingChords.Count == 0)
-                        return;
-
-                    if (matchingChords.Count > 100)
-                    {
-                        var mb = MessageBox.Show(string.Format("There are currently {0} matching chords, Continue?",
-                            matchingChords.Count),
-                            "Warning", MessageBoxButtons.YesNo);
-                        if (mb == System.Windows.Forms.DialogResult.No)
-                            return;
-                    }
-
-                    EditorPro.BackupSequence();
-
-                    foreach (var chord in matchingChords)
-                    {
-                        mcp.Matches.Add(new GuitarChord[] { chord });
-                    }
+                foreach (var chord in matchingChords)
+                {
+                    mcp.Matches.Add(new GuitarChord[] { chord });
+                }
 
 
-                    int numReplaced = 0;
-                    int minTick = int.MinValue;
-                    foreach (var m in mcp.Matches)
-                    {
-                        int irep = 0;
-                        minTick = ReplaceNotes(EditorPro.Messages,
-                            mcp.OriginalChords6, mcp.DeltaTimeStart,
-                                 minTick, m,
-                                m.GetMinTick(), m.GetMaxTick(), out irep);
+                int numReplaced = 0;
+                int minTick = int.MinValue;
+                foreach (var m in mcp.Matches)
+                {
+                    int irep = 0;
+                    minTick = ReplaceNotes(EditorPro.Messages,
+                        mcp.OriginalChords6, mcp.DeltaTimeStart,
+                                minTick, m,
+                            m.GetMinTick(), m.GetMaxTick(), out irep);
 
-                        numReplaced += irep;
-                    }
+                    numReplaced += irep;
+                }
 
 
-                    if (numReplaced == 0)
-                    {
-                        MessageBox.Show("No Matches found");
-                    }
-                    else
-                    {
-                        MessageBox.Show(string.Format("Replaced {0} Matches", numReplaced));
-                    }
+                if (numReplaced == 0)
+                {
+                    MessageBox.Show("No Matches found");
+                }
+                else
+                {
+                    MessageBox.Show(string.Format("Replaced {0} Matches", numReplaced));
                 }
             }
+        
             catch { }
         }
 
@@ -7978,7 +7576,7 @@ namespace ProUpgradeEditor.UI
 
                 chords.ForEach(x =>
                 {
-                    var newTicks = EditorPro.SnapLeftRightTicks(x.TickPair, new TrackEditor.SnapConfig(true, false, false));
+                    var newTicks = EditorPro.SnapLeftRightTicks(x.TickPair, new SnapConfig(true, false, false));
                     x.SetTicks(newTicks);
                     x.UpdateEvents();
                 });
@@ -8780,7 +8378,7 @@ namespace ProUpgradeEditor.UI
 
         }
 
-        private void button102_Click(object sender, EventArgs e)
+        private void buttonShortToG5Len_Click(object sender, EventArgs e)
         {
             try
             {
@@ -8888,224 +8486,9 @@ namespace ProUpgradeEditor.UI
             }
         }
 
-        enum ControlAnimatorType
-        {
-            Height,
-        }
-
-        enum AnimationRoutine
-        {
-            EaseInOutSine,
-        }
-
-        class ControlAnimatorItem
-        {
-            public AnimationRoutine Routine;
-            public Control Control;
-
-            public DateTime TimeStart;
-            public DateTime TimeEnd;
-            public DateTime CurrentTime;
-
-            public ControlAnimatorType Type;
-            public Point Start;
-            public Point End;
-
-            bool completed = false;
-            public bool Completed
-            {
-                get
-                {
-                    return completed;
-                }
-                set
-                {
-                    completed = value;
-                }
-            }
-
-            public double TotalAnimTime
-            {
-                get { return (TimeEnd - TimeStart).TotalSeconds; }
-            }
-
-            public double TimeElapsed
-            {
-                get { return (CurrentTime - TimeStart).TotalSeconds; }
-            }
-
-            public double Progress
-            {
-                get { return TimeElapsed / TotalAnimTime; }
-            }
-        }
-
-        class ControlAnimator
-        {
-            static List<ControlAnimatorItem> animatingControls = new List<ControlAnimatorItem>();
-
-
-            public static void CreateHeightChange(Control control, int to, double seconds = 0.50)
-            {
-                var item = new ControlAnimatorItem()
-                {
-                    Routine = AnimationRoutine.EaseInOutSine,
-                    Control = control,
-                    TimeStart = DateTime.Now,
-                    TimeEnd = DateTime.Now + TimeSpan.FromSeconds(seconds),
-                    Type = ControlAnimatorType.Height,
-                };
-
-                item.Start = new Point(0, control.Height);
-                item.End = new Point(0, to);
-
-                var oldItem = animatingControls.SingleOrDefault(x => x.Control == control && x.Type == ControlAnimatorType.Height);
-                if (oldItem != null)
-                {
-                    control.Height = oldItem.End.Y;
-                    int delta = control.Height - to;
-                    item.End.Y += delta;
-                    animatingControls.Remove(oldItem);
-                }
-
-                animatingControls.Add(item);
-            }
 
 
 
-            public static double EaseInOutSine(double x, double t, double b, double c, double d)
-            {
-                return -c / 2.0 * (Math.Cos(Math.PI * x) - 1.0) + b;
-            }
-
-            public static double GetProgress(AnimationRoutine routine, double elapsed, double totalAnimTime)
-            {
-                double ret = 1.0;
-                if (routine == AnimationRoutine.EaseInOutSine)
-                {
-                    if (elapsed > totalAnimTime)
-                        elapsed = totalAnimTime;
-                    ret = EaseInOutSine(elapsed / totalAnimTime, elapsed, 0, totalAnimTime, 1.0);
-                }
-                return ret;
-            }
-
-            public static Point GetUpdatedPoint(
-                double progress,
-                Point start, Point end)
-            {
-                var ret = new Point(start.X + (int)(Math.Round((end.X - start.X) * progress)),
-                                 start.Y + (int)(Math.Round((end.Y - start.Y) * progress)));
-
-                return ret;
-            }
-            /*
-             * 
- x = 0 - 1 as float of completion
- t = elapsed time in ms
- b = 0
- c = 1
- d = duration in ms
-
-
-    easeInQuad: function (x, t, b, c, d) {
-        return c*(t/=d)*t + b;
-    },
-    easeOutQuad: function (x, t, b, c, d) {
-        return -c *(t/=d)*(t-2) + b;
-    },
-    easeInOutQuad: function (x, t, b, c, d) {
-        if ((t/=d/2) < 1) return c/2*t*t + b;
-        return -c/2 * ((--t)*(t-2) - 1) + b;
-    },
-    easeInCubic: function (x, t, b, c, d) {
-        return c*(t/=d)*t*t + b;
-    },
-    easeOutCubic: function (x, t, b, c, d) {
-        return c*((t=t/d-1)*t*t + 1) + b;
-    },
-    easeInOutCubic: function (x, t, b, c, d) {
-        if ((t/=d/2) < 1) return c/2*t*t*t + b;
-        return c/2*((t-=2)*t*t + 2) + b;
-    },
-    easeInQuart: function (x, t, b, c, d) {
-        return c*(t/=d)*t*t*t + b;
-    },
-    easeOutQuart: function (x, t, b, c, d) {
-        return -c * ((t=t/d-1)*t*t*t - 1) + b;
-    },
-    easeInOutQuart: function (x, t, b, c, d) {
-        if ((t/=d/2) < 1) return c/2*t*t*t*t + b;
-        return -c/2 * ((t-=2)*t*t*t - 2) + b;
-    },
-    easeInQuint: function (x, t, b, c, d) {
-        return c*(t/=d)*t*t*t*t + b;
-    },
-    easeOutQuint: function (x, t, b, c, d) {
-        return c*((t=t/d-1)*t*t*t*t + 1) + b;
-    },
-    easeInOutQuint: function (x, t, b, c, d) {
-        if ((t/=d/2) < 1) return c/2*t*t*t*t*t + b;
-        return c/2*((t-=2)*t*t*t*t + 2) + b;
-    },
-    easeInSine: function (x, t, b, c, d) {
-        return -c * Math.cos(t/d * (Math.PI/2)) + c + b;
-    },
-    easeOutSine: function (x, t, b, c, d) {
-        return c * Math.sin(t/d * (Math.PI/2)) + b;
-    },
-    easeInOutSine: function (x, t, b, c, d) {
-        return -c/2 * (Math.cos(Math.PI*t/d) - 1) + b;
-    },
-    easeInExpo: function (x, t, b, c, d) {
-        return (t==0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b;
-    },
-    easeOutExpo: function (x, t, b, c, d) {
-        return (t==d) ? b+c : c * (-Math.pow(2, -10 * t/d) + 1) + b;
-    },
-    easeInOutExpo: function (x, t, b, c, d) {
-        if (t==0) return b;
-        if (t==d) return b+c;
-        if ((t/=d/2) < 1) return c/2 * Math.pow(2, 10 * (t - 1)) + b;
-        return c/2 * (-Math.pow(2, -10 * --t) + 2) + b;
-    },
-             * */
-            public static void Update(int elapsedMS)
-            {
-                DateTime now = DateTime.Now;
-                double timeElapsed = elapsedMS.CastObject<double>() / 1000.0;
-
-                foreach (var item in animatingControls.ToList())
-                {
-                    if (now >= item.TimeStart)
-                    {
-                        item.CurrentTime = now;
-                        Point point = item.End;
-                        if (item.TimeElapsed < item.TotalAnimTime)
-                        {
-                            var progress = GetProgress(item.Routine, item.Progress, item.TotalAnimTime);
-                            point = GetUpdatedPoint(progress, item.Start, item.End);
-                        }
-                        else
-                        {
-                            item.Completed = true;
-                        }
-
-                        if (item.Type == ControlAnimatorType.Height)
-                        {
-                            item.Control.Height = point.Y;
-                        }
-
-                        item.Control.Parent.Invalidate();
-
-                        if (item.Completed)
-                        {
-                            animatingControls.Remove(item);
-                        }
-                    }
-                }
-            }
-        }
 
 
         private void trackEditorG6_Enter(object sender, EventArgs e)
@@ -9965,32 +9348,9 @@ namespace ProUpgradeEditor.UI
             }
         }
 
-        public class MidiEventData1Comparer : IEqualityComparer<MidiEvent>
-        {
-            public bool Equals(MidiEvent x, MidiEvent y)
-            {
-                return x.Data1 == y.Data1;
-            }
 
 
-            public int GetHashCode(MidiEvent obj)
-            {
-                return obj.Data1;
-            }
-        }
 
-        public class MidiEventData2Comparer : IEqualityComparer<MidiEvent>
-        {
-            public bool Equals(MidiEvent x, MidiEvent y)
-            {
-                return x.Data2 == y.Data2;
-            }
-
-            public int GetHashCode(MidiEvent obj)
-            {
-                return obj.Data2;
-            }
-        }
 
         private void midiExportToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -10001,40 +9361,14 @@ namespace ProUpgradeEditor.UI
 
         private void ImportTabSiteExportXml(string file)
         {
-            string fileName = string.Empty;
+            
             ExecAndRestoreTrackDifficulty(delegate()
             {
                 try
                 {
-                    
+
                     var seq = ConvertWebTabToPro(file);
-                    if (seq != null && seq.Count > 1)
-                    {
-                        var popup = new PEPopupWindow();
-                        var tabImport = new PEWebTabImportPanel(seq);
-                        popup.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-                        popup.SetControl(tabImport, EditorPro);
-                        popup.Text = "Web Tab Import";
-                        popup.FormClosed += (sender,e)=>
-                        {
-                            if (popup != null && popup.DialogResult == System.Windows.Forms.DialogResult.OK)
-                            {
-                                seq = tabImport.Sequence;
-
-                                var saveFileName = ShowSaveFileDlg("Save File", file.GetFolderName(), file.GetFileNameWithoutExtension() + Utility.DefaultPROFileExtension);
-                                if (!saveFileName.IsEmpty())
-                                {
-                                    seq.Save(saveFileName);
-
-                                    if (EditorPro.LoadMidi17(saveFileName, ReadFileBytes(saveFileName), false))
-                                    {
-                                        fileName = saveFileName;
-                                    }
-                                }
-                            }
-                        };
-                        popup.Show(this);
-                    }
+                    ShowImportManipPopup(seq);
                 }
                 catch
                 {
@@ -10042,9 +9376,37 @@ namespace ProUpgradeEditor.UI
                 }
             });
 
-            if (!fileName.IsEmpty())
+        }
+
+        private void ShowImportManipPopup(Sequence seq)
+        {
+            if (seq != null && seq.Count > 1)
             {
-                EditorPro.LoadMidi17(fileName, ReadFileBytes(fileName), false);
+                var popup = new PEPopupWindow();
+                var tabImport = new PEWebTabImportPanel(seq);
+                popup.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+                popup.SetControl(tabImport, EditorPro);
+                popup.Text = "Web Tab Import";
+                
+                popup.FormClosed += (sender, e) =>
+                {
+                    if (popup != null && popup.DialogResult == System.Windows.Forms.DialogResult.OK)
+                    {
+                        seq = tabImport.Sequence;
+
+                        var saveFileName = ShowSaveFileDlg("Save File", DefaultMidiFileLocationPro,"");
+                        if (!saveFileName.IsEmpty())
+                        {
+                            seq.Save(saveFileName);
+
+                            if (EditorPro.LoadMidi17(saveFileName, ReadFileBytes(saveFileName), false))
+                            {
+                                
+                            }
+                        }
+                    }
+                };
+                popup.Show(this);
             }
         }
 
@@ -10143,53 +9505,7 @@ namespace ProUpgradeEditor.UI
             return numTicks;
         }
 
-        public class TabSiteMeasureAttribute
-        {
-            public int Divisions;
-            public int StaffLines;
-            public string[] StaffLineTuning;
-            public int Beats;
-            public int BeatType;
 
-            public static void FromMeasure(ref TabSiteMeasureAttribute ret, XmlNode measureNode)
-            {
-                var attributes = XMLUtil.GetNode(measureNode, "attributes");
-                if (attributes != null)
-                {
-                    var i = XMLUtil.GetNodeValue(attributes, "divisions").ToInt();
-                    if (i.IsNull() == false)
-                    {
-                        ret.Divisions = i;
-                    }
-
-                    //num strings (ex: 6)
-                    i = XMLUtil.GetNodeValue(attributes, "staff-details/staff-lines").ToInt();
-                    if (i.IsNull() == false)
-                    {
-                        ret.StaffLines = i;
-                    }
-
-                    //string tuning (ex: E)
-                    var n = XMLUtil.GetNode(attributes, "staff-details/staff-tuning");
-                    if (n != null)
-                    {
-                        ret.StaffLineTuning = XMLUtil.GetNodeList(n, "tuning-step").Select(x => XMLUtil.GetNodeValue(x)).ToArray();
-                    }
-
-                    //beats per bar (ex: 6)
-                    var b = XMLUtil.GetNodeValue(attributes, "time/beats").ToInt();
-                    if (b.IsNull() == false) { ret.Beats = b; }
-
-                    //4 = quarter note
-                    b = XMLUtil.GetNodeValue(attributes, "time/beat-type").ToInt();
-                    if (b.IsNull() == false)
-                    {
-                        ret.BeatType = b;
-                    }
-                }
-
-            }
-        }
 
         private void buttonFixOverlappingNotes_Click(object sender, EventArgs e)
         {
@@ -10306,6 +9622,245 @@ namespace ProUpgradeEditor.UI
                 });
             }
             catch { }
+        }
+
+        private void tabPackageViewer_FileDrop(object sender, DragEventArgs e)
+        {
+            var fileNames = e.Data.GetData("FileDrop") as string[];
+            if (fileNames != null && fileNames.Length > 0)
+            {
+                foreach (var fileName in fileNames)
+                {
+                    var pk = Package.Load(fileName);
+                    if (pk != null)
+                    {
+                        LoadPackageIntoTree(pk, fileName, true);
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void tabPage8_DragEnter(object sender, DragEventArgs e)
+        {
+
+        }
+
+        private void tabPackageViewer_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.All;
+        }
+
+        private void guitarProToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var file = ShowOpenFileDlg("Import Guitar Pro File", "","");
+                if(!file.IsEmpty())
+                {
+                    using (var fs = File.OpenRead(file))
+                    {
+                        var data = PhoneGuitarTab.Core.TabFactory.CreateFromGp(fs);
+
+                        Sequence seq = new Sequence(FileType.Pro);
+                        seq.AddTempo(EditorG5.GuitarTrack.GetTempoTrack().Clone(FileType.Pro));
+
+                        foreach (var track in data.Tracks)
+                        {
+                            Track seqTrack = new Track(FileType.Pro, track.Name);
+                            var position = 0;
+                            foreach (var measure in track.Measures)
+                            {
+                                
+                                foreach (var beat in measure.Beats)
+                                {
+                                    double duration = 0;
+                                    switch(beat.Duration){
+                                        case PhoneGuitarTab.Tablature.Duration.Whole:
+                                            duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote * 4;
+                                        break;
+                                        case PhoneGuitarTab.Tablature.Duration.Half:
+                                            duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote * 2;
+                                        break;
+                                        case PhoneGuitarTab.Tablature.Duration.Quarter:
+                                            duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote;
+                                        break;
+                                        case PhoneGuitarTab.Tablature.Duration.Eighth:
+                                            duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote * 0.5;
+                                        break;
+                                        case PhoneGuitarTab.Tablature.Duration.Sixteenth:
+                                            duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote * 0.25;
+                                        break;
+                                        case PhoneGuitarTab.Tablature.Duration.ThirtySecond:
+                                            duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote * (0.25*0.5);
+                                        break;
+                                        case PhoneGuitarTab.Tablature.Duration.SixtyFourth:
+                                            duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote * (0.25*0.25);
+                                        break;
+                                        case PhoneGuitarTab.Tablature.Duration.HundredTwentyEighth:
+                                            duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote * (0.25*0.25*0.5);
+                                        break;
+                                    }
+                                    
+                                    
+                                    foreach (var note in beat.Notes)
+                                    {
+                                        int noteString = 5-beat.Notes.IndexOf(note);
+                                        if (!note.Fret.IsEmpty())
+                                        {
+                                            seqTrack.Insert(position, new ChannelMessage(ChannelCommand.NoteOn, Utility.ExpertData1LowE + noteString,
+                                                100 + note.Fret.ToInt()));
+
+                                            seqTrack.Insert(position + duration.Floor(), new ChannelMessage(ChannelCommand.NoteOff, Utility.ExpertData1LowE + noteString,
+                                                0));
+                                        }
+                                    }
+
+                                    position += duration.Ceiling();
+                                }
+                            }
+                            if (seqTrack.ChanMessages.Count() > 5)
+                                seq.Add(seqTrack);
+                        }
+
+                        ShowImportManipPopup(seq);
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private void treePackageContents_DragDrop(object sender, DragEventArgs e)
+        {
+            try
+            {
+                var pk = (treePackageContents.Tag as Package);
+                if(pk != null && treePackageContents.SelectedNode != null &&
+                    treePackageContents.SelectedNode.Tag != null)
+                {
+                    
+                    if (e.Data.GetDataPresent(DataFormats.FileDrop, false))
+                    {
+                        string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                        
+                        if (treePackageContents.SelectedNode.Tag is PackageFile)
+                        {
+                            var pkFile = treePackageContents.SelectedNode.Tag as PackageFile;
+                            if (pkFile != null && files.Count() == 1)
+                            {
+                                Package.AddFileToFolder(pkFile.Package, pkFile.Folder, files.First().GetFileName(), files.First().ReadFileBytes());
+                            }
+                        }
+                        else if(treePackageContents.SelectedNode.Tag is PackageFolder)
+                        {
+                            var pkFolder = treePackageContents.SelectedNode.Tag as PackageFolder;
+                            if (pkFolder != null)
+                            {
+                                foreach (var file in files)
+                                {
+                                    Package.AddFileToFolder(pkFolder.Package, pkFolder, file.GetFileName(), file.ReadFileBytes());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private void treePackageContents_DragEnter(object sender, DragEventArgs e)
+        {
+
+        }
+
+        private void treePackageContents_DragOver(object sender, DragEventArgs e)
+        {
+            if (treePackageContents.SelectedNode == null ||
+                treePackageContents.Tag == null ||
+                e.Data.GetDataPresent(DataFormats.FileDrop, false) == false ||
+                (treePackageContents.Tag is Package) == false)
+            {
+                e.Effect = DragDropEffects.None;
+                
+            }
+            else
+            {
+                e.Effect = DragDropEffects.All;
+            }
+
+        }
+
+        private void buttonPackageViewerSave_Click(object sender, EventArgs e)
+        {
+            if (treePackageContents.Tag == null ||
+                (treePackageContents.Tag is Package)==false)
+            {
+                return;
+            }
+
+            var pk = (treePackageContents.Tag as Package);
+
+            var bytes = Package.RebuildPackageInMemory(pk);
+            if (bytes == null)
+            {
+                MessageBox.Show("Cannot rebuild package");
+            }
+            else
+            {
+                if (treePackageContentsIsFATXFileEntry)
+                {
+                    WriteUSBFile(treePackageContentsFATXFileEntry.Parent, 
+                        treePackageContentsFATXFileEntry.Name, 
+                        treePackageContentsFATXFileEntry);
+                }
+                else if (treePackageContentsIsLocal)
+                {
+                    File.WriteAllBytes(treePackageContentsFilePath, bytes);
+
+                    var pk2 = Package.Load(treePackageContentsFilePath, true);
+                    LoadPackageIntoTree(pk2, treePackageContentsFilePath, treePackageContentsIsLocal);
+                
+                }
+
+            }
+
+        }
+
+        private void toolStripPackageEditorDeleteFile_Click(object sender, EventArgs e)
+        {
+            if (treePackageContents.SelectedNode != null &&
+                    treePackageContents.SelectedNode.Tag != null && treePackageContents.SelectedNode.Tag is PackageFile)
+            {
+                var pk = treePackageContents.Tag as Package;
+                var pkf = treePackageContents.SelectedNode.Tag as PackageFile;
+                bool reopened = false;
+                if (pkf.Package.package.CanWrite == false)
+                {
+                    reopened = pkf.Package.package.OpenAgain();
+                }
+                pkf.FileEntry.Delete();
+
+                if (reopened)
+                {
+                    pkf.Package.package.CloseIO();
+                }
+
+                if (treePackageContentsIsFATXFileEntry)
+                {
+                }
+                else
+                {
+                    LoadPackageIntoTree(pk, treePackageContentsFilePath, treePackageContentsIsLocal);
+                }
+            }
+        }
+
+        private void contextToolStripPackageEditor_Opening(object sender, CancelEventArgs e)
+        {
+            toolStripPackageEditorDeleteFile.Enabled = (treePackageContents.SelectedNode != null &&
+                    treePackageContents.SelectedNode.Tag != null && treePackageContents.SelectedNode.Tag is PackageFile);
+            
         }
     }
 }

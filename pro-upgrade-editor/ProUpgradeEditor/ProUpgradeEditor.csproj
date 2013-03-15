@@ -106,10 +106,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="XPackage, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\XPackage.dll</HintPath>
-    </Reference>
     <Reference Include="ZipLib, Version=0.86.0.518, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\ZipLib.dll</HintPath>
@@ -127,6 +123,15 @@
     <Compile Include="UI\AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\ControlAnimator.cs" />
+    <Compile Include="UI\ControlAnimatorItem.cs" />
+    <Compile Include="UI\CopyPatternPreset.cs" />
+    <Compile Include="UI\DTAFile.cs" />
+    <Compile Include="UI\DTAFileNode.cs" />
+    <Compile Include="UI\DTASegment.cs" />
+    <Compile Include="UI\EditorTrackDifficulty.cs" />
+    <Compile Include="UI\FindMatchingPatternConfig.cs" />
+    <Compile Include="UI\ListViewColumnSorter.cs" />
     <Compile Include="UI\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -135,12 +140,23 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\MatchingCopyPattern.cs" />
+    <Compile Include="UI\MidiEventData1Comparer.cs" />
+    <Compile Include="UI\MidiEventData2Comparer.cs" />
+    <Compile Include="UI\naudioPlayer.cs" />
+    <Compile Include="UI\StoredChordSearchConfig.cs" />
+    <Compile Include="UI\stringObject.cs" />
     <Compile Include="UI\TabPopout.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\TabPopout.Designer.cs">
       <DependentUpon>TabPopout.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\TabSiteMeasureAttribute.cs" />
+    <Compile Include="UI\ThreadedTimerParam.cs" />
+    <Compile Include="UI\ThreadTimer.cs" />
+    <Compile Include="UI\USBDrive.cs" />
+    <Compile Include="UI\USBDriveEntry.cs" />
     <EmbeddedResource Include="ProResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ProResources.Designer.cs</LastGenOutput>
@@ -379,6 +395,10 @@
     <ProjectReference Include="..\Tools\Sanford.Multimedia.Midi\Sanford.Multimedia.Midi.csproj">
       <Project>{4269C72A-8D3A-4737-8F89-72EAA33EA9E1}</Project>
       <Name>Sanford.Multimedia.Midi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tools\XPackage\XPackage\XPackage.csproj">
+      <Project>{EE644FE5-458F-496B-B9E3-0B37921F7D38}</Project>
+      <Name>XPackage</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

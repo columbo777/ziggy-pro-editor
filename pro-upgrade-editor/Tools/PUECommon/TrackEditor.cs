@@ -263,7 +263,7 @@ namespace ProUpgradeEditor.Common
 
                     if (HScroll != null)
                     {
-                        
+
                         if (value < 0)
                             value = 0;
 
@@ -277,7 +277,7 @@ namespace ProUpgradeEditor.Common
                         }
 
                         Invalidate();
-                        
+
                     }
                 }
                 catch { }
@@ -1508,6 +1508,7 @@ namespace ProUpgradeEditor.Common
                             Utility.ScollToSelectionOffset;
 
                 HScrollValue = (HScrollValue + i).Max(0);
+                Invalidate();
             }
         }
 
@@ -1789,152 +1790,7 @@ namespace ProUpgradeEditor.Common
 
         List<int> SnapPoints = new List<int>();
 
-        public class CopyChordList : GuitarMessageList
-        {
-            public CopyChordList(TrackEditor owner)
-                : base(owner)
-            {
 
-            }
-
-            public void Clear()
-            {
-                AllMessageTypes.Select(x => GetMessageListForType(x)).ForEach(x => x.List.ToList().ForEach(v => x.Remove(v)));
-            }
-
-            public void Add(GuitarChord chord)
-            {
-                base.Add(chord.CloneToMemory(this));
-            }
-
-            public void AddRange(IEnumerable<GuitarChord> chords)
-            {
-                foreach (var chord in chords)
-                {
-                    Add(chord);
-                }
-            }
-
-
-            int MinSelectionString
-            {
-                get
-                {
-                    return base.Chords.Min(i => i.Notes.Min(x => x.NoteString));
-                }
-            }
-
-
-            Point mousePointBegin;
-            int mouseStringBegin;
-            Point FirstChordOffset;
-
-            public void Begin(Point mousePoint)
-            {
-                mousePointBegin = Owner.SelectStartPoint;
-                mouseStringBegin = Owner.SnapToString(Owner.SelectStartPoint.Y);
-                var sp = this.Chords.First().ScreenPointPair;
-                FirstChordOffset = new Point(sp.Down - Owner.HScrollValue, mouseStringBegin);
-
-                UpdatePastePoint(mousePoint, Point.Empty);
-            }
-            public void BeginPaste(Point startPoint)
-            {
-                Owner.SelectStartPoint = startPoint;
-
-                mousePointBegin = Owner.SelectStartPoint;
-                mouseStringBegin = MinSelectionString;
-
-                var sp = Chords.First().ScreenPointPair;
-
-                FirstChordOffset = new Point(mousePointBegin.X, 0);
-
-                UpdatePastePoint(mousePointBegin, Point.Empty);
-            }
-            public void UpdatePastePoint(Point newMousePosition, Point mouseDelta)
-            {
-                if (!Chords.Any())
-                {
-                    return;
-                }
-
-                var mouseString = Owner.SnapToString(newMousePosition.Y);
-
-                var offset = new Point(FirstChordOffset.X - mousePointBegin.X, mouseStringBegin - MinSelectionString);
-
-
-                if (Owner.GridSnap)
-                {
-                    var screenPoint = Owner.GetClientPointFromTick(Chords.GetTickPair());
-
-                    var offsetPointLeft = new Point(newMousePosition.X + offset.X, mouseString - offset.Y);
-                    var offsetPointRight = new Point(newMousePosition.X + offset.X + screenPoint.TickLength, mouseString - offset.Y);
-
-                    int snapLeft;
-                    var snappedLeft = Owner.GetGridSnapPointFromClientPoint(offsetPointLeft, out snapLeft);
-                    int snapRight;
-                    var snappedRight = Owner.GetGridSnapPointFromClientPoint(offsetPointRight, out snapRight);
-
-                    if (snappedLeft && snappedRight)
-                    {
-                        if (mouseDelta.X < 0)// Math.Abs(offsetPointLeft.X - snapLeft) < Math.Abs(offsetPointRight.X - snapRight))
-                        {
-                            newMousePosition.X = snapLeft - offset.X;
-                        }
-                        else
-                        {
-                            newMousePosition.X = snapRight - screenPoint.TickLength - offset.X;
-                        }
-                    }
-                    else if (snappedLeft)
-                    {
-                        newMousePosition.X = snapLeft - offset.X;
-                    }
-                    else if (snappedRight)
-                    {
-                        newMousePosition.X = snapRight - screenPoint.TickLength - offset.X;
-                    }
-
-                }
-
-
-                Owner.CurrentPastePoint.MousePos = new Point(newMousePosition.X, mouseString);
-                Owner.CurrentPastePoint.MinChordX = newMousePosition.X;
-                Owner.CurrentPastePoint.Offset = offset;
-                Owner.CurrentPastePoint.MinNoteString = MinSelectionString;
-
-                var pastePoint = Owner.CurrentPastePoint;
-                var copyRange = Chords.GetTickPair();
-
-                var stringOffset = (pastePoint.MousePos.Y) - pastePoint.MinNoteString - pastePoint.Offset.Y;
-
-                var startTick = Owner.GetTickFromClientPoint(pastePoint.MousePos.X + pastePoint.Offset.X);
-
-                var pasteRange = new TickPair(startTick, startTick + copyRange.TickLength);
-
-                var copyTime = Owner.GuitarTrack.TickToTime(copyRange);
-
-                var pasteTime = Owner.GuitarTrack.TickToTime(pasteRange);
-
-                pasteTime.TimeLength = copyTime.TimeLength;
-                pasteRange.Up = Owner.GuitarTrack.TimeToTick(pasteTime.Up);
-
-                pasteRange = Owner.SnapTickPairPro(pasteRange);
-
-                foreach (var c in Chords)
-                {
-                    var noteTime = Owner.guitarTrack.TickToTime(c.TickPair);
-
-                    var delta = noteTime.Down - copyTime.Down;
-
-                    var startEndTick = new TickPair(
-                        Owner.GuitarTrack.TimeToTick(pasteTime.Down + delta),
-                        Owner.GuitarTrack.TimeToTick(pasteTime.Down + delta + c.TimeLength));
-
-                    c.SetTicks(startEndTick);
-                }
-            }
-        }
 
 
         void Draw22Tar(PaintEventArgs e, Rectangle clipRect)
@@ -2169,44 +2025,9 @@ namespace ProUpgradeEditor.Common
             }
         }
 
-        class VisibleTextEvent : IComparable<VisibleTextEvent>
-        {
-            public GuitarTextEvent Event { get; set; }
-            public RectangleF DrawRect { get; set; }
 
-            public int CompareTo(VisibleTextEvent other)
-            {
-                var ret = Event.AbsoluteTicks < other.Event.AbsoluteTicks ? -1 :
-                    Event.AbsoluteTicks > other.Event.AbsoluteTicks ? 1 : 0;
 
-                if (ret == 0)
-                {
-                    ret = string.Compare(Event.Text, other.Event.Text);
-                }
-                return ret;
-            }
-        }
 
-        class VisibleTextEventContainer
-        {
-            List<VisibleTextEvent> Events = new List<VisibleTextEvent>();
-
-            public void Clear() { Events.Clear(); }
-
-            public int CountOverlapping(RectangleF rect)
-            {
-                RectangleF rs = rect;
-                rs.Inflate(-2, -2);
-                rs.Location = new PointF(rs.Location.X + 1f, rs.Location.Y + 1f);
-                return Events.Where(x => x.DrawRect.IntersectsWith(rect)).Count();
-            }
-
-            public void Add(GuitarTextEvent ev, RectangleF rect)
-            {
-                Events.Add(new VisibleTextEvent() { DrawRect = rect, Event = ev });
-                Events.Sort();
-            }
-        }
 
         public void ClearTextEventSelection()
         {
@@ -2718,24 +2539,7 @@ namespace ProUpgradeEditor.Common
             return stringIndex;
         }
 
-        public class Selector
-        {
-            public bool IsRight;
-            public Point CurrentPoint;
-            public Point StartPoint;
-            public GuitarChord Chord;
-            public bool IsMouseNear = false;
-            public bool IsMouseOver = false;
 
-            public Rectangle GetCurrentRect(TrackEditor editor)
-            {
-                var rect = editor.GetScreenRectFromMessage(Chord);
-
-                return new Rectangle(CurrentPoint,
-                    new Size(Utility.SelectorWidth,
-                         rect.Height));
-            }
-        }
         public List<Selector> visibleSelectors = new List<Selector>();
 
 
@@ -3114,19 +2918,7 @@ namespace ProUpgradeEditor.Common
             return GetClientPointFromScreenPoint(screenPoint);
         }
 
-        public class SnapConfig
-        {
-            public bool SnapG5;
-            public bool SnapG6;
-            public bool SnapGrid;
 
-            public SnapConfig(bool snapG5, bool snapG6, bool snapGrid)
-            {
-                this.SnapG5 = snapG5;
-                this.SnapG6 = snapG6;
-                this.SnapGrid = snapGrid;
-            }
-        }
         public TickPair SnapLeftRightTicks(TickPair tickPair, SnapConfig config)
         {
 
@@ -4410,14 +4202,7 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
-        public class PastePointParam
-        {
-            public int MinChordX;
-            public int MinNoteString;
-            public Point MousePos;
-            public Point Offset;
 
-        }
         public PastePointParam CurrentPastePoint = new PastePointParam();
 
 

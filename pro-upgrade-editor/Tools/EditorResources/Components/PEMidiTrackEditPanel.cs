@@ -340,7 +340,7 @@ namespace EditorResources.Components
 
         void peTrack_DifficultyItemDropped(PEMidiTrack sender, GuitarDifficulty difficulty, DragEventArgs e)
         {
-            var o = e.GetDropObject<PEMidiTrack.PETrackDifficulty>();
+            var o = e.GetDropObject<PETrackDifficulty>();
             o.IfObjectNotNull(op =>
             {
                 DoRequestBackup();

@@ -560,6 +560,9 @@ namespace X360.STFS
             //  return false;
             //}
         }
+
+        public int DataSize { get { return (int)(xBlockCount * 0x1000); } }
+
         internal bool xExtractMS(Stream s)
         {
             if (!Opened && !ReadBlocks())
@@ -596,14 +599,17 @@ namespace X360.STFS
         }
 
 
-        public byte[] ExtractBytes()
+        public byte[] ExtractBytes(bool readData)
         {
             byte[] ret = null;
-            using (var ms = Extract())
+            if (DataSize < 500000 || readData)
             {
-                using (var br = new BinaryReader(ms))
+                using (var ms = Extract())
                 {
-                    ret = br.ReadBytes((int)ms.Length);
+                    using (var br = new BinaryReader(ms))
+                    {
+                        ret = br.ReadBytes((int)ms.Length);
+                    }
                 }
             }
             return ret;
@@ -661,7 +667,7 @@ namespace X360.STFS
             //catch { ClearBlocks(); return false; }
         }
 
-        uint BlockCountSTFS(byte[] y)
+        public static uint BlockCountSTFS(byte[] y)
         {
             if (y.Length == 0)
                 return 0;
@@ -785,7 +791,7 @@ namespace X360.STFS
         {
             if (!Opened && !ReadBlocks())
                 return null;
-            DJsIO xIO = new DJsIO(ExtractBytes(), BigEndian);
+            DJsIO xIO = new DJsIO(ExtractBytes(true), BigEndian);
 
             ClearBlocks();
             return xIO;
@@ -800,7 +806,7 @@ namespace X360.STFS
         {
             if (!xPackage.ActiveCheck())
                 return null;
-            DJsIO xReturn = new DJsIO(ExtractBytes(), BigEndian);
+            DJsIO xReturn = new DJsIO(ExtractBytes(true), BigEndian);
 
             xPackage.xActive = false;
             return xReturn;
@@ -1464,10 +1470,6 @@ namespace X360.STFS
             xCurrent = xDesired;
         }
 
-        /// <summary>
-        /// Clear all the licenses
-        /// </summary>
-        /// <returns></returns>
         public bool ClearLicenses()
         {
             if (!xLoaded)
@@ -1502,13 +1504,6 @@ namespace X360.STFS
             xContentSize = x;
         }
 
-        /// <summary>
-        /// Attempts to add a license
-        /// </summary>
-        /// <param name="ID"></param>
-        /// <param name="Bits"></param>
-        /// <param name="Flags"></param>
-        /// <returns></returns>
         public bool AddLicense(long ID, int Bits, int Flags)
         {
             for (int i = 0; i < 0x10; i++)
@@ -1971,11 +1966,14 @@ namespace X360.STFS
             // Writes the new file
             //AddToLog("Writing file to package");
 
-            MemoryStream ms = new MemoryStream(data);
-            ms.Seek(0, SeekOrigin.Begin);
+            using (var ms = new MemoryStream(data))
+            {
+                ms.Seek(0, SeekOrigin.Begin);
 
-            if (!xWriteTo(ms, xFileAlloc))
-                return (xActive = false);
+                if (!xWriteTo(ms, xFileAlloc))
+                    return (xActive = false);
+            }
+
             if (!xWriteChain(xEntAlloc))
                 return (xActive = false);
             if (!xWriteChain(xFileAlloc))
@@ -2373,7 +2371,30 @@ namespace X360.STFS
             }
             //catch (Exception x) { return (xActive = false); throw x; }
         }
-
+        bool xAddFile(byte[] data, string xFileName, ushort Folder)
+        {
+            //try
+            {
+                
+                foreach (FileEntry m in xFileDirectory)
+                {
+                    if (m.FolderPointer == Folder && m.Name == xFileName)
+                        return (xActive = false);
+                }
+                // Allocates blocks
+                //AddToLog("Allocating blocks");
+                BlockRecord[] xEntAlloc = xAllocateBlocks(xNewEntBlckCnt(1), 0);
+                BlockRecord[] xFileAlloc = xAllocateBlocks(FileEntry.BlockCountSTFS(data), xEntAlloc[xEntAlloc.Length - 1].ThisBlock + 1);
+                // Adds new file info
+                //AddToLog("Adding file information");
+                ItemEntry x = new ItemEntry(xFileName, (int)data.Length, false, (ushort)(xFileDirectory.Count + xFolderDirectory.Count), Folder, this);
+                FileEntry y = new FileEntry(x);
+                y.xStartBlock = xFileAlloc[0].ThisBlock;
+                xFileDirectory.Add(y);
+                return xDoAdd(data, ref xEntAlloc, ref xFileAlloc);
+            }
+            //catch (Exception x) { return (xActive = false); throw x; }
+        }
         /// <summary>
         /// Deletes an item via its entry
         /// </summary>
@@ -3272,7 +3293,30 @@ namespace X360.STFS
             return xAddFile(xIOIn, Name, FolderID);
             //}catch { return (xActive = false); }
         }
-
+        public bool OpenAgain()
+        {
+            return this.xIO.OpenAgain();
+        }
+        public bool CanRead
+        {
+            get { return this.xIO != null && this.xIO.xStream.CanRead; }
+        }
+        public bool CanWrite
+        {
+            get { return this.xIO != null && this.xIO.xStream.CanWrite; }
+        }
+        public bool AddFileToFolder(FolderEntry folder, string name, byte[] data)
+        {
+            var matchingFiles = xFileDirectory.ToList().Where(x => x.FolderPointer == folder.EntryID && string.Compare(x.Name, name, true) == 0);
+            if (!matchingFiles.Any())
+            {
+                return xAddFile(data, name, folder.EntryID);
+            }
+            else
+            {
+                return matchingFiles.First().Replace(data);
+            }
+        }
         /// <summary>
         /// Adds a file
         /// </summary>
@@ -3333,16 +3377,36 @@ namespace X360.STFS
 
         public byte[] RebuildPackageInMemory(RSAParams xParams)
         {
-
+            if (!CanRead)
+            {
+                OpenAgain();
+            }
             var cstfs = new CreateSTFS();
-            cstfs.HeaderData = xHeader;
+            cstfs.HeaderData.Description = xHeader.Description;
+            cstfs.HeaderData.DeviceID = xHeader.DeviceID;
+            
+            cstfs.HeaderData.ProfileID = xHeader.ProfileID;
+            cstfs.HeaderData.Publisher = xHeader.Publisher;
+            cstfs.HeaderData.SaveConsoleID = xHeader.SaveConsoleID;
+            cstfs.HeaderData.Title_Package = xHeader.Title_Package;
+            cstfs.HeaderData.Title_Display = xHeader.Title_Display;
+            cstfs.HeaderData.ThisType = xHeader.ThisType;
+            cstfs.HeaderData.SaveGameID = xHeader.SaveGameID;
+            cstfs.HeaderData.DataFileCount = xHeader.DataFileCount;
+            cstfs.HeaderData.DataFileSize = xHeader.DataFileSize;
+            cstfs.HeaderData.MediaID = xHeader.MediaID;
+            cstfs.HeaderData.MetaDataVersion = xHeader.MetaDataVersion;
+            cstfs.HeaderData.Platform = xHeader.Platform;
+            cstfs.HeaderData.SeasonNumber = xHeader.SeasonNumber;
+           
+
             cstfs.STFSType = xSTFSStruct.ThisType;
             // Populate
             foreach (var y in xFolderDirectory)
                 cstfs.AddFolder(y.GetPath());
             foreach (var y in xFileDirectory)
             {
-                cstfs.AddFile(y.ExtractBytes(), y.GetPath());
+                cstfs.AddFile(y.ExtractBytes(true), y.GetPath());
             }
             byte[] ret;
             var xreturn = new STFSPackage(cstfs, xParams, out ret, xLog);

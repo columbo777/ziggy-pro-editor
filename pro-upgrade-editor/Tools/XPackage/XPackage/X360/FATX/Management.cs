@@ -577,7 +577,7 @@ namespace X360.FATX
 
             if (findFolders.Count == 1)
             {
-                xFolderOut = new FATXFolderEntry(contents.Folders[0], Path);
+                xFolderOut = new FATXFolderEntry(contents.Folders[0].Parent, contents.Folders[0], Path);
                 return contents;
             }
 

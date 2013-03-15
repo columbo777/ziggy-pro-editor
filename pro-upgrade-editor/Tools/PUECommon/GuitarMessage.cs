@@ -114,13 +114,13 @@ namespace ProUpgradeEditor.Common
             }
 
         }
-
-        public MidiEventProps(GuitarMessageList owner)
+        
+        public MidiEventProps(GuitarMessageList owner = null)
         {
             resetProps(owner);
         }
 
-        private void resetProps(GuitarMessageList owner)
+        private void resetProps(GuitarMessageList owner = null)
         {
             Owner = owner;
             Data1 = Int32.MinValue;
@@ -254,22 +254,26 @@ namespace ProUpgradeEditor.Common
                 !props.Channel.IsNull() &&
                  props.TickPair.IsValid)
             {
+
                 if (Owner != null)
                 {
                     var list = Owner.GetMessageListForType(messageType);
+
                     if (list != null)
                     {
                         var between = list.List.GetBetweenTick(props.TickPair);
                         if (between.Any())
                         {
-                            Owner.Remove(between);
+                            Owner.Remove(between.ToList());
                         }
                     }
                 }
+              
                 props.SetUpdatedEventPair(
                     Owner.Insert(props.Data1, props.Data2, props.Channel, props.TickPair));
 
                 IsDeleted = false;
+
             }
         }
 
@@ -402,7 +406,7 @@ namespace ProUpgradeEditor.Common
 
         public virtual void SnapEvents()
         {
-            var newTicks = Owner.Owner.SnapLeftRightTicks(TickPair, new TrackEditor.SnapConfig(true, true, true));
+            var newTicks = Owner.Owner.SnapLeftRightTicks(TickPair, new SnapConfig(true, true, true));
             if (newTicks.CompareTo(TickPair) != 0)
             {
                 SetTicks(newTicks);

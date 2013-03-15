@@ -262,7 +262,16 @@ namespace ProUpgradeEditor.UI
             public static UtilProperty[] GetInitialProperties()
             {
                 return new UtilProperty[]{
-                    new UtilProperty("Enable Render MP3 Wave", false),
+                    //new UtilProperty("Enable Render MP3 Wave", false),
+                    new UtilProperty( "108 Generation Enabled", Utility.HandPositionGenerationEnabled),
+                    new UtilProperty( "108 Marker Start Offset", Utility.HandPositionMarkerStartOffset),
+                    new UtilProperty( "108 Marker End Offset", Utility.HandPositionMarkerEndOffset),
+                    new UtilProperty( "108 Marker Max Fret", Utility.HandPositionMarkerMaxFret),
+                    new UtilProperty( "108 Marker Min Fret", Utility.HandPositionMarkerMinFret),
+                    new UtilProperty( "108 Marker By Difficulty", Utility.HandPositionMarkerByDifficulty),
+                    new UtilProperty( "108 Marker First Begin", Utility.HandPositionMarkerFirstBeginOffset),
+                    new UtilProperty( "108 Marker First End", Utility.HandPositionMarkerFirstEndOffset),
+                    
                     new UtilProperty( "Show Measure Numbers", true),
                     new UtilProperty( "Show Tempos", true),
                     new UtilProperty( "Show Time Signatures", true),
@@ -271,7 +280,7 @@ namespace ProUpgradeEditor.UI
                     new UtilProperty( "Keep Auto Gen Difficulty Selection", false),
 
                     new UtilProperty( "Max Backups", Utility.MaxBackups),
-                    new UtilProperty( "Gap For 108 Note", Utility.LargestGapFor108Note),
+                    
 
                     new UtilProperty( "Dummy Tempo", Utility.DummyTempo),
                     new UtilProperty( "Default CON File Extension", Utility.DefaultCONFileExtension),
@@ -755,6 +764,20 @@ namespace ProUpgradeEditor.UI
         {
             switch (p.Description)
             {
+                case "108 Generation Enabled": { Utility.HandPositionGenerationEnabled = (bool)p.Data; }
+                    break;
+                case "108 Marker Start Offset": { Utility.HandPositionMarkerStartOffset = (int)p.Data; }
+                    break;
+                case "108 Marker End Offset": { Utility.HandPositionMarkerEndOffset = (int)p.Data; }
+                    break;
+                case "108 Marker Max Fret": { Utility.HandPositionMarkerMaxFret = (int)p.Data; }
+                    break;
+                case "108 Marker Min Fret": { Utility.HandPositionMarkerMinFret = (int)p.Data; }
+                    break;
+                case "108 Marker By Difficulty": { Utility.HandPositionMarkerByDifficulty = (bool)p.Data; }
+                    break;    
+                case "108 Marker First Begin":{ Utility.HandPositionMarkerFirstBeginOffset = (int)p.Data; }break;
+                case "108 Marker First End":{ Utility.HandPositionMarkerFirstEndOffset = (int)p.Data; }break;
                 case "Enable Render MP3 Wave": { EditorPro.EnableRenderMP3Wave = (bool)p.Data; }
                     break;
                 case "Background Brush": { Utility.BackgroundBrush = (SolidBrush)p.Data; }
@@ -882,8 +905,7 @@ namespace ProUpgradeEditor.UI
                 case "Dummy Tempo": { Utility.DummyTempo = (int)p.Data; }
                     break; //, "405405"),
 
-                case "Gap For 108 Note": { Utility.LargestGapFor108Note = (int)p.Data; }
-                    break; //, "8"),
+                
 
                 case "Trainer Color": { Utility.TrainerBrush = (SolidBrush)p.Data; }
                     break;

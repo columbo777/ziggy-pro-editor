@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace EditorResources.Components
 {
-    
+
     public partial class PEEditBox : TextBox
     {
         public PEEditBox()

@@ -15,533 +15,6 @@ using System.Diagnostics;
 namespace ProUpgradeEditor.Common
 {
 
-    public class KeyValueObject<TKey, TValue>
-    {
-        public virtual TKey Key { get; set; }
-        public virtual TValue Value { get; set; }
-
-        public KeyValueObject()
-        {
-            Key = default(TKey);
-            Value = default(TValue);
-        }
-
-        public KeyValueObject(TKey key, TValue value)
-        {
-            this.Key = key;
-            this.Value = value;
-        }
-    }
-
-    public class StringPair : KeyValueObject<string, string>
-    {
-        public StringPair() { Key = string.Empty; Value = string.Empty; }
-
-        public StringPair(string key, string value) : base(key, value) { }
-
-        public StringPair(StringPair pair) : this(pair.Key, pair.Value) { }
-
-        public override string ToString()
-        {
-            return "Key: " + (Key ?? "") + " Value: " + (Value ?? "");
-        }
-    }
-
-
-    public class DataPair<T>
-    {
-        public T A { get; set; }
-        public T B { get; set; }
-        public DataPair(T a, T b) { this.A = a; this.B = b; }
-    }
-
-
-    public class Data1ChannelPairEqualityComparer : IEqualityComparer<Data1ChannelPair>
-    {
-        public bool Equals(Data1ChannelPair x, Data1ChannelPair y)
-        {
-            return x.Data1 == y.Data1 && x.Channel == y.Channel;
-        }
-
-        public int GetHashCode(Data1ChannelPair obj)
-        {
-            return 0;
-        }
-    }
-
-    public class MidiEventTickCommandComparer : IComparer<MidiEvent>
-    {
-        public int Compare(MidiEvent x, MidiEvent y)
-        {
-            if (x.AbsoluteTicks < y.AbsoluteTicks)
-                return -1;
-            if (x.AbsoluteTicks > y.AbsoluteTicks)
-                return 1;
-            if (x.IsOn && y.IsOff)
-                return 1;
-            if (x.IsOff && y.IsOn)
-                return -1;
-            return 0;
-        }
-    }
-    public class Data1ChannelPair : IComparable<Data1ChannelPair>, IEquatable<Data1ChannelPair>
-    {
-        public int Data1 { get; set; }
-        public int Channel { get; set; }
-
-        public static Data1ChannelPair NullValue { get { return new Data1ChannelPair(Int32.MinValue, Int32.MinValue); } }
-
-        public Data1ChannelPair(int data1, int channel)
-        {
-            this.Data1 = data1;
-            this.Channel = channel;
-        }
-
-        public int CompareTo(Data1ChannelPair other)
-        {
-            if (Data1 < other.Data1)
-                return -1;
-            else if (Data1 > other.Data1)
-                return 1;
-            else if (Channel < other.Channel)
-                return -1;
-            else if (Channel > other.Channel)
-                return 1;
-            else
-                return 0;
-        }
-
-
-        public bool Equals(Data1ChannelPair other)
-        {
-            return CompareTo(other) == 0;
-        }
-    }
-
-    public interface DownUpPair<T>
-    {
-        T Down { get; set; }
-        T Up { get; set; }
-
-        bool IsNull { get; }
-    }
-
-    public struct TimePair : DownUpPair<double>
-    {
-        double down;
-        double up;
-
-        public static TimePair NullValue { get { return new TimePair(double.MinValue, double.MinValue); } }
-
-        public TimePair(double downTime, double upTime)
-        {
-            this.down = downTime;
-            this.up = upTime;
-        }
-        public TimePair(TimePair times) : this(times.Down, times.Up) { }
-
-        public bool IsCloseBoth(TimePair ticks)
-        {
-            return IsCloseDownDown(ticks) && IsCloseUpUp(ticks);
-        }
-
-        public static bool IsClose(double a, double b)
-        {
-            return Math.Abs(a - b) < 0.0001;
-        }
-
-        public bool IsCloseDownDown(TimePair times)
-        {
-            return IsClose(Down, times.Down);
-        }
-
-        public bool IsCloseUpUp(TimePair times)
-        {
-            return IsClose(Up, times.Up);
-        }
-
-        public bool IsCloseUpDown(TimePair times)
-        {
-            return IsClose(Up, times.Down);
-        }
-
-        public bool IsCloseDownUp(TimePair times)
-        {
-            return IsClose(Down, times.Up);
-        }
-
-        public double TimeLength
-        {
-            get
-            {
-                return Up - Down;
-            }
-            set
-            {
-                Up = Down + value;
-            }
-        }
-
-        public bool IsShort { get { return HasNull || IsClose(Up, Down); } }
-
-        public bool IsZeroLength { get { return HasNull || TimeLength <= 0.0; } }
-        public bool NotZeroLength { get { return NotNull && TimeLength > 0.0; } }
-
-        public bool IsInvalid { get { return HasNull || Up < Down; } }
-        public bool IsValid { get { return !IsInvalid; } }
-
-
-        public bool IsNull { get { return Up == double.MinValue && Down == double.MinValue; } }
-
-        public bool HasNull { get { return Up == double.MinValue || Down == double.MinValue; } }
-
-        public bool NotNull { get { return !HasNull; } }
-
-        public bool HasLength { get { return !HasNull && (Up > Down); } }
-
-        public static TimePair operator -(TimePair pair, double i)
-        {
-            return new TimePair(pair.Down - i, pair.Up - i);
-        }
-        public static TimePair operator +(TimePair pair, double i)
-        {
-            return new TimePair(pair.Down + i, pair.Up + i);
-        }
-
-        public override string ToString()
-        {
-            return "Down: " + Down.ToStringEx() + " - Up: " + Up.ToStringEx() + " Length: " + TimeLength.ToStringEx();
-        }
-
-        public double Down
-        {
-            get { return this.down; }
-            set { this.down = value; }
-        }
-
-        public double Up
-        {
-            get { return this.up; }
-            set { this.up = value; }
-        }
-    }
-
-    public struct TickPair : IComparable<TickPair>
-    {
-        public int Down;
-        public int Up;
-
-        public static TickPair NullValue { get { return new TickPair(Int32.MinValue, Int32.MinValue); } }
-
-        public TickPair(int downTick, int upTick)
-        {
-            if (downTick > upTick)
-            {
-                upTick = downTick;
-            }
-            Down = downTick;
-            Up = upTick;
-        }
-
-        public TickPair(TickPair ticks) : this(ticks.Down, ticks.Up) { }
-
-        public bool IsClose(int tick)
-        {
-            return Utility.IsCloseTick(Down, tick) || Utility.IsCloseTick(Up, tick);
-        }
-
-        public bool IsCloseBoth(TickPair ticks)
-        {
-            return IsCloseDownDown(ticks) && IsCloseUpUp(ticks);
-        }
-
-        public bool IsCloseDownDown(TickPair ticks)
-        {
-            return Utility.IsCloseTick(Down, ticks.Down);
-        }
-
-        public bool IsCloseUpUp(TickPair ticks)
-        {
-            return Utility.IsCloseTick(Up, ticks.Up);
-        }
-
-        public bool IsCloseUpDown(TickPair ticks)
-        {
-            return Utility.IsCloseTick(Up, ticks.Down);
-        }
-
-        public bool IsCloseDownUp(TickPair ticks)
-        {
-            return Utility.IsCloseTick(Down, ticks.Up);
-        }
-
-        public int TickLength { get { return Up - Down; } }
-
-        public bool IsShort { get { return HasNull || Utility.IsCloseTick(Up, Down); } }
-
-        public bool IsZeroLength { get { return HasNull || TickLength <= 0; } }
-        public bool NotZeroLength { get { return NotNull && TickLength > 0; } }
-
-        public bool IsInvalid { get { return HasNull || Up < Down; } }
-        public bool IsValid { get { return !IsInvalid; } }
-
-        public bool IsNull { get { return Up == Int32.MinValue && Down == Int32.MinValue; } }
-
-        public bool HasNull { get { return Up == Int32.MinValue || Down == Int32.MinValue; } }
-
-        public bool NotNull { get { return !HasNull; } }
-
-        public bool HasLength { get { return !HasNull && (Up > Down); } }
-
-        public static TickPair operator -(TickPair pair, int i)
-        {
-            return new TickPair(pair.Down - i, pair.Up - i);
-        }
-        public static TickPair operator +(TickPair pair, int i)
-        {
-            return new TickPair(pair.Down + i, pair.Up + i);
-        }
-        public TickPair Expand(int amount)
-        {
-            var d = Down - amount;
-            var u = Up + amount;
-            if (u < d)
-            {
-                d = Down;
-                u = Up;
-            }
-            return new TickPair(d, u);
-        }
-        public TickPair Offset(int amount)
-        {
-            return new TickPair(Down + amount, Up + amount);
-        }
-        public TickPair Scale(double amount)
-        {
-            return new TickPair((Down.ToDouble() * amount).Round(), (Up.ToDouble() * amount).Round());
-        }
-        public TickPair ExtendTo(int up)
-        {
-            return new TickPair(Down, up);
-        }
-        public override string ToString()
-        {
-            return "Down: " + Down.ToStringEx() + " - Up: " + Up.ToStringEx() + " Length: " + TickLength.ToStringEx();
-        }
-
-        public int CompareTo(TickPair other)
-        {
-            if (Down < other.Down)
-                return -1;
-
-            if (Down > other.Down)
-                return 1;
-
-            if (Up < other.Up)
-                return -1;
-
-            if (Up > other.Up)
-                return 1;
-
-            return 0;
-        }
-    }
-
-    public struct GuitarMessagePair : DownUpPair<GuitarMessage>
-    {
-        GuitarMessage down;
-        GuitarMessage up;
-        public GuitarMessagePair(GuitarMessage down)
-        {
-            this.down = down;
-            this.up = null;
-        }
-        public GuitarMessagePair(GuitarMessage down, GuitarMessage up)
-        {
-            this.down = down;
-            this.up = up;
-        }
-
-        public GuitarMessage Down
-        {
-            get { return this.down; }
-            set { this.down = value; }
-        }
-
-        public GuitarMessage Up
-        {
-            get { return this.up; }
-            set { this.up = value; }
-        }
-
-
-        public bool IsNull
-        {
-            get { return (up == null && down == null); }
-        }
-    }
-    public struct MidiEventPair : DownUpPair<MidiEvent>
-    {
-        GuitarMessageList owner;
-        MidiEvent down;
-        MidiEvent up;
-        Data1ChannelPair dPair;
-
-
-        public MidiEventPair(GuitarMessageList owner, MidiEventPair pair) : this(owner, pair.down, pair.up) { }
-        public MidiEventPair(MidiEventPair pair) : this(pair.owner, pair.down, pair.up) { }
-        public MidiEventPair(GuitarMessageList owner) : this(owner, null, null) { }
-        public MidiEventPair(GuitarMessageList owner, MidiEvent down) : this(owner, down, null) { }
-        public MidiEventPair(GuitarMessageList owner, MidiEvent down, MidiEvent up)
-        {
-            this.owner = owner;
-            this.down = down;
-            this.up = up;
-            if (down == null)
-            {
-                dPair = Data1ChannelPair.NullValue;
-            }
-            else
-            {
-                dPair = new Data1ChannelPair(down.Data1, down.Channel);
-            }
-        }
-
-        public GuitarTrack OwnerTrack { get { return owner.Owner.GuitarTrack; } }
-
-        public int Data1 { get { return Down != null ? Down.Data1 : Int32.MinValue; } }
-        public int Data2 { get { return Down != null ? Down.Data2 : Int32.MinValue; } }
-
-        public int Channel { get { return Down != null ? Down.Channel : Int32.MinValue; } }
-
-        public Data1ChannelPair Data1ChannelPair { get { return dPair; } }
-
-        public bool HasDown { get { return Down != null; } }
-        public bool HasUp { get { return Up != null; } }
-
-        public bool IsValid { get { return (HasUp || HasDown) && !IsDeleted; } }
-
-        public bool IsDeleted { get { return IsDownDeleted || IsUpDeleted; } }
-
-        public bool IsUpDeleted { get { return HasUp ? Up.Deleted : false; } }
-        public bool IsDownDeleted { get { return HasDown ? Down.Deleted : false; } }
-
-        public MidiEventPair GetInsertedClone(GuitarMessageList owner)
-        {
-            return new MidiEventPair(owner,
-                HasDown ? Down.GetInsertedClone(owner) : null,
-                HasUp ? Up.GetInsertedClone(owner) : null);
-        }
-
-        public MidiEventPair CloneToMemory(GuitarMessageList owner)
-        {
-            return new MidiEventPair(owner,
-                HasDown ? new MidiEvent(null, Down.AbsoluteTicks, Down.Clone()) : null,
-                HasUp ? new MidiEvent(null, Up.AbsoluteTicks, Up.Clone()) : null);
-        }
-
-        public MidiEvent Down
-        {
-            get { return this.down; }
-            set { this.down = value; }
-        }
-
-        public MidiEvent Up
-        {
-            get { return this.up; }
-            set { this.up = value; }
-        }
-
-
-        public bool IsNull
-        {
-            get { return !(HasUp || HasDown); }
-        }
-
-        public int DownTick { get { return Down != null ? Down.AbsoluteTicks : Int32.MinValue; } }
-        public int UpTick { get { return Up != null ? Up.AbsoluteTicks : Down.AbsoluteTicks; } }
-
-        public int TickLength { get { return UpTick - DownTick; } }
-    }
-
-
-
-    public class GuitarMessageSorter : IComparer<GuitarMessage>
-    {
-
-        public int Compare(GuitarMessage x, GuitarMessage y)
-        {
-            var ret = 0;
-
-            if (x.AbsoluteTicks < y.AbsoluteTicks)
-                ret = -1;
-            else if (x.AbsoluteTicks > y.AbsoluteTicks)
-                ret = 1;
-            else
-            {
-                if (x.IsChannelEvent() && y.IsChannelEvent())
-                {
-                    if (x.IsOff && y.IsOn)
-                        ret = -1;
-                    else if (x.IsOn && y.IsOff)
-                        ret = 1;
-                    else if ((int)x.Difficulty < (int)y.Difficulty)
-                        return -1;
-                    else if ((int)x.Difficulty > (int)y.Difficulty)
-                        return 1;
-                }
-            }
-            return ret;
-        }
-    }
-
-
-    public class MidiEventPairInterlacingSorter : IComparer<MidiEventPair>
-    {
-        public int Compare(MidiEventPair a, MidiEventPair b)
-        {
-            if (a.Down.AbsoluteTicks < b.Down.AbsoluteTicks)
-                return -1;
-            else if (a.Down.AbsoluteTicks > b.Down.AbsoluteTicks)
-                return 1;
-            else
-                return 0;
-        }
-    }
-    public class MidiEventChannelMessageSorter : IComparer<MidiEvent>
-    {
-        public int Compare(MidiEvent x, MidiEvent y)
-        {
-            if (x.AbsoluteTicks == y.AbsoluteTicks &&
-                x.Data1 == y.Data1 &&
-                x.Channel == y.Channel &&
-                x.Command != y.Command)
-            {
-                if (x.IsOff)
-                    return -1;
-                else
-                    return 1;
-            }
-            else
-            {
-                if (x.AbsoluteTicks < y.AbsoluteTicks)
-                    return -1;
-                else if (x.AbsoluteTicks > y.AbsoluteTicks)
-                    return 1;
-                else if (x.Data1 < y.Data1)
-                    return -1;
-                else if (x.Data1 > y.Data1)
-                    return 1;
-                else if (x.Channel < y.Channel)
-                    return -1;
-                else if (x.Channel > y.Channel)
-                    return 1;
-                else
-                    return 0;
-            }
-        }
-    }
-
     public static class PUEExtensions
     {
 
@@ -2253,23 +1726,7 @@ namespace ProUpgradeEditor.Common
 
         }
 
-        public class TickCloseComparer : IEqualityComparer<int>
-        {
-            int closeWidth;
-            public TickCloseComparer(int closeWidth)
-            {
-                this.closeWidth = closeWidth;
-            }
-            public bool Equals(int x, int y)
-            {
-                return Math.Abs(x - y) <= closeWidth;
-            }
 
-            public int GetHashCode(int obj)
-            {
-                return 0;
-            }
-        }
         public static IEnumerable<IEnumerable<MidiEventPair>> GroupMidiEventPairByCloseTick(this IEnumerable<MidiEventPair> list, int closeValue)
         {
             return list.GroupBy(x => x.DownTick, x => x, new TickCloseComparer(closeValue)).ToList();
@@ -2302,12 +1759,16 @@ namespace ProUpgradeEditor.Common
             GuitarMessageList owner, int data1)
         {
             var ret = new List<MidiEventPair>();
-            foreach (var k in dic.Where(k => data1 == k.Key.Data1))
+            try
             {
-                ret.AddRange(k.Value.GetEventPairsFromData1List(owner));
-            }
+                foreach (var k in dic.Where(k => data1 == k.Key.Data1))
+                {
+                    ret.AddRange(k.Value.GetEventPairsFromData1List(owner));
+                }
 
-            ret.Sort(new MidiEventPairInterlacingSorter());
+                ret.Sort(new MidiEventPairInterlacingSorter());
+            }
+            catch { }
             return ret.ToList();
         }
 
@@ -2316,12 +1777,16 @@ namespace ProUpgradeEditor.Common
             GuitarMessageList owner, IEnumerable<int> data1)
         {
             var ret = new List<MidiEventPair>();
-            foreach (var k in dic.Where(k => data1.Contains(k.Key.Data1)))
+            try
             {
-                ret.AddRange(k.Value.GetEventPairsFromData1List(owner));
-            }
+                foreach (var k in dic.Where(k => data1.Contains(k.Key.Data1)))
+                {
+                    ret.AddRange(k.Value.GetEventPairsFromData1List(owner));
+                }
 
-            ret.Sort(new MidiEventPairInterlacingSorter());
+                ret.Sort(new MidiEventPairInterlacingSorter());
+            }
+            catch { }
             return ret.ToList();
         }
 
@@ -2348,263 +1813,265 @@ namespace ProUpgradeEditor.Common
         public static IEnumerable<MidiEventPair> GetEventPairsFromData1List(this IEnumerable<MidiEvent> items, GuitarMessageList owner)
         {
             var ret = new List<MidiEventPair>();
-
-            if (!items.Any())
-                return ret;
-
-            int minWidth = Utility.NoteCloseWidth;
-            var d1 = items.First().Data1;
-            if (d1 == Utility.HandPositionData1)
-                minWidth = 1;
-
-            var closeGroups = items.GroupByCloseTick(minWidth);
-            int numGroups = closeGroups.Count();
-
-            int lastOnTick = Int32.MinValue;
-            int lastOffTick = Int32.MinValue;
-
-            if (d1 == Utility.HandPositionData1)
+            try
             {
+                if (!items.Any())
+                    return ret;
 
-                if (numGroups >= 2)
+                int minWidth = Utility.NoteCloseWidth;
+                var d1 = items.First().Data1;
+                if (d1 == Utility.HandPositionData1)
+                    minWidth = 1;
+
+                var closeGroups = items.GroupByCloseTick(minWidth);
+                int numGroups = closeGroups.Count();
+
+                int lastOnTick = Int32.MinValue;
+                int lastOffTick = Int32.MinValue;
+
+                if (d1 == Utility.HandPositionData1)
                 {
-                    if (numGroups == 2 && closeGroups.First().Count() == 1 && closeGroups.Last().Count() == 1)
-                    {
-                        ret.Add(new MidiEventPair(owner, closeGroups.First().First(), closeGroups.Last().First()));
-                        return ret;
-                    }
 
-                    IEnumerable<IEnumerable<MidiEvent>> remaining = null;
-
-                    if (closeGroups.ElementAt(0).Count() == 1 && closeGroups.ElementAt(1).Count() == 1)
+                    if (numGroups >= 2)
                     {
-                        ret.Add(new MidiEventPair(owner, closeGroups.ElementAt(0).First(), closeGroups.ElementAt(1).First()));
-                        remaining = closeGroups.Where((e, i) => i > 1);
+                        if (numGroups == 2 && closeGroups.First().Count() == 1 && closeGroups.Last().Count() == 1)
+                        {
+                            ret.Add(new MidiEventPair(owner, closeGroups.First().First(), closeGroups.Last().First()));
+                            return ret;
+                        }
+
+                        IEnumerable<IEnumerable<MidiEvent>> remaining = null;
+
+                        if (closeGroups.ElementAt(0).Count() == 1 && closeGroups.ElementAt(1).Count() == 1)
+                        {
+                            ret.Add(new MidiEventPair(owner, closeGroups.ElementAt(0).First(), closeGroups.ElementAt(1).First()));
+                            remaining = closeGroups.Where((e, i) => i > 1);
+                        }
+                        else
+                        {
+                            remaining = closeGroups;
+                        }
+
+                        var good = remaining.Where(x => x.Count() == 2 && x.First().IsOn && x.Last().IsOff).ToList();
+                        if (good.Any())
+                        {
+                            ret.AddRange(good.Select(x => new MidiEventPair(owner, x.First(), x.Last())));
+                            if (good.Count == remaining.Count())
+                                return ret;
+                        }
+
+                        var bad = remaining.Where(x => x.Count() != 2 || (x.Count() == 2 && !x.First().IsOn || !x.Last().IsOff)).ToList();
+                        if (bad.Any())
+                        {
+                            owner.Owner.GuitarTrack.Remove(bad.SelectMany(x => x));
+                        }
                     }
                     else
                     {
-                        remaining = closeGroups;
+                        owner.Remove(closeGroups.SelectMany(x => x));
                     }
 
-                    var good = remaining.Where(x => x.Count() == 2 && x.First().IsOn && x.Last().IsOff).ToList();
-                    if (good.Any())
-                    {
-                        ret.AddRange(good.Select(x => new MidiEventPair(owner, x.First(), x.Last())));
-                        if (good.Count == remaining.Count())
-                            return ret;
-                    }
-
-                    var bad = remaining.Where(x => x.Count() != 2 || (x.Count() == 2 && !x.First().IsOn || !x.Last().IsOff)).ToList();
-                    if (bad.Any())
-                    {
-                        owner.Owner.GuitarTrack.Remove(bad.SelectMany(x => x));
-                    }
                 }
                 else
                 {
-                    owner.Remove(closeGroups.SelectMany(x => x));
-                }
-
-            }
-            else
-            {
-                for (int i = 0; i < closeGroups.Count(); )
-                {
-                    var tickGroup1 = closeGroups.ElementAt(i);
-
-                    var notesOn1 = tickGroup1.Where(x => x.IsOn);
-                    var notesOff1 = tickGroup1.Where(x => x.IsOff);
-
-
-
-                    if (!notesOn1.Any())
+                    for (int i = 0; i < closeGroups.Count(); )
                     {
-                        if (notesOff1.Any())
+                        var tickGroup1 = closeGroups.ElementAt(i);
+
+                        var notesOn1 = tickGroup1.Where(x => x.IsOn);
+                        var notesOff1 = tickGroup1.Where(x => x.IsOff);
+
+
+
+                        if (!notesOn1.Any())
                         {
-                            if (lastOffTick.IsNull())
+                            if (notesOff1.Any())
                             {
-                                owner.Remove(notesOff1);
+                                if (lastOffTick.IsNull())
+                                {
+                                    owner.Remove(notesOff1);
+                                }
+                                else if (notesOff1.Count() > 1)
+                                {
+                                }
+                                else if (notesOff1.First().AbsoluteTicks > lastOffTick)
+                                {
+                                    owner.Remove(notesOff1);
+                                }
                             }
-                            else if (notesOff1.Count() > 1)
-                            {
-                            }
-                            else if (notesOff1.First().AbsoluteTicks > lastOffTick)
-                            {
-                                owner.Remove(notesOff1);
-                            }
-                        }
-                        i++;
-                    }
-                    else
-                    {
-                        var tickGroup2 = closeGroups.ElementAtOrDefault(i + 1);
-                        if (tickGroup2 == null)
-                        {
-                            owner.Remove(notesOn1);
-
-                            if (lastOffTick.IsNull())
-                            {
-                                owner.Remove(notesOff1);
-                            }
-
-                            break;
-                        }
-                        var notesOn2 = tickGroup2.Where(x => x.IsOn);
-                        var notesOff2 = tickGroup2.Where(x => x.IsOff);
-
-                        if (notesOn1.Any() && notesOff2.Any())
-                        {
-                            var on = notesOn1.First();
-                            var off = notesOff2.First();
-
-                            if (notesOff1.Any() && lastOffTick.IsNull())
-                            {
-                                owner.Remove(notesOff1);
-                            }
-
-                            lastOnTick = on.AbsoluteTicks;
-                            lastOffTick = off.AbsoluteTicks;
-
-                            ret.Add(new MidiEventPair(owner, on, off));
-
-                            var del1 = notesOn1.Where(x => x != on);
-                            if (del1.Any())
-                                owner.Remove(del1);
-
-                            var del2 = notesOff2.Where(x => x != off);
-                            if (del2.Any())
-                                owner.Remove(del2);
-
                             i++;
                         }
                         else
                         {
-                            if (d1 == 102 || d1 == 103)
+                            var tickGroup2 = closeGroups.ElementAtOrDefault(i + 1);
+                            if (tickGroup2 == null)
                             {
                                 owner.Remove(notesOn1);
+
+                                if (lastOffTick.IsNull())
+                                {
+                                    owner.Remove(notesOff1);
+                                }
+
+                                break;
+                            }
+                            var notesOn2 = tickGroup2.Where(x => x.IsOn);
+                            var notesOff2 = tickGroup2.Where(x => x.IsOff);
+
+                            if (notesOn1.Any() && notesOff2.Any())
+                            {
+                                var on = notesOn1.First();
+                                var off = notesOff2.First();
+
+                                if (notesOff1.Any() && lastOffTick.IsNull())
+                                {
+                                    owner.Remove(notesOff1);
+                                }
+
+                                lastOnTick = on.AbsoluteTicks;
+                                lastOffTick = off.AbsoluteTicks;
+
+                                ret.Add(new MidiEventPair(owner, on, off));
+
+                                var del1 = notesOn1.Where(x => x != on);
+                                if (del1.Any())
+                                    owner.Remove(del1);
+
+                                var del2 = notesOff2.Where(x => x != off);
+                                if (del2.Any())
+                                    owner.Remove(del2);
+
                                 i++;
                             }
                             else
                             {
-                                var on = notesOn1.Single();
-                                var ev = owner.Insert(notesOn2.First().AbsoluteTicks, new ChannelMessage(ChannelCommand.NoteOff, on.Data1, 0, on.Channel));
+                                if (d1 == 102 || d1 == 103)
+                                {
+                                    owner.Remove(notesOn1);
+                                    i++;
+                                }
+                                else
+                                {
+                                    var on = notesOn1.LastOrDefault();
+                                    var ev = owner.Insert(notesOn2.First().AbsoluteTicks, new ChannelMessage(ChannelCommand.NoteOff, on.Data1, 0, on.Channel));
 
-                                ret.Add(new MidiEventPair(owner, on, ev));
-                                i++;
+                                    ret.Add(new MidiEventPair(owner, on, ev));
+                                    i++;
+                                }
                             }
                         }
                     }
                 }
-            }
-            /*
-            int i;
+                /*
+                int i;
             
 
-            int minWidth = Utility.NoteCloseWidth;
+                int minWidth = Utility.NoteCloseWidth;
 
-            var d1 = sorted[0].Data1;
+                var d1 = sorted[0].Data1;
 
-            if (d1 == Utility.HandPositionData1)
-                minWidth = 1;
+                if (d1 == Utility.HandPositionData1)
+                    minWidth = 1;
 
-            for (i = 0; i < sorted.Length - 1; )
-            {
-                var p1 = sorted[i];
-                var p2 = sorted[i + 1];
-
-                var delta = Math.Abs(p1.AbsoluteTicks - p2.AbsoluteTicks);
-                if (delta < minWidth)
+                for (i = 0; i < sorted.Length - 1; )
                 {
-                    if (p1.IsOn)
+                    var p1 = sorted[i];
+                    var p2 = sorted[i + 1];
+
+                    var delta = Math.Abs(p1.AbsoluteTicks - p2.AbsoluteTicks);
+                    if (delta < minWidth)
+                    {
+                        if (p1.IsOn)
+                        {
+                            swap(sorted, i, i + 1);
+                            swapEvents(ref p1, ref p2);
+
+                            owner.Remove(p1);
+                            i++;
+                            continue;
+                        }
+                        else if (p1.Command == p2.Command)
+                        {
+                            owner.Remove(p1);
+                            owner.Remove(p2);
+                            i += 2;
+                            continue;
+                        }
+                        else
+                        {
+                            owner.Remove(p1);
+                            i++;
+                            continue;
+                        }
+                    
+                    }
+
+                    if (p1.Command == p2.Command)
+                    {
+                    
+                        owner.Remove(p1);
+                        i++;
+                        continue;
+                    }
+                    if (p1.IsOff && p2.IsOn)
                     {
                         swap(sorted, i, i + 1);
                         swapEvents(ref p1, ref p2);
-
-                        owner.Remove(p1);
-                        i++;
-                        continue;
                     }
-                    else if (p1.Command == p2.Command)
+
+                
+                
+
+                    if (p2.IsOn && 
+                        sorted[i+2].IsOff &&
+                        sorted[i+1].AbsoluteTicks == sorted[i+2].AbsoluteTicks)
                     {
-                        owner.Remove(p1);
+                        swapEvents(ref sorted[i + 1], ref sorted[i + 2]);
+                        p2 = sorted[i + 1];
+                    }
+
+                    if (p2.AbsoluteTicks == p1.AbsoluteTicks && p2.Command == p1.Command)
+                    {
                         owner.Remove(p2);
-                        i += 2;
-                        continue;
-                    }
-                    else
-                    {
-                        owner.Remove(p1);
+                        sorted[i + 1] = sorted[i];
                         i++;
                         continue;
                     }
-                    
-                }
-
-                if (p1.Command == p2.Command)
-                {
-                    
-                    owner.Remove(p1);
-                    i++;
-                    continue;
-                }
-                if (p1.IsOff && p2.IsOn)
-                {
-                    swap(sorted, i, i + 1);
-                    swapEvents(ref p1, ref p2);
-                }
-
-                
-                
-
-                if (p2.IsOn && 
-                    sorted[i+2].IsOff &&
-                    sorted[i+1].AbsoluteTicks == sorted[i+2].AbsoluteTicks)
-                {
-                    swapEvents(ref sorted[i + 1], ref sorted[i + 2]);
-                    p2 = sorted[i + 1];
-                }
-
-                if (p2.AbsoluteTicks == p1.AbsoluteTicks && p2.Command == p1.Command)
-                {
-                    owner.Remove(p2);
-                    sorted[i + 1] = sorted[i];
-                    i++;
-                    continue;
-                }
-                else if (sorted.Count(x => x.IsOn) == 1)
-                {
-                    var noteOn = sorted.FirstOrDefault(x=> x.IsOn);
-                    var noteOff = sorted.LastOrDefault(x=> x.IsOff && x.AbsoluteTicks > noteOn.AbsoluteTicks);
-
-                    var min = sorted.Min(x => x.AbsoluteTicks);
-                    var max = sorted.Max(x => x.AbsoluteTicks);
-                    if (max != min)
+                    else if (sorted.Count(x => x.IsOn) == 1)
                     {
-                        owner.Remove(sorted.Where(x => x != noteOn && x != noteOff));
-                        ret.Clear();
-                        ret.Add(new MidiEventPair(owner, noteOn, noteOff));
+                        var noteOn = sorted.FirstOrDefault(x=> x.IsOn);
+                        var noteOff = sorted.LastOrDefault(x=> x.IsOff && x.AbsoluteTicks > noteOn.AbsoluteTicks);
 
-                        return ret;
+                        var min = sorted.Min(x => x.AbsoluteTicks);
+                        var max = sorted.Max(x => x.AbsoluteTicks);
+                        if (max != min)
+                        {
+                            owner.Remove(sorted.Where(x => x != noteOn && x != noteOff));
+                            ret.Clear();
+                            ret.Add(new MidiEventPair(owner, noteOn, noteOff));
+
+                            return ret;
+                        }
                     }
-                }
 
-                if (p1.IsOn && 
-                    p2.IsOff &&
-                    p2.AbsoluteTicks > p1.AbsoluteTicks)
-                {
-                    ret.Add(new MidiEventPair(owner, p1, p2));
-                }
+                    if (p1.IsOn && 
+                        p2.IsOff &&
+                        p2.AbsoluteTicks > p1.AbsoluteTicks)
+                    {
+                        ret.Add(new MidiEventPair(owner, p1, p2));
+                    }
                 
-                i += 2;
-            }
+                    i += 2;
+                }
 
-            while (i < sorted.Length - 1)
-            {
-                owner.Remove(sorted[i]);
-                i++;
+                while (i < sorted.Length - 1)
+                {
+                    owner.Remove(sorted[i]);
+                    i++;
+                }
+                 */
             }
-             */
-
+            catch { }
             return ret;
         }
 

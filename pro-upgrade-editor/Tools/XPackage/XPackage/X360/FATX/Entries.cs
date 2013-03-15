@@ -299,8 +299,10 @@ namespace X360.FATX
         public FATXPartition Partition { get { return xPart; } }
         #endregion
 
-        public FATXEntry(ref FATXEntry xEntry)
+        public FATXEntry Parent { get; internal set; }
+        public FATXEntry(FATXEntry parent, ref FATXEntry xEntry)
         {
+            this.Parent = parent;
             //Debug.WriteLine("fatx entry ref");
             xOffset = xEntry.xOffset;
             xNLen = xEntry.xNLen;
@@ -381,7 +383,7 @@ namespace X360.FATX
             catch { xIsValid = false; }*/
         }
 
-        public FATXEntry(string xNameIn, uint xStart, int xSizeIn, long xPosition, bool xFolder, ref FATXDrive xdrive)
+        public FATXEntry(FATXEntry parent, string xNameIn, uint xStart, int xSizeIn, long xPosition, bool xFolder, ref FATXDrive xdrive)
         {
             Debug.WriteLine("fatx string " + xNameIn);
             int DT = TimeStamps.FatTimeInt(DateTime.Now);
@@ -475,8 +477,9 @@ namespace X360.FATX
     /// </summary>
     public sealed class FATXFileEntry : FATXEntry
     {
-        public FATXFileEntry(FATXEntry x)
-            : base(ref x) { }
+        
+        public FATXFileEntry(FATXFolderEntry folder, FATXEntry x)
+            : base(folder, ref x) {  }
 
         public override string ToString()
         {
@@ -885,8 +888,9 @@ namespace X360.FATX
     /// </summary>
     public sealed class FATXFolderEntry : FATXEntry
     {
-        public FATXFolderEntry(FATXEntry xEntry, string path) : base(ref xEntry) { this.Path = path; }
+        public FATXFolderEntry(FATXEntry parent, FATXEntry xEntry, string path) : base(parent, ref xEntry) { this.Path = path; }
 
+        
         public string Path;
         /// <summary>
         /// Reads the contents
@@ -994,14 +998,14 @@ namespace X360.FATX
                     {
                         if (string.Compare(xEntries[i].Name, this.Name, true) != 0)
                         {
-                            var f = new FATXFolderEntry(xEntries[i], Path + "/" + xEntries[i].Name);
+                            var f = new FATXFolderEntry(this, xEntries[i], Path + "/" + xEntries[i].Name);
 
                             xreturn.xfolds.Add(f);
                         }
                     }
                     else
                     {
-                        var f = new FATXFileEntry(xEntries[i]);
+                        var f = new FATXFileEntry(this, xEntries[i]);
 
                         xreturn.xfiles.Add(f);
                     }
@@ -1079,9 +1083,10 @@ namespace X360.FATX
                     return false;
                 foreach (FATXFolderEntry x in xconts.xfolds)
                 {
-                    if (x.Name == FolderName)
+                    if (string.Compare(x.Name , FolderName,true)==0)
                         return (xDrive.xActive = false);
                 }
+
                 var b = new byte[Partition.xBlockSize];
                 for (int x = 0; x < 4; x++)
                     b[x] = 0x00;
@@ -1106,7 +1111,7 @@ namespace X360.FATX
                 if (!Partition.WriteFile(blocks, ref xIOIn))
                     return (xDrive.xActive = false);
 
-                FATXEntry y = new FATXEntry(FolderName, blocks[0],
+                FATXEntry y = new FATXEntry(this, FolderName, blocks[0],
                     (int)xIOIn.Length, xpos, true, ref xDrive);
 
                 //y.FatEntry = new FATXEntry64(xData);
@@ -1147,6 +1152,7 @@ namespace X360.FATX
         /// 
         public bool AddFile(string FileName, string FileLocation, AddType xType)
         {
+            
             try
             {
                 byte[] b = File.ReadAllBytes(FileLocation);
@@ -1166,6 +1172,7 @@ namespace X360.FATX
 
         public bool AddFile(string FileName, byte[] fileData, AddType xType)
         {
+            
             if (!VariousFunctions.IsValidXboxName(FileName))
                 return false;
 
@@ -1216,7 +1223,8 @@ namespace X360.FATX
                 if (!Partition.WriteFile(blocks, ref xIOIn))
                     return (xDrive.xActive = false);
 
-                FATXEntry y = new FATXEntry(FileName,
+                FATXEntry y = new FATXEntry(this,
+                    FileName,
                     blocks[0], (int)xIOIn.Length,
                     xpos, false, ref xDrive);
 
@@ -1242,9 +1250,11 @@ namespace X360.FATX
                 if (Partition.WriteAllocTable())
                     return !(xDrive.xActive = false);
 
+
                 return (xDrive.xActive = false);
             }
             catch { xIOIn.Close(); return (xDrive.xActive = false); }
+            
         }
 
         bool xExtract(string xOut, bool Sub)
@@ -1436,11 +1446,11 @@ namespace X360.FATX
             {
                 if (x.IsFolder)
                 {
-                    xFolders.Add(new FATXFolderEntry(x, this.PartitionName + "/" + x.Name));
+                    xFolders.Add(new FATXFolderEntry(null, x, this.PartitionName + "/" + x.Name));
                 }
                 else
                 {
-                    xFiles.Add(new FATXFileEntry(x));
+                    xFiles.Add(new FATXFileEntry(null, x));
                 }
             }
 

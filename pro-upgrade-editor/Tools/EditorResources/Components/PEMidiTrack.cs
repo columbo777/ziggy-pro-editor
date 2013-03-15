@@ -37,28 +37,9 @@ namespace EditorResources.Components
 
         [Category("Custom")]
         public event TrackEventHandler TrackDifficultyChanged;
-        public class PETrackDifficulty
-        {
-            public PEMidiTrack MidiTrack;
-            public GuitarDifficulty Difficulty;
+        
 
-            public PETrackDifficulty(PEMidiTrack track, GuitarDifficulty diff)
-            {
-                this.MidiTrack = track;
-                this.Difficulty = diff;
-            }
-        }
-
-        public class DifficultyButton : PETrackDifficulty
-        {
-            public Button Button;
-
-            public DifficultyButton(PETrackDifficulty trackDiff, Button button)
-                : base(trackDiff.MidiTrack, trackDiff.Difficulty)
-            {
-                this.Button = button;
-            }
-        }
+        
 
         public PEMidiTrack(Track track)
         {
@@ -160,7 +141,7 @@ namespace EditorResources.Components
         void Button_DragDrop(object sender, DragEventArgs e)
         {
 
-            var dropDiff = e.GetDropObject<PEMidiTrack.PETrackDifficulty>();
+            var dropDiff = e.GetDropObject<PETrackDifficulty>();
             if (dropDiff != null)
             {
                 var btn = DifficultyButtons.SingleOrDefault(x => x.Button == sender);
@@ -175,7 +156,7 @@ namespace EditorResources.Components
         void Button_DragEnter(object sender, DragEventArgs e)
         {
             e.Effect = DragDropEffects.None;
-            var dropDiff = e.GetDropObject<PEMidiTrack.PETrackDifficulty>();
+            var dropDiff = e.GetDropObject<PETrackDifficulty>();
             if (dropDiff != null)
             {
                 var btn = DifficultyButtons.SingleOrDefault(x => x.Button == sender);

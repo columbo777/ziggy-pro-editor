@@ -194,14 +194,14 @@ namespace ProUpgradeEditor.Common
             int NumBits;    /* Number of bits needed to store indices */
             int i, j, k, n;
             int BlockSize, BlockEnd;
-            double angle_numerator = 2.0 * Utilities.DDC_PI;
+            double angle_numerator = 2.0 * DSPUtilities.DDC_PI;
             double tr, ti;     /* temp real, temp imaginary */
             if (pRealIn == null || pRealOut == null || pImagOut == null)
             {
                 // error
                 throw new ArgumentNullException("Null argument");
             }
-            if (!Utilities.IsPowerOfTwo((int)NumSamples))
+            if (!DSPUtilities.IsPowerOfTwo((int)NumSamples))
             {
                 // error
                 throw new ArgumentException("Number of samples must be power of 2");
@@ -465,7 +465,7 @@ namespace ProUpgradeEditor.Common
 
             i = 1;
             j = 2;
-            m = (int)Utilities.NextPowerOfTwo((int)n);
+            m = (int)DSPUtilities.NextPowerOfTwo((int)n);
             for (l = n - 1; l >= 0; l--)
             {
                 //System.Diagnostics.Debug.WriteLine("l = " + l);
@@ -497,7 +497,7 @@ namespace ProUpgradeEditor.Common
             int l;
             int m;
 
-            i = (int)Utilities.NextPowerOfTwo((int)(n - 1));
+            i = (int)DSPUtilities.NextPowerOfTwo((int)(n - 1));
             j = 2 * i;
             m = 1;
             for (l = 1; l <= n; l++)
@@ -526,7 +526,7 @@ namespace ProUpgradeEditor.Common
             int i;
             int npts;
 
-            npts = (int)Utilities.NextPowerOfTwo((int)n);
+            npts = (int)DSPUtilities.NextPowerOfTwo((int)n);
             double[] a = new double[npts / 2];
             double[] c = new double[npts / 2];
             for (i = 0; i < npts / 2; i++)
@@ -549,7 +549,7 @@ namespace ProUpgradeEditor.Common
         {
             int m;
             int npts;
-            npts = (int)Utilities.NextPowerOfTwo((int)signal.Length);
+            npts = (int)DSPUtilities.NextPowerOfTwo((int)signal.Length);
             for (m = signal.Length - 1; m >= 0; m--)
             {
                 Wavelet.Haar_forward_pass_1d(m + 1, ref signal);
@@ -581,7 +581,7 @@ namespace ProUpgradeEditor.Common
         static void Haar_inverse_pass_1d(int n, ref double[] signal)
         {
             int i;
-            int npts = (int)Utilities.NextPowerOfTwo((int)n);
+            int npts = (int)DSPUtilities.NextPowerOfTwo((int)n);
             double[] r = new double[npts];
             for (i = 0; i < npts / 2; i++)
             {
@@ -641,8 +641,8 @@ namespace ProUpgradeEditor.Common
             {
                 Haar_forward_pass_2d(m + 1, ref signal);
             }*/
-            double[] row = new double[Utilities.NextPowerOfTwo((int)width)];
-            double[] column = new double[Utilities.NextPowerOfTwo((int)height)];
+            double[] row = new double[DSPUtilities.NextPowerOfTwo((int)width)];
+            double[] column = new double[DSPUtilities.NextPowerOfTwo((int)height)];
             for (int y = 0; y < height; y++)
             {
                 Array.Copy(signal, (int)(y * width), row, 0, (int)width);
@@ -696,8 +696,8 @@ namespace ProUpgradeEditor.Common
             {
                 Haar_inverse_pass_2d(m, ref signal);
             }*/
-            double[] row = new double[Utilities.NextPowerOfTwo((int)width)];
-            double[] column = new double[Utilities.NextPowerOfTwo((int)height)];
+            double[] row = new double[DSPUtilities.NextPowerOfTwo((int)width)];
+            double[] column = new double[DSPUtilities.NextPowerOfTwo((int)height)];
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
@@ -791,7 +791,7 @@ namespace ProUpgradeEditor.Common
             }
         }
     }
-    public class Utilities
+    public class DSPUtilities
     {
         public const Double DDC_PI = 3.14159265358979323846;
         /// <summary>

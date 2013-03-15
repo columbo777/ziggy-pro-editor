@@ -39,7 +39,7 @@
             System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Date", System.Windows.Forms.HorizontalAlignment.Left);
             this.panel8 = new System.Windows.Forms.Panel();
             this.midiTrackEditorG5 = new EditorResources.Components.PEMidiTrackEditPanel();
-            this.button102 = new System.Windows.Forms.Button();
+            this.buttonShortToG5Len = new System.Windows.Forms.Button();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.button136 = new System.Windows.Forms.Button();
             this.button134 = new System.Windows.Forms.Button();
@@ -500,11 +500,14 @@
             this.tabControl3 = new System.Windows.Forms.TabControl();
             this.tabPage8 = new System.Windows.Forms.TabPage();
             this.groupBox32 = new System.Windows.Forms.GroupBox();
+            this.buttonPackageViewerSave = new System.Windows.Forms.Button();
             this.checkBoxPackageEditExtractDTAMidOnly = new System.Windows.Forms.CheckBox();
             this.button9 = new System.Windows.Forms.Button();
             this.button67 = new System.Windows.Forms.Button();
             this.textBoxPackageDTAText = new System.Windows.Forms.TextBox();
             this.treePackageContents = new System.Windows.Forms.TreeView();
+            this.contextToolStripPackageEditor = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripPackageEditorDeleteFile = new System.Windows.Forms.ToolStripMenuItem();
             this.buttonPackageEditorOpenPackage = new System.Windows.Forms.Button();
             this.label41 = new System.Windows.Forms.Label();
             this.button60 = new System.Windows.Forms.Button();
@@ -670,6 +673,7 @@
             this.tabVToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.midiExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mergeProMidiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.guitarProToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -751,6 +755,7 @@
             this.tabControl3.SuspendLayout();
             this.tabPage8.SuspendLayout();
             this.groupBox32.SuspendLayout();
+            this.contextToolStripPackageEditor.SuspendLayout();
             this.tabPage6.SuspendLayout();
             this.groupBox31.SuspendLayout();
             this.groupBox30.SuspendLayout();
@@ -809,7 +814,7 @@
             // 
             // groupBox15
             // 
-            groupBox15.Controls.Add(this.button102);
+            groupBox15.Controls.Add(this.buttonShortToG5Len);
             groupBox15.Controls.Add(this.button136);
             groupBox15.Controls.Add(this.button134);
             groupBox15.Controls.Add(this.checkGenDiffCopyGuitarToBass);
@@ -838,22 +843,22 @@
             // 
             // button102
             // 
-            this.button102.BackColor = System.Drawing.Color.Transparent;
-            this.button102.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.button102.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button102.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.button102.ImageIndex = 14;
-            this.button102.ImageList = this.imageList1;
-            this.button102.Location = new System.Drawing.Point(162, 211);
-            this.button102.Name = "button102";
-            this.button102.Size = new System.Drawing.Size(133, 24);
-            this.button102.TabIndex = 15;
-            this.button102.Text = "Short To G5 Len";
-            this.button102.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.button102.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip1.SetToolTip(this.button102, "Set any invalid length notes to the same length as in the Guitar5 midi");
-            this.button102.UseVisualStyleBackColor = true;
-            this.button102.Click += new System.EventHandler(this.button102_Click);
+            this.buttonShortToG5Len.BackColor = System.Drawing.Color.Transparent;
+            this.buttonShortToG5Len.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.buttonShortToG5Len.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.buttonShortToG5Len.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.buttonShortToG5Len.ImageIndex = 14;
+            this.buttonShortToG5Len.ImageList = this.imageList1;
+            this.buttonShortToG5Len.Location = new System.Drawing.Point(162, 211);
+            this.buttonShortToG5Len.Name = "button102";
+            this.buttonShortToG5Len.Size = new System.Drawing.Size(133, 24);
+            this.buttonShortToG5Len.TabIndex = 15;
+            this.buttonShortToG5Len.Text = "Short To G5 Len";
+            this.buttonShortToG5Len.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.buttonShortToG5Len.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.toolTip1.SetToolTip(this.buttonShortToG5Len, "Set any invalid length notes to the same length as in the Guitar5 midi");
+            this.buttonShortToG5Len.UseVisualStyleBackColor = true;
+            this.buttonShortToG5Len.Click += new System.EventHandler(this.buttonShortToG5Len_Click);
             // 
             // imageList1
             // 
@@ -1635,7 +1640,7 @@
             this.tabControl2.MinimumSize = new System.Drawing.Size(736, 403);
             this.tabControl2.Name = "tabControl2";
             this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(781, 516);
+            this.tabControl2.Size = new System.Drawing.Size(764, 516);
             this.tabControl2.TabIndex = 16;
             // 
             // tabSongLibSongProperties
@@ -1646,7 +1651,7 @@
             this.tabSongLibSongProperties.Location = new System.Drawing.Point(4, 24);
             this.tabSongLibSongProperties.Margin = new System.Windows.Forms.Padding(0);
             this.tabSongLibSongProperties.Name = "tabSongLibSongProperties";
-            this.tabSongLibSongProperties.Size = new System.Drawing.Size(773, 488);
+            this.tabSongLibSongProperties.Size = new System.Drawing.Size(756, 488);
             this.tabSongLibSongProperties.TabIndex = 0;
             this.tabSongLibSongProperties.Text = "Song Properties";
             // 
@@ -1696,7 +1701,7 @@
             this.groupBox25.ForeColor = System.Drawing.SystemColors.ControlText;
             this.groupBox25.Location = new System.Drawing.Point(0, 0);
             this.groupBox25.Name = "groupBox25";
-            this.groupBox25.Size = new System.Drawing.Size(773, 488);
+            this.groupBox25.Size = new System.Drawing.Size(756, 488);
             this.groupBox25.TabIndex = 0;
             this.groupBox25.TabStop = false;
             this.groupBox25.UseCompatibleTextRendering = true;
@@ -2534,7 +2539,7 @@
             this.tabSongLibUtility.Location = new System.Drawing.Point(4, 23);
             this.tabSongLibUtility.Name = "tabSongLibUtility";
             this.tabSongLibUtility.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSongLibUtility.Size = new System.Drawing.Size(773, 489);
+            this.tabSongLibUtility.Size = new System.Drawing.Size(756, 489);
             this.tabSongLibUtility.TabIndex = 1;
             this.tabSongLibUtility.Text = "Batch Utilities";
             // 
@@ -2601,7 +2606,7 @@
             this.groupBox4.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.groupBox4.Location = new System.Drawing.Point(3, 3);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(767, 259);
+            this.groupBox4.Size = new System.Drawing.Size(750, 259);
             this.groupBox4.TabIndex = 14;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Batch Processing";
@@ -3111,7 +3116,7 @@
             this.tabSongLibSongUtility.Controls.Add(this.groupBox47);
             this.tabSongLibSongUtility.Location = new System.Drawing.Point(4, 23);
             this.tabSongLibSongUtility.Name = "tabSongLibSongUtility";
-            this.tabSongLibSongUtility.Size = new System.Drawing.Size(773, 489);
+            this.tabSongLibSongUtility.Size = new System.Drawing.Size(756, 489);
             this.tabSongLibSongUtility.TabIndex = 2;
             this.tabSongLibSongUtility.Text = "Song Utility";
             this.tabSongLibSongUtility.UseVisualStyleBackColor = true;
@@ -3126,7 +3131,7 @@
             this.groupBox47.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.groupBox47.Location = new System.Drawing.Point(0, 0);
             this.groupBox47.Name = "groupBox47";
-            this.groupBox47.Size = new System.Drawing.Size(773, 489);
+            this.groupBox47.Size = new System.Drawing.Size(756, 489);
             this.groupBox47.TabIndex = 0;
             this.groupBox47.TabStop = false;
             this.groupBox47.Text = "Song Utilities";
@@ -3173,10 +3178,10 @@
             this.tabTrackEditor.Controls.Add(this.panel2);
             this.tabTrackEditor.ForeColor = System.Drawing.SystemColors.ControlText;
             this.tabTrackEditor.ImageIndex = 46;
-            this.tabTrackEditor.Location = new System.Drawing.Point(4, 23);
+            this.tabTrackEditor.Location = new System.Drawing.Point(4, 24);
             this.tabTrackEditor.Margin = new System.Windows.Forms.Padding(0);
             this.tabTrackEditor.Name = "tabTrackEditor";
-            this.tabTrackEditor.Size = new System.Drawing.Size(1095, 523);
+            this.tabTrackEditor.Size = new System.Drawing.Size(1095, 522);
             this.tabTrackEditor.TabIndex = 1;
             this.tabTrackEditor.Text = "Track Editor";
             // 
@@ -6597,6 +6602,7 @@
             // 
             // tabPage8
             // 
+            this.tabPage8.AllowDrop = true;
             this.tabPage8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(248)))), ((int)(((byte)(248)))));
             this.tabPage8.Controls.Add(this.groupBox32);
             this.tabPage8.Location = new System.Drawing.Point(4, 24);
@@ -6605,9 +6611,13 @@
             this.tabPage8.Size = new System.Drawing.Size(1081, 489);
             this.tabPage8.TabIndex = 1;
             this.tabPage8.Text = "Package Viewer";
+            this.tabPage8.DragDrop += new System.Windows.Forms.DragEventHandler(this.tabPackageViewer_FileDrop);
+            this.tabPage8.DragEnter += new System.Windows.Forms.DragEventHandler(this.tabPage8_DragEnter);
+            this.tabPage8.DragOver += new System.Windows.Forms.DragEventHandler(this.tabPackageViewer_DragOver);
             // 
             // groupBox32
             // 
+            this.groupBox32.Controls.Add(this.buttonPackageViewerSave);
             this.groupBox32.Controls.Add(this.checkBoxPackageEditExtractDTAMidOnly);
             this.groupBox32.Controls.Add(this.button9);
             this.groupBox32.Controls.Add(this.button67);
@@ -6627,6 +6637,21 @@
             this.groupBox32.TabIndex = 0;
             this.groupBox32.TabStop = false;
             this.groupBox32.Text = "Package Viewer";
+            // 
+            // buttonPackageViewerSave
+            // 
+            this.buttonPackageViewerSave.ForeColor = System.Drawing.Color.Black;
+            this.buttonPackageViewerSave.ImageIndex = 30;
+            this.buttonPackageViewerSave.ImageList = this.imageList1;
+            this.buttonPackageViewerSave.Location = new System.Drawing.Point(9, 302);
+            this.buttonPackageViewerSave.Name = "buttonPackageViewerSave";
+            this.buttonPackageViewerSave.Size = new System.Drawing.Size(69, 24);
+            this.buttonPackageViewerSave.TabIndex = 39;
+            this.buttonPackageViewerSave.Text = "Save";
+            this.buttonPackageViewerSave.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.buttonPackageViewerSave.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.buttonPackageViewerSave.UseVisualStyleBackColor = true;
+            this.buttonPackageViewerSave.Click += new System.EventHandler(this.buttonPackageViewerSave_Click);
             // 
             // checkBoxPackageEditExtractDTAMidOnly
             // 
@@ -6691,6 +6716,8 @@
             // 
             // treePackageContents
             // 
+            this.treePackageContents.AllowDrop = true;
+            this.treePackageContents.ContextMenuStrip = this.contextToolStripPackageEditor;
             this.treePackageContents.ForeColor = System.Drawing.SystemColors.ControlText;
             this.treePackageContents.HideSelection = false;
             this.treePackageContents.ImageKey = "XPFolder.gif";
@@ -6701,7 +6728,25 @@
             this.treePackageContents.Size = new System.Drawing.Size(433, 234);
             this.treePackageContents.TabIndex = 1;
             this.treePackageContents.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treePackageContents_AfterSelect);
+            this.treePackageContents.DragDrop += new System.Windows.Forms.DragEventHandler(this.treePackageContents_DragDrop);
+            this.treePackageContents.DragEnter += new System.Windows.Forms.DragEventHandler(this.treePackageContents_DragEnter);
+            this.treePackageContents.DragOver += new System.Windows.Forms.DragEventHandler(this.treePackageContents_DragOver);
             this.treePackageContents.DoubleClick += new System.EventHandler(this.treePackageContents_DoubleClick);
+            // 
+            // contextToolStripPackageEditor
+            // 
+            this.contextToolStripPackageEditor.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripPackageEditorDeleteFile});
+            this.contextToolStripPackageEditor.Name = "contextToolStripPackageEditor";
+            this.contextToolStripPackageEditor.Size = new System.Drawing.Size(129, 26);
+            this.contextToolStripPackageEditor.Opening += new System.ComponentModel.CancelEventHandler(this.contextToolStripPackageEditor_Opening);
+            // 
+            // toolStripPackageEditorDeleteFile
+            // 
+            this.toolStripPackageEditorDeleteFile.Name = "toolStripPackageEditorDeleteFile";
+            this.toolStripPackageEditorDeleteFile.Size = new System.Drawing.Size(128, 22);
+            this.toolStripPackageEditorDeleteFile.Text = "Delete File";
+            this.toolStripPackageEditorDeleteFile.Click += new System.EventHandler(this.toolStripPackageEditorDeleteFile_Click);
             // 
             // buttonPackageEditorOpenPackage
             // 
@@ -6787,7 +6832,7 @@
             this.tabPage6.Location = new System.Drawing.Point(4, 22);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage6.Size = new System.Drawing.Size(1081, 491);
+            this.tabPage6.Size = new System.Drawing.Size(1081, 490);
             this.tabPage6.TabIndex = 0;
             this.tabPage6.Text = "Package Utility";
             // 
@@ -8512,14 +8557,14 @@
             // newToolStripMenuItem
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this.newToolStripMenuItem.Text = "&New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this.closeToolStripMenuItem.Text = "&Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
@@ -8530,7 +8575,7 @@
             this.openPro17ToolStripMenuItem,
             this.openConfigurationToolStripMenuItem});
             this.openToolStripMenuItem1.Name = "openToolStripMenuItem1";
-            this.openToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.openToolStripMenuItem1.Size = new System.Drawing.Size(110, 22);
             this.openToolStripMenuItem1.Text = "&Open";
             // 
             // openToolStripMenuItem
@@ -8565,7 +8610,7 @@
             this.saveConfigurationAsToolStripMenuItem,
             this.saveProXMLToolStripMenuItem});
             this.saveToolStripMenuItem1.Name = "saveToolStripMenuItem1";
-            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(110, 22);
             this.saveToolStripMenuItem1.Text = "&Save";
             // 
             // saveToolStripMenuItem
@@ -8624,9 +8669,10 @@
             this.cONPackageToolStripMenuItem,
             this.zipFileToolStripMenuItem,
             this.tabVToolStripMenuItem,
-            this.mergeProMidiToolStripMenuItem});
+            this.mergeProMidiToolStripMenuItem,
+            this.guitarProToolStripMenuItem});
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this.importToolStripMenuItem.Text = "&Import";
             // 
             // cONPackageToolStripMenuItem
@@ -8665,15 +8711,22 @@
             this.mergeProMidiToolStripMenuItem.Text = "Merge Pro Midi";
             this.mergeProMidiToolStripMenuItem.Click += new System.EventHandler(this.mergeProMidiToolStripMenuItem_Click);
             // 
+            // guitarProToolStripMenuItem
+            // 
+            this.guitarProToolStripMenuItem.Name = "guitarProToolStripMenuItem";
+            this.guitarProToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.guitarProToolStripMenuItem.Text = "Guitar Pro";
+            this.guitarProToolStripMenuItem.Click += new System.EventHandler(this.guitarProToolStripMenuItem_Click);
+            // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(107, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -8840,6 +8893,7 @@
             this.tabPage8.ResumeLayout(false);
             this.groupBox32.ResumeLayout(false);
             this.groupBox32.PerformLayout();
+            this.contextToolStripPackageEditor.ResumeLayout(false);
             this.tabPage6.ResumeLayout(false);
             this.groupBox31.ResumeLayout(false);
             this.groupBox31.PerformLayout();
@@ -8874,7 +8928,7 @@
 
         }
 
-        
+
 
         #endregion
 
@@ -9029,9 +9083,9 @@
         private System.Windows.Forms.RadioButton radioDifficultyEasy;
         private System.Windows.Forms.Button button56;
         private System.Windows.Forms.Button button59;
-        
+
         private System.Windows.Forms.TabPage tabPackageEditor;
-        
+
         private System.Windows.Forms.Button button62;
         private System.Windows.Forms.TextBox textBoxDefaultCONFileLocation;
         private System.Windows.Forms.Label label31;
@@ -9064,7 +9118,7 @@
         private System.Windows.Forms.CheckBox checkBoxSongLibCopyGuitar;
         private System.Windows.Forms.CheckBox checkBoxSongLibHasGuitar;
         private System.Windows.Forms.CheckBox checkBoxSongLibHasBass;
-        
+
         private System.Windows.Forms.Label label40;
         private System.Windows.Forms.Label label41;
         private System.Windows.Forms.TreeView treePackageContents;
@@ -9248,7 +9302,7 @@
         private System.Windows.Forms.GroupBox groupBox35;
         private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem1;
-        
+
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem1;
         private System.Windows.Forms.CheckBox checkBox11;
         private System.Windows.Forms.GroupBox groupBox36;
@@ -9463,7 +9517,7 @@
         private System.Windows.Forms.Button buttonUpOctave;
         private System.Windows.Forms.Button buttonUtilMethodFindNoteLenZero;
         private System.Windows.Forms.Button buttonUtilMethodSetToG5;
-        private System.Windows.Forms.Button button102;
+        private System.Windows.Forms.Button buttonShortToG5Len;
         private System.Windows.Forms.Button buttonSongPropertiesExploreMP3Location;
         private System.Windows.Forms.Button buttonSongPropertiesChooseMP3Location;
         private System.Windows.Forms.Label label53;
@@ -9524,7 +9578,11 @@
         private System.Windows.Forms.Button buttonSelectBack;
         private System.Windows.Forms.Button buttonFindNoteInMP3;
         private System.Windows.Forms.ToolStripMenuItem mergeProMidiToolStripMenuItem;
-        
+        private System.Windows.Forms.ToolStripMenuItem guitarProToolStripMenuItem;
+        private System.Windows.Forms.Button buttonPackageViewerSave;
+        private System.Windows.Forms.ContextMenuStrip contextToolStripPackageEditor;
+        private System.Windows.Forms.ToolStripMenuItem toolStripPackageEditorDeleteFile;
+
 
     }
 }

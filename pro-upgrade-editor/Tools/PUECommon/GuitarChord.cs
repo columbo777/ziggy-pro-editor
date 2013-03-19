@@ -416,7 +416,9 @@ namespace ProUpgradeEditor.Common
 
         public void RemoveStrum()
         {
-            RemoveModifiers(ChordModifierType.Hammeron);
+            RemoveModifiers(ChordModifierType.ChordStrumHigh);
+            RemoveModifiers(ChordModifierType.ChordStrumMed);
+            RemoveModifiers(ChordModifierType.ChordStrumLow);
         }
 
         public void AddStrum(ChordStrum strum)
@@ -465,7 +467,6 @@ namespace ProUpgradeEditor.Common
             if (Utility.GetHammeronData1(Difficulty) != -1)
             {
                 Modifiers.Add(GuitarHammeron.CreateHammeron(Owner, ticks));
-
             }
         }
 

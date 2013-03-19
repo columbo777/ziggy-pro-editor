@@ -11,6 +11,8 @@ namespace ProUpgradeEditor.Common
     {
         public GuitarSingleStringTremelo(GuitarMessageList track, MidiEvent downEvent, MidiEvent upEvent) :
             base(track, downEvent, upEvent, GuitarModifierType.SingleStringTremelo, GuitarMessageType.GuitarSingleStringTremelo) { }
+        public GuitarSingleStringTremelo(MidiEventPair ev) :
+            base(ev, GuitarModifierType.SingleStringTremelo, GuitarMessageType.GuitarSingleStringTremelo) { }
 
         public static GuitarSingleStringTremelo CreateSingleStringTremelo(GuitarMessageList track, TickPair ticks)
         {

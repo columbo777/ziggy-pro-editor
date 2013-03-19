@@ -593,10 +593,33 @@ namespace ProUpgradeEditor.Common
                 yield return enumer.Current as Ret;
             }
         }
+
+        public static bool IsTrainerGuitar(this GuitarTrainerMetaEventType type)
+        {
+            return type == GuitarTrainerMetaEventType.BeginProGuitar || type == GuitarTrainerMetaEventType.EndProGuitar || type == GuitarTrainerMetaEventType.ProGuitarNorm;
+        }
+
+
+        public static bool IsTrainerBass(this GuitarTrainerMetaEventType type)
+        {
+            return type == GuitarTrainerMetaEventType.BeginProBass || type == GuitarTrainerMetaEventType.EndProBass || type == GuitarTrainerMetaEventType.ProBassNorm;
+        }
+        public static bool IsTrainerBegin(this GuitarTrainerMetaEventType type)
+        {
+            return type == GuitarTrainerMetaEventType.BeginProBass || type == GuitarTrainerMetaEventType.BeginProGuitar;
+        }
+        public static bool IsTrainerEnd(this GuitarTrainerMetaEventType type)
+        {
+            return type == GuitarTrainerMetaEventType.EndProBass || type == GuitarTrainerMetaEventType.EndProGuitar;
+        }
+        public static bool IsTrainerNorm(this GuitarTrainerMetaEventType type)
+        {
+            return type == GuitarTrainerMetaEventType.ProBassNorm || type == GuitarTrainerMetaEventType.ProGuitarNorm;
+        }
         public static bool IsTextEvent(this MidiEvent ev)
         {
             return ev != null && ev.MetaMessage != null && (ev.MetaMessage.MetaType != MetaType.EndOfTrack &&
-                ev.MetaMessage.MetaType != MetaType.TrackName);
+                ev.MetaMessage.MetaType != MetaType.TrackName && ev.MetaMessage.Text.IsNotEmpty());
         }
 
         public static bool IsChannelEvent(this MidiEvent ev)
@@ -1001,12 +1024,19 @@ namespace ProUpgradeEditor.Common
         public static Track Clone(this Track t, FileType targetType = FileType.Unknown)
         {
             Track ret = new Track(targetType == FileType.Unknown ? t.FileType : targetType, t.Name);
+
             if (t.FileType != ret.FileType && t.FileType == FileType.Pro)
+            {
                 ret.Merge(t.ConvertToG5());
+            }
             else if (t.FileType != ret.FileType && t.FileType == FileType.Guitar5)
+            {
                 ret.Merge(t.ConvertToPro());
+            }
             else
+            {
                 ret.Merge(t);
+            }
             return ret;
         }
 
@@ -1577,7 +1607,10 @@ namespace ProUpgradeEditor.Common
             }
             return ret;
         }
-
+        public static T SingleBetweenTick<T>(this IEnumerable<T> list, TickPair ticks) where T : GuitarMessage
+        {
+            return list.FirstOrDefault(x => x.DownTick < ticks.Up && x.UpTick > ticks.Down);
+        }
         public static IEnumerable<T> GetBetweenTick<T>(this IEnumerable<T> list, TickPair ticks) where T : GuitarMessage
         {
             return list.Where(x => x.DownTick < ticks.Up && x.UpTick > ticks.Down);
@@ -1693,37 +1726,19 @@ namespace ProUpgradeEditor.Common
             return list.Where(x => x.Data1 == data1).ToList();
         }
 
-        public static IEnumerable<KeyValuePair<Data1ChannelPair, IEnumerable<MidiEvent>>> GroupByData1Channel(
+        public static IEnumerable<Data1ChannelPair> GetDistinctData1ChannelPairs(this IEnumerable<MidiEvent> list)
+        {
+            var ret = new List<Data1ChannelPair>();
+
+            ret.AddRange(list.Distinct(new MidiEventData1ChannelPairEqualityComparer()).ToList().Select(x => new Data1ChannelPair(x.Data1, x.Channel)).ToList());
+
+            return ret;
+        }
+
+        public static IEnumerable<IGrouping<Data1ChannelPair, MidiEvent>> GroupByData1Channel(
             this IEnumerable<MidiEvent> list, IEnumerable<int> data1)
         {
-            var comparer = new Data1ChannelPairEqualityComparer();
-
-            var full = list.Where(x => data1.Contains(x.Data1)).ToList();
-
-            var keys = full.Select(x => x.GetData1ChannelPair()).Distinct(comparer).ToList();
-
-            var ret = new List<KeyValuePair<Data1ChannelPair, List<MidiEvent>>>();
-
-            foreach (var item in full)
-            {
-                var p = item.GetData1ChannelPair();
-                var cntList = ret.Where(x => x.Key.CompareTo(p) == 0);
-                if (!cntList.Any())
-                {
-                    var cnt = new KeyValuePair<Data1ChannelPair, List<MidiEvent>>(p, new List<MidiEvent>());
-                    cnt.Value.Add(item);
-                    ret.Add(cnt);
-                }
-                else
-                {
-                    cntList.Single().Value.Add(item);
-                }
-            }
-
-            return ret.Select(x =>
-                new KeyValuePair<Data1ChannelPair, IEnumerable<MidiEvent>>(x.Key,
-                    x.Value.OrderBy(i => i, new MidiEventTickCommandComparer()).ToList())).ToList();
-
+            return list.Where(d=> data1.Contains(d.Data1)).ToList().GroupBy(x => x.GetData1ChannelPair());
         }
 
 
@@ -1743,19 +1758,8 @@ namespace ProUpgradeEditor.Common
         {
             return list.GroupBy(x => x.DownTick, x => x, new TickCloseComparer(Utility.TickCloseWidth)).ToList();
         }
-        public static IEnumerable<MidiEvent> GetEventsByData1(this IDictionary<Data1ChannelPair, IEnumerable<MidiEvent>> dic, IEnumerable<int> data1)
-        {
-            var ret = new List<MidiEvent>();
 
-            foreach (var k in dic.Keys.Where(x => data1.Contains(x.Data1)))
-            {
-                ret.AddRange(dic[k]);
-            }
-
-            return ret;
-        }
-
-        public static IEnumerable<MidiEventPair> GetEventPairs(this IEnumerable<KeyValuePair<Data1ChannelPair, IEnumerable<MidiEvent>>> dic,
+        public static IEnumerable<MidiEventPair> GetEventPairs(this IEnumerable<IGrouping<Data1ChannelPair, MidiEvent>> dic,
             GuitarMessageList owner, int data1)
         {
             var ret = new List<MidiEventPair>();
@@ -1763,7 +1767,7 @@ namespace ProUpgradeEditor.Common
             {
                 foreach (var k in dic.Where(k => data1 == k.Key.Data1))
                 {
-                    ret.AddRange(k.Value.GetEventPairsFromData1List(owner));
+                    ret.AddRange(k.GetEventPairsFromData1List(owner));
                 }
 
                 ret.Sort(new MidiEventPairInterlacingSorter());
@@ -1773,15 +1777,18 @@ namespace ProUpgradeEditor.Common
         }
 
 
-        public static IEnumerable<MidiEventPair> GetEventPairs(this IEnumerable<KeyValuePair<Data1ChannelPair, IEnumerable<MidiEvent>>> dic,
+        public static IEnumerable<MidiEventPair> GetEventPairs(this IEnumerable<IGrouping<Data1ChannelPair, MidiEvent>> dic,
             GuitarMessageList owner, IEnumerable<int> data1)
         {
             var ret = new List<MidiEventPair>();
             try
             {
-                foreach (var k in dic.Where(k => data1.Contains(k.Key.Data1)))
+                foreach (var d1 in data1)
                 {
-                    ret.AddRange(k.Value.GetEventPairsFromData1List(owner));
+                    foreach (var k in dic.Where(k => d1 == k.Key.Data1))
+                    {
+                        ret.AddRange(k.GetEventPairsFromData1List(owner));
+                    }
                 }
 
                 ret.Sort(new MidiEventPairInterlacingSorter());
@@ -1790,24 +1797,24 @@ namespace ProUpgradeEditor.Common
             return ret.ToList();
         }
 
-        static MidiEvent ReplaceEvent(GuitarMessageList owner, MidiEvent ev, int tick, ChannelCommand cmd)
+        public static IOrderedEnumerable<MidiEvent> OrderByTicks(this IEnumerable<MidiEvent> items)
         {
-            var ticks = ev.AbsoluteTicks;
-            var cb = new ChannelMessageBuilder(ev.ChannelMessage);
-            cb.Command = cmd;
-            if (cmd == ChannelCommand.NoteOn)
+            return items.OrderBy(x => x.AbsoluteTicks);
+        }
+        public static IOrderedEnumerable<MidiEvent> OrderByCommand(this IEnumerable<MidiEvent> items, CommandSortEnum channelSort)
+        {
+            if (channelSort == CommandSortEnum.OffFirst)
             {
-                if (cb.Data2 < 100)
-                    cb.Data2 = 100;
+                return items.OrderBy(x => x.Command);
             }
             else
             {
-                cb.Data2 = 0;
+                return items.OrderByDescending(x => x.Command);
             }
-
-            cb.Build();
-            owner.Remove(ev);
-            return owner.Insert(tick, cb.Result);
+        }
+        public static IEnumerable<IGrouping<int, MidiEvent>> GroupByMatchingTicks(this IEnumerable<MidiEvent> items)
+        {
+            return items.GroupBy(x => x.AbsoluteTicks);
         }
 
         public static IEnumerable<MidiEventPair> GetEventPairsFromData1List(this IEnumerable<MidiEvent> items, GuitarMessageList owner)
@@ -1818,258 +1825,77 @@ namespace ProUpgradeEditor.Common
                 if (!items.Any())
                     return ret;
 
-                int minWidth = Utility.NoteCloseWidth;
-                var d1 = items.First().Data1;
-                if (d1 == Utility.HandPositionData1)
-                    minWidth = 1;
+                var removeList = new List<MidiEvent>();
 
-                var closeGroups = items.GroupByCloseTick(minWidth);
-                int numGroups = closeGroups.Count();
+                var tickGroups = items.OrderByTicks().ToList().GroupByMatchingTicks().ToList();
+                MidiEvent downEvent = null;
+                MidiEvent upEvent = null;
+                var expectingOn = true;
 
-                int lastOnTick = Int32.MinValue;
-                int lastOffTick = Int32.MinValue;
-
-                if (d1 == Utility.HandPositionData1)
+                foreach (var group in tickGroups)
                 {
+                    var offItems = group.Where(x => x.IsOff);
+                    var onItems = group.Where(x => x.IsOn);
 
-                    if (numGroups >= 2)
+                    if (expectingOn)
                     {
-                        if (numGroups == 2 && closeGroups.First().Count() == 1 && closeGroups.Last().Count() == 1)
+                        removeList.AddRange(offItems);
+                        if (onItems.Any())
                         {
-                            ret.Add(new MidiEventPair(owner, closeGroups.First().First(), closeGroups.Last().First()));
-                            return ret;
-                        }
+                            downEvent = onItems.First();
+                            upEvent = null;
+                            if (onItems.Count() > 1)
+                            {
+                                removeList.AddRange(onItems.Skip(1));
+                            }
+                            expectingOn = false;
 
-                        IEnumerable<IEnumerable<MidiEvent>> remaining = null;
-
-                        if (closeGroups.ElementAt(0).Count() == 1 && closeGroups.ElementAt(1).Count() == 1)
-                        {
-                            ret.Add(new MidiEventPair(owner, closeGroups.ElementAt(0).First(), closeGroups.ElementAt(1).First()));
-                            remaining = closeGroups.Where((e, i) => i > 1);
-                        }
-                        else
-                        {
-                            remaining = closeGroups;
-                        }
-
-                        var good = remaining.Where(x => x.Count() == 2 && x.First().IsOn && x.Last().IsOff).ToList();
-                        if (good.Any())
-                        {
-                            ret.AddRange(good.Select(x => new MidiEventPair(owner, x.First(), x.Last())));
-                            if (good.Count == remaining.Count())
-                                return ret;
-                        }
-
-                        var bad = remaining.Where(x => x.Count() != 2 || (x.Count() == 2 && !x.First().IsOn || !x.Last().IsOff)).ToList();
-                        if (bad.Any())
-                        {
-                            owner.Owner.GuitarTrack.Remove(bad.SelectMany(x => x));
                         }
                     }
                     else
                     {
-                        owner.Remove(closeGroups.SelectMany(x => x));
-                    }
-
-                }
-                else
-                {
-                    for (int i = 0; i < closeGroups.Count(); )
-                    {
-                        var tickGroup1 = closeGroups.ElementAt(i);
-
-                        var notesOn1 = tickGroup1.Where(x => x.IsOn);
-                        var notesOff1 = tickGroup1.Where(x => x.IsOff);
-
-
-
-                        if (!notesOn1.Any())
+                        if (offItems.Any() == false)
                         {
-                            if (notesOff1.Any())
-                            {
-                                if (lastOffTick.IsNull())
-                                {
-                                    owner.Remove(notesOff1);
-                                }
-                                else if (notesOff1.Count() > 1)
-                                {
-                                }
-                                else if (notesOff1.First().AbsoluteTicks > lastOffTick)
-                                {
-                                    owner.Remove(notesOff1);
-                                }
-                            }
-                            i++;
+                            removeList.AddRange(onItems);
                         }
                         else
                         {
-                            var tickGroup2 = closeGroups.ElementAtOrDefault(i + 1);
-                            if (tickGroup2 == null)
+                            upEvent = offItems.First();
+                            if (offItems.Count() > 1)
                             {
-                                owner.Remove(notesOn1);
-
-                                if (lastOffTick.IsNull())
-                                {
-                                    owner.Remove(notesOff1);
-                                }
-
-                                break;
+                                removeList.AddRange(offItems.Skip(1));
                             }
-                            var notesOn2 = tickGroup2.Where(x => x.IsOn);
-                            var notesOff2 = tickGroup2.Where(x => x.IsOff);
 
-                            if (notesOn1.Any() && notesOff2.Any())
+                            ret.Add(new MidiEventPair(owner, downEvent, upEvent));
+                            downEvent = null;
+                            upEvent = null;
+
+                            expectingOn = true;
+
+                            if (onItems.Any())
                             {
-                                var on = notesOn1.First();
-                                var off = notesOff2.First();
-
-                                if (notesOff1.Any() && lastOffTick.IsNull())
+                                downEvent = onItems.First();
+                                if (onItems.Count() > 1)
                                 {
-                                    owner.Remove(notesOff1);
+                                    removeList.AddRange(onItems.Skip(1));
                                 }
-
-                                lastOnTick = on.AbsoluteTicks;
-                                lastOffTick = off.AbsoluteTicks;
-
-                                ret.Add(new MidiEventPair(owner, on, off));
-
-                                var del1 = notesOn1.Where(x => x != on);
-                                if (del1.Any())
-                                    owner.Remove(del1);
-
-                                var del2 = notesOff2.Where(x => x != off);
-                                if (del2.Any())
-                                    owner.Remove(del2);
-
-                                i++;
-                            }
-                            else
-                            {
-                                if (d1 == 102 || d1 == 103)
-                                {
-                                    owner.Remove(notesOn1);
-                                    i++;
-                                }
-                                else
-                                {
-                                    var on = notesOn1.LastOrDefault();
-                                    var ev = owner.Insert(notesOn2.First().AbsoluteTicks, new ChannelMessage(ChannelCommand.NoteOff, on.Data1, 0, on.Channel));
-
-                                    ret.Add(new MidiEventPair(owner, on, ev));
-                                    i++;
-                                }
+                                expectingOn = false;
                             }
                         }
                     }
                 }
-                /*
-                int i;
-            
+                if (downEvent != null)
+                    removeList.Add(downEvent);
 
-                int minWidth = Utility.NoteCloseWidth;
-
-                var d1 = sorted[0].Data1;
-
-                if (d1 == Utility.HandPositionData1)
-                    minWidth = 1;
-
-                for (i = 0; i < sorted.Length - 1; )
+                if (upEvent != null)
+                    removeList.Add(upEvent);
+                if (removeList.Any())
                 {
-                    var p1 = sorted[i];
-                    var p2 = sorted[i + 1];
-
-                    var delta = Math.Abs(p1.AbsoluteTicks - p2.AbsoluteTicks);
-                    if (delta < minWidth)
-                    {
-                        if (p1.IsOn)
-                        {
-                            swap(sorted, i, i + 1);
-                            swapEvents(ref p1, ref p2);
-
-                            owner.Remove(p1);
-                            i++;
-                            continue;
-                        }
-                        else if (p1.Command == p2.Command)
-                        {
-                            owner.Remove(p1);
-                            owner.Remove(p2);
-                            i += 2;
-                            continue;
-                        }
-                        else
-                        {
-                            owner.Remove(p1);
-                            i++;
-                            continue;
-                        }
-                    
-                    }
-
-                    if (p1.Command == p2.Command)
-                    {
-                    
-                        owner.Remove(p1);
-                        i++;
-                        continue;
-                    }
-                    if (p1.IsOff && p2.IsOn)
-                    {
-                        swap(sorted, i, i + 1);
-                        swapEvents(ref p1, ref p2);
-                    }
-
-                
-                
-
-                    if (p2.IsOn && 
-                        sorted[i+2].IsOff &&
-                        sorted[i+1].AbsoluteTicks == sorted[i+2].AbsoluteTicks)
-                    {
-                        swapEvents(ref sorted[i + 1], ref sorted[i + 2]);
-                        p2 = sorted[i + 1];
-                    }
-
-                    if (p2.AbsoluteTicks == p1.AbsoluteTicks && p2.Command == p1.Command)
-                    {
-                        owner.Remove(p2);
-                        sorted[i + 1] = sorted[i];
-                        i++;
-                        continue;
-                    }
-                    else if (sorted.Count(x => x.IsOn) == 1)
-                    {
-                        var noteOn = sorted.FirstOrDefault(x=> x.IsOn);
-                        var noteOff = sorted.LastOrDefault(x=> x.IsOff && x.AbsoluteTicks > noteOn.AbsoluteTicks);
-
-                        var min = sorted.Min(x => x.AbsoluteTicks);
-                        var max = sorted.Max(x => x.AbsoluteTicks);
-                        if (max != min)
-                        {
-                            owner.Remove(sorted.Where(x => x != noteOn && x != noteOff));
-                            ret.Clear();
-                            ret.Add(new MidiEventPair(owner, noteOn, noteOff));
-
-                            return ret;
-                        }
-                    }
-
-                    if (p1.IsOn && 
-                        p2.IsOff &&
-                        p2.AbsoluteTicks > p1.AbsoluteTicks)
-                    {
-                        ret.Add(new MidiEventPair(owner, p1, p2));
-                    }
-                
-                    i += 2;
+                    owner.Remove(removeList);
                 }
+                return ret;
 
-                while (i < sorted.Length - 1)
-                {
-                    owner.Remove(sorted[i]);
-                    i++;
-                }
-                 */
+
             }
             catch { }
             return ret;
@@ -2265,6 +2091,36 @@ namespace ProUpgradeEditor.Common
                 }
             }
 
+            return ret;
+        }
+
+        public static bool IsTrainerBass(this string text)
+        {
+            var ret = false;
+            if (!text.IsEmpty())
+            {
+                var et = text.GetGuitarTrainerMetaEventType();
+                if (et != GuitarTrainerMetaEventType.Unknown)
+                {
+                    if (et == GuitarTrainerMetaEventType.BeginProBass || et == GuitarTrainerMetaEventType.EndProBass || et == GuitarTrainerMetaEventType.ProBassNorm)
+                        ret = true;
+                }
+            }
+            return ret;
+        }
+
+        public static bool IsTrainerGuitar(this string text)
+        {
+            var ret = false;
+            if (!text.IsEmpty())
+            {
+                var et = text.GetGuitarTrainerMetaEventType();
+                if (et != GuitarTrainerMetaEventType.Unknown)
+                {
+                    if (et == GuitarTrainerMetaEventType.BeginProGuitar || et == GuitarTrainerMetaEventType.EndProGuitar || et == GuitarTrainerMetaEventType.ProGuitarNorm)
+                        ret = true;
+                }
+            }
             return ret;
         }
 

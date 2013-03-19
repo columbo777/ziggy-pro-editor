@@ -138,7 +138,7 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                return Iterator();
+                return Iterator().ToList();
             }
 
         }

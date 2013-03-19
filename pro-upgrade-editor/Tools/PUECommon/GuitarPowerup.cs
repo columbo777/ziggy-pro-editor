@@ -11,7 +11,8 @@ namespace ProUpgradeEditor.Common
     {
         public GuitarPowerup(GuitarMessageList track, MidiEvent downEvent, MidiEvent upEvent) :
             base(track, downEvent, upEvent, GuitarModifierType.Powerup, GuitarMessageType.GuitarPowerup) { }
-
+        public GuitarPowerup(MidiEventPair ev) :
+            base(ev, GuitarModifierType.Powerup, GuitarMessageType.GuitarPowerup) { }
 
         public static GuitarPowerup CreatePowerup(GuitarMessageList track, TickPair ticks)
         {

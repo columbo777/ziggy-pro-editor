@@ -1167,7 +1167,7 @@ namespace ProUpgradeEditor.UI
                         }
                     }
 
-                    var config = new GenDiffConfig(SelectedSong, true, 
+                    var config = new GenDiffConfig(SelectedSong, true,
                         SelectedSong.CopyGuitarToBass, false, false, Utility.HandPositionGenerationEnabled);
 
                     if (!GenerateDifficulties(false, config))
@@ -2234,9 +2234,9 @@ namespace ProUpgradeEditor.UI
 
             if (ticks.IsValid)
             {
-                textBox19.SuspendLayout();
-                textBox19.Text = (ticks.TickLength).ToStringEx();
-                textBox19.ResumeLayout();
+                textBoxNoteEditorSelectedChordTickLength.SuspendLayout();
+                textBoxNoteEditorSelectedChordTickLength.Text = (ticks.TickLength).ToStringEx();
+                textBoxNoteEditorSelectedChordTickLength.ResumeLayout();
             }
         }
 
@@ -2247,7 +2247,7 @@ namespace ProUpgradeEditor.UI
 
             var ticks = GetChordTicksFromScreen();
 
-            var tickLength = textBox19.Text.ToInt();
+            var tickLength = textBoxNoteEditorSelectedChordTickLength.Text.ToInt();
 
             if (!ticks.Down.IsNull() && !tickLength.IsNull())
             {
@@ -2518,12 +2518,15 @@ namespace ProUpgradeEditor.UI
             });
         }
 
-        private void listBox1_DoubleClick(object sender, EventArgs e)
+        private void listBoxSongLibrary_DoubleClick(object sender, EventArgs e)
         {
             try
             {
-                SongList.SelectedSong = listBoxSongLibrary.SelectedItem as SongCacheItem;
-                OpenSongCacheItem(SongList.SelectedSong);
+                if (listBoxSongLibrary.SelectedIndex != -1)
+                {
+                    SongList.SelectedSong = listBoxSongLibrary.SelectedItem as SongCacheItem;
+                    OpenSongCacheItem(SongList.SelectedSong);
+                }
             }
             catch { }
         }
@@ -3586,7 +3589,7 @@ namespace ProUpgradeEditor.UI
                 EditorPro.ClearSelection();
                 result.ForEach(x => x.Selected = true);
                 EditorPro.ScrollToSelection();
-                
+
             }
         }
 
@@ -5988,7 +5991,7 @@ namespace ProUpgradeEditor.UI
                         }
                         if (found)
                         {
-                            
+
                             var b = fileEntry.xExtractBytes();
                             if (b != null)
                             {
@@ -5997,20 +6000,20 @@ namespace ProUpgradeEditor.UI
                                 var path = folderEntry.Name;
                                 while (parent != null)
                                 {
-                                    path = parent.Name+"/"+ path;
+                                    path = parent.Name + "/" + path;
                                     parent = parent.Parent;
                                 }
 
                                 var contents2 = SelectedUSB.Drive.ReadToFolder(
                                     path, out xfolder2);
 
-                                
+
                                 if (xfolder2.AddFile(fileName, b, AddType.Replace))
                                 {
                                     contents2 = SelectedUSB.Drive.ReadToFolder(path, out xfolder2);
                                     ret = contents2.Files.Where(x => string.Compare(x.Name, fileName, true) == 0).FirstOrDefault();
                                 }
-                                
+
                             }
                         }
                     }
@@ -6050,7 +6053,7 @@ namespace ProUpgradeEditor.UI
 
                             if (folderNode != tn)
                             {
-                                if ((ModifierKeys & Keys.Control) == Keys.Control)
+                                if (ModifierKeys.HasFlag(Keys.Control))
                                 {
                                     e.Effect = DragDropEffects.All;
                                 }
@@ -7289,7 +7292,7 @@ namespace ProUpgradeEditor.UI
                     MessageBox.Show(string.Format("Replaced {0} Matches", numReplaced));
                 }
             }
-        
+
             catch { }
         }
 
@@ -7743,7 +7746,7 @@ namespace ProUpgradeEditor.UI
                         EditorPro.SelectedChords.GetTickPair(),
                         checkTrainerLoopableProGuitar.Checked);
 
-                    RefreshTrainer(GuitarTrainerType.ProGuitar);
+                    RefreshTrainers();
                     return;
                 }
             }
@@ -7767,7 +7770,7 @@ namespace ProUpgradeEditor.UI
                         EditorPro.SelectedChords.GetTickPair(),
                         checkTrainerLoopableProBass.Checked);
 
-                    RefreshTrainer(GuitarTrainerType.ProBass);
+                    RefreshTrainers();
                     return;
                 }
             }
@@ -9361,7 +9364,7 @@ namespace ProUpgradeEditor.UI
 
         private void ImportTabSiteExportXml(string file)
         {
-            
+
             ExecAndRestoreTrackDifficulty(delegate()
             {
                 try
@@ -9387,21 +9390,21 @@ namespace ProUpgradeEditor.UI
                 popup.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
                 popup.SetControl(tabImport, EditorPro);
                 popup.Text = "Web Tab Import";
-                
+
                 popup.FormClosed += (sender, e) =>
                 {
                     if (popup != null && popup.DialogResult == System.Windows.Forms.DialogResult.OK)
                     {
                         seq = tabImport.Sequence;
 
-                        var saveFileName = ShowSaveFileDlg("Save File", DefaultMidiFileLocationPro,"");
+                        var saveFileName = ShowSaveFileDlg("Save File", DefaultMidiFileLocationPro, "");
                         if (!saveFileName.IsEmpty())
                         {
                             seq.Save(saveFileName);
 
                             if (EditorPro.LoadMidi17(saveFileName, ReadFileBytes(saveFileName), false))
                             {
-                                
+
                             }
                         }
                     }
@@ -9655,8 +9658,8 @@ namespace ProUpgradeEditor.UI
         {
             try
             {
-                var file = ShowOpenFileDlg("Import Guitar Pro File", "","");
-                if(!file.IsEmpty())
+                var file = ShowOpenFileDlg("Import Guitar Pro File", "", "");
+                if (!file.IsEmpty())
                 {
                     using (var fs = File.OpenRead(file))
                     {
@@ -9671,41 +9674,42 @@ namespace ProUpgradeEditor.UI
                             var position = 0;
                             foreach (var measure in track.Measures)
                             {
-                                
+
                                 foreach (var beat in measure.Beats)
                                 {
                                     double duration = 0;
-                                    switch(beat.Duration){
+                                    switch (beat.Duration)
+                                    {
                                         case PhoneGuitarTab.Tablature.Duration.Whole:
                                             duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote * 4;
-                                        break;
+                                            break;
                                         case PhoneGuitarTab.Tablature.Duration.Half:
                                             duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote * 2;
-                                        break;
+                                            break;
                                         case PhoneGuitarTab.Tablature.Duration.Quarter:
                                             duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote;
-                                        break;
+                                            break;
                                         case PhoneGuitarTab.Tablature.Duration.Eighth:
                                             duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote * 0.5;
-                                        break;
+                                            break;
                                         case PhoneGuitarTab.Tablature.Duration.Sixteenth:
                                             duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote * 0.25;
-                                        break;
+                                            break;
                                         case PhoneGuitarTab.Tablature.Duration.ThirtySecond:
-                                            duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote * (0.25*0.5);
-                                        break;
+                                            duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote * (0.25 * 0.5);
+                                            break;
                                         case PhoneGuitarTab.Tablature.Duration.SixtyFourth:
-                                            duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote * (0.25*0.25);
-                                        break;
+                                            duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote * (0.25 * 0.25);
+                                            break;
                                         case PhoneGuitarTab.Tablature.Duration.HundredTwentyEighth:
-                                            duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote * (0.25*0.25*0.5);
-                                        break;
+                                            duration = EditorG5.GuitarTrack.GetTempo(position).TicksPerQuarterNote * (0.25 * 0.25 * 0.5);
+                                            break;
                                     }
-                                    
-                                    
+
+
                                     foreach (var note in beat.Notes)
                                     {
-                                        int noteString = 5-beat.Notes.IndexOf(note);
+                                        int noteString = 5 - beat.Notes.IndexOf(note);
                                         if (!note.Fret.IsEmpty())
                                         {
                                             seqTrack.Insert(position, new ChannelMessage(ChannelCommand.NoteOn, Utility.ExpertData1LowE + noteString,
@@ -9735,15 +9739,15 @@ namespace ProUpgradeEditor.UI
             try
             {
                 var pk = (treePackageContents.Tag as Package);
-                if(pk != null && treePackageContents.SelectedNode != null &&
+                if (pk != null && treePackageContents.SelectedNode != null &&
                     treePackageContents.SelectedNode.Tag != null)
                 {
-                    
+
                     if (e.Data.GetDataPresent(DataFormats.FileDrop, false))
                     {
                         string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-                        
+
                         if (treePackageContents.SelectedNode.Tag is PackageFile)
                         {
                             var pkFile = treePackageContents.SelectedNode.Tag as PackageFile;
@@ -9752,7 +9756,7 @@ namespace ProUpgradeEditor.UI
                                 Package.AddFileToFolder(pkFile.Package, pkFile.Folder, files.First().GetFileName(), files.First().ReadFileBytes());
                             }
                         }
-                        else if(treePackageContents.SelectedNode.Tag is PackageFolder)
+                        else if (treePackageContents.SelectedNode.Tag is PackageFolder)
                         {
                             var pkFolder = treePackageContents.SelectedNode.Tag as PackageFolder;
                             if (pkFolder != null)
@@ -9782,7 +9786,7 @@ namespace ProUpgradeEditor.UI
                 (treePackageContents.Tag is Package) == false)
             {
                 e.Effect = DragDropEffects.None;
-                
+
             }
             else
             {
@@ -9794,7 +9798,7 @@ namespace ProUpgradeEditor.UI
         private void buttonPackageViewerSave_Click(object sender, EventArgs e)
         {
             if (treePackageContents.Tag == null ||
-                (treePackageContents.Tag is Package)==false)
+                (treePackageContents.Tag is Package) == false)
             {
                 return;
             }
@@ -9810,8 +9814,8 @@ namespace ProUpgradeEditor.UI
             {
                 if (treePackageContentsIsFATXFileEntry)
                 {
-                    WriteUSBFile(treePackageContentsFATXFileEntry.Parent, 
-                        treePackageContentsFATXFileEntry.Name, 
+                    WriteUSBFile(treePackageContentsFATXFileEntry.Parent,
+                        treePackageContentsFATXFileEntry.Name,
                         treePackageContentsFATXFileEntry);
                 }
                 else if (treePackageContentsIsLocal)
@@ -9820,7 +9824,7 @@ namespace ProUpgradeEditor.UI
 
                     var pk2 = Package.Load(treePackageContentsFilePath, true);
                     LoadPackageIntoTree(pk2, treePackageContentsFilePath, treePackageContentsIsLocal);
-                
+
                 }
 
             }
@@ -9860,7 +9864,362 @@ namespace ProUpgradeEditor.UI
         {
             toolStripPackageEditorDeleteFile.Enabled = (treePackageContents.SelectedNode != null &&
                     treePackageContents.SelectedNode.Tag != null && treePackageContents.SelectedNode.Tag is PackageFile);
+
+        }
+
+        public class SongUtilSearchResult
+        {
+            public string MidiPath;
+            public List<MidiEvent> Matches;
+
+            public SongUtilSearchResult(string path) { MidiPath = path; Matches = new List<MidiEvent>(); }
+        }
+
+        public class SongUtilFindInFileConfig
+        {
+            public bool FindDistinctText;
+
+            public bool FirstMatchOnly;
+            public bool MatchCountOnly;
+            public bool SelectedSongOnly;
+            public bool OpenResults;
+            public bool MatchWholeWord;
+
+            public string RootFolder;
+
+            public int FindData1;
+            public int FindData2;
+            public int FindChannel;
+            public string FindText;
             
         }
+
+        private void buttonSongUtilFindInFileSearch_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var config = GetSongUtilFindInFileSearchConfigFromScreen();
+
+                SongUtilFindMatchesInFile(config);
+            }
+            catch { }
+        }
+
+        private SongUtilFindInFileConfig GetSongUtilFindInFileSearchConfigFromScreen()
+        {
+            var config = new SongUtilFindInFileConfig();
+            config.FirstMatchOnly = checkBoxSongUtilFindInFileFirstMatchOnly.Checked;
+            config.MatchCountOnly = checkBoxSongUtilFindInFileMatchCountOnly.Checked;
+            config.SelectedSongOnly = checkBoxSongUtilFindInFileSelectedSongOnly.Checked;
+            config.OpenResults = checkBoxSongUtilFindInFileResultsOpenCompleted.Checked;
+            config.MatchWholeWord = checkBoxSongUtilFindInFileMatchWholeWord.Checked;
+            config.RootFolder = textBoxSongUtilSearchFolder.Text;
+            if (config.RootFolder.FolderExists() == false)
+            {
+                if (DefaultMidiFileLocationPro.IsNotEmpty() && DefaultMidiFileLocationPro.FolderExists())
+                {
+                    config.RootFolder = DefaultMidiFileLocationPro;
+                }
+                else if (DefaultMidiFileLocationG5.IsNotEmpty() && DefaultMidiFileLocationG5.FolderExists())
+                {
+                    config.RootFolder = DefaultMidiFileLocationG5;
+                }
+            }
+            if (config.RootFolder.IsNotEmpty())
+            {
+                config.RootFolder = config.RootFolder.AppendSlashIfMissing();
+                if (config.RootFolder.FolderExists() == false)
+                {
+                    config.RootFolder = string.Empty;
+                }
+            }
+            config.FindData1 = textBoxSongUtilFindInFileData1.Text.ToInt();
+            config.FindData2 = textBoxSongUtilFindInFileData2.Text.ToInt();
+            config.FindChannel = textBoxSongUtilFindInFileChan.Text.ToInt();
+            config.FindText = textBoxSongUtilFindInFileText.Text.Trim();
+            config.FindDistinctText = false;
+            return config;
+        }
+
+        private void SongUtilFindMatchesInFile(SongUtilFindInFileConfig config)
+        {
+
+            textBoxSongUtilFindInFileResults.Text = "Starting Search";
+            Application.DoEvents();
+
+
+            var root = config.RootFolder.AppendSlashIfMissing();
+            if (root.FolderExists())
+            {
+                var midiFiles = new List<string>();
+
+                var results = new List<SongUtilSearchResult>();
+
+                if (config.SelectedSongOnly)
+                {
+                    if (SongList.MultiSelectedSongs != null && SongList.MultiSelectedSongs.Any())
+                    {
+                        var l = SongList.MultiSelectedSongs.Where(x => x.G6FileName.IsNotEmpty() && x.G6FileName.FileExists()).ToList();
+                        if (l.Any())
+                        {
+                            midiFiles = l.Select(v => v.G6FileName).GroupBy(v => v.GetFileName().ToLower()).Select(v => v.First()).ToList();
+                        }
+                        else
+                        {
+                            l = SongList.MultiSelectedSongs.Where(x => x.G5FileName.IsNotEmpty() && x.G5FileName.FileExists()).ToList();
+                            if (l.Any())
+                            {
+                                midiFiles = l.Select(v => v.G5FileName).GroupBy(v => v.GetFileName().ToLower()).Select(v => v.First()).ToList();
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    midiFiles = root.GetFilesInFolder(true, "*.mid").ToList();
+                    midiFiles.AddRange(root.GetFilesInFolder(true, "*.midi").ToList());
+                    midiFiles = midiFiles.GroupBy(v => v.GetFileName().ToLower()).Select(v => v.First()).ToList();
+                }
+
+                for (int idx = 0; idx < midiFiles.Count; idx++)
+                {
+                    var mf = midiFiles[idx];
+                    var sbLog = new StringBuilder();
+                    sbLog.AppendLine("Searching: " + (idx + 1) + "/" + midiFiles.Count);
+                    sbLog.AppendLine(mf);
+                    textBoxSongUtilFindInFileResults.Text = sbLog.ToString();
+
+                    Application.DoEvents();
+
+                    var res = new SongUtilSearchResult(mf);
+                    var seq = mf.LoadSequenceFile();
+                    if (seq == null)
+                        continue;
+
+                    var tracks = seq.Tracks.ToList();
+
+                    if (config.FindDistinctText)
+                    {
+                        var meta = tracks.Where(v => v.Meta.Any()).SelectMany(v => v.Meta).ToList();
+                        meta = meta.Where(m => m.MetaMessage.Text.IsNotEmpty()).ToList();
+                        if (meta.Any())
+                        {
+                            res.Matches.AddRange(meta);
+                        }
+                    }
+                    else
+                    {
+                        var txt = config.FindText.ToLower();
+                        if (txt.IsNotEmpty())
+                        {
+                            var meta = tracks.Where(v => v.Meta.Any()).SelectMany(v => v.Meta).ToList().Where(v=> v.MetaMessage.Text.IsNotEmpty()).ToList();
+                            meta = meta.Where(m => m.MetaMessage.Text.IsNotEmpty()).ToList();
+
+                            if (meta.Any())
+                            {
+                                var mt = new List<MidiEvent>();
+                                if (config.MatchWholeWord)
+                                {
+                                    mt.AddRange(meta.Where(v => v.MetaMessage.Text.EqualsEx(txt)).ToList());
+                                }
+                                else
+                                {
+                                    mt.AddRange(meta.Where(v => v.MetaMessage.Text.ToLower().Contains(txt)).ToList());
+                                }
+                                if (mt.Any())
+                                {
+                                    res.Matches.AddRange(mt);
+                                }
+                            }
+                        }
+
+
+                        if (config.FindData1.IsNull() == false || config.FindData2.IsNull() == false || config.FindChannel.IsNull() == false)
+                        {
+                            tracks = tracks.Where(cm => cm.ChanMessages.Any()).ToList();
+
+                            foreach (var track in tracks)
+                            {
+
+                                var cmlist = track.ChanMessages.Where(cm =>
+                                    (config.FindData1.IsNull() ? true : cm.Data1 == config.FindData1) &&
+                                    (config.FindData2.IsNull() ? true : cm.Data2 == config.FindData2) &&
+                                    (config.FindChannel.IsNull() ? true : cm.Channel == config.FindChannel)
+                                    );
+                                if (cmlist.Any())
+                                {
+                                    if (config.FirstMatchOnly)
+                                    {
+                                        res.Matches.Add(cmlist.First());
+
+                                    }
+                                    else
+                                    {
+                                        res.Matches.AddRange(cmlist);
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+
+                    if (res.Matches.Any())
+                    {
+                        results.Add(res);
+                    }
+                }
+
+
+                if (!results.Any())
+                {
+                    textBoxSongUtilFindInFileResults.Text = "No Results";
+                }
+                else
+                {
+                    textBoxSongUtilFindInFileResults.Text = "";
+                    var sb = new StringBuilder();
+
+                    if (config.FindDistinctText)
+                    {
+                        
+                        var resList = results.SelectMany(vm => vm.Matches.Select(v => v.MetaMessage.Text)).ToList().Distinct().ToList();
+                        resList.OrderBy(v => v).ToList().ForEach(r => sb.AppendLine(r));
+
+                        sb.AppendLine("");
+                        sb.AppendLine("");
+                        sb.AppendLine("");
+                        sb.AppendLine("--Match Breakdown--");
+
+                        foreach (var res in results)
+                        {
+                            sb.AppendLine(res.MidiPath);
+
+                            foreach (var trackGroup in res.Matches.GroupBy(o => o.Owner))
+                            {
+
+                                sb.Append("\t");
+                                sb.AppendLine(trackGroup.Key.Name ?? "");
+                                if (config.MatchCountOnly)
+                                {
+                                    sb.Append("\t\t");
+                                    sb.Append(trackGroup.Count());
+                                    sb.AppendLine(" Matches");
+                                }
+                                else
+                                {
+
+                                    foreach (var match in trackGroup)
+                                    {
+                                        sb.Append("\t\t");
+                                        sb.Append(match.AbsoluteTicks);
+                                        sb.Append(" ");
+                                        sb.Append(match.MetaType);
+                                        sb.Append(" ");
+                                        sb.AppendLine(match.ToString());
+                                    }
+                                }
+                            }
+
+                            sb.AppendLine();
+                        }
+                        
+                    }
+                    else
+                    {
+                        foreach (var res in results)
+                        {
+                            sb.AppendLine(res.MidiPath);
+
+                            foreach (var trackGroup in res.Matches.GroupBy(o => o.Owner))
+                            {
+                                sb.Append("\t");
+                                sb.AppendLine(trackGroup.Key.Name ?? "");
+                                if (config.MatchCountOnly)
+                                {
+                                    sb.Append("\t\t");
+                                    sb.Append(trackGroup.Count());
+                                    sb.AppendLine(" Matches");
+                                }
+                                else
+                                {
+                                    foreach (var match in trackGroup)
+                                    {
+                                        sb.Append("\t\t");
+                                        sb.AppendLine(match.ToString());
+                                    }
+                                }
+                            }
+
+                            sb.AppendLine();
+                        }
+                    }
+                    textBoxSongUtilFindInFileResults.Text = sb.ToString();
+
+                    if (config.OpenResults)
+                    {
+                        OpenSongUtilSearchResultsNotepad();
+                    }
+                }
+            }
+        }
+
+        private void buttonSongUtilFindInFileResultsOpenWindow_Click(object sender, EventArgs e)
+        {
+            OpenSongUtilSearchResultsNotepad();
+        }
+
+        private void OpenSongUtilSearchResultsNotepad()
+        {
+            if (textBoxSongUtilFindInFileResults.Text.IsNotEmpty())
+            {
+                OpenNotepad(Encoding.ASCII.GetBytes(textBoxSongUtilFindInFileResults.Text));
+            }
+        }
+
+        private void buttonSongUtilFindInFileDistinctText_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var config = GetSongUtilFindInFileSearchConfigFromScreen();
+                config.FindDistinctText = true;
+                
+                SongUtilFindMatchesInFile(config);
+            }
+            catch { }
+        }
+
+        private void buttonAddTextEvent_Click_1(object sender, EventArgs e)
+        {
+            if (!EditorPro.IsLoaded)
+                return;
+            try
+            {
+
+                EditorPro.BackupSequence();
+
+                var tick = textBoxEventTick.Text.ToInt();
+                var text = textBoxEventText.Text.Trim();
+                if (tick.IsNull())
+                {
+                    MessageBox.Show("Invalid Tick");
+                }
+                else if (text.IsEmpty())
+                {
+                    MessageBox.Show("Invalid text");
+                }
+                else
+                {
+                    var te = GuitarTextEvent.CreateTextEvent(EditorPro.Messages, tick, text);
+
+                    RefreshTextEvents();
+
+                    listTextEvents.SetSelectedItem(te);
+
+                }
+
+            }
+            catch { }
+        }
+
     }
 }

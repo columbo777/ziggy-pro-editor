@@ -194,7 +194,7 @@ namespace Sanford.Multimedia.Midi
 
         public Track GetTrack(string name)
         {
-            return tracks.FirstOrDefault(x => string.Compare(x.Name, name) == 0);
+            return tracks.FirstOrDefault(x => string.Compare(x.Name, name, true) == 0);
         }
 
         bool dirty;
@@ -478,6 +478,10 @@ namespace Sanford.Multimedia.Midi
         {
             item.Sequence = this;
             item.FileType = this.FileType;
+            if (index > tracks.Count)
+            {
+                index = tracks.Count;
+            }
             tracks.Insert(index, item);
             properties.TrackCount = tracks.Count;
         }

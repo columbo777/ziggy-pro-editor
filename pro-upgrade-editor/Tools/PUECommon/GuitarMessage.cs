@@ -221,7 +221,11 @@ namespace ProUpgradeEditor.Common
         {
 
         }
+        public GuitarMessage(MidiEventPair pair, GuitarMessageType type)
+            : this(pair.Owner, pair, type)
+        {
 
+        }
         public GuitarMessage(GuitarMessageList owner, MidiEventProps props, GuitarMessageType type)
         {
             this.props = props.CloneToMemory(owner);

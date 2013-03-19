@@ -11,9 +11,8 @@ namespace ProUpgradeEditor.Common
 
     public class GuitarHammeron : ChordModifier
     {
-
-        public GuitarHammeron(GuitarMessageList track, MidiEvent downEvent = null, MidiEvent upEvent = null)
-            : base(track, downEvent, upEvent, ChordModifierType.Hammeron, GuitarMessageType.GuitarHammeron)
+        public GuitarHammeron(MidiEventPair ev)
+            : base(ev, ChordModifierType.Hammeron, GuitarMessageType.GuitarHammeron)
         {
 
         }
@@ -31,9 +30,11 @@ namespace ProUpgradeEditor.Common
                 var ev = track.Insert(d1, 100, Utility.ChannelDefault,
                     ticks);
 
-                ret = new GuitarHammeron(track, ev.Down, ev.Up);
+                ret = new GuitarHammeron(new MidiEventPair(track, ev.Down, ev.Up));
+                ret.CreateEvents();
+                track.Add(ret);
             }
-            track.Add(ret);
+            
             return ret;
         }
 

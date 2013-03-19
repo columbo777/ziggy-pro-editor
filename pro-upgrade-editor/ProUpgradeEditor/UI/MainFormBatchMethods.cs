@@ -715,9 +715,6 @@ namespace ProUpgradeEditor.UI
 
                 if (noteCount > 0)
                 {
-                    if (gc.IsSlide)
-                    {
-                    }
                     ret = GuitarChord.CreateChord(
                         mess6,
                         targetDifficulty,
@@ -1032,10 +1029,9 @@ namespace ProUpgradeEditor.UI
                                             }
                                             else
                                             {
-                                                ExecAndRestoreTrackDifficulty(delegate(List<string> fe)
-                                                {
-                                                    fe.AddRange(VerifySongData(proName, sq, item));
-                                                }, fileErrors);
+                                                
+                                                fileErrors.AddRange(VerifySongData(proName, sq, item));
+                                                
                                             }
                                         }
                                     }
@@ -1428,23 +1424,25 @@ namespace ProUpgradeEditor.UI
                                 fileErrors.Add(trackName + " Arpeggio found with no chords: " + EditorPro.CurrentDifficulty.ToString());
                             }
 
-                            bool modWithNoNotes =
-                                EditorPro.GuitarTrack.Messages.SingleStringTremelos.Any(x =>
-                                    !EditorPro.GuitarTrack.Messages.Chords.GetBetweenTick(new TickPair(x.DownTick, x.UpTick)).Any());
-
-                            if (modWithNoNotes)
+                            if (EditorPro.CurrentDifficulty == GuitarDifficulty.Expert)
                             {
-                                fileErrors.Add(trackName + " Single string tremelo with no notes: " + EditorPro.CurrentDifficulty.ToString());
+                                bool modWithNoNotes =
+                                    EditorPro.GuitarTrack.Messages.SingleStringTremelos.Any(x =>
+                                        !EditorPro.GuitarTrack.Messages.Chords.GetBetweenTick(new TickPair(x.DownTick, x.UpTick)).Any());
+
+                                if (modWithNoNotes)
+                                {
+                                    fileErrors.Add(trackName + " Single string tremelo with no notes: " + EditorPro.CurrentDifficulty.ToString());
+                                }
+
+                                modWithNoNotes = EditorPro.GuitarTrack.Messages.MultiStringTremelos.Any(x =>
+                                        !EditorPro.GuitarTrack.Messages.Chords.GetBetweenTick(new TickPair(x.DownTick, x.UpTick)).Any());
+
+                                if (modWithNoNotes)
+                                {
+                                    fileErrors.Add(trackName + " Multi string tremelo with no notes: " + EditorPro.CurrentDifficulty.ToString());
+                                }
                             }
-
-                            modWithNoNotes = EditorPro.GuitarTrack.Messages.MultiStringTremelos.Any(x =>
-                                    !EditorPro.GuitarTrack.Messages.Chords.GetBetweenTick(new TickPair(x.DownTick, x.UpTick)).Any());
-
-                            if (modWithNoNotes)
-                            {
-                                fileErrors.Add(trackName + " Multi string tremelo with no notes: " + EditorPro.CurrentDifficulty.ToString());
-                            }
-
                             bool hasNotes = false;
                             int numNotes = 0;
                             int numZero = 0;

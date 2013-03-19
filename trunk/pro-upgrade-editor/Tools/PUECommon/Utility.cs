@@ -22,6 +22,7 @@ namespace ProUpgradeEditor.Common
     public static class Utility
     {
         public static int ScollToSelectionOffset = 300;
+        public static uint RockBand3TitleID = 45410914;
 
         public static int[] Null6 { get { return new int[] { Int32.MinValue, Int32.MinValue, Int32.MinValue, Int32.MinValue, Int32.MinValue, Int32.MinValue }; } }
 
@@ -157,11 +158,11 @@ namespace ProUpgradeEditor.Common
         public static int MinimumNoteWidth = 0;
 
         public static string XNoteText = "x";
-        public static int XNoteTextYOffset = 0;
+        public static int XNoteTextYOffset = -1;
 
         public static int XNoteTextXOffset = 0;
 
-        public static int NoteTextYOffset = -1;
+        public static int NoteTextYOffset = 0;
         public static int NoteTextXOffset = 0;
 
         public static string ArpeggioHelperPrefix = "(";
@@ -214,11 +215,11 @@ namespace ProUpgradeEditor.Common
 
         public static int GetArpeggioData1(GuitarDifficulty diff)
         {
-            if (diff == GuitarDifficulty.Expert)
+            if (diff.IsExpertAll())
             {
                 return ExpertArpeggioData1;
             }
-            else if (diff == GuitarDifficulty.Hard)
+            else if (diff.IsHard())
             {
                 return HardArpeggioData1;
             }
@@ -228,31 +229,35 @@ namespace ProUpgradeEditor.Common
 
         public static int GetSlideData1(GuitarDifficulty diff)
         {
-            if (diff == GuitarDifficulty.Expert)
+            if (diff.IsExpertAll())
             {
                 return ExpertSlideData1;
             }
-            else if (diff == GuitarDifficulty.Hard)
+            else if (diff.IsHard())
             {
                 return HardSlideData1;
             }
-            else if (diff == GuitarDifficulty.Medium)
+            else if (diff.IsMedium())
             {
                 return MediumSlideData1;
             }
-            else
+            else if (diff.IsEasy())
             {
                 return EasySlideData1;
+            }
+            else
+            {
+                return -1;
             }
         }
 
         public static int GetStrumData1(GuitarDifficulty diff)
         {
-            if (diff == GuitarDifficulty.Expert)
+            if (diff.IsExpertAll())
             {
                 return ExpertStrumData1;
             }
-            else if (diff == GuitarDifficulty.Hard)
+            else if (diff.IsHard())
             {
                 return HardStrumData1;
             }
@@ -261,19 +266,20 @@ namespace ProUpgradeEditor.Common
 
         public static int GetHammeronData1(GuitarDifficulty diff)
         {
-            if (diff == GuitarDifficulty.Expert)
+            
+            if (diff.IsExpertAll())
             {
                 return ExpertHammeronData1;
             }
-            else if (diff == GuitarDifficulty.Hard)
+            else if (diff.IsHard())
             {
                 return HardHammeronData1;
             }
-            else if (diff == GuitarDifficulty.Medium)
+            else if (diff.IsMedium())
             {
                 return MediumHammeronData1;
             }
-            else if (diff == GuitarDifficulty.Easy)
+            else if (diff.IsEasy())
             {
                 return EasyHammeronData1;
             }
@@ -385,7 +391,7 @@ namespace ProUpgradeEditor.Common
                     return GuitarDifficulty.Easy;
 
                 else if (data1 == HandPositionData1)
-                    return GuitarDifficulty.All;
+                    return GuitarDifficulty.Expert;
 
                 else if (data1 == ExpertArpeggioData1)
                     return GuitarDifficulty.Expert;
@@ -468,9 +474,32 @@ namespace ProUpgradeEditor.Common
 
         public static int[] GetKnownData1ForDifficulty(bool isPro, GuitarDifficulty diff)
         {
-            var d1list = new int[128];
-            d1list.For((x, i) => d1list[i] = i);
-            return d1list.Where(x => (diff).HasFlag(x.GetData1Difficulty(isPro))).ToArray();
+            List<int> ret = new List<int>();
+            for (int x = 0; x < 128; x++)
+            {
+                var d = x.GetData1Difficulty(isPro);
+                if (d.IsAll() && diff.IsAll())
+                {
+                    ret.Add(x);
+                }
+                else if(d.IsExpert() && diff.IsExpert())
+                {
+                    ret.Add(x);
+                }
+                else if (d.IsHard() && diff.IsHard())
+                {
+                    ret.Add(x);
+                }
+                else if (d.IsMedium() && diff.IsMedium())
+                {
+                    ret.Add(x);
+                }
+                else if (d.IsEasy() && diff.IsEasy())
+                {
+                    ret.Add(x);
+                }
+            }
+            return ret.ToArray();
         }
 
         public static int GetSoloData1_G5(GuitarDifficulty difficulty)

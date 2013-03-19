@@ -18,6 +18,7 @@ namespace ProUpgradeEditor.Common
             }
         }
 
+        
 
         public static GuitarTextEvent GetTextEvent(GuitarMessageList track, MidiEvent ev)
         {

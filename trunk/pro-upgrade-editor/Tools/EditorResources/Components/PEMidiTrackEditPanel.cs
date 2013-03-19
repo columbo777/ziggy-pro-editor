@@ -301,28 +301,41 @@ namespace EditorResources.Components
 
         void peTrack_ItemDropped(PEMidiTrack sender, DragEventArgs e)
         {
-            var o = e.GetDropObject<PEMidiTrack>();
-            o.IfObjectNotNull(x =>
+            var peTrack = e.GetDropObject<PEMidiTrack>();
+            peTrack.IfObjectNotNull(x =>
             {
-                if (o != sender)
+                if (peTrack != sender)
                 {
                     DoRequestBackup();
 
-                    Track t = null;
-                    if (sender.Track.Sequence == o.Track.Sequence)
+                    Track newTrack = null;
+                    if (sender.Track.Sequence == peTrack.Track.Sequence)
                     {
-                        t = o.Track;
-                        sender.Track.Sequence.MoveTrack(o.Track.GetTrackIndex(), GetInsertAt());
+                        newTrack = peTrack.Track;
+                        sender.Track.Sequence.MoveTrack(peTrack.Track.GetTrackIndex(), GetInsertAt());
                     }
                     else
                     {
-                        var senderSeq = sender.Track.Sequence;
-                        var oSeq = o.Track.Sequence;
-                        t = o.Track.Clone(sender.Track.FileType);
+                        if (IsPro && peTrack.Track.Name.IsProTrackName())
+                        {
+                            newTrack = new Track(FileType.Pro, peTrack.Track.Name);
 
-                        t.Name = sender.Track.Name;
+                            newTrack.Merge(peTrack.Track);
+                        }
+                        else if (IsPro == false && peTrack.Track.Name.IsProTrackName() == false)
+                        {
+                            newTrack = new Track(FileType.Guitar5, peTrack.Track.Name);
 
-                        sender.Track.Sequence.Insert(GetInsertAt(), t);
+                            newTrack.Merge(sender.Track);
+                        }
+                        else
+                        {
+                            newTrack = peTrack.Track.Clone(sender.Track.FileType);
+                        }
+
+                        newTrack.Name = sender.Track.Name;
+
+                        sender.Track.Sequence.Insert(GetInsertAt(), newTrack);
 
                         if (!ModifierKeys.HasFlag(Keys.Shift))
                         {
@@ -330,7 +343,7 @@ namespace EditorResources.Components
                         }
                     }
                     Refresh();
-                    SetSelectedItem(t, SelectedDifficulty);
+                    SetSelectedItem(newTrack, SelectedDifficulty);
                 }
             });
             dragItem = null;

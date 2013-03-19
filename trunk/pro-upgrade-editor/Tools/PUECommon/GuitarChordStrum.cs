@@ -11,6 +11,13 @@ namespace ProUpgradeEditor.Common
 
     public class GuitarChordStrum : ChordModifier
     {
+        public GuitarChordStrum(MidiEventPair ev, ChordModifierType type = ChordModifierType.Invalid)
+            : base(ev, 
+            type == ChordModifierType.Invalid ? (ev.Channel.GetChordStrumFromChannel().GetModifierType()) : type, 
+            GuitarMessageType.GuitarChordStrum)
+        {
+        }
+
         public GuitarChordStrum(GuitarMessageList track, MidiEvent downEvent, MidiEvent upEvent, ChordModifierType type = ChordModifierType.Invalid)
             : base(track, downEvent, upEvent, type, GuitarMessageType.GuitarChordStrum)
         {

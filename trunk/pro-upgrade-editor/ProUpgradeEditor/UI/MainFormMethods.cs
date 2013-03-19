@@ -601,52 +601,72 @@ namespace ProUpgradeEditor.UI
                 return false;
             try
             {
-                var gc = editor.GetChordFromPoint(e.Location);
+                
+                if (tabContainerMain.SelectedTab == tabNoteEditor)
+                {
 
-                if (editor.CreationState == TrackEditor.EditorCreationState.CreatingNote)
-                {
-                    if (DoCreateChordFromScreenPoint(editor, e))
-                        return true;
+                    if (editor.CreationState == TrackEditor.EditorCreationState.CreatingNote)
+                    {
+                        if (DoCreateChordFromScreenPoint(editor, e))
+                            return true;
+                    }
+                    else if (editor.CreationState == TrackEditor.EditorCreationState.CopyingPattern)
+                    {
+                        var gc = editor.GetChordFromPoint(e.Location);
+
+                        if (gc != null && DoCopyPatternSelection(gc, editor, e))
+                            return true;
+                    }
                 }
-                else if (editor.CreationState == TrackEditor.EditorCreationState.CopyingPattern)
+                else if (tabContainerMain.SelectedTab == tabModifierEditor)
                 {
-                    if (gc != null && DoCopyPatternSelection(gc, editor, e))
-                        return true;
+                    var gc = editor.GetChordFromPoint(e.Location);
+
+                    if (editor.CreationState == TrackEditor.EditorCreationState.CreatingSolo)
+                    {
+                        if (gc != null && DoSoloCreation(gc, editor, e))
+                            return true;
+                    }
+                    else if (editor.CreationState == TrackEditor.EditorCreationState.CreatingPowerup)
+                    {
+                        if (gc != null && DoPowerupCreation(gc, editor, e))
+                            return true;
+                    }
+                    else if (editor.CreationState == TrackEditor.EditorCreationState.CreatingMultiTremelo)
+                    {
+                        if (gc != null && DoMultiStringTremeloCreation(gc, editor, e))
+                            return true;
+                    }
+                    else if (editor.CreationState == TrackEditor.EditorCreationState.CreatingSingleTremelo)
+                    {
+                        if (gc != null && DoSingleStringTremeloCreation(gc, editor, e))
+                            return true;
+                    }
+                    else if (editor.CreationState == TrackEditor.EditorCreationState.CreatingArpeggio)
+                    {
+                        if (gc != null && DoArpeggioCreation(gc, editor, e))
+                            return true;
+                    }
                 }
-                else if (editor.CreationState == TrackEditor.EditorCreationState.CreatingSolo)
+                else if(tabContainerMain.SelectedTab == tabPageEvents)
                 {
-                    if (gc != null && DoSoloCreation(gc, editor, e))
+                    var gc = editor.GetChordFromPoint(e.Location);
+
+                    if (editor.CreationState == TrackEditor.EditorCreationState.CreatingProGuitarTrainer)
+                    {
+                        if (gc != null && DoTrainerCreation(gc, editor, e))
+                            return true;
+                    }
+                    else if (editor.CreationState == TrackEditor.EditorCreationState.CreatingProBassTrainer)
+                    {
+                        if (gc != null && DoTrainerCreation(gc, editor, e))
+                            return true;
+                    }
+                    else
+                    {
+                        textBoxEventTick.Text = editor.GetTickFromClientPoint(editor.MousePositionSnapped.X).ToStringEx();
                         return true;
-                }
-                else if (editor.CreationState == TrackEditor.EditorCreationState.CreatingPowerup)
-                {
-                    if (gc != null && DoPowerupCreation(gc, editor, e))
-                        return true;
-                }
-                else if (editor.CreationState == TrackEditor.EditorCreationState.CreatingMultiTremelo)
-                {
-                    if (gc != null && DoMultiStringTremeloCreation(gc, editor, e))
-                        return true;
-                }
-                else if (editor.CreationState == TrackEditor.EditorCreationState.CreatingSingleTremelo)
-                {
-                    if (gc != null && DoSingleStringTremeloCreation(gc, editor, e))
-                        return true;
-                }
-                else if (editor.CreationState == TrackEditor.EditorCreationState.CreatingArpeggio)
-                {
-                    if (gc != null && DoArpeggioCreation(gc, editor, e))
-                        return true;
-                }
-                else if (editor.CreationState == TrackEditor.EditorCreationState.CreatingProGuitarTrainer)
-                {
-                    if (gc != null && DoTrainerCreation(gc, editor, e))
-                        return true;
-                }
-                else if (editor.CreationState == TrackEditor.EditorCreationState.CreatingProBassTrainer)
-                {
-                    if (gc != null && DoTrainerCreation(gc, editor, e))
-                        return true;
+                    }
                 }
             }
             catch { }
@@ -969,6 +989,9 @@ namespace ProUpgradeEditor.UI
                         if (gc.UpTick > time)
                         {
                             CreateArpeggio(time, statusItemStartTick, gc.UpTick, checkBoxCreateArpeggioHelperNotes.Checked);
+
+                            EditorPro.SetCreationStateIdle();
+
                         }
 
                     }
@@ -1001,6 +1024,7 @@ namespace ProUpgradeEditor.UI
                         {
                             CreateTrainer(EditorPro.Messages, GuitarTrainerType.ProGuitar, new TickPair(downTick, gc.UpTick),
                                 checkTrainerLoopableProGuitar.Checked);
+
                         }
                     }
                 }
@@ -1037,14 +1061,18 @@ namespace ProUpgradeEditor.UI
         {
             try
             {
+                
                 var gt = new GuitarTrainer(list, type);
 
                 gt.Loopable = loopable;
                 gt.SetTicks(ticks);
 
-                ProGuitarTrack.AddTrainer(gt);
+                gt.CreateEvents();
 
+                list.Add(gt);
+                
                 EditorPro.SetSelectionStateIdle();
+                RefreshTextEvents();
                 RefreshTrainers();
             }
             catch { }
@@ -1107,7 +1135,7 @@ namespace ProUpgradeEditor.UI
                             }
                             if (hasGhost)
                             {
-                                var gc = EditorPro.GetStaleChord(new TickPair(downTick, upTick), false);
+                                var gc = EditorPro.Messages.Chords.SingleBetweenTick(new TickPair(downTick, upTick));
                                 if (gc != null)
                                 {
                                     SetSelectedChord(gc, false, true);
@@ -1118,11 +1146,10 @@ namespace ProUpgradeEditor.UI
                                         {
                                             NoteChannelBoxes[5 - x].Text = Utility.ChannelArpeggio.ToStringEx();
                                             GetHoldBoxes()[5 - x].Text = ghostNotes[x].ToStringEx();
-                                            //Utility.CreateMessage(ProGuitarTrack,Utility.GetStringLowE(GetDifficulty()) + x,100 + ghostNotes[x],Utility.ChannelArpeggio,downTick, firstUpTick);
                                         }
                                     }
                                     PlaceNote(SelectNextEnum.ForceKeepSelection);
-
+                                    EditorPro.Invalidate();
                                 }
                             }
                         }
@@ -1192,7 +1219,7 @@ namespace ProUpgradeEditor.UI
             int iEnd = GetChordEndBox().Text.ToInt();
             if (!iStart.IsNull() && !iEnd.IsNull())
             {
-                textBox19.Text = (iEnd - iStart).ToStringEx();
+                textBoxNoteEditorSelectedChordTickLength.Text = (iEnd - iStart).ToStringEx();
             }
 
             CheckQuickEditFocus();
@@ -1279,7 +1306,7 @@ namespace ProUpgradeEditor.UI
                     bool hasFocused = false;
                     foreach (var tb in GetHoldBoxes())
                     {
-                        if (tb.Focused && tb.Text.Length == 0)
+                        if (tb.ContainsFocus && tb.Text.Length == 0)
                         {
                             hasFocused = true;
                             break;
@@ -1339,59 +1366,43 @@ namespace ProUpgradeEditor.UI
             {
                 var ret = new int[6];
                 var cb = NoteChannelBoxes;
+                var isX = cb.Any(c=> c.Text.ToInt() == Utility.ChannelX);
 
                 for (int x = 0; x < 6; x++)
                 {
                     if (!ScreenFrets[x].IsNull())
                     {
                         ret[x] = cb[5 - x].Text.ToInt();
+
+                        if (isX && ret[x].IsNull() == false)
+                        {
+                            ret[x] = Utility.ChannelX;
+                        }
+                        
                     }
                     else
                     {
                         ret[x] = Int32.MinValue;
                     }
                 }
-
-                bool isXNote = false;
-                for (int x = 0; x < 6; x++)
-                {
-                    if (!ret[x].IsNull())
-                    {
-                        ret[x] = ret[x].IsNull() ? 0 : ret[x];
-                        if (ret[x] == Utility.ChannelX)
-                        {
-                            isXNote = true;
-                        }
-                    }
-                }
-                if (isXNote)
-                {
-                    for (int x = 0; x < 6; x++)
-                    {
-                        var chan = ret[x];
-                        if (!chan.IsNull())
-                        {
-                            ret[x] = Utility.ChannelX;
-                        }
-                    }
-                }
-
+                
                 return ret;
             }
             set
             {
                 var cb = NoteChannelBoxes;
+                var isX = value.Any(v => v == Utility.ChannelX);
 
                 for (int x = 0; x < 6; x++)
                 {
-                    cb[5 - x].Text = value[x].ToStringEx();
+                    cb[5 - x].Text = value[x].IsNull() ? "" : (isX ? Utility.ChannelX : value[x]).ToStringEx();
                 }
             }
         }
 
         TextBox GetChordStartBox()
         {
-            return textBox14;
+            return textBoxNoteEditorSelectedChordDownTick;
         }
 
         TickPair GetChordTicksFromScreen()
@@ -1404,13 +1415,21 @@ namespace ProUpgradeEditor.UI
         {
             get
             {
-                return new TextBox[] { textBox31, textBox32, textBox33, textBox34, textBox35, textBox36 };
+                return new TextBox[] 
+                { 
+                    textBoxNoteEditorSelectedChordChannelBox0, 
+                    textBoxNoteEditorSelectedChordChannelBox1, 
+                    textBoxNoteEditorSelectedChordChannelBox2,
+                    textBoxNoteEditorSelectedChordChannelBox3, 
+                    textBoxNoteEditorSelectedChordChannelBox4,
+                    textBoxNoteEditorSelectedChordChannelBox5 
+                };
             }
         }
 
         TextBox GetChordEndBox()
         {
-            return textBox20;
+            return textBoxNoteEditorSelectedChordUpTick;
         }
 
 
@@ -1620,6 +1639,7 @@ namespace ProUpgradeEditor.UI
                     {
                         MessageBox.Show("Failed");
                     }
+                    Refresh108EventList();
                 }
             });
         }
@@ -1652,30 +1672,28 @@ namespace ProUpgradeEditor.UI
             if (!config.Generate108Events)
                 return true;
 
-            ExecAndRestoreTrackDifficulty(delegate()
+            try
             {
-                try
+                var tracks = new List<Track>();
+                if (config.SelectedTrackOnly)
                 {
-                    var tracks = new List<Track>();
-                    if (config.SelectedTrackOnly)
-                    {
-                        tracks.Add(EditorPro.SelectedTrack);
-                    }
-                    else
-                    {
-                        tracks.AddRange(EditorPro.GetTracks(GuitarTrack.TrackNames6));
-                    }
-                    foreach (var t in tracks)
-                    {
-                        if (EditorPro.SetTrack(t))
-                        {
-                            EditorPro.GuitarTrack.CreateHandPositionEvents(config);
-                        }
-                    }
-                    ret = true;
+                    tracks.Add(EditorPro.SelectedTrack);
                 }
-                catch { ret = false; }
-            });
+                else
+                {
+                    tracks.AddRange(EditorPro.GetTracks(GuitarTrack.TrackNames6));
+                }
+                foreach (var t in tracks)
+                {
+                    if (EditorPro.SetTrack(t))
+                    {
+                        EditorPro.GuitarTrack.CreateHandPositionEvents(config);
+                    }
+                }
+                ret = true;
+            }
+            catch { ret = false; }
+            
 
             return ret;
         }
@@ -2642,7 +2660,7 @@ namespace ProUpgradeEditor.UI
             {
                 sc.Strum |= ChordStrum.Low;
             }
-            sc.TickLength = textBox19.Text.ToInt(Utility.MinimumNoteWidth + 5);
+            sc.TickLength = textBoxNoteEditorSelectedChordTickLength.Text.ToInt(Utility.MinimumNoteWidth + 5);
 
             return sc;
         }
@@ -2711,7 +2729,7 @@ namespace ProUpgradeEditor.UI
 
             GetChordEndBox().Text = "";
 
-            textBox19.Text = sc.TickLength.ToStringEx();
+            textBoxNoteEditorSelectedChordTickLength.Text = sc.TickLength.ToStringEx();
             int sp = GetChordStartBox().Text.ToInt();
 
             if (sp.IsNull() == false)
@@ -2867,12 +2885,17 @@ namespace ProUpgradeEditor.UI
             {
 
             }
-            else if (tabContainerMain.SelectedTab != null &&
-                tabContainerMain.SelectedTab == tabNoteEditor ||
-                EditorPro.Focused && EditorPro.IsLoaded)
+            else if (tabContainerMain.SelectedTab != null && tabContainerMain.SelectedTab == tabNoteEditor &&
+                EditorPro.IsLoaded)
             {
-                if (textBox19.ContainsFocus || textBox20.ContainsFocus || textBox14.ContainsFocus || textBox31.ContainsFocus || textBox32.ContainsFocus || textBox33.ContainsFocus || textBox34.ContainsFocus || textBox35.ContainsFocus || textBox36.ContainsFocus
-                    || textBoxPlaceNoteFret.ContainsFocus || comboNoteEditorCopyPatternPreset.ContainsFocus)
+                if (textBoxNoteEditorSelectedChordTickLength.ContainsFocus || 
+                    textBoxNoteEditorSelectedChordUpTick.ContainsFocus || 
+                    textBoxNoteEditorSelectedChordDownTick.ContainsFocus ||
+                    NoteChannelBoxes.Any(cb=>cb.ContainsFocus) ||
+                    HoldBoxes.Any(hb=> hb.ContainsFocus) ||
+                    NoteBoxes.Any(nb=> nb.ContainsFocus) ||
+                    textBoxPlaceNoteFret.ContainsFocus || 
+                    comboNoteEditorCopyPatternPreset.ContainsFocus)
                 {
                     if (comboNoteEditorCopyPatternPreset.ContainsFocus)
                         return false;
@@ -2886,10 +2909,11 @@ namespace ProUpgradeEditor.UI
                     }
                 }
 
-                else if (e.KeyCode == Keys.Delete)
+                if (e.KeyCode == Keys.Delete)
                 {
                     if (EditorPro.IsLoaded && EditorPro.SelectedChords.Any())
                     {
+                        EditorPro.BackupSequence();
                         EditorPro.Messages.Remove(EditorPro.SelectedChords.ToList());
                     }
                     HandleSelectNext(SelectNextEnum.ForceSelectNext);
@@ -2960,10 +2984,9 @@ namespace ProUpgradeEditor.UI
                 }
                 else if (e.KeyCode == Keys.C && e.Control)
                 {
-                    if (EditorPro.Focused && EditorPro.SelectedChords.Any())
+                    if (EditorPro.SelectedChords.Any())
                     {
                         EditorPro.SetSelectedToClipboard();
-
                     }
                     return true;
                 }
@@ -3363,7 +3386,13 @@ namespace ProUpgradeEditor.UI
             {
                 return GetHoldBoxes();
             }
-
+        }
+        public TextBox[] NoteBoxes
+        {
+            get
+            {
+                return GetNoteBoxes();
+            }
         }
         void CheckNoteEntry(int hbIndex)
         {
@@ -3910,12 +3939,12 @@ namespace ProUpgradeEditor.UI
             try
             {
 
-                string fileName = saveAs ? "" : sc.G6ConFile;
+                var fileName = saveAs ? "" : sc.G6ConFile;
 
-                if (string.IsNullOrEmpty(fileName))
+                if (fileName.IsEmpty())
                 {
                     var f = GetShortFileNameFromG5(sc);
-                    if (!string.IsNullOrEmpty(f))
+                    if (f.IsNotEmpty())
                     {
                         f += Utility.DefaultCONFileExtension;
                     }
@@ -3923,14 +3952,14 @@ namespace ProUpgradeEditor.UI
                         DefaultConFileLocation,
                         Path.Combine(DefaultConFileLocation, f));
 
-                    if (!string.IsNullOrEmpty(fileName))
+                    if (fileName.IsNotEmpty())
                     {
                         sc.G6ConFile = fileName;
                         textBoxSongLibConFile.Text = sc.G6ConFile;
                     }
                 }
 
-                if (!string.IsNullOrEmpty(fileName))
+                if (fileName.IsNotEmpty())
                 {
                     byte[] proTrack = null;
 
@@ -3961,6 +3990,7 @@ namespace ProUpgradeEditor.UI
 
                     var config = new Package.CreateProConfig()
                     {
+                        TitleID = Utility.RockBand3TitleID,
                         existingCONFile = existingCON,
                         proMidiFileName = sc.G6FileName.GetFileName(),
                         midFileContents = proTrack,

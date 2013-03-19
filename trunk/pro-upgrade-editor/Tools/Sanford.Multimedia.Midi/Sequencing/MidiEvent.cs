@@ -23,7 +23,7 @@ namespace Sanford.Multimedia.Midi
             get
             {
                 return data1;
-                //this.ChannelMessage != null ? this.ChannelMessage.Data1 : int.MinValue; 
+                
             }
         }
         public int Data2
@@ -31,7 +31,7 @@ namespace Sanford.Multimedia.Midi
             get
             {
                 return data2;
-                //return this.ChannelMessage != null ? this.ChannelMessage.Data2 : int.MinValue; 
+                
             }
         }
         int channelCommand;

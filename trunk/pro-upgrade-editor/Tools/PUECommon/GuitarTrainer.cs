@@ -15,7 +15,25 @@ namespace ProUpgradeEditor.Common
 
         public GuitarTextEvent Start { get { return start; } set { start = value; } }
         public GuitarTextEvent End { get { return end; } set { end = value; } }
-        public GuitarTextEvent Norm { get { return norm; } set { norm = value; } }
+        public GuitarTextEvent Norm
+        {
+            get
+            {
+                return norm;
+            }
+            set
+            {
+                norm = value;
+                if (value == null)
+                {
+                    Loopable = false;
+                }
+                else
+                {
+                    Loopable = norm.Text.GetGuitarTrainerMetaEventType().IsTrainerNorm();
+                }
+            }
+        }
 
         int trainerIndex = int.MinValue;
         GuitarTrainerType trainerType;
@@ -26,7 +44,9 @@ namespace ProUpgradeEditor.Common
         {
             get
             {
-                return Start != null && Start.IsTrainerEvent && End != null && End.IsTrainerEvent;
+                return Start != null && Start.IsTrainerEvent && End != null && End.IsTrainerEvent &&
+                    Start.Text.GetGuitarTrainerMetaEventType().IsTrainerBegin() &&
+                    End.Text.GetGuitarTrainerMetaEventType().IsTrainerEnd();
             }
         }
         public GuitarTrainerType TrainerType
@@ -188,31 +208,77 @@ namespace ProUpgradeEditor.Common
         }
 
 
+        public override void CreateEvents()
+        {
+
+            TrainerIndex = Owner.Trainers.Where(g => g.TrainerType == this.TrainerType).Count() + 1;
+
+            if (Start != null)
+            {
+                Start.SetDownTick(TickPair.Down);
+                Start.Text = StartText;
+                Start.CreateEvents();
+                Owner.Add(Start);
+            }
+            if (End != null)
+            {
+                End.SetDownTick(TickPair.Up);
+                End.Text = EndText;
+                End.CreateEvents();
+                Owner.Add(End);
+            }
+
+            if (this.Loopable)
+            {
+                Norm.SetDownTick(GetNormTick(TickPair));
+                Norm.Text = NormText;
+                Norm.CreateEvents();
+                Owner.Add(Norm);
+            }
+
+        }
+
         public override void UpdateEvents()
         {
             if (Start != null)
             {
                 Start.SetDownTick(TickPair.Down);
+                Start.Text = StartText;
                 Start.UpdateEvents();
             }
             if (End != null)
             {
                 End.SetDownTick(TickPair.Up);
+                End.Text = EndText;
                 End.UpdateEvents();
             }
 
             if (this.Loopable)
             {
                 Norm.SetDownTick(GetNormTick(TickPair));
+                Norm.Text = NormText;
                 Norm.UpdateEvents();
             }
-            base.UpdateEvents();
+            else
+            {
+                if (Norm != null && Norm.MidiEvent != null)
+                {
+                    Owner.Remove(Norm);
+                    Norm.SetMidiEvent(null);
+                }
+            }
         }
 
         public override void RemoveEvents()
         {
+            Start.Owner.Remove(Start);
             Start.RemoveEvents();
+            if (Norm != null && Norm.Owner != null)
+            {
+                Norm.Owner.Remove(Norm);
+            }
             Norm.RemoveEvents();
+            End.Owner.Remove(End);
             End.RemoveEvents();
         }
 

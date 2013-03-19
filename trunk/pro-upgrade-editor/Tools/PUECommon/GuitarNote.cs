@@ -10,6 +10,17 @@ namespace ProUpgradeEditor.Common
 {
     public class GuitarNote : GuitarMessage
     {
+        public GuitarNote(GuitarMessageList track, MidiEvent downEvent = null, MidiEvent upEvent = null)
+            : base(track, downEvent, upEvent, GuitarMessageType.GuitarNote)
+        {
+
+        }
+        public GuitarNote(MidiEventPair ev)
+            : base(ev, GuitarMessageType.GuitarNote)
+        {
+
+        }
+
         public virtual int NoteString
         {
             get
@@ -33,17 +44,13 @@ namespace ProUpgradeEditor.Common
             }
         }
 
-        public GuitarNote(GuitarMessageList track, MidiEvent downEvent = null, MidiEvent upEvent = null)
-            : base(track, downEvent, upEvent, GuitarMessageType.GuitarNote)
-        {
-
-        }
+        
 
         public GuitarNote CloneToMemory(GuitarMessageList list)
         {
             return GetNote(list, Difficulty, this.TickPair, NoteString, NoteFretDown, IsTapNote, IsArpeggioNote, IsXNote);
         }
-
+        
         public static GuitarNote GetNote(GuitarMessageList list, GuitarDifficulty diff,
             TickPair ticks, int noteString, int noteFret, bool isTap, bool isArpeggio, bool isX)
         {

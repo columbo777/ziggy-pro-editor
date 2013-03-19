@@ -11,13 +11,11 @@ namespace ProUpgradeEditor.Common
 
     public class GuitarSlide : ChordModifier
     {
-        public GuitarSlide(GuitarMessageList list, MidiEvent downEvent, MidiEvent upEvent)
-            : base(list, downEvent, upEvent,
-                downEvent.Channel == Utility.ChannelSlideReversed ? ChordModifierType.SlideReverse : ChordModifierType.Slide,
-                GuitarMessageType.GuitarSlide)
+        public GuitarSlide(MidiEventPair ev) : base(ev, 
+            (ev.HasDown && (ev.Down.Channel == Utility.ChannelSlideReversed) ? ChordModifierType.SlideReverse : ChordModifierType.Slide),
+            GuitarMessageType.GuitarSlide)
         {
         }
-
         public GuitarSlide(GuitarMessageList list, bool isReversed, MidiEvent downEvent = null, MidiEvent upEvent = null)
             : base(list, downEvent, upEvent,
             isReversed ? ChordModifierType.SlideReverse : ChordModifierType.Slide, GuitarMessageType.GuitarSlide)

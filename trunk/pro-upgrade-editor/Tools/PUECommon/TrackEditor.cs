@@ -722,6 +722,7 @@ namespace ProUpgradeEditor.Common
                         fileData = fileName.ReadFileBytes();
 
                     var seq = fileData.LoadSequence();
+                    ProcessErrors(seq);
 
                     if (loadingBackup)
                     {
@@ -743,6 +744,7 @@ namespace ProUpgradeEditor.Common
 
                     if (t != null)
                     {
+                        
                         if (!loadingBackup)
                         {
                             this.LoadedFileName = fileName;
@@ -766,6 +768,50 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
+        public void ProcessErrors(Sequence seq)
+        {
+            if (seq != null)
+            {
+                foreach (var track in seq.Tracks)
+                {
+                    if (track != null)
+                    {
+                        ProcessErrors(track);
+                    }
+                }
+            }
+        }
+        public void ProcessErrors(Track track)
+        {
+            var meta = track.Meta.Where(x => x.MetaMessage.Text.IsNotEmpty()).ToList().
+                Where(v => v.MetaMessage.Text.IsTrainerGuitar() || v.MetaMessage.Text.IsTrainerBass()).ToList();
+            if(meta.Any())
+            {
+                var nullEvents = meta.Where(t => t.MetaMessage.Text.GetTrainerEventIndex().IsNull()).ToList();
+                
+                track.Remove(nullEvents);
+
+                if (track.Name.IsGuitarTrackName())
+                {
+                    var bt = meta.Where(v => v.MetaMessage.Text.IsTrainerBass()).ToList();
+                    if (bt.Any())
+                    {
+                        track.Remove(bt);
+                    }
+                }
+                else
+                {
+                    if (track.Name.IsBassTrackName())
+                    {
+                        var gt = meta.Where(v => v.MetaMessage.Text.IsGuitarTrackName()).ToList();
+                        if (gt.Any())
+                        {
+                            track.Remove(gt);
+                        }
+                    }
+                }
+            }
+        }
 
         public Track GetProTrack(Sequence seq)
         {
@@ -1297,7 +1343,8 @@ namespace ProUpgradeEditor.Common
             {
                 foreach (var point in gridPoints.Where(x => x.IsWholeNote && x.MeasureNumber > 0))
                 {
-                    DrawTextAtTime(e.Graphics, true, false, new TickPair(point.Tick, point.Tick + 120), point.MeasureNumber.ToStringEx(), Utility.TextEventBrush, false);
+                    DrawTextAtTime(e.Graphics,80, 180, true, false, 
+                        new TickPair(point.Tick, point.Tick + 120), point.MeasureNumber.ToStringEx(), Utility.TextEventBrush, false);
                 }
             }
 
@@ -1305,7 +1352,8 @@ namespace ProUpgradeEditor.Common
             {
                 foreach (var tempo in visTempo)
                 {
-                    DrawTextAtTime(e.Graphics, true, false, tempo.TickPair, "BPM: " + (tempo.QuarterNotesPerSecond * 60.0).Round(3).Round(), Utility.TextEventBrush, false);
+                    DrawTextAtTime(e.Graphics,80,180, true, false, 
+                        tempo.TickPair, "BPM: " + (tempo.QuarterNotesPerSecond * 60.0).Round(3).Round(), Utility.TextEventBrush, false);
                 }
             }
 
@@ -1313,7 +1361,8 @@ namespace ProUpgradeEditor.Common
             {
                 foreach (var ts in visTimeSig)
                 {
-                    DrawTextAtTime(e.Graphics, true, false, ts.TickPair, "" + ts.Numerator + "/" + ts.Denominator, Utility.TextEventBrush, false);
+                    DrawTextAtTime(e.Graphics,80,180, true, false, 
+                        ts.TickPair, "" + ts.Numerator + "/" + ts.Denominator, Utility.TextEventBrush, false);
                 }
             }
         }
@@ -1676,23 +1725,6 @@ namespace ProUpgradeEditor.Common
             }
             return ret;
         }
-        public GuitarChord GetStaleChord(TickPair ticks, bool nextIfNotFound)
-        {
-            if (!IsLoaded)
-                return null;
-
-            GuitarChord ret = guitarTrack.Messages.Chords.SingleOrDefault(x => x.TickPair.IsCloseBoth(ticks));
-
-            if (ret == null &&
-                nextIfNotFound == true)
-            {
-                ret = guitarTrack.Messages.Chords.FirstOrDefault(x => x.DownTick >= ticks.Down);
-            }
-
-            return ret;
-        }
-
-
         public GuitarChord SelectNextChord(GuitarChord sel)
         {
             if (!IsLoaded)
@@ -1921,10 +1953,10 @@ namespace ProUpgradeEditor.Common
             {
                 foreach (var item in vis.Where(x => x.Selected == drawSelected))
                 {
-                    DrawTextAtTime(g, tabActive, drawSelected,
-                        new TickPair(item.DownTick, item.UpTick + 2),
+                    DrawTextAtTime(g, 80, 180, tabActive, drawSelected,
+                        new TickPair(item.DownTick, item.UpTick),
                         "Fret: " + item.NoteFretDown,
-                        drawSelected ? Utility.SelectedTextEventBrush : Utility.TextEventBrush);
+                        drawSelected ? Utility.SelectedTextEventBrush : Utility.TextEventBrush, true);
                 }
             }
         }
@@ -2102,8 +2134,10 @@ namespace ProUpgradeEditor.Common
         {
 
             var st = GetClientPointFromTick(tr.AbsoluteTicks);
-            var et = GetClientPointFromTick(tr.AbsoluteTicks + 20);
-            if (et > 0 && st < Width && st < et && (et - st) >= 2)
+            var et = st + 1;
+            if (et > 0 && 
+                st < Width && 
+                st < et)
             {
                 if (st < 0)
                     st = 0;
@@ -2112,8 +2146,8 @@ namespace ProUpgradeEditor.Common
 
                 g.FillRectangle(tb,
                     st,
-                    0, 2,
-                    Height - InnerHeight - 1);
+                    0, et-st,
+                    InnerHeight - 1);
 
                 using (var p = new Pen(tb))
                 {
@@ -2172,33 +2206,18 @@ namespace ProUpgradeEditor.Common
         }
 
 
-        private void DrawTextAtTime(Graphics g, bool tabActive, bool drawSelected, TickPair ticks, string text, SolidBrush tb, bool fullHeight = true)
+        private void DrawTextAtTime(Graphics g, int alpha80, int alpha180,
+            bool tabActive, bool drawSelected, TickPair ticks, string text, SolidBrush tb, bool fullHeight )
         {
-            if (ticks.TickLength <= 0)
-                ticks.Up = ticks.Down + 120;
             var screenTicks = GetClientPointFromTick(ticks);
+            if (screenTicks.TickLength <= 0)
+                screenTicks.Up = screenTicks.Down + 1;
 
             if (screenTicks.Up > 0 && screenTicks.Down < Width)
             {
 
                 var size = g.MeasureString(text, Utility.fretFont);
-                if (fullHeight)
-                {
-                    using (var br = new SolidBrush(Color.FromArgb(80, tb.Color)))
-                    {
-                        g.FillRectangle(br,
-                            screenTicks.Down,
-                            0, size.Width + 1,
-                            fullHeight ? (InnerHeight - 1) : size.Height + 2);
-                    }
-                    using (var p = new Pen(tb))
-                    {
-                        g.DrawRectangle(p, screenTicks.Down, 0, screenTicks.Up - screenTicks.Down, fullHeight ? (InnerHeight) : size.Height + 2);
-                    }
-                }
-
-
-
+                
                 var textRect = new RectangleF((float)screenTicks.Down, (size.Height * (0)) + (0 * size.Height * 0.1f),
                         size.Width, size.Height);
                 for (int idx = 0; idx < 8; idx++)
@@ -2215,28 +2234,42 @@ namespace ProUpgradeEditor.Common
                     }
                 }
 
+                if (fullHeight)
+                {
 
-                using (var tbg = new SolidBrush(Color.FromArgb(tabActive ? (drawSelected ? 255 : 200) : 80, Utility.BackgroundBrush.Color)))
+                    using (var br = new SolidBrush(Color.FromArgb(alpha80, tb.Color)))
+                    {
+                        g.FillRectangle(br,
+                            screenTicks.Down,
+                            0, screenTicks.TickLength,
+                            fullHeight ? (InnerHeight - 1 ) : size.Height + 1);
+                    }
+                    using (var p = new Pen(tb))
+                    {
+                        g.DrawRectangle(p, 
+                            screenTicks.Down, 0, 
+                            screenTicks.TickLength,
+                            fullHeight ? (InnerHeight ) : size.Height + 2);
+                    }
+                }
+                using (var tbg = new SolidBrush(Color.FromArgb(tabActive ? (drawSelected ? 255 : 200) : alpha80, Utility.BackgroundBrush.Color)))
                 {
                     g.FillRectangle(tbg,
                         textRect.X, textRect.Y, textRect.Width, textRect.Height + 1);
                 }
-                using (var tbg = new Pen(Color.FromArgb(180, Utility.noteBoundPen.Color)))
+                using (var tbg = new Pen(Color.FromArgb(alpha180, Utility.noteBoundPen.Color)))
                 {
                     g.DrawRectangle(tbg,
                         textRect.X, textRect.Y, textRect.Width, textRect.Height + 1);
                 }
-                using (var fb = new SolidBrush(Color.FromArgb(180, Utility.fretBrush.Color)))
+                using (var fb = new SolidBrush(Color.FromArgb(alpha180, Utility.fretBrush.Color)))
                 {
                     var tl = textRect.Location;
                     tl.X -= 1;
 
                     textRect.Location = tl;
                     textRect.Width += 3;
-                    g.DrawString(text,
-                    Utility.fretFont,
-                    fb,
-                    textRect, StringFormat.GenericDefault);
+                    g.DrawString(text, Utility.fretFont, fb, textRect, StringFormat.GenericDefault);
                 }
 
             }
@@ -2358,6 +2391,10 @@ namespace ProUpgradeEditor.Common
             {
                 ret = GetClientPointFromTick(ret);
                 return true;
+            }
+            else
+            {
+                ret = p.X;
             }
             return false;
         }
@@ -2942,10 +2979,6 @@ namespace ProUpgradeEditor.Common
             tickPair = snapLeftTick(tickPair, gridPointDown, closeToLeft6, closeToLeft5, config);
             tickPair = snapRightTick(tickPair, gridPointUp, closeToRight6, closeToRight5, config);
 
-            if (oldPair.CompareTo(tickPair) != 0)
-            {
-            }
-
             return tickPair;
         }
 
@@ -2960,20 +2993,30 @@ namespace ProUpgradeEditor.Common
 
             if (closeToLeft5.Any() && config.SnapG5)
             {
-                var maxLeft = closeToLeft5.Max(x => x.UpTick);
+                var closeDown = closeToLeft5.Where(x => x.DownTick.IsCloseTick(tickPair.Down));
+                var closeUp = closeToLeft5.Where(x => x.UpTick.IsCloseTick(tickPair.Down));
 
-                if (maxLeft > tickPair.Down)
+                if (closeDown.Any())
                 {
-                    if (tickPair.Down.IsCloseTick(maxLeft))
-                        tickPair.Down = maxLeft;
-                }
-                else if (gridPointDown != null && config.SnapGrid)
-                {
-                    var gd = gridTick.DistSq(tickPair.Down);
-                    if (gd < maxLeft.DistSq(tickPair.Down))
+                    var maxLeft = closeDown.Max(v => v.DownTick);
+                    if (maxLeft > tickPair.Down)
                     {
-                        if (tickPair.Down.IsCloseTick(gridTick))
-                            tickPair.Down = gridTick;
+                        if (tickPair.Down.IsCloseTick(maxLeft))
+                            tickPair.Down = maxLeft;
+                    }
+                    else if (gridPointDown != null && config.SnapGrid)
+                    {
+                        var gd = gridTick.DistSq(tickPair.Down);
+                        if (gd < maxLeft.DistSq(tickPair.Down))
+                        {
+                            if (tickPair.Down.IsCloseTick(gridTick))
+                                tickPair.Down = gridTick;
+                        }
+                        else
+                        {
+                            if (tickPair.Down.IsCloseTick(maxLeft))
+                                tickPair.Down = maxLeft;
+                        }
                     }
                     else
                     {
@@ -2981,11 +3024,31 @@ namespace ProUpgradeEditor.Common
                             tickPair.Down = maxLeft;
                     }
                 }
-                else
+                else if (closeUp.Any())
                 {
-                    if (tickPair.Down.IsCloseTick(maxLeft))
-                        tickPair.Down = maxLeft;
+                    var maxLeft = closeUp.Min(v => v.UpTick);
+                    tickPair.Down = maxLeft;
+
+                    if (gridPointDown != null && config.SnapGrid)
+                    {
+                        var gd = gridTick.DistSq(tickPair.Down);
+                        if (gd < maxLeft.DistSq(tickPair.Down))
+                        {
+                            if (tickPair.Down.IsCloseTick(gridTick))
+                                tickPair.Down = gridTick;
+                        }
+                        else
+                        {
+                            if (tickPair.Down.IsCloseTick(maxLeft))
+                                tickPair.Down = maxLeft;
+                        }
+                    }
+                    if (tickPair.Up <= tickPair.Down)
+                    {
+                        tickPair.Down = tickPair.Up - 1;
+                    }
                 }
+                
             }
             if (closeToLeft.Any() && config.SnapG6)
             {
@@ -3036,20 +3099,30 @@ namespace ProUpgradeEditor.Common
             }
             if (closeToRight5.Any() && config.SnapG5)
             {
-                var minDown = closeToRight5.Min(x => x.DownTick);
+                var closeDown = closeToRight5.Where(x=> x.DownTick.IsCloseTick(tickPair.Up));
+                var closeUp = closeToRight5.Where(x=> x.UpTick.IsCloseTick(tickPair.Up));
 
-                if (minDown < tickPair.Up)
+                if (closeDown.Any())
                 {
-                    if (tickPair.Up.IsCloseTick(minDown))
-                        tickPair.Up = minDown;
-                }
-                else if (gridPoint != null && config.SnapGrid)
-                {
-                    var gd = gridTick.DistSq(tickPair.Up);
-                    if (gd < minDown.DistSq(tickPair.Up))
+                    var minDown = closeDown.Min(v => v.DownTick);
+                    if (minDown < tickPair.Up)
                     {
-                        if (tickPair.Up.IsCloseTick(gridTick))
-                            tickPair.Up = gridTick;
+                        if (tickPair.Up.IsCloseTick(minDown))
+                            tickPair.Up = minDown;
+                    }
+                    else if (gridPoint != null && config.SnapGrid)
+                    {
+                        var gd = gridTick.DistSq(tickPair.Up);
+                        if (gd < minDown.DistSq(tickPair.Up))
+                        {
+                            if (tickPair.Up.IsCloseTick(gridTick))
+                                tickPair.Up = gridTick;
+                        }
+                        else
+                        {
+                            if (tickPair.Up.IsCloseTick(minDown))
+                                tickPair.Up = minDown;
+                        }
                     }
                     else
                     {
@@ -3057,10 +3130,38 @@ namespace ProUpgradeEditor.Common
                             tickPair.Up = minDown;
                     }
                 }
-                else
+                else if (closeUp.Any())
                 {
-                    if (tickPair.Up.IsCloseTick(minDown))
-                        tickPair.Up = minDown;
+                    var maxUp = closeUp.Max(v => v.UpTick);
+                    if (maxUp < tickPair.Up)
+                    {
+                        if (tickPair.Up.IsCloseTick(maxUp))
+                            tickPair.Up = maxUp;
+                    }
+                    else if (gridPoint != null && config.SnapGrid)
+                    {
+                        var gd = gridTick.DistSq(tickPair.Up);
+                        if (gd < maxUp.DistSq(tickPair.Up))
+                        {
+                            if (tickPair.Up.IsCloseTick(gridTick))
+                                tickPair.Up = gridTick;
+                        }
+                        else
+                        {
+                            if (tickPair.Up.IsCloseTick(maxUp))
+                                tickPair.Up = maxUp;
+                        }
+                    }
+                    else
+                    {
+                        if (tickPair.Up.IsCloseTick(maxUp))
+                            tickPair.Up = maxUp;
+                    }
+                }
+                if (tickPair.Up.IsNull()==false &&
+                    tickPair.Up <= tickPair.Down)
+                {
+                    tickPair.Up = tickPair.Down + 1;
                 }
             }
             if (closeToRight.Any() && config.SnapG6)
@@ -3333,7 +3434,23 @@ namespace ProUpgradeEditor.Common
             Invalidate();
         }
 
-
+        public Point MousePositionSnapped
+        {
+            get
+            {
+                var ret = PointToClient(MousePosition);
+                
+                if (GridSnap)
+                {
+                    int mc;
+                    if (GetGridSnapPointFromClientPoint(ret, out mc))
+                    {
+                        ret.X = mc;
+                    }
+                }
+                return new Point(ret.X, SnapToString(ret.Y));
+            }
+        }
         private void MoveChordSelector(Point mouseClient)
         {
             var sel = CurrentSelector;
@@ -3344,10 +3461,11 @@ namespace ProUpgradeEditor.Common
             if (GridSnap)
             {
                 int mc;
-                if (GetGridSnapPointFromClientPoint(mouseClient, out mc))
+                if (!GetGridSnapPointFromClientPoint(mouseClient, out mc))
                 {
-                    mouseClient = new Point(mc, SnapToString(mouseClient.Y));
+                    mc = mouseClient.X;
                 }
+                mouseClient = new Point(mc, SnapToString(mouseClient.Y));
             }
 
             if (sel.IsRight)
@@ -4109,6 +4227,17 @@ namespace ProUpgradeEditor.Common
 
                                 if (font != null)
                                 {
+                                    if (chord.IsXNote && Utility.XNoteText.Trim().IsNotEmpty())
+                                    {
+                                        noteTxt = Utility.XNoteText.Trim();
+                                        noteX += Utility.XNoteTextXOffset;
+                                        noteY += Utility.XNoteTextYOffset;
+                                    }
+                                    else
+                                    {
+                                        noteX += Utility.NoteTextXOffset;
+                                        noteY += Utility.NoteTextYOffset;
+                                    }
                                     g.DrawString(noteTxt,
                                         font,
                                         Utility.fretBrush,
@@ -4275,13 +4404,24 @@ namespace ProUpgradeEditor.Common
 
             using (var fb = new SolidBrush(Color.FromArgb(alpha, Utility.fretBrush.Color)))
             {
-
-                string noteTxt = note.NoteFretDown.ToString();
+                
+                var noteTxt = note.NoteFretDown.ToString();
+                if (note.IsXNote && Utility.XNoteText.Trim().IsNotEmpty())
+                {
+                    noteTxt = Utility.XNoteText.Trim();
+                    noteX += Utility.XNoteTextXOffset;
+                    noteY += Utility.XNoteTextYOffset;
+                }
+                else
+                {
+                    noteX += Utility.NoteTextXOffset;
+                    noteY += Utility.NoteTextYOffset;
+                }
 
                 g.DrawString(noteTxt,
                     Utility.fretFont,
                     fb,
-                    noteX + Utility.NoteTextXOffset,
+                    noteX ,
                     noteY - (int)(Utility.fontHeight / 4.0 + Utility.NoteTextYOffset));
             }
 

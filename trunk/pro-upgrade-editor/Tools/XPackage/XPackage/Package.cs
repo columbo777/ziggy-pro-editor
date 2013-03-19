@@ -376,6 +376,11 @@ namespace XPackage
 
         public class CreateProConfig
         {
+            public CreateProConfig()
+            {
+                TitleID = 45410914;
+
+            }
             public string displayTitle;
             public string description;
             public string guitarDifficulty;
@@ -385,6 +390,7 @@ namespace XPackage
             public string proMidiFileName;
             public byte[] midFileContents;
             public byte[] existingCONFile;
+            public uint TitleID;
         }
         public static byte[] CreateRB3Pro(CreateProConfig config)
         {
@@ -416,6 +422,9 @@ namespace XPackage
 
                 //pk.Header.ContentImage = Resources.rockband;
                 //pk.Header.PackageImage = Resources.rockband2;
+                
+                pk.Header.TitleID = config.TitleID;
+                //pk.Header.MediaID = 4FC9256F;
 
                 pk.Header.Description = config.description;
                 pk.Header.Title_Display = config.displayTitle;

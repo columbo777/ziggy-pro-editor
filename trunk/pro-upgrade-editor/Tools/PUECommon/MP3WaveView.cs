@@ -196,74 +196,45 @@ namespace ProUpgradeEditor.Common
 
                     e.Graphics.FillRectangle(Brushes.White, ClientRectangle);
 
+                    int width = Owner.ClientRectangle.Width;
+                    var startTime = Owner.GetTimeFromClientPoint(0);
+                    var endTime = Owner.GetTimeFromClientPoint(width);
+                    var timePerPix = Owner.GetTimeFromClientPoint(1);
 
-
-                    foreach (var chord in Owner.Messages.Chords.GetBetweenTick(Owner.GetTickFromClientPoint(0), Owner.GetTickFromClientPoint(Width)))
+                    var maxValues = new List<PointF>[NumChannels];
+                    var minValues = new List<PointF>[NumChannels];
+                    for(int x=0;x<NumChannels;x++)
                     {
-                        var chordSamples = ReadPixelSamples(chord.StartTime + MP3AdjustTime, chord.EndTime + MP3AdjustTime);
-
-                        var chordClientDown = Owner.GetClientPointFromScreenPoint(chord.ScreenPointPair.Down);
-                        var chordClientUp = Owner.GetClientPointFromScreenPoint(chord.ScreenPointPair.Up);
-
-                        for (var channel = 0; channel < NumChannels; channel++)
-                        {
-                            var sample = chordSamples.GetChannel(channel).Single().Samples;
-                            var sampleLen = sample.Length;
-                            var chordClientLen = chordClientUp - chordClientDown;
-                            var points = new List<Point>();
-
-
-                            var peaks = sample.Select((s, i) =>
-                            {
-                                Peak ret = null;
-                                if (i > 0 && i < sampleLen - 1 &&
-                                ((sample[i - 1] < s && s > sample[i + 1]) ||
-                                 (sample[i - 1] > s && s < sample[i + 1])))
-                                {
-                                    ret = new Peak() { SampleIndex = i, PeakHeight = s };
-                                }
-                                return ret;
-                            }).Where(x => x != null).ToArray();
-
-                            if (peaks.Any())
-                            {
-                                double range = 0.01;
-
-                                var findHz = new double[] { 130.82, 138.59, 146.83, 155.56, 164.81, 174.61, 185, 196, 207.65, 220, 233.08, 246.94, 261.63, 277.18, 293.66, 311.13, 329.63, 349.23, 369.99, 392, 415.3, 440, 466.16, 493.88, 523.25, 554.37, 587.33, 622.25, 659.26, 698.46, 739.99, 783.99, 830.61, 880, 932.33, 987.77, 1046.5, 1108.73, 1174.66, 1244.51, 1318.51, 1396.91, 1479.98, 1567.98, 1661.22, 1760, 1864.66, 1975.53, 2093.00 };
-
-
-                                var peakFrequencies = peaks.SelectMany(peak => peaks.Select(x => new PeakFrequencyPair()
-                                {
-                                    Peak = peak,
-                                    Frequency = CalculateFrequency(peak, x, chord.TimeLength)
-                                }).Where(x => x.Frequency >= 200)).ToArray();
-
-                                var inRangeFreqs = peakFrequencies.Where(x => findHz.Any(f => Math.Abs(f - x.Frequency) < range)).ToArray();
-
-
-                                /*
-
-                                Debug.WriteLine("Amplitudes: ");
-                                amplitudes.ForEach(x => Debug.WriteLine("\t" + x));
-
-                                Debug.WriteLine("Periods: ");
-                                periods.ForEach(x => Debug.WriteLine("\t" + x));
-                                */
-                                if (inRangeFreqs.Any())
-                                {
-                                    Debug.WriteLine("Frequencies: ");
-                                    inRangeFreqs.Select(x => x.Frequency).Distinct().ForEach(x => Debug.WriteLine("\t" + x));
-                                }
-
-                            }
-
-
-
-
-                        }
-
+                        maxValues[x] = new List<PointF>();
+                        minValues[x] = new List<PointF>();
                     }
-
+                    
+                    for(int pix=0;pix<width;pix++)
+                    {
+                        var samples = ReadPixelSamples(startTime + MP3AdjustTime, startTime + MP3AdjustTime + (timePerPix * pix));
+                        
+                        for(int c=0;c<NumChannels;c++)
+                        {
+                            var sampChan = samples.GetChannel(c).Where(v=> v.Samples.Any()).ToList();
+                            if(sampChan.Any())
+                            {
+                                var max = sampChan.Max(v => v.MaxValue);
+                                var min = sampChan.Min(v => v.MinValue);
+                                
+                                maxValues[c].Add(new PointF(pix, (float)max));
+                                minValues[c].Add(new PointF(pix, (float)min));
+                            
+                            }
+                        }
+                    }
+                    for (int x = 0; x < NumChannels; x++)
+                    {
+                        var pen = Pens.DarkBlue;
+                        if(x == 1)
+                            pen = Pens.Blue;
+                        e.Graphics.DrawLines(pen, maxValues[x].ToArray());
+                        e.Graphics.DrawLines(pen, minValues[x].ToArray());
+                    }
                 }
 
                 catch { }
@@ -458,12 +429,12 @@ namespace ProUpgradeEditor.Common
 
 
             var numSamples = endSample - startSample;
+            var numPixels = endPoint - startPoint;
 
             for (int channel = 0; channel < NumChannels; channel++)
             {
-
                 var pixelSamples = new List<float>();
-
+                
                 for (int x = startSample.ToInt(); x < endSample.ToInt(); x++)
                 {
                     pixelSamples.Add(WaveSamples[channel].Samples[(startSample.ToInt() + x)]);

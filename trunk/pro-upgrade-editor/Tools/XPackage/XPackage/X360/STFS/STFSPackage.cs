@@ -3395,10 +3395,13 @@ namespace X360.STFS
             cstfs.HeaderData.DataFileCount = xHeader.DataFileCount;
             cstfs.HeaderData.DataFileSize = xHeader.DataFileSize;
             cstfs.HeaderData.MediaID = xHeader.MediaID;
+            cstfs.HeaderData.TitleID = xHeader.TitleID;
+            cstfs.HeaderData.Version_ = xHeader.Version_;
+            cstfs.HeaderData.Version_Base = xHeader.Version_Base;
+
             cstfs.HeaderData.MetaDataVersion = xHeader.MetaDataVersion;
             cstfs.HeaderData.Platform = xHeader.Platform;
             cstfs.HeaderData.SeasonNumber = xHeader.SeasonNumber;
-           
 
             cstfs.STFSType = xSTFSStruct.ThisType;
             // Populate

@@ -214,46 +214,56 @@ namespace ProUpgradeEditor.UI
 
         SongCacheList SongList = null;
 
+
         class UtilProperty
         {
+            
             public string Description;
             public object Data;
             public object OriginalData;
             public PropertyType Type;
+            public Func<UtilProperty,bool> OnUpdate;
 
-            public UtilProperty(string desc, int data)
+
+            public UtilProperty(string desc, int data, Func<UtilProperty,bool> OnUpdate=null)
             {
                 this.Description = desc;
                 this.Data = OriginalData = data;
                 this.Type = PropertyType.Integer;
+                this.OnUpdate = OnUpdate;
             }
-            public UtilProperty(string desc, bool data)
+            public UtilProperty(string desc, bool data, Func<UtilProperty,bool> OnUpdate = null)
             {
+                this.OnUpdate = OnUpdate;
                 this.Description = desc;
                 this.Data = OriginalData = data;
                 this.Type = PropertyType.Bool;
             }
-            public UtilProperty(string desc, string data)
+            public UtilProperty(string desc, string data, Func<UtilProperty,bool> OnUpdate = null)
             {
+                this.OnUpdate = OnUpdate;
                 this.Description = desc;
                 this.Data = OriginalData = data;
                 this.Type = PropertyType.String;
             }
-            public UtilProperty(string desc, double data)
+            public UtilProperty(string desc, double data, Func<UtilProperty,bool> OnUpdate = null)
             {
+                this.OnUpdate = OnUpdate;
                 this.Description = desc;
                 this.Data = OriginalData = data;
                 this.Type = PropertyType.Double;
             }
 
-            public UtilProperty(string desc, Pen data)
+            public UtilProperty(string desc, Pen data, Func<UtilProperty,bool> OnUpdate = null)
             {
+                this.OnUpdate = OnUpdate;
                 this.Description = desc;
                 this.Data = OriginalData = data;
                 this.Type = PropertyType.Pen;
             }
-            public UtilProperty(string desc, SolidBrush data)
+            public UtilProperty(string desc, SolidBrush data, Func<UtilProperty,bool> OnUpdate = null)
             {
+                this.OnUpdate = OnUpdate;
                 this.Description = desc;
                 this.Data = OriginalData = data;
                 this.Type = PropertyType.Brush;
@@ -261,7 +271,25 @@ namespace ProUpgradeEditor.UI
 
             public static UtilProperty[] GetInitialProperties()
             {
-                return new UtilProperty[]{
+                return new UtilProperty[]
+                {
+                    new UtilProperty("Tick Close Distance", (int)4, (p)=>{
+                        Utility.TickCloseWidth = ((int)p.Data);
+                        return Utility.TickCloseWidth.IsNull() == false;
+                    }),
+                    new UtilProperty("Rock Band 3 Title ID", Utility.RockBand3TitleID.ToString(), (p)=>{
+                        
+                        uint titleID;
+                        var ret = uint.TryParse((string)p.Data, out titleID);
+                        if(ret)
+                        {
+                            Utility.RockBand3TitleID = titleID;
+                        }
+                        else{
+                            p.Data = Utility.RockBand3TitleID.ToString();
+                        }
+                        return ret;
+                    }),
                     //new UtilProperty("Enable Render MP3 Wave", false),
                     new UtilProperty( "108 Generation Enabled", Utility.HandPositionGenerationEnabled),
                     new UtilProperty( "108 Marker Start Offset", Utility.HandPositionMarkerStartOffset),
@@ -952,19 +980,29 @@ namespace ProUpgradeEditor.UI
 
                 default:
                     {
-                        switch (p.Type)
+                        if (p.OnUpdate != null)
                         {
-                            case PropertyType.Integer:
-                                settings.SetValue("Util_" + p.Description, (int)p.Data);
-                                break;
-                            case PropertyType.Bool:
-                                settings.SetValue("Util_" + p.Description, (bool)p.Data);
-                                break;
-                            case PropertyType.String:
-                                settings.SetValue("Util_" + p.Description, (string)p.Data);
-                                break;
+                            if (!p.OnUpdate(p))
+                            {
+                                p.Data = p.OriginalData;
+                                EditorPro.Invalidate();
+                            }
                         }
-
+                        else
+                        {
+                            switch (p.Type)
+                            {
+                                case PropertyType.Integer:
+                                    settings.SetValue("Util_" + p.Description, (int)p.Data);
+                                    break;
+                                case PropertyType.Bool:
+                                    settings.SetValue("Util_" + p.Description, (bool)p.Data);
+                                    break;
+                                case PropertyType.String:
+                                    settings.SetValue("Util_" + p.Description, (string)p.Data);
+                                    break;
+                            }
+                        }
                     }
                     break;
             }

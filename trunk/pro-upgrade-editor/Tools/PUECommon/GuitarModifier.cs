@@ -37,28 +37,40 @@ namespace ProUpgradeEditor.Common
             GuitarDifficulty difficulty = GuitarDifficulty.All, bool isPro = true)
         {
             var ret = new List<int>();
+            if (difficulty.IsAll())
+                difficulty = GuitarDifficulty.Expert;
+
             switch (type)
             {
                 case ChordModifierType.Hammeron:
                     {
-                        ret.AddRange(Utility.AllHammeronData1);
+                        var d1 = Utility.GetHammeronData1(difficulty);
+
+                        if (d1 != -1)
+                        {
+                            ret.Add(d1);
+                        }
                     }
                     break;
                 case ChordModifierType.Slide:
-                    {
-                        ret.AddRange(Utility.AllSlideData1);
-                    }
-                    break;
                 case ChordModifierType.SlideReverse:
                     {
-                        ret.AddRange(Utility.AllSlideData1);
+                        var d1 = Utility.GetSlideData1(difficulty);
+                        if(d1 != -1)
+                        {
+                            ret.Add(d1);
+                        }
                     }
                     break;
                 case ChordModifierType.ChordStrumLow:
                 case ChordModifierType.ChordStrumMed:
                 case ChordModifierType.ChordStrumHigh:
                     {
-                        ret.AddRange(Utility.AllStrumData1);
+                        var strum = Utility.GetStrumData1(difficulty);
+                        if (strum != -1)
+                        {
+                            ret.Add(strum);
+                        }
                     }
                     break;
             }
@@ -119,6 +131,13 @@ namespace ProUpgradeEditor.Common
     {
         public ChordModifierType ModifierType;
 
+        public ChordModifier(MidiEventPair ev, ChordModifierType type, GuitarMessageType gt) :
+            this(ev.Owner, ev.Down, ev.Up, type, gt)
+        {
+            Data1 = type.GetData1ForChordModifierType(ev.Owner.Owner.CurrentDifficulty, true).FirstOrDefault();
+            Data2 = 100;
+
+        }
         public ChordModifier(GuitarMessageList track, MidiEvent downEvent, MidiEvent upEvent, ChordModifierType type, GuitarMessageType gt) :
             base(track, new MidiEventPair(track, downEvent, upEvent), gt)
         {
@@ -202,7 +221,11 @@ namespace ProUpgradeEditor.Common
         {
             this.ModifierType = type;
         }
-
+        public GuitarModifier(MidiEventPair ev, GuitarModifierType type, GuitarMessageType mt) :
+            base(ev, mt)
+        {
+            this.ModifierType = type;
+        }
 
         public static GuitarModifier GetModifier(GuitarMessageList track, TickPair ticks,
             GuitarModifierType type, GuitarMessageType mt,

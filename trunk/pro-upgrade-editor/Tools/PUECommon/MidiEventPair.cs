@@ -41,7 +41,7 @@ namespace ProUpgradeEditor.Common
             }
         }
 
-        public GuitarTrack OwnerTrack { get { return owner.Owner.GuitarTrack; } }
+        public GuitarMessageList Owner { get { return owner; } }
 
         public int Data1 { get { return Down != null ? Down.Data1 : Int32.MinValue; } }
         public int Data2 { get { return Down != null ? Down.Data2 : Int32.MinValue; } }
@@ -77,7 +77,18 @@ namespace ProUpgradeEditor.Common
         public MidiEvent Down
         {
             get { return this.down; }
-            set { this.down = value; }
+            set 
+            { 
+                this.down = value;
+                if (value != null)
+                {
+                    dPair = new Data1ChannelPair(value.Data1, value.Channel);
+                }
+                else
+                {
+                    dPair = Data1ChannelPair.NullValue;
+                }
+            }
         }
 
         public MidiEvent Up

@@ -14,6 +14,15 @@ using System.Diagnostics;
 
 namespace ProUpgradeEditor.Common
 {
+    public class Data1ChannelPairEventList : List<MidiEvent>
+    {
+        public Data1ChannelPair Data1ChannelPair { get; internal set; }
+        public Data1ChannelPairEventList(int data1, int channel)
+        {
+            this.Data1ChannelPair = new Data1ChannelPair(data1, channel);
+        }
+    }
+
     public class Data1ChannelPair : IComparable<Data1ChannelPair>, IEquatable<Data1ChannelPair>
     {
         public int Data1 { get; set; }
@@ -41,6 +50,10 @@ namespace ProUpgradeEditor.Common
                 return 0;
         }
 
+        public override int GetHashCode()
+        {
+            return ((Data1 & 0x00FF) | ((Channel << 2) & 0xFF00));
+        }
 
         public bool Equals(Data1ChannelPair other)
         {

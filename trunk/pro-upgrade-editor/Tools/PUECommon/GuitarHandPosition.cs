@@ -10,18 +10,27 @@ namespace ProUpgradeEditor.Common
 
     public class GuitarHandPosition : GuitarMessage
     {
-        public GuitarHandPosition(GuitarMessageList track, MidiEvent downEvent, MidiEvent upEvent)
-            : base(track, downEvent, upEvent, GuitarMessageType.GuitarHandPosition)
+        public GuitarHandPosition(GuitarMessageList track, TickPair pair, int noteFret)
+            : base(track, new MidiEventProps(track), GuitarMessageType.GuitarHandPosition)
         {
+            this.Data1 = Utility.HandPositionData1;
+            this.Data2 = 100 + noteFret;
+            Channel = 0;
+            this.SetTicks(pair);
         }
-        
+        public GuitarHandPosition( MidiEventPair pair)
+            : base(pair.Owner, pair, GuitarMessageType.GuitarHandPosition)
+        {
+            
+        }
 
         public static GuitarHandPosition CreateEvent(GuitarMessageList track, TickPair ticks, int noteFret)
         {
-            var ev = track.Insert(Utility.HandPositionData1, 100 + noteFret, Utility.ChannelDefault, ticks);
-
-            var ret = new GuitarHandPosition(track, ev.Down, ev.Up);
+            var ret = new GuitarHandPosition(track, ticks, noteFret);
+            ret.CreateEvents();
             track.Add(ret);
+            
+            
             return ret;
         }
 

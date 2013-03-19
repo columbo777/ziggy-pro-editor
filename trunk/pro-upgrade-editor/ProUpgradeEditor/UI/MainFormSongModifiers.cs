@@ -38,6 +38,11 @@ namespace ProUpgradeEditor.UI
             }
             catch { }
 
+            try
+            {
+                Refresh108EventList();
+            }
+            catch { }
         }
 
         public void RefreshTrainers()
@@ -79,6 +84,8 @@ namespace ProUpgradeEditor.UI
             {
 
                 ListBox list = null;
+                RefreshTextEvents();
+
                 if (type == GuitarTrainerType.ProGuitar)
                 {
                     list = listProGuitarTrainers;
@@ -95,13 +102,9 @@ namespace ProUpgradeEditor.UI
                     list.Items.Clear();
                     if (EditorPro.IsLoaded)
                     {
-                        ProGuitarTrack.RefreshTrainers();
-                        foreach (var trainer in ProGuitarTrack.Messages.Trainers)
+                        foreach (var trainer in ProGuitarTrack.Messages.Trainers.Where(t=> t.TrainerType == type))
                         {
-                            if (trainer.TrainerType == type)
-                            {
-                                list.Items.Add(trainer);
-                            }
+                            list.Items.Add(trainer);
                         }
                     }
                     list.EndUpdate();
@@ -206,7 +209,7 @@ namespace ProUpgradeEditor.UI
                 {
                     var o = listBox3.SelectedItem as stringObject;
                     var m = o.Obj as GuitarArpeggio;
-
+                    
                     foreach (GuitarChord c in gt.Messages.Chords)
                     {
                         if (c.DownTick < m.UpTick &&

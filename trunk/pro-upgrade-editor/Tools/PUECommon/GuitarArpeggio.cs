@@ -10,6 +10,10 @@ namespace ProUpgradeEditor.Common
     {
         public GuitarArpeggio(GuitarMessageList track, MidiEvent downEvent, MidiEvent upEvent) :
             base(track, downEvent, upEvent, GuitarModifierType.Arpeggio, GuitarMessageType.GuitarArpeggio) { }
+        
+        public GuitarArpeggio(MidiEventPair ev) :
+            base(ev.Owner, ev.Down, ev.Up, GuitarModifierType.Arpeggio, GuitarMessageType.GuitarArpeggio) { }
+
         public GuitarArpeggio(GuitarMessageList track, TickPair ticks) :
             base(track, null, null, GuitarModifierType.Arpeggio, GuitarMessageType.GuitarArpeggio)
         {
@@ -23,6 +27,9 @@ namespace ProUpgradeEditor.Common
             if (!d1.IsNull())
             {
                 ret = new GuitarArpeggio(track, ticks);
+                ret.Data1 = d1;
+                ret.Data2 = 100;
+                ret.Channel = Utility.ChannelDefault;
             }
             return ret;
         }

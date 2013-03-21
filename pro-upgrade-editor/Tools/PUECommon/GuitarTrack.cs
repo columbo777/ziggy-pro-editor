@@ -69,19 +69,15 @@ namespace ProUpgradeEditor.Common
             {
                 message.RemoveEvents();
 
-                Messages.Remove(message);
+                message.RemoveFromList();
 
-                message.IsDeleted = true;
             }
         }
 
 
         public void Remove(MidiEvent ev)
         {
-            if (ev != null && !ev.Deleted)
-            {
-                midiTrack.Remove(ev);
-            }
+            midiTrack.Remove(ev);
         }
 
         public void Remove(IEnumerable<MidiEvent> ev)
@@ -91,19 +87,19 @@ namespace ProUpgradeEditor.Common
                 Remove(e);
             }
         }
-
+        public void Remove(IEnumerable<MidiEventPair> ev)
+        {
+            foreach (var e in ev)
+            {
+                if(e.HasDown)
+                    Remove(e.Down);
+                if (e.HasUp)
+                    Remove(e.Up);
+            }
+        }
 
         public MidiEvent Insert(int absoluteTicks, IMidiMessage ev)
         {
-            ev.IfIsType<MetaMessage>(evMeta =>
-            {
-                if (midiTrack.Meta.Any(x => x.AbsoluteTicks == absoluteTicks &&
-                    evMeta.MetaType == x.MetaType))
-                {
-                    Debug.WriteLine("Possible duplicate");
-                }
-            });
-
             return midiTrack.Insert(absoluteTicks, ev);
         }
 
@@ -419,57 +415,51 @@ namespace ProUpgradeEditor.Common
             }
             catch { }
         }
+
+        void CheckForInvalidMessages()
+        {
+            Messages.Chords.Where(chord => chord.Notes.Any(x => x.IsXNote) && chord.Notes.Any(x => x.IsXNote == false)).ToList().ForEach(chord =>
+            {
+                chord.Notes.Where(x => x.IsXNote == false).ToList().ForEach(note =>
+                {
+                    note.Channel = Utility.ChannelX;
+                    note.UpdateEvents();
+                });
+            });
+        }
+
         void BuildMessages5()
         {
-            Messages = null;
-
-            checkForInvalidNotes(midiTrack);
-
-            Messages = GetMessages(CurrentDifficulty);
+            GetMessages(CurrentDifficulty);
 
             NoteGrid = new NoteGrid(owner);
 
-            /*var tempoTrack = GetTempoTrack();
-            Messages.AddRange(GetTempoMessages(tempoTrack));
-            Messages.AddRange(GetTimeSigMessages(tempoTrack));
-
-            NoteGrid = new NoteGrid(owner);
-
-            var events = midiTrack.ChanMessages.GroupByData1Channel(Utility.GetKnownData1ForDifficulty(IsPro, CurrentDifficulty | GuitarDifficulty.All)).ToList();
-
-            Messages.AddRange(events.GetEventPairs(this, new[] { Utility.ExpertSoloData1_G5, Utility.SoloData1 }).ToList().Select(x => new GuitarSolo(this, x.Down, x.Up)));
-
-            Messages.AddRange(events.GetEventPairs(this, Utility.PowerupData1).Select(x => new GuitarPowerup(this, x.Down, x.Up)));
-
-            Messages.AddRange(events.GetEventPairs(this, Utility.GetStringsForDifficulty5(CurrentDifficulty)).Select(x => new GuitarNote(this, x.Down, x.Up)));
-
-            Messages.AddRange(Messages.Notes.GroupByCloseTick().ToList().Select(x => GuitarChord.GetChord(this, x, false)));
-
-            Messages.AddRange(midiTrack.Meta.Where(x => x.IsTextEvent() && x.MetaMessage.Text.GetGuitarTrainerMetaEventType() == GuitarTrainerMetaEventType.Unknown)
-                .ToList().Select(x => GuitarTextEvent.GetTextEvent(this, x)));*/
         }
 
         IEnumerable<GuitarBigRockEnding> GetBigRockEndings(GuitarMessageList list, IEnumerable<IGrouping<Data1ChannelPair, MidiEvent>> events)
         {
             var ret = new List<GuitarBigRockEnding>();
-            var breEvents = events.GetEventPairs(list, Utility.BigRockEndingData1);
+            var data1List = Utility.GetBigRockEndingData1(list.Owner.IsPro);
+
+            var breEvents = events.GetEventPairs(list, data1List).ToList();
 
             if (breEvents != null && breEvents.Any())
             {
-                var breList = breEvents.GroupMidiEventPairByCloseTick(Utility.TickCloseWidth).Select(bre =>
-                    new GuitarBigRockEnding(list, bre));
-
-                foreach (var bre in breList.ToList())
+                var pair = breEvents.GetTickPair();
+                
+                if(breEvents.Count() != data1List.Count())
                 {
-                    if (!bre.IsValid)
+                    list.Remove(breEvents);
+
+                    breEvents = new List<MidiEventPair>();
+                    foreach(var d1 in data1List)
                     {
-                        Remove(bre);
-                    }
-                    else
-                    {
-                        ret.Add(bre);
+                        breEvents.Add(list.Insert(d1, 100, 0, pair));
                     }
                 }
+
+                ret.Add(new GuitarBigRockEnding(list, breEvents));
+                
             }
             return ret;
         }
@@ -549,17 +539,7 @@ namespace ProUpgradeEditor.Common
                 case GuitarMessageType.GuitarBigRockEndingSubMessage:
                 case GuitarMessageType.GuitarBigRockEnding:
                     {
-                        ret = list.BigRockEndings.SingleByDownTick(down.AbsoluteTicks);
-                        if (ret == null)
-                        {
-                            ret = new GuitarBigRockEnding(list, new List<MidiEventPair>(new MidiEventPair(list, down, up).MakeEnumerable()));
-                        }
-                        else
-                        {
-                            ret.CastObject<GuitarBigRockEnding>().AddEvent(
-                                new GuitarBigRockEndingSubMessage(ret.CastObject<GuitarBigRockEnding>(),
-                                    new MidiEventPair(list, down, up)));
-                        }
+                        
                     }
                     break;
                 case GuitarMessageType.GuitarSingleStringTremelo:
@@ -579,10 +559,12 @@ namespace ProUpgradeEditor.Common
         }
 
 
-        public GuitarMessageList GetMessages(GuitarDifficulty difficulty, bool includeDifficultyAll = true)
+        public void GetMessages(GuitarDifficulty difficulty, bool includeDifficultyAll = true)
         {
-            var ret = new GuitarMessageList(owner);
+            checkForInvalidNotes(midiTrack);
 
+            Messages = new GuitarMessageList(owner);
+            var ret = Messages;
             var tempoTrack = GetTempoTrack();
             ret.AddRange(GetTempoMessages(ret, tempoTrack));
             ret.AddRange(GetTimeSigMessages(ret, tempoTrack));
@@ -598,45 +580,60 @@ namespace ProUpgradeEditor.Common
 
                 if (IsPro)
                 {
+
+                    events.GetEventPairs(ret, Utility.AllArpeggioData1).Select(x => new GuitarArpeggio(x)).ForEach(x => x.AddToList());
                     
-                    ret.AddRange(events.GetEventPairs(ret, Utility.AllArpeggioData1).Select(x => new GuitarArpeggio(x)));
-                    ret.AddRange(events.GetEventPairs(ret, Utility.SoloData1).Select(x => new GuitarSolo(x)));
-                    ret.AddRange(events.GetEventPairs(ret, Utility.PowerupData1).Select(x => new GuitarPowerup(x)));
-                    ret.AddRange(events.GetEventPairs(ret, Utility.MultiStringTremeloData1).Select(x => new GuitarMultiStringTremelo(x)));
-                    ret.AddRange(events.GetEventPairs(ret, Utility.SingleStringTremeloData1).Select(x => new GuitarSingleStringTremelo(x)));
-                    ret.AddRange(GetBigRockEndings(ret, events));
-                    ret.AddRange(events.GetEventPairs(ret, Utility.AllSlideData1).Select(x => new GuitarSlide(x)));
-                    ret.AddRange(events.GetEventPairs(ret, Utility.AllHammeronData1).Select(x => new GuitarHammeron(x)));
-                    ret.AddRange(events.GetEventPairs(ret, Utility.AllStrumData1).Select(x => new GuitarChordStrum(x)));
+                    events.GetEventPairs(ret, Utility.SoloData1).Select(x => new GuitarSolo(x)).ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.PowerupData1).Select(x => new GuitarPowerup(x)).ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.MultiStringTremeloData1).Select(x => new GuitarMultiStringTremelo(x)).ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.SingleStringTremeloData1).Select(x => new GuitarSingleStringTremelo(x)).ForEach(x => x.AddToList());
+                    
+                    GetBigRockEndings(ret, events).ForEach(x => x.AddToList());
+
+                    events.GetEventPairs(ret, Utility.AllSlideData1).Select(x => new GuitarSlide(x)).ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.AllHammeronData1).Select(x => new GuitarHammeron(x)).ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.AllStrumData1).Select(x => new GuitarChordStrum(x)).ForEach(x => x.AddToList());
+
                     var notes = events.GetEventPairs(ret, Utility.GetStringsForDifficulty6(difficulty)).Select(x => new GuitarNote(x));
-                    ret.AddRange(notes);
+                    notes.ForEach(x => x.AddToList());
                     if (notes.Any())
                     {
-                        ret.AddRange(notes.GroupByCloseTick().ToList().Select(chordNotes => GuitarChord.GetChord(ret, chordNotes, true)).Where(x => x != null).ToList());
+                        var closeNotes = notes.GroupByCloseTick().ToList();
+                        var chordNotes = closeNotes.Select(n => GuitarChord.GetChord(ret, n, true)).Where(x => x != null).ToList();
+                        chordNotes.ForEach(x => x.AddToList());
                     }
-                    var textEvents = midiTrack.Meta.Where(x => x.IsTextEvent()).Select(x => GuitarTextEvent.GetTextEvent(ret, x));
-                    ret.AddRange(textEvents);
 
-                    ret.AddRange(LoadTrainers(ret, textEvents));
-                    ret.AddRange(events.GetEventPairs(ret, Utility.HandPositionData1).Select(x => new GuitarHandPosition(x)));
+                    var textEvents = midiTrack.Meta.Where(x => x.IsTextEvent()).Select(x => GuitarTextEvent.GetTextEvent(ret, x));
+                    textEvents.ForEach(x => x.AddToList());
+
+                    LoadTrainers(ret, textEvents).ForEach(x=> x.AddToList());
+
+                    events.GetEventPairs(ret, Utility.HandPositionData1).Select(x => new GuitarHandPosition(x)).ForEach(x => x.AddToList());
                 }
                 else
                 {
-                    ret.AddRange(events.GetEventPairs(ret, new[] { Utility.ExpertSoloData1_G5, Utility.SoloData1 }).ToList().Select(x => new GuitarSolo(x)));
-                    ret.AddRange(events.GetEventPairs(ret, Utility.PowerupData1).Select(x => new GuitarPowerup(x)));
+                    events.GetEventPairs(ret, new[] { Utility.ExpertSoloData1_G5, Utility.SoloData1 }).ToList().Select(x => new GuitarSolo(x)).ForEach(x=> x.AddToList());
+                    events.GetEventPairs(ret, Utility.PowerupData1).Select(x => new GuitarPowerup(x)).ForEach(x => x.AddToList());
+                    
                     var notes = events.GetEventPairs(ret, Utility.GetStringsForDifficulty5(difficulty)).Select(x => new GuitarNote(x));
-                    ret.AddRange(notes);
+                    notes.ForEach(x=> x.AddToList());
+
                     if (notes.Any())
                     {
-                        ret.AddRange(notes.GroupByCloseTick().ToList().Select(x => GuitarChord.GetChord(ret, x, false)).Where(x => x != null));
+                        var closeNotes = notes.GroupByCloseTick().ToList();
+                        var chordNotes = closeNotes.Select(x => GuitarChord.GetChord(ret, x, false)).Where(x=> x != null).ToList();
+                        chordNotes.ForEach(x => x.AddToList());
                     }
                     
                     var textEvents = midiTrack.Meta.Where(x => x.IsTextEvent()).ToList().Select(x => GuitarTextEvent.GetTextEvent(ret, x));
-                    ret.AddRange(textEvents);
+                    textEvents.ForEach(x => x.AddToList());
+
+                    GetBigRockEndings(ret, events).ForEach(x => x.AddToList());
                 }
+                CheckForInvalidMessages();
             }
             catch { }
-            return ret;
+            
         }
 
         bool LoadEvents6()
@@ -644,43 +641,9 @@ namespace ProUpgradeEditor.Common
             bool ret = true;
             try
             {
-                Messages = null;
-
-
-                checkForInvalidNotes(midiTrack);
-
-                Messages = GetMessages(CurrentDifficulty);
+                GetMessages(CurrentDifficulty);
                 NoteGrid = new NoteGrid(owner);
 
-                /*
-                var tempoTrack = GetTempoTrack();
-                Messages.AddRange(GetTempoFromTrack(tempoTrack));
-                Messages.AddRange(GetTimeSigMessages(tempoTrack));
-
-                NoteGrid = new NoteGrid(owner);
-
-                var events = midiTrack.ChanMessages.GroupByData1Channel(
-                    Utility.GetKnownData1ForDifficulty(IsPro, CurrentDifficulty | GuitarDifficulty.All));
-
-                Messages.AddRange(events.GetEventPairs(this, Utility.HandPositionData1).Select(x => new GuitarHandPosition(this, x.Down, x.Up)));
-                Messages.AddRange(events.GetEventPairs(this, Utility.AllArpeggioData1).Select(x => new GuitarArpeggio(this, x.Down, x.Up)));
-                Messages.AddRange(events.GetEventPairs(this, Utility.SoloData1).Select(x => new GuitarSolo(this, x.Down, x.Up)));
-                Messages.AddRange(events.GetEventPairs(this, Utility.PowerupData1).Select(x => new GuitarPowerup(this, x.Down, x.Up)));
-                Messages.AddRange(events.GetEventPairs(this, Utility.MultiStringTremeloData1).Select(x => new GuitarMultiStringTremelo(this, x.Down, x.Up)));
-                Messages.AddRange(events.GetEventPairs(this, Utility.SingleStringTremeloData1).Select(x => new GuitarSingleStringTremelo(this, x.Down, x.Up)));
-                Messages.AddRange(GetBigRockEndings(events));
-                Messages.AddRange(events.GetEventPairs(this, Utility.AllSlideData1).Select(x => new GuitarSlide(this, x.Channel == Utility.ChannelSlideReversed, x.Down, x.Up)));
-                Messages.AddRange(events.GetEventPairs(this, Utility.AllHammeronData1).Select(x => new GuitarHammeron(this, x.Down, x.Up)));
-                Messages.AddRange(events.GetEventPairs(this, Utility.AllStrumData1).Select(x => new GuitarChordStrum(this, x.Down, x.Up, x.Channel.GetChordStrumFromChannel().GetModifierType())));
-                var notes = events.GetEventPairs(this, Utility.GetStringsForDifficulty6(CurrentDifficulty)).Select(x => new GuitarNote(this, x.Down, x.Up));
-                Messages.AddRange(notes);
-                Messages.AddRange(notes.GroupByCloseTick().ToList().Select(chordNotes => GuitarChord.GetChord(this, chordNotes, true)).ToList());
-                var textEvents = midiTrack.Meta.Where(x => x.IsTextEvent() && x.MetaMessage.Text.GetGuitarTrainerMetaEventType() == GuitarTrainerMetaEventType.Unknown)
-                    .Select(x => GuitarTextEvent.GetTextEvent(this, x));
-                Messages.AddRange(textEvents);
-
-                Messages.AddRange(LoadTrainers(textEvents));
-                */
                 ret = true;
 
                 this.dirtyItems = DirtyItem.None;
@@ -854,8 +817,10 @@ namespace ProUpgradeEditor.Common
                 list.Remove(textEvents.Where(v => v.Text.GetTrainerEventIndex().IsNull()).ToList());
 
                 list.Trainers.Clear();
+                var removeEvents = new List<GuitarMessage>();
 
                 var groups = textEvents.Where(v => v.IsDeleted == false).ToList().GroupBy(v => v.TrainerType.IsTrainerGuitar());
+
                 foreach (var group in groups)
                 {
                     var indexGroups = group.OrderBy(v => v.Text.GetTrainerEventIndex()).GroupBy(v => v.Text.GetTrainerEventIndex()).ToList();
@@ -882,23 +847,25 @@ namespace ProUpgradeEditor.Common
                             }
                             ret.Add(gt);
 
-
-                            list.Remove(begin.Skip(1));
-                            list.Remove(end.Skip(1));
+                            removeEvents.AddRange(begin.Skip(1));
+                            removeEvents.AddRange(end.Skip(1));
+                            
                             if (norm.Any())
                             {
-                                list.Remove(norm.Skip(1));
+                                removeEvents.AddRange(norm.Skip(1));
                             }
                         }
                         else
                         {
-                            list.Remove(trainer);
+                            removeEvents.AddRange(trainer.ToList());
                         }
                     }
                 }
+                removeEvents.ToList().ForEach(x => x.RemoveEvents());
             }
             catch { }
 
+            
             return ret.Where(v=> v.IsDeleted==false).ToList();
         }
 

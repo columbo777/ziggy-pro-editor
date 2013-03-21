@@ -19,8 +19,8 @@ namespace ProUpgradeEditor.Common
             var ev = track.Insert(Utility.PowerupData1, 100, Utility.ChannelDefault, ticks);
 
             var ret = new GuitarPowerup(track, ev.Down, ev.Up);
-
-            track.Add(ret);
+            ret.IsNew = true;
+            ret.CreateEvents();
 
             return ret;
         }

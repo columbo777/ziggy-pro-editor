@@ -210,15 +210,17 @@ namespace ProUpgradeEditor.UI
                     var o = listBox3.SelectedItem as stringObject;
                     var m = o.Obj as GuitarArpeggio;
                     
-                    foreach (GuitarChord c in gt.Messages.Chords)
+                    foreach (GuitarChord c in gt.Messages.Chords.ToList())
                     {
                         if (c.DownTick < m.UpTick &&
                             c.UpTick > m.DownTick)
                         {
-                            c.Notes.Where(x => x.IsArpeggioNote).ToList().ForEach(x => c.Notes.Remove(x));
+                            c.Notes.Where(x => x.IsArpeggioNote).ToList().ForEach(x => c.RemoveNote(x));
                         }
+                        if (c.Notes.Count() == 0)
+                            c.DeleteAll();
                     }
-                    gt.Remove(m);
+                    m.DeleteAll();
 
                     ReloadTracks();
                 }
@@ -306,7 +308,7 @@ namespace ProUpgradeEditor.UI
                 var obj = (listBox.SelectedItem as stringObject).Obj as GuitarModifier;
                 if (obj != null)
                 {
-                    gt.Remove(obj);
+                    obj.DeleteAll();
 
                     obj.Selected = false;
                 }
@@ -376,14 +378,9 @@ namespace ProUpgradeEditor.UI
                             if (ms.AbsoluteTicks != st ||
                                 me.AbsoluteTicks != ed)
                             {
-
-                                EditorPro.GuitarTrack.Remove(ms);
-                                obj.SetDownEvent(EditorPro.GuitarTrack.Insert(
-                                    st, ms.MidiMessage));
-
-                                EditorPro.GuitarTrack.Remove(me);
-                                obj.SetUpEvent(EditorPro.GuitarTrack.Insert(
-                                    ed, me.MidiMessage));
+                                obj.SetTicks(new TickPair(st, ed));
+                                obj.UpdateEvents();
+                                
                             }
                         }
                     }

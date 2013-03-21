@@ -19,8 +19,8 @@ namespace ProUpgradeEditor.Common
             var ev = track.Insert(Utility.SingleStringTremeloData1, 100, Utility.ChannelDefault, ticks);
 
             var ret = new GuitarSingleStringTremelo(track, ev.Down, ev.Up);
-
-            track.Add(ret);
+            ret.IsNew = true;
+            ret.CreateEvents();
 
             return ret;
         }

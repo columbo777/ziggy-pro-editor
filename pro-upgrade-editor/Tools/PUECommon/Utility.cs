@@ -22,7 +22,7 @@ namespace ProUpgradeEditor.Common
     public static class Utility
     {
         public static int ScollToSelectionOffset = 300;
-        public static uint RockBand3TitleID = 45410914;
+        public static uint RockBand3TitleID = 1161890068;
 
         public static int[] Null6 { get { return new int[] { Int32.MinValue, Int32.MinValue, Int32.MinValue, Int32.MinValue, Int32.MinValue, Int32.MinValue }; } }
 
@@ -39,7 +39,7 @@ namespace ProUpgradeEditor.Common
         public const int SingleStringTremeloData1 = 127;
         public const int MultiStringTremeloData1 = 126;
 
-        public static readonly int[] BigRockEndingData1 = new int[] { 120, 121, 122, 123, 124, 125 };
+        public static int[] BigRockEndingData1 = new int[] { 120, 121, 122, 123, 124, 125 };
 
         public const int PowerupData1 = 116;
         public const int SoloData1 = 115;
@@ -248,6 +248,18 @@ namespace ProUpgradeEditor.Common
             else
             {
                 return -1;
+            }
+        }
+
+        public static IEnumerable<int> GetBigRockEndingData1(bool isPro)
+        {
+            if (isPro)
+            {
+                return BigRockEndingData1.ToList();
+            }
+            else
+            {
+                return BigRockEndingData1.Skip(1).ToList();
             }
         }
 

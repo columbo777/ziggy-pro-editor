@@ -31,8 +31,8 @@ namespace ProUpgradeEditor.Common
             {
                 var ev = track.Insert(d1, 100, strum.GetChannelFromChordStrum(), ticks);
                 ret = new GuitarChordStrum(track, ev.Down, ev.Up, strum.GetModifierType());
-
-                track.Add(ret);
+                ret.IsNew = true;
+                ret.CreateEvents();
             }
             return ret;
         }

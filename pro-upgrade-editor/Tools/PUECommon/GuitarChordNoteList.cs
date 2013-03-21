@@ -85,7 +85,7 @@ namespace ProUpgradeEditor.Common
 
         public void Remove(GuitarNote note)
         {
-            track.Remove(note);
+            
             notes.Remove(note);
             if (!notes.Any())
             {
@@ -96,23 +96,26 @@ namespace ProUpgradeEditor.Common
         public void SetNotes(IEnumerable<GuitarNote> notes)
         {
             Clear();
-            notes.ForEach(x => internalAddNote(x));
+            if (notes != null)
+            {
+                notes.ForEach(x => internalAddNote(x));
+                ticks = notes.GetTickPair();
+            }
         }
         public void Clear()
         {
-            track.Remove(notes);
+            notes.ToList().ForEach(n => Remove(n));
+            
             notes.Clear();
+
+            ticks = TickPair.NullValue;
         }
 
         void internalAddNote(GuitarNote n)
         {
             ticks.Down = n.DownTick;
             ticks.Up = n.UpTick;
-
-            if (notes.Any(x => x.IsXNote != n.IsXNote))
-            {
-                n.Channel = notes.First().Channel;
-            }
+            
             notes.Add(n);
         }
         public GuitarNote this[int noteString]

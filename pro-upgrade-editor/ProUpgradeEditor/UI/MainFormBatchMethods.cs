@@ -388,7 +388,7 @@ namespace ProUpgradeEditor.UI
                 else
                 {
                     genGuitar = true;
-                    genBass = true;
+                    genBass = config.CopyGuitarToBass == false;
                 }
 
 
@@ -438,14 +438,14 @@ namespace ProUpgradeEditor.UI
 
                 if (config.SelectedTrackOnly)
                 {
-                    if (selectedTrackGuitar)
+                    if (selectedTrackGuitar && genGuitar)
                     {
                         if (!guitarDifficulties.IsUnknownOrNone())
                         {
                             GenerateDifficultiesForTrack(EditorG5.GuitarTrack.GetTrack(), EditorPro.GuitarTrack.GetTrack(), guitarDifficulties, config);
                         }
                     }
-                    else if (selectedTrackBass)
+                    else if (selectedTrackBass && genBass)
                     {
                         if (!bassDifficulties.IsUnknownOrNone())
                         {
@@ -559,57 +559,57 @@ namespace ProUpgradeEditor.UI
                     diff == GuitarDifficulty.Medium ? GuitarDifficulty.Hard :
                     GuitarDifficulty.Expert;
 
-                var sourceMessages = EditorPro.GuitarTrack.GetMessages(sourceDifficulty);
+                EditorPro.CurrentDifficulty = sourceDifficulty;
 
-                var mess6 = EditorPro.GuitarTrack.GetMessages(diff);
-                var mess5 = EditorG5.GuitarTrack.GetMessages(diff);
+                var sourceChords = EditorPro.Messages.Chords.ToList();
+                var sourceArpeggio = EditorPro.Messages.Arpeggios.ToList();
 
-                GenDiffNotes(mess5, mess6, sourceMessages, diff, config);
+                EditorPro.CurrentDifficulty = diff;
+                EditorG5.CurrentDifficulty = diff;
 
-                sourceMessages = mess6;
+                EditorPro.Messages.Chords.ToList().ForEach(x=> x.DeleteAll());
+
+                EditorPro.Messages.Arpeggios.Where(x => x.Difficulty == diff).ToList().ForEach(x => x.DeleteAll());
+                
+
+                GenDiffNotes(sourceChords, sourceArpeggio, diff, config);
+
             }
 
         }
 
-        private void GenDiffNotes(GuitarMessageList mess5, GuitarMessageList mess6, GuitarMessageList sourceMess, GuitarDifficulty targetDifficulty, GenDiffConfig config)
+        private void GenDiffNotes(
+            IEnumerable<GuitarChord> sourceChords,
+            IEnumerable<GuitarArpeggio>sourceArpeggio,
+            GuitarDifficulty targetDifficulty, GenDiffConfig config)
         {
 
 
-            mess6.Remove(mess6.Chords.ToList());
-
-            var sourceChords = sourceMess.Chords;
-
-            if (targetDifficulty == GuitarDifficulty.Hard)
-            {
-                mess6.Remove(mess6.Arpeggios.ToList().Where(x=> x.Difficulty == GuitarDifficulty.Hard).ToList());
-            }
-
             var chords = sourceChords.Where(x => x.IsPureArpeggioHelper == false).ToList();
-            CreateChords(mess5, mess6, targetDifficulty, chords);
+            CreateChords(targetDifficulty, chords);
 
             if (targetDifficulty == GuitarDifficulty.Hard)
             {
-                foreach (var arp in sourceMess.Arpeggios.Where(x => mess6.Chords.AnyBetweenTick(x.TickPair)))
+                var owner = EditorPro.Messages;
+                foreach (var arp in sourceArpeggio.Where(x => owner.Chords.AnyBetweenTick(x.TickPair)))
                 {
-                    mess6.Add(GuitarArpeggio.CreateArpeggio(mess6, targetDifficulty, arp.TickPair));
+                    GuitarArpeggio.CreateArpeggio(owner, targetDifficulty, arp.TickPair);
                 }
             }
         }
 
-        private void CreateChords(GuitarMessageList mess5, GuitarMessageList mess6, 
+        private void CreateChords( 
             GuitarDifficulty targetDifficulty, IEnumerable<GuitarChord> sourceChords)
         {
 
             GuitarChord lastChord = null;
 
-            foreach (var sc in mess5.Chords)
+            foreach (var sc in EditorG5.Messages.Chords)
             {
-                var tempo = mess6.Tempos.GetTempo(sc.DownTick);
-
                 if (lastChord != null && sc.StartTime < lastChord.EndTime)
                     continue;
 
-                var c = CreateChordAtDifficulty(mess5, sourceChords, mess6, targetDifficulty, sc);
+                var c = CreateChordAtDifficulty(sourceChords, targetDifficulty, sc);
                 if (c != null)
                 {
                     lastChord = c;
@@ -618,15 +618,15 @@ namespace ProUpgradeEditor.UI
             }
         }
 
-        private GuitarChord CreateChordAtDifficulty(GuitarMessageList mess5, IEnumerable<GuitarChord> sourceChords,
-            GuitarMessageList mess6, GuitarDifficulty targetDifficulty, GuitarChord sc)
+        private GuitarChord CreateChordAtDifficulty(IEnumerable<GuitarChord> sourceChords,
+            GuitarDifficulty targetDifficulty, GuitarChord sc)
         {
             GuitarChord ret = null;
 
             var g6c = sourceChords.GetBetweenTick(sc.TickPair);
             if (!g6c.Any())
             {
-                var last = mess6.Chords.LastOrDefault();
+                var last = EditorPro.Messages.Chords.LastOrDefault();
                 if (last != null)
                 {
                     if (sc.TickPair.Down - Utility.TickCloseWidth > last.UpTick)
@@ -716,7 +716,7 @@ namespace ProUpgradeEditor.UI
                 if (noteCount > 0)
                 {
                     ret = GuitarChord.CreateChord(
-                        mess6,
+                        EditorPro.Messages,
                         targetDifficulty,
                         sc.TickPair,
                         frets, channels, gc.IsSlide, gc.IsSlideReversed, gc.IsHammeron);

@@ -38,9 +38,9 @@ namespace ProUpgradeEditor.Common
             var ret = GetArpeggio(track, difficulty, ticks);
             if (ret != null)
             {
+                ret.IsNew = true;
                 ret.CreateEvents();
 
-                track.Add(ret);
             }
             return ret;
         }

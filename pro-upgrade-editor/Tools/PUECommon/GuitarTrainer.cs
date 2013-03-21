@@ -218,14 +218,14 @@ namespace ProUpgradeEditor.Common
                 Start.SetDownTick(TickPair.Down);
                 Start.Text = StartText;
                 Start.CreateEvents();
-                Owner.Add(Start);
+                
             }
             if (End != null)
             {
                 End.SetDownTick(TickPair.Up);
                 End.Text = EndText;
                 End.CreateEvents();
-                Owner.Add(End);
+               
             }
 
             if (this.Loopable)
@@ -233,9 +233,9 @@ namespace ProUpgradeEditor.Common
                 Norm.SetDownTick(GetNormTick(TickPair));
                 Norm.Text = NormText;
                 Norm.CreateEvents();
-                Owner.Add(Norm);
+                
             }
-
+            AddToList();
         }
 
         public override void UpdateEvents()

@@ -707,6 +707,8 @@ namespace ProUpgradeEditor.Common
             return new GuitarMessage(track, ev, null, GuitarMessageType.Unknown);
         }
 
+
+
         public static bool IsCloseScreenPoint(this int i, int x)
         {
             return (int)Math.Abs(i - x) <= Utility.GridSnapDistance;
@@ -1015,6 +1017,7 @@ namespace ProUpgradeEditor.Common
             }
             else
             {
+                
                 ret.Merge(t5);
             }
             return ret;
@@ -1064,20 +1067,22 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
-        public static Track ConvertToG5(this Track t6, GuitarDifficulty difficulty = GuitarDifficulty.Unknown)
+        public static Track ConvertToG5(this Track t6)
         {
             var ret = new Track(FileType.Guitar5, t6.Name);
 
-            t6.ChanMessages.ForEach(cm =>
+            foreach(var cm in t6.ChanMessages.ToList())
             {
-                cm.ChannelMessage.ConvertToG5(difficulty).IfObjectNotNull(cm5 =>
-                    ret.Insert(cm.AbsoluteTicks, cm5));
-            });
+                var x = cm.ChannelMessage.ConvertToG5();
+                if(x != null)
+                {
+                    ret.Insert(cm.AbsoluteTicks, new ChannelMessage(x.Message));
+                }
+            }
 
-            t6.Meta.Where(meta => meta.IsTextEvent()).ForEach(meta =>
-            {
-                ret.Insert(meta.AbsoluteTicks, meta.Clone());
-            });
+            var metaText = t6.Meta.Where(meta => meta.IsTextEvent()).ToList();
+
+            metaText.ForEach(x=> ret.Insert(x.AbsoluteTicks, x.Clone()));
 
             return ret;
         }
@@ -1252,7 +1257,7 @@ namespace ProUpgradeEditor.Common
                 else if (targetDifficulty.IsHard())
                 {
                 }
-                else if (targetDifficulty.IsUnknown() || targetDifficulty.IsAll())
+                else if (targetDifficulty.IsUnknown() || targetDifficulty.IsExpertAll())
                 {
                     if (cm.Data1.IsSoloExpert(false))
                     {
@@ -1914,7 +1919,15 @@ namespace ProUpgradeEditor.Common
             p1 = p2;
             p2 = v;
         }
-
+        public static TickPair GetTickPair(this IEnumerable<MidiEventPair> list)
+        {
+            var ret = TickPair.NullValue;
+            if (list.Any())
+            {
+                ret = new TickPair(list.Min(x => x.DownTick), list.Max(x => x.UpTick));
+            }
+            return ret;
+        }
         public static IEnumerable<MidiEventPair> GetBetweenTicks(this IEnumerable<MidiEventPair> list, TickPair ticks)
         {
             return list.Where(x =>
@@ -2217,7 +2230,10 @@ namespace ProUpgradeEditor.Common
         {
             return d == nullValue;
         }
-
+        public static bool IsNotNull(this int d)
+        {
+            return d != Int32.MinValue;
+        }
         public static string ToStringEx(this int d, string nullValue = "")
         {
             return d.IsNull() ? nullValue : d.ToString(USCulture);

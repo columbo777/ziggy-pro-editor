@@ -18,7 +18,11 @@ namespace ProUpgradeEditor.Common
     {
         public int Compare(MidiEventPair a, MidiEventPair b)
         {
-            return a.DownTick - b.DownTick;
+            if (a.DownTick < b.DownTick)
+                return -1;
+            if (a.DownTick > b.DownTick)
+                return 1;
+            return 0;
         }
     }
 }

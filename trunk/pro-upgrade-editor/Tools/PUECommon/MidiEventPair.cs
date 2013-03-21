@@ -77,8 +77,8 @@ namespace ProUpgradeEditor.Common
         public MidiEvent Down
         {
             get { return this.down; }
-            set 
-            { 
+            set
+            {
                 this.down = value;
                 if (value != null)
                 {
@@ -103,9 +103,16 @@ namespace ProUpgradeEditor.Common
             get { return !(HasUp || HasDown); }
         }
 
-        public int DownTick { get { return Down != null ? Down.AbsoluteTicks : Int32.MinValue; } }
-        public int UpTick { get { return Up != null ? Up.AbsoluteTicks : Down.AbsoluteTicks; } }
+        public TickPair TickPair
+        {
+            get
+            {
+                return new TickPair(Down == null ? Int32.MinValue : Down.AbsoluteTicks, Up == null ? (Down == null ? Int32.MinValue : Down.AbsoluteTicks + 1) : Up.AbsoluteTicks);
+            }
+        }
 
-        public int TickLength { get { return UpTick - DownTick; } }
+        public int DownTick { get { return TickPair.Down; } }
+        public int UpTick { get { return TickPair.Up; } }
+
     }
 }

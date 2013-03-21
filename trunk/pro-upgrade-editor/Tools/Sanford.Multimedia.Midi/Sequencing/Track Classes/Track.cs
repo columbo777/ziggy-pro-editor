@@ -138,7 +138,7 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                return Iterator().ToList();
+                return Iterator();
             }
 
         }
@@ -148,7 +148,7 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                return Events.Where(x => x.MessageType == MessageType.Meta).ToList();
+                return Events.Where(x => x.MessageType == MessageType.Meta && x.MetaType != MetaType.EndOfTrack).ToList();
             }
         }
 
@@ -177,7 +177,8 @@ namespace Sanford.Multimedia.Midi
             {
                 return Events.Where(x =>
                     x.MessageType == MessageType.Channel &&
-                    (x.ChannelMessage.Command == ChannelCommand.NoteOn || x.ChannelMessage.Command == ChannelCommand.NoteOff)).ToList();
+                    (x.ChannelMessage.Command == ChannelCommand.NoteOn || 
+                    x.ChannelMessage.Command == ChannelCommand.NoteOff)).ToList();
             }
         }
 
@@ -260,16 +261,30 @@ namespace Sanford.Multimedia.Midi
         }
         public void Remove(MidiEvent ev)
         {
+            
             if (ev == null)
                 return;
             if (ev == endOfTrackMidiEvent)
+            {
+                Debug.WriteLine("deleting end event");
                 return;
+            }
+
+            if (ev.Deleted)
+            {
+                Debug.WriteLine("deleting already deleted event");
+                return;
+            }
+
+            if (ev.Owner != this)
+            {
+                Debug.WriteLine("wrong track for event");
+                return;
+            }
 
             this.dirty = true;
 
             ev.Deleted = true;
-
-
 
             if (ev.Previous != null)
             {
@@ -393,193 +408,14 @@ namespace Sanford.Multimedia.Midi
         public FileType FileType
         {
             get;
-            set;
+            internal set;
         }
 
-        public void Merge(IEnumerable<MidiEvent> trk)
-        {
-            var trkCount = trk.Count();
-
-            if (trk == this.Events)
-            {
-                return;
-            }
-            else if (trkCount == 1)
-            {
-                return;
-            }
-
-            count += trkCount;
-
-            MidiEvent a = head;
-
-            MidiEvent current = null;
-
-            var v = trk.ToArray();
-            int i = 0;
-
-            MidiEvent b = v[i];
-            if (a != null && a.AbsoluteTicks <= b.AbsoluteTicks)
-            {
-                current = new MidiEvent(this, a.AbsoluteTicks, a.MidiMessage);
-                a = a.Next;
-            }
-            else
-            {
-                current = new MidiEvent(this, b.AbsoluteTicks, b.MidiMessage);
-                if (i < v.Length - 1)
-                {
-                    b = v[++i];
-                }
-                else
-                    b = null;
-            }
-
-            head = current;
-
-            while (a != null && b != null)
-            {
-                while (a != null && a.AbsoluteTicks <= b.AbsoluteTicks)
-                {
-                    current.Next = new MidiEvent(this, a.AbsoluteTicks, a.MidiMessage);
-                    current.Next.Previous = current;
-                    current = current.Next;
-                    a = a.Next;
-                }
-
-                if (a != null)
-                {
-                    while (b != null && b.AbsoluteTicks <= a.AbsoluteTicks)
-                    {
-                        current.Next = new MidiEvent(this, b.AbsoluteTicks, b.MidiMessage);
-                        current.Next.Previous = current;
-                        current = current.Next;
-                        if (i < v.Length - 1)
-                        {
-                            b = v[++i];
-                        }
-                        else
-                            b = null;
-                    }
-                }
-            }
-
-            while (a != null)
-            {
-                current.Next = new MidiEvent(this, a.AbsoluteTicks, a.MidiMessage);
-                current.Next.Previous = current;
-                current = current.Next;
-                a = a.Next;
-            }
-
-            while (b != null)
-            {
-                current.Next = new MidiEvent(this, b.AbsoluteTicks, b.MidiMessage);
-                current.Next.Previous = current;
-                current = current.Next;
-                if (i < v.Length - 1)
-                {
-                    b = v[++i];
-                }
-                else
-                    b = null;
-            }
-
-            tail = current;
-
-            endOfTrackMidiEvent.SetAbsoluteTicks(Length);
-            endOfTrackMidiEvent.Previous = tail;
-
-            safeTrackName();
-
-        }
-
-        void safeTrackName()
-        {
-            var tn = Meta.Where(x => x.MetaMessage.MetaType == MetaType.TrackName).ToArray();
-            if (tn.Length > 1)
-            {
-                for (int x = 1; x < tn.Length; x++)
-                {
-                    Remove(tn[x]);
-                }
-            }
-        }
         public void Merge(Track trk)
         {
-            if (trk == this)
-            {
-                return;
-            }
-            else if (trk.Count == 1)
-            {
-                return;
-            }
-
-            count += trk.Count - 1;
-
-            MidiEvent a = head;
-            MidiEvent b = trk.head;
-            MidiEvent current = null;
-
-
-            if (a != null && a.AbsoluteTicks <= b.AbsoluteTicks)
-            {
-                current = new MidiEvent(this, a.AbsoluteTicks, a.MidiMessage);
-                a = a.Next;
-            }
-            else
-            {
-                current = new MidiEvent(this, b.AbsoluteTicks, b.MidiMessage);
-                b = b.Next;
-            }
-
-            head = current;
-
-            while (a != null && b != null)
-            {
-                while (a != null && a.AbsoluteTicks <= b.AbsoluteTicks)
-                {
-                    current.Next = new MidiEvent(this, a.AbsoluteTicks, a.MidiMessage);
-                    current.Next.Previous = current;
-                    current = current.Next;
-                    a = a.Next;
-                }
-
-                if (a != null)
-                {
-                    while (b != null && b.AbsoluteTicks <= a.AbsoluteTicks)
-                    {
-                        current.Next = new MidiEvent(this, b.AbsoluteTicks, b.MidiMessage);
-                        current.Next.Previous = current;
-                        current = current.Next;
-                        b = b.Next;
-                    }
-                }
-            }
-
-            while (a != null)
-            {
-                current.Next = new MidiEvent(this, a.AbsoluteTicks, a.MidiMessage);
-                current.Next.Previous = current;
-                current = current.Next;
-                a = a.Next;
-            }
-
-            while (b != null)
-            {
-                current.Next = new MidiEvent(this, b.AbsoluteTicks, b.MidiMessage);
-                current.Next.Previous = current;
-                current = current.Next;
-                b = b.Next;
-            }
-
-            tail = current;
-
-            endOfTrackMidiEvent.SetAbsoluteTicks(Length);
-            endOfTrackMidiEvent.Previous = tail;
-
-            safeTrackName();
+            trk.ChanMessages.ToList().ForEach(x => this.Insert(x.AbsoluteTicks, x.Clone()));
+            trk.Meta.Where(x=> x.MetaType != MetaType.TrackName && x.MetaType != MetaType.EndOfTrack).ToList().ForEach(x => this.Insert(x.AbsoluteTicks, x.Clone()));
+            
         }
         /// <summary>
         /// Gets or sets the end of track meta message position offset.

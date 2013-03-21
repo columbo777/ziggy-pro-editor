@@ -41,8 +41,8 @@ namespace ProUpgradeEditor.Common
                         ticks);
 
                     ret = new GuitarSlide(list, reversed, ev.Down, ev.Up);
-
-                    list.Add(ret);
+                    ret.IsNew = true;
+                    ret.CreateEvents();
                 }
             }
             return ret;

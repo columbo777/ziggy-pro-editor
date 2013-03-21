@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sanford.Multimedia.Midi;
+using System.Diagnostics;
 
 
 namespace ProUpgradeEditor.Common
@@ -114,31 +115,33 @@ namespace ProUpgradeEditor.Common
         {
             var ret = new List<GuitarMessage>();
 
-            ret.AddRange(list.Where(x => x.IsMetaEvent()).ToList().Select(x => ImportMessage(x)).Where(x => x != null));
-            ret.AddRange(list.Where(x => x.IsChannelEvent() && !x.IsChordSubItem() && !x.IsGuitarChord()).ToList().Select(x => ImportMessage(x)).Where(x => x != null));
-            ret.AddRange(list.Where(x => x.IsChannelEvent() && x.IsChordSubItem()).ToList().Select(x => ImportMessage(x)).Where(x => x != null));
-            ret.AddRange(addContainerChords(ret));
-
-            return ret;
-        }
+            var meta = list.Where(x => x.IsMetaEvent()).ToList();
+            var chords= list.Where(x => x.IsGuitarChord()).ToList();
+            var nonChords = list.Where(x => x.IsChannelEvent() && !x.IsChordSubItem() && !x.IsGuitarChord()).ToList();
+            var chordSub = list.Where(x => x.IsChordSubItem()).ToList();
 
 
-        IEnumerable<GuitarMessage> addContainerChords(IEnumerable<GuitarMessage> list)
-        {
-            var ret = new List<GuitarMessage>();
-            foreach (var noteset in list.Where(x => x is GuitarNote).GroupByCloseTick().ToList())
+            ret.AddRange(meta.Select(x => ImportMessage(x)).Where(x => x != null));
+            ret.AddRange(nonChords.Select(x => ImportMessage(x)).Where(x => x != null));
+            ret.AddRange(chordSub.Select(x => ImportMessage(x)).Where(x => x != null));
+            
+
+            foreach (var noteset in ret.Where(x => x is GuitarNote).GroupByCloseTick().ToList())
             {
                 var chord = GuitarChord.GetChord(this, noteset.Cast<GuitarNote>().Where(x => x != null), true);
                 if (chord != null)
                 {
-                    ret.Add(chord);
+                    chord.IsNew = true;
+                    chord.CreateEvents();
 
-                    GetMessageListForType(GuitarMessageType.GuitarChord).Add(chord);
+                    ret.Add(chord);
                 }
             }
 
             return ret;
         }
+
+
 
         public GuitarMessage ImportMessage(GuitarMessage msg)
         {
@@ -154,33 +157,8 @@ namespace ProUpgradeEditor.Common
                 var newMessage = owner.GuitarTrack.CreateMessageByType(owner.Messages, msg.MessageType, downEvent, upEvent);
                 if (newMessage != null)
                 {
-                    GetMessageListForType(msg.MessageType).Add(newMessage);
-                }
-                return newMessage;
-            }
-            return null;
-        }
-
-        public GuitarMessage ImportEvent(GuitarMessageType type, MidiEvent down, MidiEvent up = null)
-        {
-            var cd = convertEvent(down);
-            if (cd != null)
-            {
-                var downEvent = owner.GuitarTrack.Insert(down.AbsoluteTicks, cd);
-                MidiEvent upEvent = null;
-                if (up != null)
-                {
-                    var ue = convertEvent(up);
-                    if (ue != null)
-                    {
-                        upEvent = owner.GuitarTrack.Insert(up.AbsoluteTicks, ue);
-                    }
-                }
-
-                var newMessage = owner.GuitarTrack.CreateMessageByType(owner.Messages, type, downEvent, upEvent);
-                if (newMessage != null)
-                {
-                    GetMessageListForType(type).Add(newMessage);
+                    newMessage.IsNew = true;
+                    newMessage.CreateEvents();
                 }
                 return newMessage;
             }
@@ -559,7 +537,14 @@ namespace ProUpgradeEditor.Common
                 var list = GetMessageListForType(mess.MessageType);
                 if (list != null)
                 {
-                    list.Add(mess);
+                    if (!list.List.Contains(mess))
+                    {
+                        list.Add(mess);
+                    }
+                    else
+                    {
+                        Debug.WriteLine("re-adding to list");
+                    }
                     mess.IsDeleted = false;
                 }
             }
@@ -593,15 +578,18 @@ namespace ProUpgradeEditor.Common
         {
             owner.GuitarTrack.Remove(mess);
         }
+        public void Remove(IEnumerable<MidiEventPair> mess)
+        {
+            owner.GuitarTrack.Remove(mess);
+        }
         internal void internalRemove<T>(T mess) where T : GuitarMessage
         {
             if (mess != null)
             {
-                mess.RemoveEvents();
-
                 GetMessageListForType(mess.MessageType).Remove(mess);
             }
         }
+
 
     }
 }

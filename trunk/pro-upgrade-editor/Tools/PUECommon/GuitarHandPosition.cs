@@ -27,9 +27,8 @@ namespace ProUpgradeEditor.Common
         public static GuitarHandPosition CreateEvent(GuitarMessageList track, TickPair ticks, int noteFret)
         {
             var ret = new GuitarHandPosition(track, ticks, noteFret);
+            ret.IsNew = true;
             ret.CreateEvents();
-            track.Add(ret);
-            
             
             return ret;
         }

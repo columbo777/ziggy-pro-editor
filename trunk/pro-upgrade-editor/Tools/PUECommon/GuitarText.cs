@@ -40,7 +40,9 @@ namespace ProUpgradeEditor.Common
             var ret = new GuitarTextEvent(track, absoluteTicks, text,
                 track.Insert(absoluteTicks, MetaTextBuilder.Create(MetaType.Text, text)),
                 text.GetGuitarTrainerMetaEventType());
-            track.Add(ret);
+            ret.IsNew = true;
+            ret.CreateEvents();
+
             return ret;
         }
 
@@ -66,6 +68,8 @@ namespace ProUpgradeEditor.Common
         public override void CreateEvents()
         {
             SetDownEvent(Owner.Insert(DownTick, MetaTextBuilder.Create(MetaType.Text, Text)));
+
+            AddToList();
         }
 
 

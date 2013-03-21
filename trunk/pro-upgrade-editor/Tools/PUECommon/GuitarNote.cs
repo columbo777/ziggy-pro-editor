@@ -98,8 +98,8 @@ namespace ProUpgradeEditor.Common
 
             ret.SetDownEvent(ev.Down);
             ret.SetUpEvent(ev.Up);
-
-            list.Add(ret);
+            ret.IsNew = true;
+            ret.CreateEvents();
 
             return ret;
         }

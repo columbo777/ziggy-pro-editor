@@ -234,47 +234,47 @@ namespace EditorResources.Components
 
         private void panelTracks_DragDrop(object sender, DragEventArgs e)
         {
-            var o = e.GetDropObject<PEMidiTrack>();
-            o.IfObjectNotNull(xx =>
+            var droppedPETrack = e.GetDropObject<PEMidiTrack>();
+            droppedPETrack.IfObjectNotNull(xx =>
             {
-                if (o != sender)
+                if (droppedPETrack != sender)
                 {
                     DoRequestBackup();
 
                     Track newTrack = null;
                     if (Sequence == null)
                     {
-                        var targetType = o.Track.Sequence.FileType == FileType.Guitar5 ? FileType.Pro : FileType.Guitar5;
+                        var targetType = this.IsPro ? FileType.Pro : FileType.Guitar5;
 
-                        var seq = new Sequence(targetType, o.Track.Sequence.Division);
+                        var seq = new Sequence(targetType, droppedPETrack.Track.Sequence.Division);
                         this.sequence = seq;
-                        if (!o.Track.IsTempo())
+                        if (!droppedPETrack.Track.IsTempo())
                         {
-                            var tempo = o.Track.Sequence.Tracks.Where(x => x.IsTempo());
+                            var tempo = droppedPETrack.Track.Sequence.Tracks.Where(x => x.IsTempo());
                             if (tempo.Any())
                             {
                                 seq.AddTempo(tempo.First().ConvertToPro());
                             }
                         }
-                        newTrack = o.Track.Clone(seq.FileType);
+                        newTrack = droppedPETrack.Track.Clone(seq.FileType);
                         seq.Add(newTrack);
                     }
                     else
                     {
 
-                        if (this.Sequence == o.Track.Sequence)
+                        if (this.Sequence == droppedPETrack.Track.Sequence)
                         {
-                            this.Sequence.MoveTrack(o.Track.GetTrackIndex(), GetInsertAt());
+                            this.Sequence.MoveTrack(droppedPETrack.Track.GetTrackIndex(), GetInsertAt());
                         }
                         else
                         {
-                            newTrack = o.Track.Clone(Sequence.FileType);
+                            newTrack = droppedPETrack.Track.Clone(Sequence.FileType);
 
                             sequence.Insert(GetInsertAt(), newTrack);
 
                             if (!sequence.Tracks.Any(x => x.IsTempo()))
                             {
-                                var tempo = o.Track.Sequence.Tracks.Where(x => x.IsTempo());
+                                var tempo = droppedPETrack.Track.Sequence.Tracks.Where(x => x.IsTempo());
                                 if (tempo.Any())
                                 {
                                     sequence.AddTempo(tempo.First().ConvertToPro());
@@ -365,6 +365,7 @@ namespace EditorResources.Components
                     GetChanMessagesByDifficulty(difficulty).ForEach(x => sender.Track.Insert(x.AbsoluteTicks, x.ChannelMessage));
 
                 SetSelectedItem(sender.Track, o.Difficulty);
+                
                 TrackClicked.IfObjectNotNull(x => x(this, sender.Track.Sequence, sender.Track, difficulty));
             });
         }

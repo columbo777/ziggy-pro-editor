@@ -114,7 +114,7 @@ namespace ProUpgradeEditor.Common
             }
 
         }
-        
+
         public MidiEventProps(GuitarMessageList owner = null)
         {
             resetProps(owner);
@@ -240,44 +240,142 @@ namespace ProUpgradeEditor.Common
 
         public virtual void UpdateEvents()
         {
-            if (Owner != null)
+            if (!IsBasicChannelEvent)
             {
-                RemoveEvents();
-
-                CreateEvents();
-
-                IsUpdated = false;
-
+                Debug.WriteLine("Invalid updateevents");
             }
+
+            RemoveEvents();
+            CreateEvents();
+            IsUpdated = false;
+        }
+
+
+        public virtual void RemoveEvents()
+        {
+            if (!IsBasicChannelEvent)
+            {
+                Debug.WriteLine("Invalid removeevents");
+            }
+
+            
+            if (UpEvent != null && Owner != null)
+            {
+                Owner.Remove(UpEvent);
+
+                SetUpEvent(null);
+            }
+            if (DownEvent != null && Owner != null)
+            {
+                Owner.Remove(DownEvent);
+
+                SetDownEvent(null);
+            }
+            
+        }
+
+        public virtual int DefaultData1
+        {
+            get
+            {
+                int ret = Int32.MinValue;
+                switch (messageType)
+                {
+                    case GuitarMessageType.GuitarHandPosition: { if (Difficulty.IsExpert()) { ret = Utility.HandPositionData1; } }
+                        break;
+                    case GuitarMessageType.GuitarPowerup: { if (Difficulty.IsExpert()) ret = Utility.PowerupData1; }
+                        break;
+                    case GuitarMessageType.GuitarSolo: { if (Difficulty.IsExpert()) ret = Utility.SoloData1; }
+                        break;
+                    case GuitarMessageType.GuitarArpeggio: {  ret = Utility.GetArpeggioData1(Difficulty); }
+                        break;
+                    case GuitarMessageType.GuitarSingleStringTremelo: { if (Difficulty.IsExpert()) ret = Utility.SingleStringTremeloData1; }
+                        break;
+                    case GuitarMessageType.GuitarMultiStringTremelo: { if (Difficulty.IsExpert()) ret = Utility.MultiStringTremeloData1; }
+                        break;
+                    case GuitarMessageType.GuitarSlide: { ret = Utility.GetSlideData1(this.Difficulty); }
+                        break;
+                    case GuitarMessageType.GuitarHammeron: { ret = Utility.GetHammeronData1(this.Difficulty); }
+                        break;
+                }
+                if (ret == -1)
+                    ret = Int32.MinValue;
+                return ret;
+            }
+        }
+
+        public virtual bool IsBasicChannelEvent
+        {
+            get
+            {
+                var ret = true;
+                switch (messageType)
+                {
+                    case GuitarMessageType.GuitarTempo:
+                    case GuitarMessageType.GuitarTimeSignature:
+                    case GuitarMessageType.GuitarBigRockEnding:
+                    case GuitarMessageType.GuitarBigRockEndingSubMessage:
+                    case GuitarMessageType.GuitarTextEvent:
+                    case GuitarMessageType.GuitarTrainer:
+                    case GuitarMessageType.GuitarChord: 
+                    case GuitarMessageType.GuitarChordStrum:
+                    
+                        ret = false;
+                        break;
+                }
+                return ret;
+            }
+        }
+
+        public virtual void AddToList()
+        {
+            IsDeleted = false;
+            Owner.Add(this);
+            IsNew = false;
+        }
+
+        public virtual void RemoveFromList()
+        {
+            Owner.Remove(this);
+            IsDeleted = true;
+        }
+
+        public virtual void DeleteAll()
+        {
+            RemoveEvents();
+            RemoveFromList();
         }
 
         public virtual void CreateEvents()
         {
-            if (!props.Data1.IsNull() &&
-                !props.Data2.IsNull() &&
-                !props.Channel.IsNull() &&
-                 props.TickPair.IsValid)
+            
+            if (!HasEvents)
             {
-
-                if (Owner != null)
+                if (!IsBasicChannelEvent)
                 {
-                    var list = Owner.GetMessageListForType(messageType);
-
-                    if (list != null)
-                    {
-                        var between = list.List.GetBetweenTick(props.TickPair);
-                        if (between.Any())
-                        {
-                            Owner.Remove(between.ToList());
-                        }
-                    }
+                    Debug.WriteLine("Invalid createevents - " + this.ToString());
                 }
-              
-                props.SetUpdatedEventPair(
-                    Owner.Insert(props.Data1, props.Data2, props.Channel, props.TickPair));
 
-                IsDeleted = false;
+                if (Data2.IsNull())
+                {
+                    Data2 = 100;
+                }
+                if (Data1.IsNull())
+                {
+                    Data1 = DefaultData1;
+                }
 
+                if (Data1.IsNull() || TickPair.IsValid == false || Owner == null)
+                {
+                    Debug.WriteLine("invalid properties - " + this.ToString());
+                    return;
+                }
+
+                props.SetUpdatedEventPair(Owner.Insert(props.Data1, props.Data2, props.Channel, props.TickPair));
+            }
+            if (IsNew)
+            {
+                AddToList();
             }
         }
 
@@ -377,36 +475,6 @@ namespace ProUpgradeEditor.Common
             props.SetDownEvent(ev);
         }
 
-        public virtual void RemoveEvents()
-        {
-            RemoveDownEvent();
-            RemoveUpEvent();
-        }
-
-        public virtual void RemoveUpEvent()
-        {
-            if (UpEvent != null && UpEvent.Deleted == false)
-            {
-                if (Owner != null)
-                {
-                    Owner.Remove(UpEvent);
-                }
-                SetUpEvent(null);
-
-            }
-        }
-
-        public virtual void RemoveDownEvent()
-        {
-            if (DownEvent != null && DownEvent.Deleted == false)
-            {
-                if (Owner != null)
-                {
-                    Owner.Remove(DownEvent);
-                }
-                SetDownEvent(null);
-            }
-        }
 
         public virtual void SnapEvents()
         {
@@ -631,48 +699,43 @@ namespace ProUpgradeEditor.Common
 
         private GuitarMessageType GetMessageType()
         {
-            if (messageType == GuitarMessageType.Unknown)
+            var ret = messageType;
+            if (ret == GuitarMessageType.Unknown)
             {
                 if (this is GuitarHandPosition)
-                    return GuitarMessageType.GuitarHandPosition;
+                    ret = GuitarMessageType.GuitarHandPosition;
                 else if (this is GuitarTextEvent)
-                    return GuitarMessageType.GuitarTextEvent;
+                    ret = GuitarMessageType.GuitarTextEvent;
                 else if (this is GuitarTrainer)
-                    return GuitarMessageType.GuitarTrainer;
+                    ret = GuitarMessageType.GuitarTrainer;
                 else if (this is GuitarChord)
-                    return GuitarMessageType.GuitarChord;
+                    ret = GuitarMessageType.GuitarChord;
                 else if (this is GuitarNote)
-                    return GuitarMessageType.GuitarNote;
+                    ret = GuitarMessageType.GuitarNote;
                 else if (this is GuitarPowerup)
-                    return GuitarMessageType.GuitarPowerup;
+                    ret = GuitarMessageType.GuitarPowerup;
                 else if (this is GuitarSolo)
-                    return GuitarMessageType.GuitarSolo;
+                    ret = GuitarMessageType.GuitarSolo;
                 else if (this is GuitarTempo)
-                    return GuitarMessageType.GuitarTempo;
+                    ret = GuitarMessageType.GuitarTempo;
                 else if (this is GuitarTimeSignature)
-                    return GuitarMessageType.GuitarTimeSignature;
+                    ret = GuitarMessageType.GuitarTimeSignature;
                 else if (this is GuitarArpeggio)
-                    return GuitarMessageType.GuitarArpeggio;
+                    ret = GuitarMessageType.GuitarArpeggio;
                 else if (this is GuitarBigRockEnding)
-                    return GuitarMessageType.GuitarBigRockEnding;
-
+                    ret = GuitarMessageType.GuitarBigRockEnding;
+                else if (this is GuitarBigRockEndingSubMessage)
+                    ret = GuitarMessageType.GuitarBigRockEndingSubMessage;
                 else if (this is GuitarSingleStringTremelo)
-                    return GuitarMessageType.GuitarSingleStringTremelo;
+                    ret = GuitarMessageType.GuitarSingleStringTremelo;
                 else if (this is GuitarMultiStringTremelo)
-                    return GuitarMessageType.GuitarMultiStringTremelo;
+                    ret = GuitarMessageType.GuitarMultiStringTremelo;
                 else if (this is GuitarSlide)
-                    return GuitarMessageType.GuitarSlide;
+                    ret = GuitarMessageType.GuitarSlide;
                 else if (this is GuitarHammeron)
-                    return GuitarMessageType.GuitarHammeron;
-                else
-                {
-                    return messageType;
-                }
+                    ret = GuitarMessageType.GuitarHammeron;
             }
-            else
-            {
-                return messageType;
-            }
+            return ret;
         }
 
     }

@@ -27,12 +27,12 @@ namespace ProUpgradeEditor.Common
             var d1 = Utility.GetHammeronData1(difficulty);
             if (d1 != -1)
             {
-                var ev = track.Insert(d1, 100, Utility.ChannelDefault,
-                    ticks);
+                var ev = track.Insert(d1, 100, Utility.ChannelDefault, ticks);
 
                 ret = new GuitarHammeron(new MidiEventPair(track, ev.Down, ev.Up));
+                ret.IsNew = true;
                 ret.CreateEvents();
-                track.Add(ret);
+                
             }
             
             return ret;

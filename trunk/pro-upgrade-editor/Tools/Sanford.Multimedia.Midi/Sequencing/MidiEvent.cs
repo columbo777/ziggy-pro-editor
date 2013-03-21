@@ -1,9 +1,10 @@
 using System;
 using System.Text;
+using System.Diagnostics;
 
 namespace Sanford.Multimedia.Midi
 {
-    public class MidiEvent : IComparable<MidiEvent>
+    public class MidiEvent 
     {
         private Track owner = null;
 
@@ -195,9 +196,16 @@ namespace Sanford.Multimedia.Midi
                 if (absoluteTicks != value)
                 {
                     absoluteTicks = value;
-                    if (this.message != null && owner != null)
+                    if (!deleted)
                     {
-                        owner.Move(this, absoluteTicks);
+                        if (this.message != null && owner != null)
+                        {
+                            owner.Move(this, absoluteTicks);
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine("moving deleted event");
                     }
                 }
             }
@@ -275,77 +283,6 @@ namespace Sanford.Multimedia.Midi
                 return this.MidiMessage as MetaMessage;
             }
         }
-        public int CompareTo(MidiEvent b)
-        {
-            if (AbsoluteTicks < b.AbsoluteTicks)
-            {
-                return -1;
-            }
-            else if (AbsoluteTicks > b.AbsoluteTicks)
-            {
-                return 1;
-            }
-            else
-            {
-                if (this.MessageType == MessageType.Meta &&
-                    b.MessageType == MessageType.Meta)
-                {
-                    var cm = this.MetaMessage;
-                    var bMessage = b.MetaMessage;
-
-                    if (cm.MetaType == MetaType.TrackName)
-                        return -1;
-                    else if (cm.MetaType == MetaType.EndOfTrack)
-                        return 1;
-                    else if (bMessage.MetaType == MetaType.EndOfTrack)
-                        return -1;
-                    else if (bMessage.MetaType == MetaType.TrackName)
-                        return 1;
-                    else
-                    {
-                        if (this.absoluteTicks < b.absoluteTicks)
-                            return -1;
-                        else if (this.absoluteTicks > b.absoluteTicks)
-                            return 1;
-                        else
-                            return 0;
-                    }
-                }
-                else if (this.MessageType == MessageType.Channel &&
-                        b.MessageType == MessageType.Channel)
-                {
-                    var cm = this.ChannelMessage;
-                    var bMessage = b.ChannelMessage;
-
-                    var isOffA = cm.Command == ChannelCommand.NoteOff;
-                    var isOffB = bMessage.Command == ChannelCommand.NoteOff;
-
-                    if (isOffA && !isOffB)
-                    {
-                        return -1;
-                    }
-                    else if (!isOffA && isOffB)
-                    {
-                        return 1;
-                    }
-                    else
-                    {
-                        if (isOffA == isOffB)
-                        {
-                            if (cm.Data1 < bMessage.Data1)
-                                return -1;
-                            if (cm.Data1 > bMessage.Data1)
-                                return 1;
-                            return 0;
-                        }
-                        return 0;
-                    }
-                }
-                else
-                {
-                    return 0;
-                }
-            }
-        }
+        
     }
 }

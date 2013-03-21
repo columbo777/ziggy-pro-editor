@@ -1598,13 +1598,16 @@ namespace ProUpgradeEditor.UI
                         if (checkBoxInitSelectedDifficultyOnly.Checked)
                         {
                             var diff = EditorPro.CurrentDifficulty;
+
                             if (diff == GuitarDifficulty.Expert)
                                 diff |= GuitarDifficulty.All;
 
-                            EditorPro.Messages.Where(x => diff.HasFlag(x.Difficulty)).ToList().ForEach(x => EditorPro.RemoveMessage(x));
+                            EditorPro.Messages.Where(x => diff.HasFlag(x.Difficulty)).ToList().ForEach(x => x.DeleteAll());
 
-                            EditorPro.Messages.ImportMessageRange(
-                                EditorG5.Messages.Where(x => diff.HasFlag(x.Difficulty)).ToList());
+                            
+                            var msgs = EditorG5.Messages.Where(x => diff.HasFlag(x.Difficulty)).ToList();
+
+                            EditorPro.Messages.ImportMessageRange(msgs);
                         }
                         else
                         {
@@ -2412,7 +2415,7 @@ namespace ProUpgradeEditor.UI
         {
             var path = textBoxSongLibProMidiFileName.Text;
 
-            if (string.IsNullOrEmpty(path))
+            if (path.IsNotEmpty())
             {
                 var name5 = textBoxSongLibG5MidiFileName.Text.Trim();
                 if (name5.IsNotEmpty())
@@ -2425,7 +2428,7 @@ namespace ProUpgradeEditor.UI
 
             var s = ShowOpenFileDlg("Select pro midi file",
                 DefaultMidiFileLocationPro, path);
-            if (!string.IsNullOrEmpty(s))
+            if (s.IsNotEmpty())
             {
                 textBoxSongLibProMidiFileName.Text = s;
                 textBoxSongLibProMidiFileName.ScrollToEnd();
@@ -2487,35 +2490,39 @@ namespace ProUpgradeEditor.UI
 
         private void button71_Click(object sender, EventArgs e)
         {
-            var fileName = textBoxSongLibConFile.Text;
-            var folder = DefaultConFileLocation;
-
-            if (fileName.IsEmpty())
+            try
             {
-                if (SelectedSong != null)
+                var fileName = textBoxSongLibConFile.Text;
+                var folder = DefaultConFileLocation;
+
+                if (fileName.IsEmpty())
                 {
-                    var fn = (SelectedSong.G6FileName.GetIfEmpty(SelectedSong.G5FileName) ?? "").GetFileNameWithoutExtension();
-                    if (fn.EndsWithEx("_pro"))
-                        fn = fn.Replace("_pro", "");
-                    fileName = fn + Utility.DefaultCONFileExtension;
+                    if (SelectedSong != null)
+                    {
+                        var fn = (SelectedSong.G6FileName.GetIfEmpty(SelectedSong.G5FileName) ?? "").GetFileNameWithoutExtension();
+                        if (fn.EndsWithEx("_pro"))
+                            fn = fn.Replace("_pro", "");
+                        fileName = fn + Utility.DefaultCONFileExtension;
+                    }
                 }
-            }
-            else if (fileName.FileExists())
-            {
-                fileName = fileName.GetFileName();
-                folder = fileName.GetFolderName();
-            }
+                else if (fileName.FileExists())
+                {
+                    fileName = fileName.GetFileName();
+                    folder = fileName.GetFolderName();
+                }
 
-            ShowSaveFileDlg("Select pro CON file",
-                folder,
-                fileName).IfNotEmpty(newFileName =>
-            {
-                textBoxSongLibConFile.Text = newFileName;
-                textBoxSongLibConFile.ScrollToEnd();
+                ShowSaveFileDlg("Select pro CON file",
+                    folder,
+                    fileName).IfNotEmpty(newFileName =>
+                {
+                    textBoxSongLibConFile.Text = newFileName;
+                    textBoxSongLibConFile.ScrollToEnd();
 
-                UpdateSongCacheItem(SelectedSong);
-                SaveProCONFile(SelectedSong, false, false);
-            });
+                    UpdateSongCacheItem(SelectedSong);
+                    SaveProCONFile(SelectedSong, false, false);
+                });
+            }
+            catch { }
         }
 
         private void listBoxSongLibrary_DoubleClick(object sender, EventArgs e)
@@ -7676,8 +7683,7 @@ namespace ProUpgradeEditor.UI
             {
                 EditorPro.BackupSequence();
                 SetTrainerToScreen(null);
-
-                ProGuitarTrack.Remove(gt);
+                gt.DeleteAll();
             }
 
             RefreshTrainers();
@@ -7715,8 +7721,7 @@ namespace ProUpgradeEditor.UI
             {
                 EditorPro.BackupSequence();
                 SetTrainerToScreen(null);
-
-                ProGuitarTrack.Remove(gt);
+                gt.DeleteAll();
             }
             RefreshTrainers();
         }
@@ -7871,7 +7876,7 @@ namespace ProUpgradeEditor.UI
                     if (EditorPro.HasTextEventSelection)
                     {
                         EditorPro.BackupSequence();
-                        ProGuitarTrack.Remove(EditorPro.SelectedTextEvent);
+                        EditorPro.SelectedTextEvent.DeleteAll();
                     }
                 }
                 catch { }
@@ -9026,7 +9031,10 @@ namespace ProUpgradeEditor.UI
             if (!ProGuitarTrack.Messages.Chords.Any())
                 return;
 
-            var chords = root.AddNode("chords", false);
+            var chords = root.GetNode("chords");
+            if (chords == null)
+                chords = root.AddNode("chords");
+            
             foreach (var ev in ProGuitarTrack.Messages.Chords)
             {
                 var chord = chords.AddNode("chord");
@@ -9094,7 +9102,10 @@ namespace ProUpgradeEditor.UI
         {
             if (EditorG5.Messages.Chords.Any())
             {
-                var chords = root.AddNode("chords", false);
+                var chords = root.GetNode("chords");
+                if (chords == null)
+                    chords = root.AddNode("chords");
+            
                 foreach (var ev in EditorG5.Messages.Chords)
                 {
                     var chord = chords.AddNode("chord");
@@ -9629,19 +9640,23 @@ namespace ProUpgradeEditor.UI
 
         private void tabPackageViewer_FileDrop(object sender, DragEventArgs e)
         {
-            var fileNames = e.Data.GetData("FileDrop") as string[];
-            if (fileNames != null && fileNames.Length > 0)
+            try
             {
-                foreach (var fileName in fileNames)
+                var fileNames = e.Data.GetData("FileDrop") as string[];
+                if (fileNames != null && fileNames.Length > 0)
                 {
-                    var pk = Package.Load(fileName);
-                    if (pk != null)
+                    foreach (var fileName in fileNames)
                     {
-                        LoadPackageIntoTree(pk, fileName, true);
-                        break;
+                        var pk = Package.Load(fileName);
+                        if (pk != null)
+                        {
+                            LoadPackageIntoTree(pk, fileName, true);
+                            break;
+                        }
                     }
                 }
             }
+            catch { }
         }
 
         private void tabPage8_DragEnter(object sender, DragEventArgs e)

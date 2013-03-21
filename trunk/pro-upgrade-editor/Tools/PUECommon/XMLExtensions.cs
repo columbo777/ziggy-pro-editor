@@ -7,7 +7,7 @@ using System.Web;
 
 namespace ProUpgradeEditor.Common
 {
-    public static partial class ACTionXMLExtension
+    public static class XmlExtension
     {
         public static XmlDocument ToXmlDocument(this string str, string rootName = "")
         {
@@ -16,7 +16,8 @@ namespace ProUpgradeEditor.Common
                 if (!string.IsNullOrEmpty(rootName))
                 {
                     var doc = new XmlDocument();
-                    var root = doc.FirstChild.AddNode(rootName, str);
+                    var root = XMLUtil.AddNode(doc.DocumentElement, rootName);
+                    root.SetValue(str);
                     return doc;
                 }
                 else
@@ -50,29 +51,17 @@ namespace ProUpgradeEditor.Common
             return XMLUtil.AddAttribute(node, name, value);
         }
 
-        public static XmlNode GetNode(this XmlNode node, string name) { return XMLUtil.GetNode(node, name); }
+        public static XmlNode GetNode(this XmlNode node, string name) 
+        { 
+            return XMLUtil.GetNode(node, name); 
+        }
 
-        public static XmlNode AddNode(this XmlNode node, string name, string text, bool addIfExists = true, bool setValueIfExists = true)
+
+        public static XmlNode AddNode(this XmlNode node, string name)
         {
-            var ret = node.GetNode(name);
-            if (addIfExists == false && ret != null)
-            {
-                if (setValueIfExists)
-                {
-                    ret.SetValue(text);
-                }
-            }
-            else
-            {
-                ret = node.AddNode(name);
-                ret.SetValue(text);
-            }
-            return ret;
+            return XMLUtil.AddNode(node, name);
         }
-        public static XmlNode AddNode(this XmlNode node, string name, bool addIfExists = true)
-        {
-            return AddNode(node, name, string.Empty, addIfExists);
-        }
+
         public static XmlNode AddNodes(this XmlNode node, IEnumerable<XmlNode> nodes)
         {
             if (nodes != null && node != null)
@@ -85,7 +74,7 @@ namespace ProUpgradeEditor.Common
         {
             if (nodeValues != null && node != null && !string.IsNullOrEmpty(nodeName))
             {
-                nodeValues.ToList().ForEach(x => node.AddNode(nodeName).SetValue(x));
+                nodeValues.ToList().ForEach(x => XMLUtil.AddNode(node, nodeName).SetValue(x));
             }
             return node;
         }

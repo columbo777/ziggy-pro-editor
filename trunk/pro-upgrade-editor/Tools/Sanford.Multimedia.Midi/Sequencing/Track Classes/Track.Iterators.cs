@@ -7,21 +7,36 @@ namespace Sanford.Multimedia.Midi
     public sealed partial class Track
     {
         #region Iterators
-
-        public IEnumerable<MidiEvent> Iterator()
+        public IEnumerable<MidiEvent> AllIterator()
         {
             MidiEvent current = head;
 
             while (current != null)
             {
-                yield return current;
-
+                if (current.MidiMessage != null)
+                {
+                    yield return current;
+                }
                 current = current.Next;
             }
 
             current = endOfTrackMidiEvent;
 
             yield return current;
+        }
+        public IEnumerable<MidiEvent> Iterator()
+        {
+            MidiEvent current = head;
+
+            while (current != null)
+            {
+                if (current.MidiMessage != null)
+                {
+                    yield return current;
+                }
+                current = current.Next;
+            }
+
         }
 
         public IEnumerable<int> DispatcherIterator(MessageDispatcher dispatcher)

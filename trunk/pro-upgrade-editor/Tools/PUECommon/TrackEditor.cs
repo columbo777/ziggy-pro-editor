@@ -1637,12 +1637,26 @@ namespace ProUpgradeEditor.Common
 
         public int GetChordMinYOffset(GuitarChord c)
         {
-            return c.Notes.Min(n => GetNoteMinYOffset(n));
+            if (c.Notes.Any())
+            {
+                return c.Notes.Min(n => GetNoteMinYOffset(n));
+            }
+            else
+            {
+                return Int32.MinValue;
+            }
         }
 
         public int GetChordMaxYOffset(GuitarChord c)
         {
-            return c.Notes.Max(n => GetNoteMaxYOffset(n));
+            if (c.Notes.Any())
+            {
+                return c.Notes.Max(n => GetNoteMaxYOffset(n));
+            }
+            else
+            {
+                return Int32.MinValue;
+            }
         }
 
         public int GetNoteMaxYOffset(GuitarNote n)
@@ -1799,7 +1813,7 @@ namespace ProUpgradeEditor.Common
                 var ret = new List<GuitarChord>();
                 if (IsLoaded)
                 {
-                    ret.AddRange(guitarTrack.Messages.Chords.Where(x => x.Selected));
+                    ret.AddRange(guitarTrack.Messages.Chords.Where(x => x.IsDeleted == false && x.Selected));
                 }
                 return ret;
             }
@@ -2891,7 +2905,7 @@ namespace ProUpgradeEditor.Common
         private bool MovingSelectorMouseUp()
         {
             bool ret = false;
-            if (CurrentSelector != null)
+            if (CurrentSelector != null && CurrentSelector.Chord != null)
             {
                 var sel = CurrentSelector;
 
@@ -3368,7 +3382,7 @@ namespace ProUpgradeEditor.Common
                                 int stringY2 = SnapToString(mouseClient.Y);
 
                                 if (stringY1 != stringY2 ||
-                                    Math.Abs(mouseClient.X - SelectStartPoint.X) > Utility.NoteCloseWidth)
+                                    Math.Abs(mouseClient.X - SelectStartPoint.X) > Utility.NoteSnapDistance)
                                 {
                                     if (EditorType != EEditorType.Guitar5)
                                     {
@@ -4494,9 +4508,10 @@ namespace ProUpgradeEditor.Common
 
         List<Selector> GetVisibleSelectors()
         {
+            
             var ret = new List<Selector>();
             var chord = SelectedChord;
-            if (chord == null)
+            if ((SelectedChord != null && SelectedChord.IsDeleted) || chord == null || chord.HasNotes==false)
                 return ret;
 
             Point p = PointToClient(MousePosition);
@@ -4569,9 +4584,10 @@ namespace ProUpgradeEditor.Common
         void DrawSelector(Graphics g,
             Selector sel)
         {
+
             var c = Utility.noteBGBrushSel.Color;
             var color = Color.FromArgb(40, 80, 40);
-            if (sel == null)
+            if (sel == null || sel.Chord.HasNotes == false)
                 return;
 
             var trans = sel.IsMouseOver ? 205 : sel.IsMouseNear ? 120 : 80;

@@ -50,7 +50,7 @@ namespace ProUpgradeEditor.Common
         public GuitarChordList(TrackEditor owner) : base(owner) { }
         public IEnumerable<GuitarChord> GetBetweenTick(int tickMin, int tickMax)
         {
-            return this.Where(x => x.DownTick < tickMax && x.UpTick > tickMin);
+            return this.Where(x => x.HasNotes && (x.DownTick < tickMax && x.UpTick > tickMin));
         }
 
     }
@@ -161,20 +161,10 @@ namespace ProUpgradeEditor.Common
 
         public void SetDownEvent(MidiEvent ev)
         {
-            if (ev == null && TickPair.Down.IsNull() &&
-                _eventPair.Down != null)
-            {
-                TickPair = new TickPair(_eventPair.Down.AbsoluteTicks, TickPair.Down);
-            }
             _eventPair.Down = ev;
         }
         public void SetUpEvent(MidiEvent ev)
         {
-            if (ev == null && TickPair.Up.IsNull() &&
-                _eventPair.Up != null)
-            {
-                TickPair = new TickPair(TickPair.Down, _eventPair.Up.AbsoluteTicks);
-            }
             _eventPair.Up = ev;
         }
 

@@ -31,6 +31,8 @@ namespace ProUpgradeEditor.Common
             this.owner = owner;
             this.down = down;
             this.up = up;
+            _downTick = (down == null ? Int32.MinValue : down.AbsoluteTicks);
+            _upTick = (up == null ? Int32.MinValue : up.AbsoluteTicks);
             if (down == null)
             {
                 dPair = Data1ChannelPair.NullValue;
@@ -103,14 +105,17 @@ namespace ProUpgradeEditor.Common
             get { return !(HasUp || HasDown); }
         }
 
+        
         public TickPair TickPair
         {
             get
             {
-                return new TickPair(Down == null ? Int32.MinValue : Down.AbsoluteTicks, Up == null ? (Down == null ? Int32.MinValue : Down.AbsoluteTicks + 1) : Up.AbsoluteTicks);
+                return new TickPair(Down == null ? _downTick : Down.AbsoluteTicks, Up == null ? (Down == null ? _downTick + 1 : Down.AbsoluteTicks + 1) : Up.AbsoluteTicks);
             }
         }
 
+        int _downTick;
+        int _upTick;
         public int DownTick { get { return TickPair.Down; } }
         public int UpTick { get { return TickPair.Up; } }
 

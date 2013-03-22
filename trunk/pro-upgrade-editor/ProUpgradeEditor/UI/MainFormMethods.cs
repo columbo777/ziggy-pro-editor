@@ -2264,7 +2264,8 @@ namespace ProUpgradeEditor.UI
             try
             {
 
-                var match = FindMatchingCopyPattern(new FindMatchingPatternConfig(true, true, false));
+                var replaceConfig = GetNewCopyPatternPresetFromScreen();
+                var match = FindMatchingCopyPattern(new FindMatchingPatternConfig(true, true, false), replaceConfig);
                 if (match != null)
                 {
                     var track6 = EditorPro.GuitarTrack;
@@ -2285,8 +2286,9 @@ namespace ProUpgradeEditor.UI
                     }
                     EditorPro.BackupSequence();
                     int numReplaced = 0;
-                    foreach (var m in match.Matches)
+                    foreach (var m in match.Matches.ToList())
                     {
+                        
                         int trep;
                         minTick = ReplaceNotes(EditorPro.Messages, match.OriginalChords6, match.DeltaTimeStart,
                                 minTick, m,
@@ -2295,6 +2297,8 @@ namespace ProUpgradeEditor.UI
 
                         numReplaced += trep;
 
+                        if (replaceConfig.FirstMatchOnly)
+                            break;
                     }
 
                     if (numReplaced == 0)
@@ -2355,20 +2359,19 @@ namespace ProUpgradeEditor.UI
 
             var replaceConfig = GetNewCopyPatternPresetFromScreen();
 
+            TickPair tp = m.GetTickPair();
+
+            if (replaceConfig.RemoveExisting)
+            {
+                list.Chords.GetBetweenTick(
+                    new TickPair(tp.Down + Utility.NoteCloseWidth / 2, tp.Up - Utility.NoteCloseWidth / 2))
+                    .ToList().ForEach(x => x.DeleteAll());
+            }
 
             if (replaceConfig.KeepLengths &&
                 m.Length == oChords6.Length)
             {
-                if (replaceConfig.RemoveExisting)
-                {
-                    list.Chords.GetBetweenTick(
-                        new TickPair(m.GetMinTick() + Utility.NoteCloseWidth,
-                        m.GetMaxTick() - Utility.NoteCloseWidth))
-                        .ToList().ForEach(x => x.RemoveEvents());
-                    
-                }
-
-
+                
                 int iochord6 = 0;
                 foreach (var oC in oChords6)
                 {
@@ -2407,13 +2410,6 @@ namespace ProUpgradeEditor.UI
                         if (newTicks.Down >= minTime)
                         {
 
-                            if (replaceConfig.RemoveExisting)
-                            {
-                                list.Chords.GetBetweenTick(
-                                    new TickPair(m.GetMinTick() + Utility.NoteCloseWidth,
-                                    m.GetMaxTick() - Utility.NoteCloseWidth)).ToList().ForEach(x => x.DeleteAll());
-                            }
-
                             var nn = oC.CloneAtTime(list, newTicks);
                             if (nn != null)
                             {
@@ -2443,13 +2439,13 @@ namespace ProUpgradeEditor.UI
             var onoteStart = track6.TickToTime(ticks.Down);
             var onoteEnd = track6.TickToTime(ticks.Up);
 
-            var currentTempo = track6.GetTempo(currentTick).Tempo;
-
+            var currentTempo = track6.GetTempo(currentTick);
+            
             var secs = ProGuitarTrack.GetTempo(ticks.Down).SecondsPerQuarterNote;
-            var secs2 = ProGuitarTrack.GetTempo(currentTick).SecondsPerQuarterNote;
+            var secs2 = currentTempo.SecondsPerQuarterNote;
 
 
-            var deltaTime = ProGuitarTrack.GetTempo(spaceTick).SecondsPerTick * spaceTick;
+            var deltaTime = currentTempo.SecondsPerTick * spaceTick;
             //*secs2;
             currentTime += deltaTime;
             currentTick = track6.TimeToTick(currentTime);

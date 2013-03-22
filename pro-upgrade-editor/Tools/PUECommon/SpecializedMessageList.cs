@@ -177,7 +177,6 @@ namespace ProUpgradeEditor.Common
             var item = mess as T;
             if (item != null)
             {
-                
                 internalRemove(item);
             }
         }

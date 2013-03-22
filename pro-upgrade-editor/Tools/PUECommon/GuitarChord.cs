@@ -148,8 +148,7 @@ namespace ProUpgradeEditor.Common
 
             if (ret != null)
             {
-                list.Chords.GetBetweenTick(ret.TickPair).ToList().ForEach(x => x.DeleteAll());
-
+                
                 var newMods = ret.Modifiers.Select(x => ChordModifier.CreateModifier(list, ticks, x.ModifierType, true, difficulty)).Where(x=> x != null).ToList();
                 ret.Modifiers.Clear();
                 ret.Modifiers.AddRange(newMods);
@@ -431,13 +430,22 @@ namespace ProUpgradeEditor.Common
 
         public override void DeleteAll()
         {
-            Notes.ToList().ForEach(x => x.DeleteAll());
-            Modifiers.ToList().ForEach(x => x.DeleteAll());
+            if (!IsDeleted)
+            {
+                TickPair tp = this.TickPair;
 
-            Notes.Clear();
-            Modifiers.Clear();
+                Notes.ToList().ForEach(x => x.DeleteAll());
+                Modifiers.ToList().ForEach(x => x.DeleteAll());
 
-            base.DeleteAll();
+                Notes.Clear();
+                Modifiers.Clear();
+
+                this.SetTicks(tp);
+
+                RemoveFromList();
+
+                IsDeleted = true;
+            }
         }
 
         public override void RemoveFromList()
@@ -449,6 +457,8 @@ namespace ProUpgradeEditor.Common
         }
         public override void CreateEvents()
         {
+            Owner.Chords.GetBetweenTick(TickPair).Where(x=> x != this).ToList().ForEach(x => x.DeleteAll());
+
             if (Notes.Any(x => x.IsXNote))
             {
                 Notes.ToList().ForEach(x => x.Channel = Utility.ChannelX);

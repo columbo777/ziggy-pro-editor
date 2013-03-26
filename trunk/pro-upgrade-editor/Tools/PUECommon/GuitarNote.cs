@@ -131,8 +131,10 @@ namespace ProUpgradeEditor.Common
         public override string ToString()
         {
             return base.ToString() +
-                " String: " + NoteString + " Arp: " + this.IsArpeggioNote.ToString() + " X: " +
-                this.IsXNote + " Tap: " + this.IsTapNote;
+                " [" + NoteString.ToStringEx() + "]->" + NoteFretDown.ToStringEx() + " " + 
+                (this.IsArpeggioNote ? "(helper)" : "") +
+                (this.IsXNote ? "(x)" : "") + 
+                (this.IsTapNote ? "(tap)":"");
         }
     }
 

@@ -123,14 +123,17 @@
     <Compile Include="UI\AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\AnimationRoutine.cs" />
     <Compile Include="UI\ControlAnimator.cs" />
     <Compile Include="UI\ControlAnimatorItem.cs" />
+    <Compile Include="UI\ControlAnimatorType.cs" />
     <Compile Include="UI\CopyPatternPreset.cs" />
     <Compile Include="UI\DTAFile.cs" />
     <Compile Include="UI\DTAFileNode.cs" />
     <Compile Include="UI\DTASegment.cs" />
     <Compile Include="UI\EditorTrackDifficulty.cs" />
     <Compile Include="UI\FindMatchingPatternConfig.cs" />
+    <Compile Include="UI\ListedModifier.cs" />
     <Compile Include="UI\ListViewColumnSorter.cs" />
     <Compile Include="UI\MainForm.cs">
       <SubType>Form</SubType>
@@ -143,7 +146,15 @@
     <Compile Include="UI\MatchingCopyPattern.cs" />
     <Compile Include="UI\MidiEventData1Comparer.cs" />
     <Compile Include="UI\MidiEventData2Comparer.cs" />
+    <Compile Include="UI\MidiInputListItem.cs" />
+    <Compile Include="UI\MidiOutputListItem.cs" />
     <Compile Include="UI\naudioPlayer.cs" />
+    <Compile Include="UI\PropertyType.cs" />
+    <Compile Include="UI\SelectNextEnum.cs" />
+    <Compile Include="UI\SongCacheList.cs" />
+    <Compile Include="UI\SongListSortMode.cs" />
+    <Compile Include="UI\SongUtilFindInFileConfig.cs" />
+    <Compile Include="UI\SongUtilSearchResult.cs" />
     <Compile Include="UI\StoredChordSearchConfig.cs" />
     <Compile Include="UI\stringObject.cs" />
     <Compile Include="UI\TabPopout.cs">
@@ -157,6 +168,7 @@
     <Compile Include="UI\ThreadTimer.cs" />
     <Compile Include="UI\USBDrive.cs" />
     <Compile Include="UI\USBDriveEntry.cs" />
+    <Compile Include="UI\UtilProperty.cs" />
     <EmbeddedResource Include="ProResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ProResources.Designer.cs</LastGenOutput>

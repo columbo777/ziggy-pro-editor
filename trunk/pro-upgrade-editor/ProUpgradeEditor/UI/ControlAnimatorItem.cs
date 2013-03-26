@@ -25,17 +25,6 @@ using ZipLib.SharpZipLib.Zip;
 namespace ProUpgradeEditor.UI
 {
 
-    public enum ControlAnimatorType
-    {
-        Height,
-    }
-
-    public enum AnimationRoutine
-    {
-        EaseInOutSine,
-    }
-
-
     public class ControlAnimatorItem
     {
         public AnimationRoutine Routine;

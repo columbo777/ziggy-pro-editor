@@ -27,16 +27,5 @@ namespace ProUpgradeEditor.Common
         }
     }
 
-    public class MidiEventData1ChannelPairEqualityComparer : IEqualityComparer<MidiEvent>
-    {
-        public bool Equals(MidiEvent x, MidiEvent y)
-        {
-            return x.Data1 == y.Data1 && x.Channel == y.Channel;
-        }
-
-        public int GetHashCode(MidiEvent obj)
-        {
-            return ((obj.Data1 & 0x00FF) | ((obj.Channel << 2) & 0xFF00));
-        }
-    }
+    
 }

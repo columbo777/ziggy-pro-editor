@@ -23,7 +23,7 @@ using X360;
 
 namespace ProUpgradeEditor.UI
 {
-    class MatchingCopyPattern
+    public class MatchingCopyPattern
     {
         public int StartTick;
         public int EndTick;

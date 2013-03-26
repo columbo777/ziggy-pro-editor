@@ -14,9 +14,6 @@ using NAudio.Wave;
 
 namespace ProUpgradeEditor.Common
 {
-
-
-
     public class TrackEditor : UserControl
     {
         public Track MidiTrack
@@ -722,14 +719,14 @@ namespace ProUpgradeEditor.Common
                         fileData = fileName.ReadFileBytes();
 
                     var seq = fileData.LoadSequence();
-                    ProcessErrors(seq);
+
 
                     if (loadingBackup)
                     {
                         try
                         {
                             var gt6 = EditorPro.GuitarTrack.GetTrack();
-                            if (gt6 != null && !string.IsNullOrEmpty(gt6.Name))
+                            if (gt6 != null && gt6.Name.IsNotEmpty())
                             {
                                 t = seq.GetTrack(gt6.Name);
                             }
@@ -744,7 +741,7 @@ namespace ProUpgradeEditor.Common
 
                     if (t != null)
                     {
-                        
+
                         if (!loadingBackup)
                         {
                             this.LoadedFileName = fileName;
@@ -785,10 +782,10 @@ namespace ProUpgradeEditor.Common
         {
             var meta = track.Meta.Where(x => x.MetaMessage.Text.IsNotEmpty()).ToList().
                 Where(v => v.MetaMessage.Text.IsTrainerGuitar() || v.MetaMessage.Text.IsTrainerBass()).ToList();
-            if(meta.Any())
+            if (meta.Any())
             {
                 var nullEvents = meta.Where(t => t.MetaMessage.Text.GetTrainerEventIndex().IsNull()).ToList();
-                
+
                 track.Remove(nullEvents);
 
                 if (track.Name.IsGuitarTrackName())
@@ -1343,7 +1340,7 @@ namespace ProUpgradeEditor.Common
             {
                 foreach (var point in gridPoints.Where(x => x.IsWholeNote && x.MeasureNumber > 0))
                 {
-                    DrawTextAtTime(e.Graphics,80, 180, true, false, 
+                    DrawTextAtTime(e.Graphics, 80, 180, true, false,
                         new TickPair(point.Tick, point.Tick + 120), point.MeasureNumber.ToStringEx(), Utility.TextEventBrush, false);
                 }
             }
@@ -1352,7 +1349,7 @@ namespace ProUpgradeEditor.Common
             {
                 foreach (var tempo in visTempo)
                 {
-                    DrawTextAtTime(e.Graphics,80,180, true, false, 
+                    DrawTextAtTime(e.Graphics, 80, 180, true, false,
                         tempo.TickPair, "BPM: " + (tempo.QuarterNotesPerSecond * 60.0).Round(3).Round(), Utility.TextEventBrush, false);
                 }
             }
@@ -1361,7 +1358,7 @@ namespace ProUpgradeEditor.Common
             {
                 foreach (var ts in visTimeSig)
                 {
-                    DrawTextAtTime(e.Graphics,80,180, true, false, 
+                    DrawTextAtTime(e.Graphics, 80, 180, true, false,
                         ts.TickPair, "" + ts.Numerator + "/" + ts.Denominator, Utility.TextEventBrush, false);
                 }
             }
@@ -2149,8 +2146,8 @@ namespace ProUpgradeEditor.Common
 
             var st = GetClientPointFromTick(tr.AbsoluteTicks);
             var et = st + 1;
-            if (et > 0 && 
-                st < Width && 
+            if (et > 0 &&
+                st < Width &&
                 st < et)
             {
                 if (st < 0)
@@ -2160,7 +2157,7 @@ namespace ProUpgradeEditor.Common
 
                 g.FillRectangle(tb,
                     st,
-                    0, et-st,
+                    0, et - st,
                     InnerHeight - 1);
 
                 using (var p = new Pen(tb))
@@ -2221,7 +2218,7 @@ namespace ProUpgradeEditor.Common
 
 
         private void DrawTextAtTime(Graphics g, int alpha80, int alpha180,
-            bool tabActive, bool drawSelected, TickPair ticks, string text, SolidBrush tb, bool fullHeight )
+            bool tabActive, bool drawSelected, TickPair ticks, string text, SolidBrush tb, bool fullHeight)
         {
             var screenTicks = GetClientPointFromTick(ticks);
             if (screenTicks.TickLength <= 0)
@@ -2231,7 +2228,7 @@ namespace ProUpgradeEditor.Common
             {
 
                 var size = g.MeasureString(text, Utility.fretFont);
-                
+
                 var textRect = new RectangleF((float)screenTicks.Down, (size.Height * (0)) + (0 * size.Height * 0.1f),
                         size.Width, size.Height);
                 for (int idx = 0; idx < 8; idx++)
@@ -2256,14 +2253,14 @@ namespace ProUpgradeEditor.Common
                         g.FillRectangle(br,
                             screenTicks.Down,
                             0, screenTicks.TickLength,
-                            fullHeight ? (InnerHeight - 1 ) : size.Height + 1);
+                            fullHeight ? (InnerHeight - 1) : size.Height + 1);
                     }
                     using (var p = new Pen(tb))
                     {
-                        g.DrawRectangle(p, 
-                            screenTicks.Down, 0, 
+                        g.DrawRectangle(p,
+                            screenTicks.Down, 0,
                             screenTicks.TickLength,
-                            fullHeight ? (InnerHeight ) : size.Height + 2);
+                            fullHeight ? (InnerHeight) : size.Height + 2);
                     }
                 }
                 using (var tbg = new SolidBrush(Color.FromArgb(tabActive ? (drawSelected ? 255 : 200) : alpha80, Utility.BackgroundBrush.Color)))
@@ -2533,12 +2530,11 @@ namespace ProUpgradeEditor.Common
             if ((NoteSnapG6 && EditorType == EEditorType.ProGuitar) ||
                 (NoteSnapG5 && EditorType == EEditorType.Guitar5))
             {
-                var min = clientPoint - Utility.NoteSnapDistance / 2;
-                var max = clientPoint + Utility.NoteSnapDistance / 2;
+                var minMax = new TickPair(
+                    clientPoint - Utility.NoteSnapDistance / 2,
+                    clientPoint + Utility.NoteSnapDistance / 2);
 
-                var chords = guitarTrack.Messages.Chords.GetBetweenTick(
-                    GetTickFromClientPoint(min),
-                    GetTickFromClientPoint(max)).ToList();
+                var chords = guitarTrack.Messages.Chords.GetBetweenTick(GetTickFromClientPoint(minMax)).ToList();
 
                 if (EditorType == EEditorType.ProGuitar && SelectedChords.Any())
                 {
@@ -3062,7 +3058,7 @@ namespace ProUpgradeEditor.Common
                         tickPair.Down = tickPair.Up - 1;
                     }
                 }
-                
+
             }
             if (closeToLeft.Any() && config.SnapG6)
             {
@@ -3113,8 +3109,8 @@ namespace ProUpgradeEditor.Common
             }
             if (closeToRight5.Any() && config.SnapG5)
             {
-                var closeDown = closeToRight5.Where(x=> x.DownTick.IsCloseTick(tickPair.Up));
-                var closeUp = closeToRight5.Where(x=> x.UpTick.IsCloseTick(tickPair.Up));
+                var closeDown = closeToRight5.Where(x => x.DownTick.IsCloseTick(tickPair.Up));
+                var closeUp = closeToRight5.Where(x => x.UpTick.IsCloseTick(tickPair.Up));
 
                 if (closeDown.Any())
                 {
@@ -3172,7 +3168,7 @@ namespace ProUpgradeEditor.Common
                             tickPair.Up = maxUp;
                     }
                 }
-                if (tickPair.Up.IsNull()==false &&
+                if (tickPair.Up.IsNull() == false &&
                     tickPair.Up <= tickPair.Down)
                 {
                     tickPair.Up = tickPair.Down + 1;
@@ -3453,7 +3449,7 @@ namespace ProUpgradeEditor.Common
             get
             {
                 var ret = PointToClient(MousePosition);
-                
+
                 if (GridSnap)
                 {
                     int mc;
@@ -3604,18 +3600,6 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
-        public void RemoveMessage(GuitarMessage message)
-        {
-            if (IsLoaded)
-            {
-                try
-                {
-                    guitarTrack.Remove(message);
-                    Invalidate();
-                }
-                catch { }
-            }
-        }
 
         Track GetTrack() { return GuitarTrack == null ? null : GuitarTrack.GetTrack(); }
 
@@ -4163,7 +4147,7 @@ namespace ProUpgradeEditor.Common
 
                         if (len > 4)
                         {
-                            if (chord.IsHammeron && chord.IsSlide)
+                            if (chord.HasHammeron && chord.HasSlide)
                             {
                                 using (var slb = new SolidBrush(Color.FromArgb(Utility.hammerOnPen.Color.A, Utility.hammerOnPen.Color)))
                                 {
@@ -4174,14 +4158,14 @@ namespace ProUpgradeEditor.Common
                                     g.FillPolygon(slb, new Point[] { new Point(noteX + width, noteY), new Point(noteX + width, noteY + NoteHeight), new Point(noteX, noteY + NoteHeight) });
                                 }
                             }
-                            else if (chord.IsHammeron)
+                            else if (chord.HasHammeron)
                             {
                                 using (var slb = new SolidBrush(Color.FromArgb(Utility.hammerOnPen.Color.A, Utility.hammerOnPen.Color)))
                                 {
                                     g.FillRectangle(slb, noteRect);
                                 }
                             }
-                            else if (chord.IsSlide)
+                            else if (chord.HasSlide)
                             {
                                 using (var slb = new SolidBrush(Color.FromArgb(Utility.slidePen.Color.A, Utility.slidePen.Color)))
                                 {
@@ -4418,7 +4402,7 @@ namespace ProUpgradeEditor.Common
 
             using (var fb = new SolidBrush(Color.FromArgb(alpha, Utility.fretBrush.Color)))
             {
-                
+
                 var noteTxt = note.NoteFretDown.ToString();
                 if (note.IsXNote && Utility.XNoteText.Trim().IsNotEmpty())
                 {
@@ -4435,7 +4419,7 @@ namespace ProUpgradeEditor.Common
                 g.DrawString(noteTxt,
                     Utility.fretFont,
                     fb,
-                    noteX ,
+                    noteX,
                     noteY - (int)(Utility.fontHeight / 4.0 + Utility.NoteTextYOffset));
             }
 
@@ -4508,10 +4492,10 @@ namespace ProUpgradeEditor.Common
 
         List<Selector> GetVisibleSelectors()
         {
-            
+
             var ret = new List<Selector>();
             var chord = SelectedChord;
-            if ((SelectedChord != null && SelectedChord.IsDeleted) || chord == null || chord.HasNotes==false)
+            if ((SelectedChord != null && SelectedChord.IsDeleted) || chord == null || chord.HasNotes == false)
                 return ret;
 
             Point p = PointToClient(MousePosition);
@@ -4754,12 +4738,5 @@ namespace ProUpgradeEditor.Common
 
         public int TopLineOffset { get { return (int)(NoteHeight * 0.75); } }
 
-    }
-
-    public enum SelectNextEnum
-    {
-        ForceSelectNext,
-        ForceKeepSelection,
-        UseConfiguration,
     }
 }

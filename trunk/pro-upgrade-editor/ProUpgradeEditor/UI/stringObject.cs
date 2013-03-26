@@ -23,7 +23,7 @@ using X360;
 
 namespace ProUpgradeEditor.UI
 {
-    class stringObject
+    public class StringObject
     {
         public object Obj;
         public string Name;

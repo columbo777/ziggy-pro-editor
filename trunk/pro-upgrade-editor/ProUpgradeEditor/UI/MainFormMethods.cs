@@ -25,6 +25,7 @@ using X360.FATX;
 namespace ProUpgradeEditor.UI
 {
 
+    
     partial class MainForm
     {
 
@@ -676,7 +677,7 @@ namespace ProUpgradeEditor.UI
 
 
 
-        int statusItemStartTick = -1;
+        int statusItemStartTick = Int32.MinValue;
         public bool DoCreateChordFromScreenPoint(TrackEditor editor, MouseEventArgs e)
         {
             bool ret = false;
@@ -1112,14 +1113,15 @@ namespace ProUpgradeEditor.UI
                                 new TickPair(downTick, upTick));
 
                             bool hasGhost = false;
-                            int[] ghostNotes = new int[6] { -1, -1, -1, -1, -1, -1 };
+                            int[] ghostNotes = Utility.Null6.ToArray();
+
                             foreach (var msg in msgs)
                             {
                                 foreach (var note in msg.Notes)
                                 {
                                     if (note.DownTick >= firstUpTick)
                                     {
-                                        if (ghostNotes[note.NoteString] == -1)
+                                        if (ghostNotes[note.NoteString].IsNull())
                                         {
                                             hasGhost = true;
                                             ghostNotes[note.NoteString] = note.NoteFretDown;
@@ -1192,18 +1194,18 @@ namespace ProUpgradeEditor.UI
                 eb.Text = gc.UpTick.ToStringEx();
 
 
-                checkIsSlide.Checked = gc.IsSlide;
-                checkIsSlideReversed.Checked = gc.IsSlideReversed;
+                checkIsSlide.Checked = gc.HasSlide;
+                checkIsSlideReversed.Checked = gc.HasSlideReversed;
 
-                checkIsHammeron.Checked = gc.IsHammeron;
+                checkIsHammeron.Checked = gc.HasHammeron;
 
                 checkIsTap.Checked = gc.IsTap;
 
                 checkIsX.Checked = gc.IsXNote;
 
-                checkStrumHigh.Checked = (gc.StrumMode & ChordStrum.High) > 0;
-                checkStrumMid.Checked = (gc.StrumMode & ChordStrum.Mid) > 0;
-                checkStrumLow.Checked = (gc.StrumMode & ChordStrum.Low) > 0;
+                checkStrumHigh.Checked = gc.HasStrumMode(ChordStrum.High);
+                checkStrumMid.Checked = gc.HasStrumMode(ChordStrum.Mid);
+                checkStrumLow.Checked = gc.HasStrumMode(ChordStrum.Low);
             }
             else if (gc != null)
             {
@@ -1790,7 +1792,7 @@ namespace ProUpgradeEditor.UI
                         EditorG5.ReloadTrack();
 
                         RefreshModifierListBoxes();
-
+                        Refresh108EventList();
                     }
 
                     if (selectNext)
@@ -1823,7 +1825,7 @@ namespace ProUpgradeEditor.UI
             return ret;
         }
 
-        public void ReloadStaleChords(List<GuitarChord> selectedChords)
+        public void ReloadStaleChords(IEnumerable<GuitarChord> selectedChords)
         {
             if (selectedChords != null)
             {
@@ -1967,7 +1969,7 @@ namespace ProUpgradeEditor.UI
             bool matchSpacing = replaceConfig.MatchSpacing;
             bool matchBeat = replaceConfig.MatchBeat;
 
-            bool replaceFirstMatchOnly = replaceConfig.FirstMatchOnly;
+            
             TickPair ticks;
             if (!getPatternMatchTicks(out ticks))
                 return ret;
@@ -2197,7 +2199,6 @@ namespace ProUpgradeEditor.UI
 
                 ret.Matches.Clear();
 
-                
                 matches.ToList().For((x, i) => matches[i] = x.SortTicks().ToArray());
 
                 if (config.FindNext && config.FindPrevious)
@@ -2245,12 +2246,8 @@ namespace ProUpgradeEditor.UI
                         {
                             ret.Matches.AddRange(next);
                         }
-
                     }
                 }
-
-
-
             }
             catch { }
 
@@ -2260,63 +2257,64 @@ namespace ProUpgradeEditor.UI
         bool DoReplace()
         {
             bool ret = true;
-
             try
             {
-
                 var replaceConfig = GetNewCopyPatternPresetFromScreen();
-                var match = FindMatchingCopyPattern(new FindMatchingPatternConfig(true, true, false), replaceConfig);
-                if (match != null)
+
+                var result = FindMatchingCopyPattern(
+                    new FindMatchingPatternConfig(true, true, replaceConfig.FirstMatchOnly));
+
+                if (result != null)
                 {
-                    var track6 = EditorPro.GuitarTrack;
-                    int minTick = int.MinValue;
-
-                    int totmat = 0;
-                    foreach (var im in match.Matches)
+                    
+                    if (replaceConfig.FirstMatchOnly)
                     {
-                        totmat += im.Length;
-                    }
-                    if (totmat > 100)
-                    {
+                        var m = result.Matches.FirstOrDefault();
 
-                        var mb = MessageBox.Show(string.Format("There are currently {0} matching chords, Continue?", totmat),
-                            "Warning", MessageBoxButtons.YesNo);
-                        if (mb == System.Windows.Forms.DialogResult.No)
-                            return true;
-                    }
-                    EditorPro.BackupSequence();
-                    int numReplaced = 0;
-                    foreach (var m in match.Matches.ToList())
-                    {
-                        
-                        int trep;
-                        minTick = ReplaceNotes(EditorPro.Messages, match.OriginalChords6, match.DeltaTimeStart,
-                                minTick, m,
-                                m.GetMinTick(), m.GetMaxTick(), out trep);
+                        if (m != null)
+                        {
+                            int numReplaced;
+                            var ocTicks = result.OriginalChords6.GetTickPair();
+                            ReplaceNotes(EditorPro.Messages, result.OriginalChords6, result.DeltaTimeStart,
+                                    Int32.MinValue, m,
+                                    m.GetMinTick(), m.GetMaxTick(), out numReplaced);
 
+                            if (numReplaced > 0)
+                            {
+                                EditorPro.ClearSelection();
 
-                        numReplaced += trep;
+                                EditorPro.Messages.Chords.GetBetweenTick(ocTicks).ToList().ForEach(x => x.Selected = true);
 
-                        if (replaceConfig.FirstMatchOnly)
-                            break;
-                    }
-
-                    if (numReplaced == 0)
-                    {
-                        MessageBox.Show("No Matches found");
+                                MessageBox.Show(string.Format("Replaced {0} Matches", numReplaced));
+                            }
+                        }
                     }
                     else
                     {
-                        EditorPro.ClearSelection();
-                        if (match.OriginalChords6 != null)
+                        int minTick = Int32.MinValue;
+
+                        int numReplacedTotal=0;
+                        TickPair ocTicks = TickPair.NullValue;
+                        foreach(var match in result.Matches)
                         {
-                            track6.Messages.Chords.GetBetweenTick(new TickPair(match.OriginalChords6.GetMinTick(),
-                                match.OriginalChords6.GetMaxTick())).ToList().ForEach(x => x.Selected = true);
+                            int numReplaced;
+                            ocTicks = result.OriginalChords6.GetTickPair();
+                            minTick = ReplaceNotes(EditorPro.Messages, result.OriginalChords6, result.DeltaTimeStart,
+                                    minTick, match,
+                                    match.GetMinTick(), match.GetMaxTick(), out numReplaced);
+                            numReplacedTotal += numReplaced;
                         }
-                        MessageBox.Show(string.Format("Replaced {0} Matches", numReplaced));
+
+                        if (numReplacedTotal > 0)
+                        {
+                            EditorPro.ClearSelection();
+                            EditorPro.Messages.Chords.GetBetweenTick(ocTicks).ToList().ForEach(x => x.Selected = true);
+
+                            MessageBox.Show(string.Format("Replaced {0} Matches", numReplacedTotal));
+                        }
                     }
                 }
-
+            
             }
             catch { ret = false; }
             EditorPro.Invalidate();
@@ -2673,59 +2671,63 @@ namespace ProUpgradeEditor.UI
         }
         public void StoreScreenChord()
         {
-            var sc = GetStoredChordFromScreen();
-
-            listBoxStoredChords.Items.Add(sc);
-            listBoxStoredChords.SelectedItem = sc;
+            var len = textBoxNoteEditorSelectedChordTickLength.Text.ToInt(Utility.MinimumNoteWidth);
+            var sc = GetStoredChordFromScreen(len);
+            if (sc != null)
+            {
+                listBoxStoredChords.Items.Add(sc);
+                listBoxStoredChords.SelectedItem = sc;
+            }
         }
 
 
-        public StoredChord GetStoredChordFromScreen()
+        public StoredChord GetStoredChordFromScreen(int tickLength)
         {
-            var sc = new StoredChord();
-            sc.Notes = new int[6];
-            sc.NoteChannels = new int[6];
-            var hb = GetHoldBoxes();
+            StoredChord ret = null;
 
-            for (int x = 0; x < hb.Length; x++)
+            var notes = GetHoldBoxes().Select(x => x.Text.ToInt()).ToArray();
+            if (notes.Any(x => x.IsNull() == false) && tickLength.IsNotNull())
             {
-                var note = hb[x].Text;
-                int iNote = note.ToInt(-1);
+                ret = new StoredChord();
 
-                sc.Notes[x] = iNote;
+                ret.NoteChannels = Utility.Null6.ToArray();
 
+                ret.Notes = notes;
 
-                if (sc.Notes[x] != -1)
+                var channels = NoteChannelBoxes.Select(cb => cb.Text.ToInt()).ToArray();
+                bool isXChan = channels.Any(x => x == Utility.ChannelX);
+                if (isXChan)
                 {
-                    sc.NoteChannels[x] = NoteChannelBoxes[x].Text.ToInt(-1);
+                    channels = channels.Select(x => Utility.ChannelX).ToArray();
                 }
-                else
+
+                ret.Notes.ForEach((n, index) =>
                 {
-                    sc.NoteChannels[x] = -1;
+                    ret.NoteChannels[index] = channels[index].GetIfNull(0);
+                });
+
+                ret.IsSlide = checkIsSlide.Checked;
+                ret.IsSlideRev = checkIsSlideReversed.Checked;
+                ret.IsHammeron = checkIsHammeron.Checked;
+                ret.IsTap = checkIsTap.Checked;
+                ret.IsXNote = checkIsX.Checked;
+
+                ret.Strum = ChordStrum.Normal;
+                if (checkStrumHigh.Checked)
+                {
+                    ret.Strum |= ChordStrum.High;
                 }
+                if (checkStrumMid.Checked)
+                {
+                    ret.Strum |= ChordStrum.Mid;
+                }
+                if (checkStrumLow.Checked)
+                {
+                    ret.Strum |= ChordStrum.Low;
+                }
+                ret.TickLength = tickLength;
             }
-            sc.IsSlide = checkIsSlide.Checked;
-            sc.IsSlideRev = checkIsSlideReversed.Checked;
-            sc.IsHammeron = checkIsHammeron.Checked;
-            sc.IsTap = checkIsTap.Checked;
-            sc.IsXNote = checkIsX.Checked;
-
-            sc.Strum = ChordStrum.Normal;
-            if (checkStrumHigh.Checked)
-            {
-                sc.Strum |= ChordStrum.High;
-            }
-            if (checkStrumMid.Checked)
-            {
-                sc.Strum |= ChordStrum.Mid;
-            }
-            if (checkStrumLow.Checked)
-            {
-                sc.Strum |= ChordStrum.Low;
-            }
-            sc.TickLength = textBoxNoteEditorSelectedChordTickLength.Text.ToInt(Utility.MinimumNoteWidth + 5);
-
-            return sc;
+            return ret;
         }
 
 
@@ -2734,7 +2736,8 @@ namespace ProUpgradeEditor.UI
         {
             if (listBoxStoredChords.SelectedItem != null)
             {
-                var sc = GetStoredChordFromScreen();
+                var len = textBoxNoteEditorSelectedChordTickLength.Text.ToInt(Utility.MinimumNoteWidth);
+                var sc = GetStoredChordFromScreen(len);
 
                 listBoxStoredChords.Items[listBoxStoredChords.SelectedIndex] = sc;
             }
@@ -2757,45 +2760,36 @@ namespace ProUpgradeEditor.UI
             for (int x = 0; x < hb.Length; x++)
             {
                 var n = sc.Notes[x];
-                if (n == -1)
-                    hb[x].Text = "";
-                else
-                    hb[x].Text = n.ToString();
+                
+                hb[x].Text = n.ToStringEx();
 
                 var ch = sc.NoteChannels[x];
-                if (ch != -1)
+                if (ch.IsNotNull())
                 {
-                    NoteChannelBoxes[x].Text = ch.ToString();
+                    NoteChannelBoxes[x].Text = ch.ToStringEx();
                 }
-                else if (hb[x].Text.Length > 0)
+                else
                 {
-                    if (ch != -1)
-                    {
-                        NoteChannelBoxes[x].Text = ch.ToString();
-                    }
-                    else
-                    {
-                        NoteChannelBoxes[x].Text = "0";
-                    }
+                    NoteChannelBoxes[x].Text = hb[x].Text.ToInt().ToStringEx("0");
                 }
             }
+
             checkIsSlide.Checked = sc.IsSlide;
             checkIsSlideReversed.Checked = sc.IsSlideRev;
             checkIsHammeron.Checked = sc.IsHammeron;
             checkIsTap.Checked = sc.IsTap;
             checkIsX.Checked = sc.IsXNote;
 
-
-            checkStrumHigh.Checked = (sc.Strum & ChordStrum.High) > 0;
-            checkStrumMid.Checked = (sc.Strum & ChordStrum.Mid) > 0;
-            checkStrumLow.Checked = (sc.Strum & ChordStrum.Low) > 0;
+            checkStrumHigh.Checked = sc.Strum.HasFlag(ChordStrum.High);
+            checkStrumMid.Checked = sc.Strum.HasFlag(ChordStrum.Mid);
+            checkStrumLow.Checked = sc.Strum.HasFlag(ChordStrum.Low);
 
             GetChordEndBox().Text = "";
 
             textBoxNoteEditorSelectedChordTickLength.Text = sc.TickLength.ToStringEx();
             int sp = GetChordStartBox().Text.ToInt();
 
-            if (sp.IsNull() == false)
+            if (sp.IsNotNull())
             {
                 GetChordEndBox().Text = (sp + sc.TickLength).ToStringEx();
             }
@@ -2834,7 +2828,7 @@ namespace ProUpgradeEditor.UI
 
             try
             {
-                foreach (var sc in EditorPro.SelectedChords)
+                foreach (var sc in EditorPro.SelectedChords.ToList())
                 {
                     var len = sc.TickLength;
                     if (len / 2 > Utility.NoteCloseWidth)
@@ -3555,11 +3549,10 @@ namespace ProUpgradeEditor.UI
                 if (Utility.GetArpeggioData1(EditorPro.CurrentDifficulty).IsNull())
                     return;
 
-
                 foreach (var a in ProGuitarTrack.Messages.Arpeggios.ToList())
                 {
                     foreach (var ch in ProGuitarTrack.Messages.Chords.GetBetweenTick(new TickPair(a.DownTick, a.UpTick)).Where(x =>
-                        x.Notes.Any(n => n.IsArpeggioNote)).ToList())
+                        x.Notes.Any(n => n.IsArpeggioNote) && x.IsPureArpeggioHelper == false).ToList())
                     {
                         foreach (var n in ch.Notes.Where(x => x.IsArpeggioNote).ToList())
                         {
@@ -3589,14 +3582,10 @@ namespace ProUpgradeEditor.UI
                 if (gt.Messages == null)
                     return;
 
-                foreach (var c in gt.Messages.Chords)
+                foreach (var c in gt.Messages.Chords.Where(c=> c.HasStrum).ToList())
                 {
-                    if (c.HasStrum)
-                    {
-                        c.RemoveStrum();
-                    }
+                    c.RemoveStrum();
                 }
-
 
             }
             catch { }
@@ -4662,40 +4651,37 @@ namespace ProUpgradeEditor.UI
                 EditorPro.ClearSelection();
                 ClearDTAFileProperties();
 
+                SetSelectedSongItem(item);
+
                 if (item != null)
                 {
-                    SetSelectedSongItem(null);
-
-                    SetSelectedSongItem(item);
                     if (item.G5FileName.FileExists())
                     {
-                        ret = EditorG5.LoadMidi5(item.G5FileName, ReadFileBytes(item.G5FileName), true);
+                        try
+                        {
+                            ret = EditorG5.LoadMidi5(item.G5FileName, ReadFileBytes(item.G5FileName), true);
+                        }
+                        catch { }
                     }
                     if (item.G6FileName.FileExists())
                     {
-                        ret = EditorPro.LoadMidi17(item.G6FileName, ReadFileBytes(item.G6FileName), false);
+                        var v = EditorPro.LoadMidi17(item.G6FileName, ReadFileBytes(item.G6FileName), false);
+                        if (ret != true)
+                            ret = v;
                     }
 
                     SetEditorDifficulty(GuitarDifficulty.Expert);
 
-                    RefreshModifierListBoxes();
-
-                    RefreshTrainers();
-
                     listBoxSongLibrary.SelectedItem = item;
 
                     SongList.SelectedSong = listBoxSongLibrary.SelectedItem as SongCacheItem;
-
-                }
-                else
-                {
-
-                    SetSelectedSongItem(null);
                 }
             }
             catch { }
+            
             UpdateEditorPropertiesForSong();
 
+            
             return ret;
         }
 
@@ -4716,6 +4702,12 @@ namespace ProUpgradeEditor.UI
                 }
             }
             catch { }
+
+            RefreshUSBSongs();
+            
+            RefreshModifierListBoxes();
+
+            RefreshTrainers();
         }
 
 
@@ -4781,36 +4773,39 @@ namespace ProUpgradeEditor.UI
             }
         }
 
-        public void AddNewSongToLibrary()
+        public bool AddNewSongToLibrary(bool silent)
         {
             ClearDTAFileProperties();
 
-            string songName = "";
+            var songName = "";
 
-
-            if (!string.IsNullOrEmpty(FileNameG5))
+            if (FileNameG5.IsNotEmpty())
             {
-                songName = Path.GetFileNameWithoutExtension(FileNameG5);
+                songName = FileNameG5.GetFileNameWithoutExtension();
             }
 
-            if (string.IsNullOrEmpty(songName) && !string.IsNullOrEmpty(FileNamePro))
+            if (songName.IsEmpty() && FileNamePro.IsNotEmpty())
             {
-                songName = Path.GetFileNameWithoutExtension(FileNamePro);
+                songName = FileNamePro.GetFileNameWithoutExtension();
             }
 
-            if (string.IsNullOrEmpty(songName))
+            if (songName.IsEmpty())
             {
-                MessageBox.Show("Cannot find song name in package");
-                return;
+                if (!silent)
+                {
+                    MessageBox.Show("Cannot find song name in package");
+                }
+                return false;
             }
 
             foreach (SongCacheItem sc in SongList)
             {
-                if (sc.SongName.EqualsEx(songName) || sc.DTASongShortName.EqualsEx(songName))
+                if (sc.SongName.EqualsEx(songName) || sc.DTASongShortName.EqualsEx(songName) ||
+                    sc.G5FileName.GetFileName().EqualsEx(FileNameG5.GetFileName()) ||
+                    sc.G6FileName.GetFileName().EqualsEx(FileNamePro.GetFileName()))
                 {
                     SongList.SelectedSong = sc;
-                    OpenSongCacheItem(SongList.SelectedSong);
-                    return;
+                    return OpenSongCacheItem(SongList.SelectedSong);
                 }
             }
 
@@ -4830,17 +4825,13 @@ namespace ProUpgradeEditor.UI
 
             if (OpenSongCacheItem(i))
             {
-                FindDTAInformation(i);
-
-                UpdateSongCacheItem(i);
+                if (FindDTAInformation(i))
+                {
+                    UpdateSongCacheItem(i);
+                }
             }
 
-            RefreshUSBSongs();
-
-            ReloadTracks();
-
-            SongList.SelectedSong = i;
-            OpenSongCacheItem(SongList.SelectedSong);
+            return OpenSongCacheItem(SongList.SelectedSong);
         }
 
         public void ClearDTAFileProperties()
@@ -5615,24 +5606,24 @@ namespace ProUpgradeEditor.UI
                 var cn = new List<int>();
                 for (int x = 0; x < 6; x++)
                 {
-                    GuitarNote n = c.Notes[x];
+                    var n = c.Notes[x];
                     int scn = sc.Notes[5 - x];
 
-                    if (scn != -1)
+                    if (scn.IsNotNull())
                         numToMatch++;
-                    if (n == null && scn == -1)
+                    if (n == null && scn.IsNull())
                     {
                         continue;
                     }
-                    else if (n == null && scn != -1)
+                    else if (n == null && scn.IsNotNull())
                     {
                         same = false;
                     }
-                    else if (n != null && scn == -1)
+                    else if (n != null && scn.IsNull())
                     {
                         same = false;
                     }
-                    else if (n != null && scn != -1 &&
+                    else if (n != null && scn.IsNotNull() &&
                         n.NoteFretDown == scn)
                     {
                         cn.Add(x);
@@ -5649,7 +5640,7 @@ namespace ProUpgradeEditor.UI
                     if (cn.Count != numToMatch)
                         same = false;
                 }
-                else if (matchAll == false && cn.Count > 0)
+                else if (matchAll == false && cn.Any())
                 {
                     same = true;
                 }
@@ -5671,27 +5662,17 @@ namespace ProUpgradeEditor.UI
         public void CheckMinimumNoteWidth()
         {
             int i = textBoxMinimumNoteWidth.Text.ToInt();
-            if (!i.IsNull())
+            if (i.IsNotNull() && i >= 0)
             {
-                if (i >= 0)
-                {
-                    Utility.MinimumNoteWidth = i;
-                }
+                Utility.MinimumNoteWidth = i;
             }
         }
 
         public void SetScrollToSelectionOffset()
         {
-            var soffset = textBoxScrollToSelectionOffset.Text;
-            var offset = soffset.ToInt();
-            if (offset.IsNull())
-            {
-                textBoxScrollToSelectionOffset.Text = "300";
-                offset = 300;
-            }
-
+            var offset = textBoxScrollToSelectionOffset.Text.ToInt(300);
+            textBoxScrollToSelectionOffset.Text = offset.ToStringEx();
             Utility.ScollToSelectionOffset = offset;
-
         }
 
 

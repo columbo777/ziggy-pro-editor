@@ -9,14 +9,7 @@ using Sanford.Multimedia.Midi;
 
 namespace ProUpgradeEditor.Common
 {
-    [Flags()]
-    public enum ChordStrum
-    {
-        Normal = 0,
-        Low = 1,
-        Mid = 2,
-        High = 4,
-    }
+    
 
 
     public static class Utility
@@ -247,7 +240,7 @@ namespace ProUpgradeEditor.Common
             }
             else
             {
-                return -1;
+                return Int32.MinValue;
             }
         }
 
@@ -273,7 +266,7 @@ namespace ProUpgradeEditor.Common
             {
                 return HardStrumData1;
             }
-            return -1;
+            return Int32.MinValue;
         }
 
         public static int GetHammeronData1(GuitarDifficulty diff)
@@ -297,7 +290,7 @@ namespace ProUpgradeEditor.Common
             }
             else
             {
-                return -1;
+                return Int32.MinValue;
             }
         }
 
@@ -388,7 +381,18 @@ namespace ProUpgradeEditor.Common
                     ChordNameEData1
                 };
 
-
+        public static IEnumerable<GuitarDifficulty> GetDifficultyIter(bool sortExpertToEasy = true)
+        {
+            var ret = new List<GuitarDifficulty>();
+            ret.Add(GuitarDifficulty.Easy);
+            ret.Add(GuitarDifficulty.Medium);
+            ret.Add(GuitarDifficulty.Hard);
+            ret.Add(GuitarDifficulty.Expert);
+            if(sortExpertToEasy)
+                ret.Reverse();
+            return ret.ToList();
+        }
+            
         public static GuitarDifficulty GetDifficulty(int data1, bool isPro)
         {
             if (isPro)
@@ -555,7 +559,7 @@ namespace ProUpgradeEditor.Common
                 }
                 else
                 {
-                    return -1;
+                    return Int32.MinValue;
                 }
             }
             else if (AllSlideData1.Contains(sourceData1))
@@ -578,7 +582,7 @@ namespace ProUpgradeEditor.Common
                 }
                 else
                 {
-                    return -1;
+                    return Int32.MinValue;
                 }
             }
             else if (AllArpeggioData1.Contains(sourceData1))
@@ -593,7 +597,7 @@ namespace ProUpgradeEditor.Common
                 }
                 else
                 {
-                    return -1;
+                    return Int32.MinValue;
                 }
             }
             else if (AllStrumData1.Contains(sourceData1))
@@ -608,13 +612,13 @@ namespace ProUpgradeEditor.Common
                 }
                 else
                 {
-                    return -1;
+                    return Int32.MinValue;
                 }
             }
 
             else
             {
-                return -1;
+                return Int32.MinValue;
             }
         }
 
@@ -726,7 +730,7 @@ namespace ProUpgradeEditor.Common
 
         public static int GetNoteString(int data1)
         {
-            int ret = -1;
+            int ret = Int32.MinValue;
 
             if (ExpertData1Strings.Contains(data1))
             {
@@ -749,7 +753,7 @@ namespace ProUpgradeEditor.Common
 
         public static int GetNoteString5(int data1)
         {
-            int ret = -1;
+            int ret = Int32.MinValue;
             if (ExpertData1StringsG5.Contains(data1))
             {
                 ret = data1 - ExpertData1LowE;
@@ -817,7 +821,7 @@ namespace ProUpgradeEditor.Common
                 return HardData1LowE;
             if (difficulty == GuitarDifficulty.Expert)
                 return ExpertData1LowE;
-            return -1;
+            return Int32.MinValue;
         }
 
         public static int GetChannelFromStrum(ChordStrum cs)
@@ -886,35 +890,5 @@ namespace ProUpgradeEditor.Common
         public static bool ModifyWebTabScale = false;
     }
 
-    public static class GridScale
-    {
-        public static readonly double WholeNote = 1.0;
-        public static readonly double HalfNote = 0.5;
-        public static readonly double QuarterNote = 0.25;
-        public static readonly double EigthNote = 0.125;
-        public static readonly double SixteenthNote = 0.0625;
-        public static readonly double ThirtySecondNote = 0.03125;
-        public static readonly double SixtyFourthNote = 0.015625;
-        public static readonly double OneTwentyEightNote = 0.0078125;
-
-        public static TimeUnit GetTimeUnit(double scale)
-        {
-            if (scale == WholeNote)
-                return TimeUnit.Whole;
-            else if (scale == HalfNote)
-                return TimeUnit.Half;
-            else if (scale == QuarterNote)
-                return TimeUnit.Quarter;
-            else if (scale == EigthNote)
-                return TimeUnit.Eight;
-            else if (scale == SixteenthNote)
-                return TimeUnit.Sixteenth;
-            else if (scale == ThirtySecondNote)
-                return TimeUnit.ThirtySecond;
-            else if (scale == SixtyFourthNote)
-                return TimeUnit.SixtyFourth;
-            else //if (scale == OneTwentyEightNote)
-                return TimeUnit.OneTwentyEigth;
-        }
-    }
+    
 }

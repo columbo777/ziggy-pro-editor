@@ -11,39 +11,34 @@ namespace ProUpgradeEditor.Common
 
     public class GuitarSlide : ChordModifier
     {
-        public GuitarSlide(MidiEventPair ev) : base(ev, 
-            (ev.HasDown && (ev.Down.Channel == Utility.ChannelSlideReversed) ? ChordModifierType.SlideReverse : ChordModifierType.Slide),
+        public override bool IsSlide
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        
+        public GuitarSlide(GuitarChord chord, bool isReversed)
+            : base(chord,
+            isReversed ?  ChordModifierType.SlideReverse : ChordModifierType.Slide, GuitarMessageType.GuitarSlide)
+        {
+            
+        }
+        public GuitarSlide(MidiEventPair pair)
+            : base(pair, pair.Channel == Utility.ChannelSlideReversed  ? ChordModifierType.SlideReverse : ChordModifierType.Slide, 
             GuitarMessageType.GuitarSlide)
         {
         }
-        public GuitarSlide(GuitarMessageList list, bool isReversed, MidiEvent downEvent = null, MidiEvent upEvent = null)
-            : base(list, downEvent, upEvent,
-            isReversed ? ChordModifierType.SlideReverse : ChordModifierType.Slide, GuitarMessageType.GuitarSlide)
-        {
-        }
-
-
-        public static GuitarSlide CreateSlide(GuitarMessageList list,
-            TickPair ticks, bool reversed, GuitarDifficulty difficulty = GuitarDifficulty.Unknown)
+        public static GuitarSlide CreateSlide(GuitarChord chord, bool reversed)
         {
             GuitarSlide ret = null;
-            if (ticks.IsValid)
+            if (!chord.HasSlide && Utility.GetSlideData1(chord.Difficulty).IsNotNull())
             {
-                if (difficulty.IsUnknownOrNone())
-                    difficulty = list.Owner.CurrentDifficulty;
-
-                var d1 = Utility.GetSlideData1(difficulty);
-                if (d1 != -1)
-                {
-                    var ev = list.Insert(d1,
-                        100,
-                        reversed ? Utility.ChannelSlideReversed : Utility.ChannelDefault,
-                        ticks);
-
-                    ret = new GuitarSlide(list, reversed, ev.Down, ev.Up);
-                    ret.IsNew = true;
-                    ret.CreateEvents();
-                }
+                ret = new GuitarSlide(chord, reversed);
+                ret.IsNew = true;
+                ret.CreateEvents();
             }
             return ret;
         }
@@ -62,17 +57,11 @@ namespace ProUpgradeEditor.Common
                 }
             }
         }
-        public bool IsReversed
+
+        public override bool IsReversed
         {
             get { return ModifierType == ChordModifierType.SlideReverse; }
-            set
-            {
-                if (value != IsReversed)
-                {
-                    ModifierType = (value == true ?
-                        ChordModifierType.SlideReverse : ChordModifierType.Slide);
-                }
-            }
+            
         }
 
         public override string ToString()

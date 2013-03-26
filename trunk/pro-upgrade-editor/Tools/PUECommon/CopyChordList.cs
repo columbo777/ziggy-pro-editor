@@ -24,13 +24,16 @@ namespace ProUpgradeEditor.Common
 
         public void Clear()
         {
-            var allLists = AllMessageTypes.Select(x => GetMessageListForType(x));
+            
+            var allLists = GetAllMessageTypes().Select(x => GetMessageListForType(x));
 
-            allLists.ToList().ForEach(x =>
+            foreach(var messageList in allLists)
+            {
+                foreach (var elem in messageList.ToList())
                 {
-                    var elems = x.List.ToList();
-                    elems.ForEach(v => v.RemoveFromList());
-                });
+                    elem.RemoveFromList();
+                }
+            }
         }
 
         public void Add(GuitarChord chord)
@@ -40,7 +43,7 @@ namespace ProUpgradeEditor.Common
 
         public void AddRange(IEnumerable<GuitarChord> chords)
         {
-            foreach (var chord in chords)
+            foreach (var chord in chords.ToList())
             {
                 Add(chord);
             }

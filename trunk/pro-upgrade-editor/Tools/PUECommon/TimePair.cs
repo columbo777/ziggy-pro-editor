@@ -98,7 +98,7 @@ namespace ProUpgradeEditor.Common
 
         public override string ToString()
         {
-            return "Down: " + Down.ToStringEx() + " - Up: " + Up.ToStringEx() + " Length: " + TimeLength.ToStringEx();
+            return "(" + Down.ToStringEx("null") + ", " + Up.ToStringEx("null") + ")";
         }
 
         public double Down

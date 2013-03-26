@@ -1603,7 +1603,7 @@
             this.listBoxSongLibrary.ScrollAlwaysVisible = true;
             this.listBoxSongLibrary.Size = new System.Drawing.Size(250, 259);
             this.listBoxSongLibrary.TabIndex = 1;
-            this.listBoxSongLibrary.SelectedIndexChanged += new System.EventHandler(this.listBoxSongLibrary_SelectedIndexChanged);
+            
             this.listBoxSongLibrary.DoubleClick += new System.EventHandler(this.listBoxSongLibrary_DoubleClick);
             // 
             // buttonCreateSongFromOpenMidi
@@ -3422,10 +3422,10 @@
             this.tabTrackEditor.Controls.Add(this.panel2);
             this.tabTrackEditor.ForeColor = System.Drawing.SystemColors.ControlText;
             this.tabTrackEditor.ImageIndex = 46;
-            this.tabTrackEditor.Location = new System.Drawing.Point(4, 24);
+            this.tabTrackEditor.Location = new System.Drawing.Point(4, 23);
             this.tabTrackEditor.Margin = new System.Windows.Forms.Padding(0);
             this.tabTrackEditor.Name = "tabTrackEditor";
-            this.tabTrackEditor.Size = new System.Drawing.Size(1095, 522);
+            this.tabTrackEditor.Size = new System.Drawing.Size(1095, 523);
             this.tabTrackEditor.TabIndex = 1;
             this.tabTrackEditor.Text = "Track Editor";
             // 
@@ -3551,10 +3551,10 @@
             this.tabNoteEditor.Controls.Add(this.groupBoxStrumMarkers);
             this.tabNoteEditor.ForeColor = System.Drawing.SystemColors.ControlText;
             this.tabNoteEditor.ImageIndex = 13;
-            this.tabNoteEditor.Location = new System.Drawing.Point(4, 24);
+            this.tabNoteEditor.Location = new System.Drawing.Point(4, 23);
             this.tabNoteEditor.Name = "tabNoteEditor";
             this.tabNoteEditor.Padding = new System.Windows.Forms.Padding(3);
-            this.tabNoteEditor.Size = new System.Drawing.Size(1095, 522);
+            this.tabNoteEditor.Size = new System.Drawing.Size(1095, 523);
             this.tabNoteEditor.TabIndex = 2;
             this.tabNoteEditor.Text = "Note Editor";
             this.tabNoteEditor.Click += new System.EventHandler(this.tabPage2_Click);
@@ -3879,7 +3879,7 @@
             this.checkBoxPlayMidiStrum.TabIndex = 5;
             this.checkBoxPlayMidiStrum.Text = "Play Midi on Strum";
             this.checkBoxPlayMidiStrum.UseVisualStyleBackColor = true;
-            this.checkBoxPlayMidiStrum.CheckedChanged += new System.EventHandler(this.checkBoxPlayMidiStrum_CheckedChanged);
+            
             // 
             // checkBoxEnableClearTimer
             // 
@@ -3890,7 +3890,7 @@
             this.checkBoxEnableClearTimer.TabIndex = 4;
             this.checkBoxEnableClearTimer.Text = "Enable Clear Timer";
             this.checkBoxEnableClearTimer.UseVisualStyleBackColor = true;
-            this.checkBoxEnableClearTimer.CheckedChanged += new System.EventHandler(this.checkBox12_CheckedChanged);
+            
             // 
             // checkBoxChordStrum
             // 
@@ -4950,7 +4950,7 @@
             this.button11.TabIndex = 3;
             this.toolTip1.SetToolTip(this.button11, "Update");
             this.button11.UseVisualStyleBackColor = true;
-            this.button11.Click += new System.EventHandler(this.updateNoteProperties_Click);
+            
             // 
             // label9
             // 
@@ -7073,7 +7073,7 @@
             this.tabPage6.Location = new System.Drawing.Point(4, 22);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage6.Size = new System.Drawing.Size(1081, 490);
+            this.tabPage6.Size = new System.Drawing.Size(1081, 491);
             this.tabPage6.TabIndex = 0;
             this.tabPage6.Text = "Package Utility";
             // 
@@ -7830,7 +7830,7 @@
             this.checkView5Button.Text = "View 5 Button";
             this.checkView5Button.UseCompatibleTextRendering = true;
             this.checkView5Button.UseVisualStyleBackColor = true;
-            this.checkView5Button.CheckedChanged += new System.EventHandler(this.checkView5Button_CheckedChanged);
+            
             // 
             // checkBoxMidiInputStartup
             // 
@@ -8335,7 +8335,7 @@
             this.checkBoxRenderMouseSnap.TabIndex = 10;
             this.checkBoxRenderMouseSnap.Text = "Render Mouse Snap";
             this.checkBoxRenderMouseSnap.UseVisualStyleBackColor = true;
-            this.checkBoxRenderMouseSnap.CheckedChanged += new System.EventHandler(this.checkBoxRenderMouseSnap_CheckedChanged);
+            
             // 
             // checkBoxSnapToCloseNotes
             // 

@@ -44,7 +44,7 @@ namespace ProUpgradeEditor.Common
 
         public override string ToString()
         {
-            return "Fret: " + NoteFretDown.ToStringEx();
+            return base.ToString() + " Fret: " + NoteFretDown.ToStringEx();
         }
     }
 }

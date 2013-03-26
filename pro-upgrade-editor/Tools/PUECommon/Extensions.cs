@@ -930,7 +930,7 @@ namespace ProUpgradeEditor.Common
             {
                 var tempo = seq5.Tracks.FirstOrDefault();
                 if (tempo != null)
-                    seq.AddTempo(tempo.Clone());
+                    seq.AddTempo(tempo.Clone(FileType.Pro));
 
                 seq5.GetGuitarBassTracks().ForEach(x => seq.Add(x.ConvertToPro()));
             }
@@ -941,15 +941,10 @@ namespace ProUpgradeEditor.Common
             return seq;
         }
 
-        public static int IndexOf<T>(this IEnumerable<T> list, T item)
+        public static int IndexOf<T>(this IEnumerable<T> list, T item) where T : class
         {
-            var ret = Int32.MinValue;
-            var l = list.ToList();
-            if (l.Contains(item))
-            {
-                ret = l.IndexOf(item);
-            }
-            return ret;
+            var ret = -1;
+            return list.Where((x, i) => (x == item) && ((ret = i) == i)).Any() ? ret : -1;
         }
 
 
@@ -957,7 +952,7 @@ namespace ProUpgradeEditor.Common
         {
             return t.Sequence.IndexOf(t);
         }
-        public static bool HasTrack(this Sequence seq, Track t) { return seq.IndexOf(t).IsNull() == false; }
+        public static bool HasTrack(this Sequence seq, Track t) { return seq.IndexOf(t) != -1; }
 
         public static bool IsTempo(this Track t)
         {
@@ -1216,74 +1211,79 @@ namespace ProUpgradeEditor.Common
         public static ChannelMessage ConvertToPro(this ChannelMessage cm, GuitarDifficulty targetDifficulty = GuitarDifficulty.Unknown)
         {
             ChannelMessage ret = null;
-            var cb = new ChannelMessageBuilder(cm);
 
-            if (targetDifficulty.IsUnknown())
-                targetDifficulty = cm.Data1.GetData1Difficulty(false);
-
-            var noteString = cm.Data1.GetNoteString5();
-            if (noteString != -1)
+            if (targetDifficulty.IsUnknownOrNone())
             {
-                cb.Data2 = cm.Command.GetData2();
-                cb.Command = cm.Command;
-                cb.Data1 = targetDifficulty.GetStringLowEPro() + noteString;
-                cb.MidiChannel = Utility.ChannelDefault;
+                targetDifficulty = cm.Data1.GetData1Difficulty(false);
+            }
 
-                cb.Build();
-
-                ret = cb.Result;
+            if (targetDifficulty.IsUnknownOrNone())
+            {
+                cm.ToString().OutputDebug();
             }
             else
             {
-                var modData1 = Utility.GetModifierData1ForDifficulty(cm.Data1,
-                    cm.Data1.GetData1Difficulty(false), targetDifficulty);
-                if (modData1 != -1)
+                var cb = new ChannelMessageBuilder(cm);
+                var noteString = cm.Data1.GetNoteString5();
+                if (noteString != -1)
                 {
                     cb.Data2 = cm.Command.GetData2();
                     cb.Command = cm.Command;
-                    cb.Data1 = modData1;
+                    cb.Data1 = targetDifficulty.GetStringLowEPro() + noteString;
                     cb.MidiChannel = Utility.ChannelDefault;
 
                     cb.Build();
 
                     ret = cb.Result;
                 }
-                else if (targetDifficulty.IsEasy())
+                else
                 {
-                }
-                else if (targetDifficulty.IsMedium())
-                {
-                }
-                else if (targetDifficulty.IsHard())
-                {
-                }
-                else if (targetDifficulty.IsUnknown() || targetDifficulty.IsExpertAll())
-                {
-                    if (cm.Data1.IsSoloExpert(false))
+                    var modData1 = Utility.GetModifierData1ForDifficulty(cm.Data1,
+                        cm.Data1.GetData1Difficulty(false), targetDifficulty);
+                    if (modData1 != -1)
                     {
                         cb.Data2 = cm.Command.GetData2();
                         cb.Command = cm.Command;
-                        cb.Data1 = Utility.SoloData1;
+                        cb.Data1 = modData1;
                         cb.MidiChannel = Utility.ChannelDefault;
 
                         cb.Build();
 
                         ret = cb.Result;
                     }
-                    else if (cm.Data1.IsPowerup() || cm.Data1.IsBigRockEnding())
+                    else if (targetDifficulty.IsEasy())
                     {
-                        cb.Data2 = cm.Command.GetData2();
-                        cb.Command = cm.Command;
-                        cb.Data1 = cm.Data1;
-                        cb.MidiChannel = Utility.ChannelDefault;
-
-                        cb.Build();
-
-                        ret = cb.Result;
                     }
-                    else
+                    else if (targetDifficulty.IsMedium())
                     {
-                        cm.ToString().OutputDebug();
+                    }
+                    else if (targetDifficulty.IsHard())
+                    {
+                    }
+                    else if (targetDifficulty.IsExpertAll())
+                    {
+                        if (cm.Data1.IsSoloExpert(false))
+                        {
+                            cb.Data2 = cm.Command.GetData2();
+                            cb.Command = cm.Command;
+                            cb.Data1 = Utility.SoloData1;
+                            cb.MidiChannel = Utility.ChannelDefault;
+
+                            cb.Build();
+
+                            ret = cb.Result;
+                        }
+                        else if (cm.Data1.IsPowerup() || cm.Data1.IsBigRockEnding())
+                        {
+                            cb.Data2 = cm.Command.GetData2();
+                            cb.Command = cm.Command;
+                            cb.Data1 = cm.Data1;
+                            cb.MidiChannel = Utility.ChannelDefault;
+
+                            cb.Build();
+
+                            ret = cb.Result;
+                        }
                     }
                 }
             }
@@ -1528,7 +1528,7 @@ namespace ProUpgradeEditor.Common
 
         public static ChordModifierType GetModifierType(this ChordStrum strum)
         {
-            var ret = ChordModifierType.Invalid;
+            var ret = ChordModifierType.None;
             if (strum == ChordStrum.High)
                 ret = ChordModifierType.ChordStrumHigh;
             if (strum == ChordStrum.Mid)
@@ -1602,16 +1602,6 @@ namespace ProUpgradeEditor.Common
             return list.Where(x => diff.HasFlag(x.Data1.GetData1Difficulty(isPro))).ToList();
         }
 
-        public static T SingleByDownTick<T>(this SpecializedMessageList<T> list, int downTick) where T : GuitarMessage
-        {
-            downTick = downTick < 0 ? 0 : downTick;
-            var ret = list.SingleOrDefault(x => x.DownTick <= downTick && x.UpTick > downTick);
-            if (ret == null)
-            {
-                ret = list.LastOrDefault();
-            }
-            return ret;
-        }
         public static T SingleBetweenTick<T>(this IEnumerable<T> list, TickPair ticks) where T : GuitarMessage
         {
             return list.FirstOrDefault(x => x.DownTick < ticks.Up && x.UpTick > ticks.Down);
@@ -1759,11 +1749,7 @@ namespace ProUpgradeEditor.Common
         {
             return list.GroupBy(x => x.DownTick, x => x, new TickCloseComparer(Utility.TickCloseWidth)).ToList();
         }
-        public static IEnumerable<IEnumerable<T>> GroupByCloseTick<T>(this SpecializedMessageList<T> list) where T : GuitarMessage
-        {
-            return list.GroupBy(x => x.DownTick, x => x, new TickCloseComparer(Utility.TickCloseWidth)).ToList();
-        }
-
+        
         public static IEnumerable<MidiEventPair> GetEventPairs(this IEnumerable<IGrouping<Data1ChannelPair, MidiEvent>> dic,
             GuitarMessageList owner, int data1)
         {

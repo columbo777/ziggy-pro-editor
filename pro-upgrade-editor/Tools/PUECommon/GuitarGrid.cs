@@ -5,37 +5,9 @@ using System.Text;
 
 namespace ProUpgradeEditor.Common
 {
-    public enum TimeUnit
-    {
-        Invalid = 0,
-        Whole = 1,
-        Half = 2,
-        Quarter = 4,
-        Eight = 8,
-        Sixteenth = 16,
-        ThirtySecond = 32,
-        SixtyFourth = 64,
-        OneTwentyEigth = 128,
-    }
+    
 
-    public class GridPoint
-    {
-        public double Time;
-        public int Tick;
-        public bool IsWholeNote;
-        public int MeasureNumber;
-
-        public int ScreenPoint
-        {
-            get
-            {
-                return (int)Math.Round(Utility.ScaleUp(Time));
-            }
-        }
-        public TimeUnit TimeUnit;
-
-        public int IntTimeUnit { get { return (int)TimeUnit; } }
-    }
+    
 
     public class NoteGrid
     {

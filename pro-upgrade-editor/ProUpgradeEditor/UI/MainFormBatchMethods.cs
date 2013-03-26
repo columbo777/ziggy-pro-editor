@@ -515,18 +515,11 @@ namespace ProUpgradeEditor.UI
                 if (config.Generate108Events)
                 {
                     Set108Events(config);
-
-                    try
-                    {
-                        Refresh108EventList();
-                    }
-                    catch { }
                 }
 
+                ret = true;
             }
             catch { ret = false; }
-
-            ret = true;
 
             return ret;
         }
@@ -604,7 +597,7 @@ namespace ProUpgradeEditor.UI
 
             GuitarChord lastChord = null;
 
-            foreach (var sc in EditorG5.Messages.Chords)
+            foreach (var sc in EditorG5.Messages.Chords.ToList())
             {
                 if (lastChord != null && sc.StartTime < lastChord.EndTime)
                     continue;
@@ -719,7 +712,7 @@ namespace ProUpgradeEditor.UI
                         EditorPro.Messages,
                         targetDifficulty,
                         sc.TickPair,
-                        frets, channels, gc.IsSlide, gc.IsSlideReversed, gc.IsHammeron);
+                        frets, channels, gc.HasSlide, gc.HasSlideReversed, gc.HasHammeron);
 
                 }
             }
@@ -1187,490 +1180,261 @@ namespace ProUpgradeEditor.UI
             return ret;
         }
 
-        List<string> VerifySongData(string proName, Sequence sq, SongCacheItem item)
+        List<string> VerifySongData(string midiTrackName, Sequence midiSequence, SongCacheItem songCacheItem)
         {
 
             var fileErrors = new List<string>();
             try
             {
 
-                foreach (var track in sq)
+                foreach (var track in midiSequence)
                 {
                     if (track.Name.IsEmpty())
                     {
                         fileErrors.Add("Null track name");
                     }
-                    else if (track.Name.IsProTrackName() && sq.IndexOf(track) == 0)
+                    else if (track.Name.IsProTrackName() && midiSequence.IndexOf(track) == 0)
                     {
                         fileErrors.Add("Tempo must be first track");
                     }
                 }
 
-                bool foundGuitarTrack = false;
-                bool foundBassTrack = false;
-                bool foundGuitar22 = false;
-                bool foundBass22 = false;
-                bool foundGuitar17 = false;
-                bool foundBass17 = false;
-
-                foreach (Track t in sq)
-                {
-                    var name = t.Name;
-                    if (name.IsGuitarTrackName6())
-                    {
-                        foundGuitarTrack = true;
-                    }
-                    else if (name.IsBassTrackName6())
-                    {
-                        foundBassTrack = true;
-                    }
-                    if (name.IsGuitarTrackName22())
-                    {
-                        foundGuitar22 = true;
-                    }
-                    if (name.IsBassTrackName22())
-                    {
-                        foundBass22 = true;
-                    }
-                    if (name.IsGuitarTrackName17())
-                    {
-                        foundGuitar17 = true;
-                    }
-                    if (name.IsBassTrackName17())
-                    {
-                        foundBass17 = true;
-                    }
-                }
+                var tracks = midiSequence.GetGuitarBassTracks().ToList();
+                bool foundGuitarTrack = tracks.Any(x=> x.Name.IsGuitarTrackName());
+                bool foundBassTrack = tracks.Any(x => x.Name.IsBassTrackName());
+                bool foundGuitar22 = tracks.Any(x => x.Name.IsGuitarTrackName22());
+                bool foundBass22 = tracks.Any(x => x.Name.IsBassTrackName22());
+                bool foundGuitar17 = tracks.Any(x => x.Name.IsGuitarTrackName17());
+                bool foundBass17 = tracks.Any(x => x.Name.IsBassTrackName17());
 
                 if (foundGuitarTrack == false)
                 {
-                    fileErrors.Add("No pro guitar track in midi file: " + proName);
+                    fileErrors.Add("No pro guitar track in midi file: " + midiTrackName);
                 }
-                if (foundBassTrack == false && (item != null && item.HasBass == true))
+                if (foundBassTrack == false && (songCacheItem != null && songCacheItem.HasBass == true))
                 {
-                    fileErrors.Add("No pro bass track in midi file: " + proName);
+                    fileErrors.Add("No pro bass track in midi file: " + midiTrackName);
                 }
 
-                if (foundGuitar22 == true &&
-                    foundGuitar17 == false)
+                if (foundGuitar22 == true && foundGuitar17 == false)
                 {
-                    fileErrors.Add("No 17 fret pro guitar track in file: " + proName);
+                    fileErrors.Add("No 17 fret pro guitar track in file: " + midiTrackName);
                 }
-                if (foundBass22 == true &&
-                    foundBass17 == false)
+                if (foundBass22 == true && foundBass17 == false)
                 {
-                    fileErrors.Add("No 17 fret pro bass track in file: " + proName);
+                    fileErrors.Add("No 17 fret pro bass track in file: " + midiTrackName);
                 }
 
 
-                foreach (Track t in sq.Where(x => x.Name.IsProTrackName()))
+                foreach (var currentTrack in tracks)
                 {
-                    var trackName = t.Name;
 
-                    EditorPro.SetTrack6(sq, t, GuitarDifficulty.Expert);
-
-
-                    var h108 = ProGuitarTrack.Messages.HandPositions;
-
-                    if (!h108.Any())
+                    var currentTrackName = currentTrack.Name ?? "(no name)";
+                    
+                    if (!EditorPro.SetTrack6(midiSequence, currentTrack, GuitarDifficulty.Expert))
                     {
-                        fileErrors.Add(trackName + " does not have hand position events (108)");
-                    }
-                    else
-                    {
-                        var first = h108.First();
-
-                        if (EditorPro.Messages.Chords.Any())
-                        {
-                            if (first.AbsoluteTicks >= EditorPro.Messages.Chords.First().DownTick)
-                            {
-                                fileErrors.Add("108 hand position event occurs too late on track: " + (trackName ?? "(no name)"));
-                            }
-                        }
-                        else
-                        {
-                            fileErrors.Add("no chords defined for track: " + (trackName ?? "(no name)"));
-                        }
-                    }
-
-                    var tempotrack = EditorPro.GuitarTrack.GetTempoTrack();
-                    if (tempotrack == null)
-                    {
-                        fileErrors.Add(trackName + " no tempo created");
-                    }
-                    else
-                    {
-                        if (tempotrack.TimeSig.Count() == 0)
-                        {
-                            fileErrors.Add(trackName + " Time signature missing from tempo track.");
-                        }
-
-                        if (tempotrack.Tempo.Count() == 0)
-                        {
-                            fileErrors.Add(trackName + " Tempo missing from tempo track.");
-                        }
+                        fileErrors.Add(currentTrackName + " Failed to set track ");
+                        continue;
                     }
 
 
-                    for (int tx = 0; tx < 4; tx++)
-                    {
-                        EditorPro.CurrentDifficulty = (GuitarDifficulty)(((int)GuitarDifficulty.Easy) << tx);
+                    var metaNames = currentTrack.Meta.Where(x => x.MetaType == MetaType.TrackName).ToList();
 
-
-                        if (!EditorPro.GuitarTrack.Messages.Chords.Any())
-                        {
-                            fileErrors.Add(trackName + " difficulty not created: " + EditorPro.CurrentDifficulty.ToString());
-                        }
-                        else
-                        {
-                            int nonSnappedNotes = 0;
-                            int overlappingChords = 0;
-
-                            var proChords = EditorPro.GuitarTrack.Messages.Chords.ToArray();
-                            for (int x = 0; x < proChords.Length - 2; x++)
-                            {
-                                var c1 = proChords[x];
-                                var c2 = proChords[x + 1];
-
-                                int min1 = int.MaxValue;
-                                int max1 = int.MinValue;
-                                int firstMin = int.MaxValue;
-                                int firstMax = int.MinValue;
-                                foreach (var n in c1.Notes)
-                                {
-                                    if (n != null)
-                                    {
-                                        if (firstMin == int.MaxValue)
-                                        {
-                                            firstMin = n.DownTick;
-                                        }
-                                        else
-                                        {
-                                            if (n.DownTick != firstMin)
-                                            {
-                                                nonSnappedNotes++;
-                                            }
-                                        }
-                                        if (firstMax == int.MinValue)
-                                        {
-                                            firstMax = n.UpTick;
-                                        }
-                                        else
-                                        {
-                                            if (n.UpTick != firstMax)
-                                            {
-                                                nonSnappedNotes++;
-                                            }
-                                        }
-                                        if (n.DownTick < min1)
-                                        {
-                                            min1 = n.DownTick;
-                                        }
-                                        if (n.UpTick > max1)
-                                        {
-                                            max1 = n.UpTick;
-                                        }
-                                    }
-                                }
-
-                                int min2 = int.MaxValue;
-                                int max2 = int.MinValue;
-                                foreach (var n in c2.Notes)
-                                {
-                                    if (n != null)
-                                    {
-                                        if (n.DownTick < min2)
-                                        {
-                                            min2 = n.DownTick;
-                                        }
-                                        if (n.UpTick > max2)
-                                        {
-                                            max2 = n.UpTick;
-                                        }
-                                    }
-                                }
-
-                                if (min2 < max1)
-                                {
-                                    overlappingChords++;
-                                }
-                            }
-
-                            if (overlappingChords > 0)
-                            {
-                                fileErrors.Add(trackName + " " + overlappingChords.ToString() + " Overlapping notes found: " + EditorPro.CurrentDifficulty.ToString());
-                            }
-                            if (nonSnappedNotes > 0)
-                            {
-                                fileErrors.Add(trackName + " " + nonSnappedNotes.ToString() + " Note times not matching chord times: " + EditorPro.CurrentDifficulty.ToString());
-                            }
-
-                            bool arpeggioMissingChords = false;
-
-                            foreach (var mod in EditorPro.GuitarTrack.Messages.Arpeggios.ToList())
-                            {
-                                var chords = EditorPro.GuitarTrack.Messages.Chords.GetBetweenTick(
-                                    new TickPair(mod.DownTick, mod.UpTick)).ToList();
-
-                                if (!chords.Any())
-                                {
-                                    arpeggioMissingChords = true;
-                                }
-
-                            }
-
-                            if (arpeggioMissingChords)
-                            {
-                                fileErrors.Add(trackName + " Arpeggio found with no chords: " + EditorPro.CurrentDifficulty.ToString());
-                            }
-
-                            if (EditorPro.CurrentDifficulty == GuitarDifficulty.Expert)
-                            {
-                                bool modWithNoNotes =
-                                    EditorPro.GuitarTrack.Messages.SingleStringTremelos.Any(x =>
-                                        !EditorPro.GuitarTrack.Messages.Chords.GetBetweenTick(new TickPair(x.DownTick, x.UpTick)).Any());
-
-                                if (modWithNoNotes)
-                                {
-                                    fileErrors.Add(trackName + " Single string tremelo with no notes: " + EditorPro.CurrentDifficulty.ToString());
-                                }
-
-                                modWithNoNotes = EditorPro.GuitarTrack.Messages.MultiStringTremelos.Any(x =>
-                                        !EditorPro.GuitarTrack.Messages.Chords.GetBetweenTick(new TickPair(x.DownTick, x.UpTick)).Any());
-
-                                if (modWithNoNotes)
-                                {
-                                    fileErrors.Add(trackName + " Multi string tremelo with no notes: " + EditorPro.CurrentDifficulty.ToString());
-                                }
-                            }
-                            bool hasNotes = false;
-                            int numNotes = 0;
-                            int numZero = 0;
-                            int numZeroInARow = 0;
-                            bool hasShortChord = false;
-                            bool hasMixedXNotes = false;
-                            bool hasOver17 = false;
-
-                            foreach (var gc in EditorPro.GuitarTrack.Messages.Chords)
-                            {
-                                hasNotes = false;
-                                int numX = 0;
-                                int numNonX = 0;
-                                bool allZeroNotes = true;
-                                for (int x = 0; x < 6; x++)
-                                {
-                                    if (gc.Notes[x] == null)
-                                        continue;
-
-                                    var noteFret = gc.Notes[x].NoteFretDown;
-                                    if (noteFret != -1)
-                                    {
-                                        hasNotes = true;
-
-                                        if (noteFret != 0)
-                                        {
-                                            allZeroNotes = false;
-                                        }
-                                        if (noteFret > 17 && EditorPro.GuitarTrack.Name.IsProTrackName17())
-                                        {
-                                            hasOver17 = true;
-                                        }
-
-                                    }
-
-                                    if (gc.Notes[x].IsXNote)
-                                    {
-                                        numX++;
-                                    }
-                                    else
-                                    {
-                                        numNonX++;
-                                    }
-                                }
-
-
-                                if (numX > 0 && numNonX > 0 && numX != numNonX)
-                                {
-                                    hasMixedXNotes = true;
-                                }
-                                if (Utility.IsCloseTick(gc.UpTick, gc.DownTick))
-                                {
-                                    hasShortChord = true;
-                                }
-
-                                if (hasNotes)
-                                {
-                                    numNotes++;
-                                }
-
-                                if (allZeroNotes)
-                                {
-                                    numZeroInARow++;
-                                    numZero++;
-                                }
-                                else
-                                {
-                                    numZeroInARow = 0;
-                                }
-                            }
-
-                            if (!t.Name.IsProTrackName22())
-                            {
-                                if (hasOver17)
-                                {
-                                    fileErrors.Add(trackName + " Notes above 17 on Mustang chart: " + EditorPro.CurrentDifficulty.ToString());
-                                }
-                            }
-                            if (hasMixedXNotes)
-                            {
-                                fileErrors.Add(trackName + " Chord(s) found with mixture of mute and non mute notes: " + EditorPro.CurrentDifficulty.ToString());
-                            }
-
-                            if (((numZeroInARow > numNotes / 2) ||
-                                (numZero == numNotes) && numNotes > 0))
-                            {
-                                if (numZero == numNotes)
-                                {
-                                    fileErrors.Add(trackName + " All Zero notes for difficulty: " + EditorPro.CurrentDifficulty.ToString());
-                                }
-                                else
-                                {
-                                    fileErrors.Add(trackName + " A lot of missing notes for difficulty: " + EditorPro.CurrentDifficulty.ToString());
-                                }
-                            }
-                            else if (numNotes == 0)
-                            {
-                                fileErrors.Add(trackName + " No notes set: " + EditorPro.CurrentDifficulty.ToString());
-                            }
-
-                            if (hasShortChord)
-                            {
-                                fileErrors.Add(trackName + " invalid chord length found: " + EditorPro.CurrentDifficulty.ToString());
-                            }
-
-                            if (EditorG5.IsLoaded &&
-                                EditorPro.CurrentDifficulty == GuitarDifficulty.Expert &&
-                                EditorPro.IsEditingGuitar)
-                            {
-
-                                if (t.Name.IsBassTrackName6() && (item != null && item.CopyGuitarToBass == false))
-                                {
-                                    EditorG5.SetTrack(GuitarTrack.GuitarTrackName5, EditorPro.CurrentDifficulty);
-                                }
-                                else
-                                {
-                                    EditorG5.SetTrack(t.Name.GetG5TrackNameFromPro(), EditorPro.CurrentDifficulty);
-                                }
-
-                                if (EditorPro.CurrentDifficulty == GuitarDifficulty.Expert)
-                                {
-                                    if (EditorG5.Messages.BigRockEndings.Any() &&
-                                        !EditorPro.Messages.BigRockEndings.Any())
-                                    {
-                                        fileErrors.Add(trackName + " Big Rock Ending in 5 button but not pro");
-                                    }
-
-                                    if (EditorG5.Messages.Solos.Count() !=
-                                        EditorPro.Messages.Solos.Count())
-                                    {
-                                        fileErrors.Add(trackName + " Not all solos created");
-                                    }
-                                    if (EditorG5.Messages.Powerups.Count() !=
-                                        EditorPro.Messages.Powerups.Count())
-                                    {
-                                        fileErrors.Add(trackName + " Not all powerups created");
-                                    }
-                                }
-                            }
-
-                        }
-
-                    }//end for each difficulty 
-
-                    bool foundName = false;
-                    string name = "";
-
-                    MidiEvent nameEvent = null;
-                    var extraNames = new List<MidiEvent>();
-                    foreach (var meta in ProGuitarTrack.GetTrack().Meta.Where(x => x.MetaType == MetaType.TrackName))
-                    {
-                        if (foundName)
-                        {
-                            extraNames.Add(meta);
-                        }
-                        else
-                        {
-                            foundName = true;
-                            nameEvent = meta;
-                            name = meta.MetaMessage.Text;
-                        }
-                    }
-                    if (!foundName)
+                    if (!metaNames.Any())
                     {
                         fileErrors.Add("Contains Invalid track with no name");
                     }
-                    else
+                    else if (metaNames.Count() > 1)
                     {
-                        if (extraNames.Any())
+                        fileErrors.Add(metaNames.First().MetaMessage.Text + " Contains Extra track names:");
+                        foreach (var en in metaNames)
                         {
-                            fileErrors.Add(name + " Contains Extra track names:");
-                            foreach (var en in extraNames)
-                            {
-                                fileErrors.Add("Extra Track Name: " + en.MetaMessage.Text);
-                            }
+                            fileErrors.Add(en.MetaMessage.Text);
                         }
                     }
 
-
-                    for (int tx = 0; tx < 2; tx++)
+                    foreach(var diff in Utility.GetDifficultyIter())
                     {
-                        EditorPro.CurrentDifficulty = tx == 0 ? GuitarDifficulty.Expert : GuitarDifficulty.Hard;
+                        
+                        EditorPro.CurrentDifficulty = diff;
 
-
-
-                        foreach (var gc in EditorPro.GuitarTrack.Messages.Chords)
+                        var messages = EditorPro.Messages;
+                        var chords = messages.Chords.ToList();
+                        if (diff.IsExpert())
                         {
-                            string chordDesc = string.Empty;
-                            for (int x = 0; x < 6; x++)
-                            {
-                                if (gc.Notes[x] != null)
-                                {
-                                    chordDesc += "'" + gc.Notes[x].NoteFretDown.ToString() + "',";
-                                }
-                                else
-                                {
-                                    chordDesc += "' ',";
-                                }
-                            }
-                            chordDesc = chordDesc.Trim(',');
 
-
-                            if (gc.HasStrum)
+                            if (EditorG5.IsLoaded)
                             {
-                                if ((gc.StrumMode & ChordStrum.High) > 0)
+                                var copyGuitarToBass = (songCacheItem != null && songCacheItem.CopyGuitarToBass == false);
+                                if (currentTrackName.IsBassTrackName() && !copyGuitarToBass &&
+                                    EditorG5.GetTrack(GuitarTrack.BassTrackName5) != null)
                                 {
-                                    if (gc.Notes[4] == null && gc.Notes[5] == null)
+                                    EditorG5.SetTrack(GuitarTrack.BassTrackName5, diff);
+                                }
+                                else if (EditorG5.GetTrack(GuitarTrack.GuitarTrackName5) != null)
+                                {
+                                    EditorG5.SetTrack(GuitarTrack.GuitarTrackName5, diff);
+                                }
+                                if (diff.IsExpert())
+                                {
+                                    if (EditorG5.Messages.BigRockEndings.Any() &&
+                                        !messages.BigRockEndings.Any())
                                     {
-                                        fileErrors.Add(trackName + " High strum marker missing high notes : " + chordDesc);
+                                        fileErrors.Add(currentTrackName + " Big Rock Ending in 5 button but not pro");
+                                    }
+
+                                    var solo5 = EditorG5.Messages.Solos.ToList();
+                                    var solo6 = messages.Solos.ToList();
+
+                                    var missing5 = solo5.Where(x => !solo6.Any(sx => sx.TickPair == x.TickPair)).ToList();
+                                    if (missing5.Any())
+                                    {
+                                        fileErrors.Add(currentTrackName + " Not all solos created ");
+                                        fileErrors.AddRange(missing5.Select(m => m.TickPair.ToString()));
+                                    }
+
+                                    var power5 = EditorG5.Messages.Powerups.ToList();
+                                    var power6 = messages.Powerups.ToList();
+
+                                    var missingpower5 = power5.Where(x => !power6.Any(sx => sx.TickPair == x.TickPair)).ToList();
+                                    if (missingpower5.Any())
+                                    {
+                                        fileErrors.Add(currentTrackName + " Not all powerups snapped ");
+                                        fileErrors.AddRange(missingpower5.Select(m => m.TickPair.ToString()));
                                     }
                                 }
-                                if ((gc.StrumMode & ChordStrum.Mid) > 0)
-                                {
-                                    if (gc.Notes[2] == null && gc.Notes[3] == null)
-                                    {
-                                        fileErrors.Add(trackName + " Mid strum marker missing Mid notes : " + chordDesc);
-                                    }
-                                }
-                                if ((gc.StrumMode & ChordStrum.Low) > 0)
-                                {
-                                    if (gc.Notes[0] == null && gc.Notes[1] == null)
-                                    {
-                                        fileErrors.Add(trackName + " Low strum marker missing low notes : " + chordDesc);
-                                    }
-                                }
+
                             }
 
                         }
+
+                        if (!chords.Any())
+                        {
+                            fileErrors.Add(currentTrackName + " No Chords Created !! " + diff);
+                            continue;
+                        }
+                        if (diff.IsExpert())
+                        {
+                            var handPositions = messages.HandPositions.ToList();
+                            if (!handPositions.Any())
+                            {
+                                fileErrors.Add(currentTrackName + " does not have hand position events (108) " + diff);
+                            }
+                            else
+                            {
+                                if (chords.First().DownTick < handPositions.First().DownTick)
+                                {
+                                    fileErrors.Add("108 hand position event occurs too late on track: " + (currentTrackName) + " " + diff);
+                                }
+                            }
+                        }
+                        var tempotrack = EditorPro.GuitarTrack.GetTempoTrack();
+                        if (tempotrack == null)
+                        {
+                            fileErrors.Add(currentTrackName + " no tempo track found");
+                        }
+                        
+                        
+                        if (!messages.TimeSignatures.Any())
+                        {
+                            fileErrors.Add(currentTrackName + " Time signature missing from tempo track.");
+                        }
+
+                        if (!messages.Tempos.Any())
+                        {
+                            fileErrors.Add(currentTrackName + " Tempo missing from tempo track.");
+                        }
+                        
+                        var noteAligns = chords.Where(x => x.Notes.NotesAligned == false).ToList();
+                        if (noteAligns.Any())
+                        {
+                            fileErrors.Add(currentTrackName + " " + noteAligns.Count + " Note times not snapped: " + diff);
+                        }
+
+                        var modAligns = chords.Where(chord => chord.Modifiers.Any(modifier => modifier.TickPair != chord.TickPair)).ToList();
+                        if (modAligns.Any())
+                        {
+                            fileErrors.Add(currentTrackName + " " + modAligns.Count + " Modifier times not snapped: " + diff);
+                        }
+
+                        var overlaps = chords.Take(chords.Count-1).Where(x=> x.UpTick > x.NextChord.DownTick).ToList();
+
+                        if (overlaps.Any())
+                        {
+                            fileErrors.Add(currentTrackName + " " + overlaps.Count + " Overlapping notes found: " + diff);
+                        }
+                            
+
+                        if (Utility.GetArpeggioData1(diff).IsNotNull())
+                        {
+                            var arpeggios = messages.Arpeggios.ToList();
+                            var arpeggioMissingChords = arpeggios.Where(x => chords.AnyBetweenTick(x.TickPair) == false).ToList();
+                            if (arpeggioMissingChords.Any())
+                            {
+                                   
+                                fileErrors.Add(currentTrackName + " " + arpeggioMissingChords.Count + " Arpeggios found with no chords: " + diff);
+                            }
+                        }
+                            
+                            
+                        if (diff.IsExpert())
+                        {
+                            var sstrem = messages.SingleStringTremelos.ToList();
+                            var modWithNoNotes = sstrem.Where(x=> chords.AnyBetweenTick(x.TickPair)==false).ToList();
+                                
+                            if (modWithNoNotes.Any())
+                            {
+                                fileErrors.Add(currentTrackName + " " + modWithNoNotes.Count + " Single string tremelo with no notes: " + diff);
+                            }
+                        }
+
+                        if(diff.IsExpert())
+                        {
+                            var trem = messages.MultiStringTremelos.ToList();
+                            var modWithNoNotes = trem.Where(x=> chords.AnyBetweenTick(x.TickPair)==false).ToList();
+                                
+                            if (modWithNoNotes.Any())
+                            {
+                                fileErrors.Add(currentTrackName + " " + modWithNoNotes.Count + " Multi string tremelo with no notes: " + diff);
+                            }
+                        }
+                            
+                        var hasOver17 = chords.Any(x => x.HighestFret > 17);
+                        if (currentTrackName.IsProTrackName17() && hasOver17)
+                        {
+                            fileErrors.Add(currentTrackName + " Notes above 17 on Mustang chart: " + diff);
+                        }
+                        if (chords.Any(x=> x.Notes.Any(n=> n.IsXNote) && x.Notes.Any(n=> n.IsXNote)==false))
+                        {
+                            fileErrors.Add(currentTrackName + " Mix of mute and non mute: " + diff);
+                        }
+
+                        var numZero = chords.Count(x=> x.HighestFret==0);
+                        var numNonZero = chords.Count(x=> x.HighestFret!=0);
+
+                        if(numNonZero==0)
+                        {
+                            fileErrors.Add(currentTrackName + " No notes set: " + diff);
+                        }
+
+                        if (chords.Any(x=> x.TickLength < 8))
+                        {
+                            fileErrors.Add(currentTrackName + " invalid chord length found: " + diff);
+                            foreach (var chord in chords.Where(x => x.TickLength < 8))
+                            {
+                                fileErrors.Add("  " + chord.ToString());
+                            }
+                        }
+
+                        chords.Where(x =>
+                            (x.HasHighStrum && !x.HighStrumNotes.Any()) ||
+                            (x.HasMidStrum && !x.MidStrumNotes.Any()) ||
+                            (x.HasLowStrum && !x.LowStrumNotes.Any())
+                            ).ToList().ForEach(x =>
+                            {
+                                fileErrors.Add(currentTrackName + " " + diff + " strum marker missing notes ");
+                            });
+                        
                     }
                 }//end for each track
 

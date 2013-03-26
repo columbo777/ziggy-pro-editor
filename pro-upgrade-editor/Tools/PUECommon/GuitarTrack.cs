@@ -498,66 +498,6 @@ namespace ProUpgradeEditor.Common
             }
         }
 
-        public GuitarMessage CreateMessageByType(GuitarMessageList list, GuitarMessageType type, MidiEvent down, MidiEvent up = null)
-        {
-            GuitarMessage ret = null;
-            switch (type)
-            {
-                case GuitarMessageType.GuitarHandPosition:
-                    ret = new GuitarHandPosition(new MidiEventPair(list,down, up));
-                    break;
-                case GuitarMessageType.GuitarTextEvent:
-                    ret = GuitarTextEvent.GetTextEvent(list, down);
-                    break;
-                case GuitarMessageType.GuitarTrainer:
-                    ret = new GuitarTrainer(list, GuitarTrainerType.Unknown);
-                    break;
-                case GuitarMessageType.GuitarChord:
-                    ret = GuitarChord.GetChord(list, list.Notes.Where(x => x.DownTick == down.AbsoluteTicks), true);
-                    break;
-                case GuitarMessageType.GuitarChordStrum:
-                    ret = new GuitarChordStrum(list, down, up);
-                    break;
-                case GuitarMessageType.GuitarNote:
-                    ret = new GuitarNote(list, down, up);
-                    break;
-                case GuitarMessageType.GuitarPowerup:
-                    ret = new GuitarPowerup(list, down, up);
-                    break;
-                case GuitarMessageType.GuitarSolo:
-                    ret = new GuitarSolo(list, down, up);
-                    break;
-                case GuitarMessageType.GuitarTempo:
-                    ret = new GuitarTempo(list, down);
-                    break;
-                case GuitarMessageType.GuitarTimeSignature:
-                    ret = new GuitarTimeSignature(list, down);
-                    break;
-                case GuitarMessageType.GuitarArpeggio:
-                    ret = new GuitarArpeggio(list, down, up);
-                    break;
-                case GuitarMessageType.GuitarBigRockEndingSubMessage:
-                case GuitarMessageType.GuitarBigRockEnding:
-                    {
-                        
-                    }
-                    break;
-                case GuitarMessageType.GuitarSingleStringTremelo:
-                    ret = new GuitarSingleStringTremelo(list, down, up);
-                    break;
-                case GuitarMessageType.GuitarMultiStringTremelo:
-                    ret = new GuitarMultiStringTremelo(list, down, up);
-                    break;
-                case GuitarMessageType.GuitarSlide:
-                    ret = new GuitarSlide(new MidiEventPair(list, down, up));
-                    break;
-                case GuitarMessageType.GuitarHammeron:
-                    ret = new GuitarHammeron(new MidiEventPair( list, down, up));
-                    break;
-            }
-            return ret;
-        }
-
 
         public void GetMessages(GuitarDifficulty difficulty, bool includeDifficultyAll = true)
         {
@@ -581,18 +521,18 @@ namespace ProUpgradeEditor.Common
                 if (IsPro)
                 {
 
-                    events.GetEventPairs(ret, Utility.AllArpeggioData1).Select(x => new GuitarArpeggio(x)).ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.AllArpeggioData1).Select(x => new GuitarArpeggio(x)).ToList().ForEach(x => x.AddToList());
                     
-                    events.GetEventPairs(ret, Utility.SoloData1).Select(x => new GuitarSolo(x)).ForEach(x => x.AddToList());
-                    events.GetEventPairs(ret, Utility.PowerupData1).Select(x => new GuitarPowerup(x)).ForEach(x => x.AddToList());
-                    events.GetEventPairs(ret, Utility.MultiStringTremeloData1).Select(x => new GuitarMultiStringTremelo(x)).ForEach(x => x.AddToList());
-                    events.GetEventPairs(ret, Utility.SingleStringTremeloData1).Select(x => new GuitarSingleStringTremelo(x)).ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.SoloData1).Select(x => new GuitarSolo(x)).ToList().ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.PowerupData1).Select(x => new GuitarPowerup(x)).ToList().ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.MultiStringTremeloData1).Select(x => new GuitarMultiStringTremelo(x)).ToList().ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.SingleStringTremeloData1).Select(x => new GuitarSingleStringTremelo(x)).ToList().ForEach(x => x.AddToList());
                     
                     GetBigRockEndings(ret, events).ForEach(x => x.AddToList());
 
-                    events.GetEventPairs(ret, Utility.AllSlideData1).Select(x => new GuitarSlide(x)).ForEach(x => x.AddToList());
-                    events.GetEventPairs(ret, Utility.AllHammeronData1).Select(x => new GuitarHammeron(x)).ForEach(x => x.AddToList());
-                    events.GetEventPairs(ret, Utility.AllStrumData1).Select(x => new GuitarChordStrum(x)).ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.AllSlideData1).Select(x => new GuitarSlide(x)).ToList().ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.AllHammeronData1).Select(x => new GuitarHammeron(x)).ToList().ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.AllStrumData1).Select(x => new GuitarChordStrum(x)).ToList().ForEach(x => x.AddToList());
 
                     var notes = events.GetEventPairs(ret, Utility.GetStringsForDifficulty6(difficulty)).Select(x => new GuitarNote(x));
                     notes.ForEach(x => x.AddToList());
@@ -816,7 +756,6 @@ namespace ProUpgradeEditor.Common
 
                 list.Remove(textEvents.Where(v => v.Text.GetTrainerEventIndex().IsNull()).ToList());
 
-                list.Trainers.Clear();
                 var removeEvents = new List<GuitarMessage>();
 
                 var groups = textEvents.Where(v => v.IsDeleted == false).ToList().GroupBy(v => v.TrainerType.IsTrainerGuitar());
@@ -1072,11 +1011,7 @@ namespace ProUpgradeEditor.Common
             }
         }
 
-        public class GuitarHandPositionMeta
-        {
-            public TickPair Ticks;
-            public int Fret;
-        }
+        
 
         private IEnumerable<GuitarHandPositionMeta> Generate108(GenDiffConfig config)
         {

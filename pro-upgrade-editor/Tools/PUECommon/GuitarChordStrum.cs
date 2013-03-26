@@ -11,36 +11,33 @@ namespace ProUpgradeEditor.Common
 
     public class GuitarChordStrum : ChordModifier
     {
-        public GuitarChordStrum(MidiEventPair ev, ChordModifierType type = ChordModifierType.Invalid)
-            : base(ev, 
-            type == ChordModifierType.Invalid ? (ev.Channel.GetChordStrumFromChannel().GetModifierType()) : type, 
-            GuitarMessageType.GuitarChordStrum)
+        public GuitarChordStrum(MidiEventPair pair)
+            : base(pair, pair.Channel.GetChordStrumFromChannel().GetModifierType(), GuitarMessageType.GuitarChordStrum)
         {
+            
+        }
+        public GuitarChordStrum(GuitarChord chord, ChordModifierType type)
+            : base(chord, type, GuitarMessageType.GuitarChordStrum)
+        {
+            
         }
 
-        public GuitarChordStrum(GuitarMessageList track, MidiEvent downEvent, MidiEvent upEvent, ChordModifierType type = ChordModifierType.Invalid)
-            : base(track, downEvent, upEvent, type, GuitarMessageType.GuitarChordStrum)
-        {
-        }
-
-        public static GuitarChordStrum CreateStrum(GuitarMessageList track, GuitarDifficulty difficulty, ChordStrum strum, TickPair ticks)
+        public static GuitarChordStrum CreateStrum(GuitarChord chord, ChordStrum strum)
         {
             GuitarChordStrum ret = null;
-            var d1 = Utility.GetStrumData1(difficulty);
-            if (d1 != -1)
+            if (!chord.HasStrumMode(strum) && Utility.GetStrumData1(chord.Difficulty).IsNotNull())
             {
-                var ev = track.Insert(d1, 100, strum.GetChannelFromChordStrum(), ticks);
-                ret = new GuitarChordStrum(track, ev.Down, ev.Up, strum.GetModifierType());
+                ret = new GuitarChordStrum(chord, strum.GetModifierType());
                 ret.IsNew = true;
                 ret.CreateEvents();
             }
             return ret;
         }
 
-        public ChordStrum StrumMode
+        public override ChordStrum StrumMode
         {
             get { return Channel.GetChordStrumFromChannel(); }
-            set { Channel = value.GetChannelFromChordStrum(); }
+            
         }
 
         public override string ToString()

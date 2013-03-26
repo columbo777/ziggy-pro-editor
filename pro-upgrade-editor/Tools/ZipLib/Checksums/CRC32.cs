@@ -18,7 +18,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// Linking this library statically or dynamically with other modules is
+
 // making a combined work based on this library.  Thus, the terms and
 // conditions of the GNU General Public License cover the whole
 // combination.

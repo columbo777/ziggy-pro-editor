@@ -89,6 +89,25 @@ namespace ProUpgradeEditor.Common
         {
             return new TickPair(pair.Down + i, pair.Up + i);
         }
+        public static bool operator !=(TickPair a, TickPair b)
+        {
+            return !(a.Down == b.Down && a.Up == b.Up);
+        }
+        public static bool operator ==(TickPair a, TickPair b)
+        {
+            return (a.Down == b.Down && a.Up == b.Up);
+        }
+        public override bool Equals(object obj)
+        {
+            return GetHashCode() == ((TickPair)obj).GetHashCode();
+        }
+        public override int GetHashCode()
+        {
+            //http://en.wikipedia.org/wiki/Cantor_pairing_function#Cantor_pairing_function
+            //((x + y) * (x + y + 1) / 2) + y;
+            return ((Down + Up) * (Down + Up + 1) / 2) + Up;
+        }
+
         public TickPair Expand(int amount)
         {
             var d = Down - amount;
@@ -114,7 +133,7 @@ namespace ProUpgradeEditor.Common
         }
         public override string ToString()
         {
-            return "Down: " + Down.ToStringEx() + " - Up: " + Up.ToStringEx() + " Length: " + TickLength.ToStringEx();
+            return "(" + Down.ToStringEx("null") + ", " + Up.ToStringEx("null") + ")";
         }
 
         public int CompareTo(TickPair other)

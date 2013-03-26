@@ -9,194 +9,7 @@ using System.Diagnostics;
 
 namespace ProUpgradeEditor.Common
 {
-    public enum GuitarMessageType
-    {
-        Unknown,
-        GuitarHandPosition,
-        GuitarTextEvent,
-        GuitarTrainer,
-        GuitarChord,
-        GuitarChordStrum,
-        GuitarNote,
-        GuitarPowerup,
-        GuitarSolo,
-        GuitarTempo,
-        GuitarTimeSignature,
-        GuitarArpeggio,
-        GuitarBigRockEnding,
-        GuitarBigRockEndingSubMessage,
-        GuitarSingleStringTremelo,
-        GuitarMultiStringTremelo,
-        GuitarSlide,
-        GuitarHammeron
-    }
-
-
-
-    public class GuitarHandPositionList : SpecializedMessageList<GuitarHandPosition>
-    {
-        public GuitarHandPositionList(TrackEditor owner) : base(owner) { }
-    }
-    public class GuitarTextEventList : SpecializedMessageList<GuitarTextEvent>
-    {
-        public GuitarTextEventList(TrackEditor owner) : base(owner) { }
-    }
-    public class GuitarTrainerList : SpecializedMessageList<GuitarTrainer>
-    {
-        public GuitarTrainerList(TrackEditor owner) : base(owner) { }
-    }
-    public class GuitarChordList : SpecializedMessageList<GuitarChord>
-    {
-        public GuitarChordList(TrackEditor owner) : base(owner) { }
-        public IEnumerable<GuitarChord> GetBetweenTick(int tickMin, int tickMax)
-        {
-            return this.Where(x => x.HasNotes && (x.DownTick < tickMax && x.UpTick > tickMin));
-        }
-
-    }
-    public class GuitarNoteList : SpecializedMessageList<GuitarNote>
-    {
-        public GuitarNoteList(TrackEditor owner) : base(owner) { }
-    }
-
-
-    public class GuitarTempoList : SpecializedMessageList<GuitarTempo>
-    {
-        public GuitarTempoList(TrackEditor owner)
-            : base(owner)
-        {
-
-        }
-
-
-        public GuitarTempo GetTempo(int tick)
-        {
-            return this.SingleByDownTick(tick < 0 ? 0 : tick > itemList.Last().DownTick ? itemList.Last().DownTick : tick);
-        }
-
-    }
-    public class GuitarTimeSignatureList : SpecializedMessageList<GuitarTimeSignature> { public GuitarTimeSignatureList(TrackEditor owner) : base(owner) { } }
-    public class GuitarPowerupList : SpecializedMessageList<GuitarPowerup> { public GuitarPowerupList(TrackEditor owner) : base(owner) { } }
-    public class GuitarSoloList : SpecializedMessageList<GuitarSolo> { public GuitarSoloList(TrackEditor owner) : base(owner) { } }
-    public class GuitarArpeggioList : SpecializedMessageList<GuitarArpeggio> { public GuitarArpeggioList(TrackEditor owner) : base(owner) { } }
-    public class GuitarBigRockEndingList : SpecializedMessageList<GuitarBigRockEnding> { public GuitarBigRockEndingList(TrackEditor owner) : base(owner) { } }
-    public class GuitarSingleStringTremeloList : SpecializedMessageList<GuitarSingleStringTremelo> { public GuitarSingleStringTremeloList(TrackEditor owner) : base(owner) { } }
-    public class GuitarMultiStringTremeloList : SpecializedMessageList<GuitarMultiStringTremelo> { public GuitarMultiStringTremeloList(TrackEditor owner) : base(owner) { } }
-    public class GuitarSlideList : SpecializedMessageList<GuitarSlide> { public GuitarSlideList(TrackEditor owner) : base(owner) { } }
-    public class GuitarHammeronList : SpecializedMessageList<GuitarHammeron> { public GuitarHammeronList(TrackEditor owner) : base(owner) { } }
-    public class ChordStrumList : SpecializedMessageList<GuitarChordStrum> { public ChordStrumList(TrackEditor owner) : base(owner) { } }
-
-
-    public class MidiEventProps
-    {
-        public GuitarMessageList Owner { get; set; }
-
-        public int Data2 { get; set; }
-
-        public int Data1 { get; set; }
-
-        public int Channel { get; set; }
-
-        public ChannelCommand Command { get; set; }
-
-        public string Text { get; set; }
-
-        public TickPair TickPair { get; set; }
-
-        public TimePair TimePair { get; set; }
-
-        MidiEventPair _eventPair;
-        public MidiEventPair EventPair
-        {
-            get
-            {
-                return _eventPair;
-            }
-
-        }
-
-        public MidiEventProps(GuitarMessageList owner = null)
-        {
-            resetProps(owner);
-        }
-
-        private void resetProps(GuitarMessageList owner = null)
-        {
-            Owner = owner;
-            Data1 = Int32.MinValue;
-            Data2 = Int32.MinValue;
-            Channel = Int32.MinValue;
-            Command = ChannelCommand.Invalid;
-            Text = string.Empty;
-            TickPair = TickPair.NullValue;
-            TimePair = TimePair.NullValue;
-            _eventPair = new MidiEventPair(owner);
-        }
-
-        public MidiEventProps CloneToMemory(GuitarMessageList owner)
-        {
-            var ret = new MidiEventProps(owner);
-            ret.setEventPair(EventPair.CloneToMemory(owner));
-            ret.Owner = Owner;
-            ret.Data1 = Data1;
-            ret.Data2 = Data2;
-            ret.Channel = Channel;
-            ret.Command = Command;
-            ret.Text = Text;
-            ret.TickPair = new TickPair(TickPair);
-            ret.TimePair = new TimePair(TimePair);
-            return ret;
-        }
-
-        public MidiEventProps(GuitarMessageList owner, MidiEvent down, MidiEvent up)
-            : this(owner, new MidiEventPair(owner, down, up))
-        {
-
-        }
-        public MidiEventProps(GuitarMessageList owner, MidiEventPair pair)
-            : this(owner)
-        {
-            setEventPair(pair);
-        }
-
-        public void SetDownEvent(MidiEvent ev)
-        {
-            _eventPair.Down = ev;
-        }
-        public void SetUpEvent(MidiEvent ev)
-        {
-            _eventPair.Up = ev;
-        }
-
-        public void SetUpdatedEventPair(MidiEventPair pair)
-        {
-            resetProps(Owner);
-            setEventPair(pair);
-        }
-
-        private void setEventPair(MidiEventPair pair)
-        {
-            _eventPair = new MidiEventPair(pair);
-
-            if (_eventPair.Down != null)
-            {
-                if (_eventPair.Down.IsChannelEvent())
-                {
-                    Data1 = _eventPair.Down.Data1;
-                    Data2 = _eventPair.Down.Data2;
-                    Channel = _eventPair.Down.Channel;
-                    Command = _eventPair.Down.Command;
-                }
-                if (_eventPair.Down.IsTextEvent())
-                {
-                    Text = _eventPair.Down.MetaMessage.Text;
-                }
-            }
-
-            this.TickPair = new TickPair((_eventPair.Down == null ? Int32.MinValue : _eventPair.Down.AbsoluteTicks),
-                                     (_eventPair.Up == null ? Int32.MinValue : _eventPair.Up.AbsoluteTicks));
-        }
-    }
+    
 
     public class GuitarMessage : DeletableEntity
     {
@@ -248,7 +61,7 @@ namespace ProUpgradeEditor.Common
                 Debug.WriteLine("Invalid removeevents");
             }
 
-            
+
             if (UpEvent != null && Owner != null)
             {
                 Owner.Remove(UpEvent);
@@ -261,7 +74,7 @@ namespace ProUpgradeEditor.Common
 
                 SetDownEvent(null);
             }
-            
+
         }
 
         public virtual int DefaultData1
@@ -277,7 +90,7 @@ namespace ProUpgradeEditor.Common
                         break;
                     case GuitarMessageType.GuitarSolo: { if (Difficulty.IsExpert()) ret = Utility.SoloData1; }
                         break;
-                    case GuitarMessageType.GuitarArpeggio: {  ret = Utility.GetArpeggioData1(Difficulty); }
+                    case GuitarMessageType.GuitarArpeggio: { ret = Utility.GetArpeggioData1(Difficulty); }
                         break;
                     case GuitarMessageType.GuitarSingleStringTremelo: { if (Difficulty.IsExpert()) ret = Utility.SingleStringTremeloData1; }
                         break;
@@ -307,9 +120,9 @@ namespace ProUpgradeEditor.Common
                     case GuitarMessageType.GuitarBigRockEndingSubMessage:
                     case GuitarMessageType.GuitarTextEvent:
                     case GuitarMessageType.GuitarTrainer:
-                    case GuitarMessageType.GuitarChord: 
+                    case GuitarMessageType.GuitarChord:
                     case GuitarMessageType.GuitarChordStrum:
-                    
+
                         ret = false;
                         break;
                 }
@@ -338,7 +151,7 @@ namespace ProUpgradeEditor.Common
 
         public virtual void CreateEvents()
         {
-            
+
             if (!HasEvents)
             {
                 if (!IsBasicChannelEvent)
@@ -624,8 +437,11 @@ namespace ProUpgradeEditor.Common
 
         public override string ToString()
         {
-            return "Down: " + DownTick.ToString() + " Up: " + UpTick.ToString() +
-                " Deleted: " + this.IsDeleted + " Dirty: " + this.IsDirty;
+            return TickPair.ToString() + " " + MessageType.ToString() +
+                (IsDeleted ? " (Deleted)" : "") +
+                (IsNew ? " (New)" : "") +
+                (!HasDownEvent ? " (no down)" : "") +
+                (!HasUpEvent ? " (no up)" : "");
         }
 
 

@@ -14,14 +14,7 @@ using System.Diagnostics;
 
 namespace ProUpgradeEditor.Common
 {
-    public class Data1ChannelPairEventList : List<MidiEvent>
-    {
-        public Data1ChannelPair Data1ChannelPair { get; internal set; }
-        public Data1ChannelPairEventList(int data1, int channel)
-        {
-            this.Data1ChannelPair = new Data1ChannelPair(data1, channel);
-        }
-    }
+    
 
     public class Data1ChannelPair : IComparable<Data1ChannelPair>, IEquatable<Data1ChannelPair>
     {

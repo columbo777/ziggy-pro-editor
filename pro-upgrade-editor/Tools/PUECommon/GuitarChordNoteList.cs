@@ -17,6 +17,14 @@ namespace ProUpgradeEditor.Common
 
         TickPair ticks;
 
+        public bool NotesAligned
+        {
+            get
+            {
+                var tp = notes.GetTickPair();
+                return notes.All(x => x.DownTick == tp.Down && x.UpTick == tp.Up);
+            }
+        }
         public int[] FretArray
         {
             get
@@ -85,7 +93,6 @@ namespace ProUpgradeEditor.Common
 
         public void Remove(GuitarNote note)
         {
-            
             notes.Remove(note);
             if (!notes.Any())
             {
@@ -104,6 +111,7 @@ namespace ProUpgradeEditor.Common
         }
         public void Clear()
         {
+            
             notes.ToList().ForEach(n => Remove(n));
             
             notes.Clear();

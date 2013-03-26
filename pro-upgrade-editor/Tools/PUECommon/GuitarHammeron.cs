@@ -11,28 +11,25 @@ namespace ProUpgradeEditor.Common
 
     public class GuitarHammeron : ChordModifier
     {
-        public GuitarHammeron(MidiEventPair ev)
-            : base(ev, ChordModifierType.Hammeron, GuitarMessageType.GuitarHammeron)
+        public GuitarHammeron(GuitarChord chord)
+            : base(chord, ChordModifierType.Hammeron, GuitarMessageType.GuitarHammeron)
         {
-
+            
         }
-
-        public static GuitarHammeron CreateHammeron(GuitarMessageList track,
-            TickPair ticks, GuitarDifficulty difficulty = GuitarDifficulty.Unknown)
+        public GuitarHammeron(MidiEventPair pair)
+            : base(pair, ChordModifierType.Hammeron, GuitarMessageType.GuitarHammeron)
+        {
+            
+        }
+        public static GuitarHammeron CreateHammeron(GuitarChord chord)
         {
             GuitarHammeron ret = null;
-            if (difficulty.IsUnknownOrNone())
-                difficulty = track.Owner.CurrentDifficulty;
-
-            var d1 = Utility.GetHammeronData1(difficulty);
-            if (d1 != -1)
+            
+            if (!chord.HasHammeron && Utility.GetHammeronData1(chord.Difficulty).IsNotNull())
             {
-                var ev = track.Insert(d1, 100, Utility.ChannelDefault, ticks);
-
-                ret = new GuitarHammeron(new MidiEventPair(track, ev.Down, ev.Up));
+                ret = new GuitarHammeron(chord);
                 ret.IsNew = true;
                 ret.CreateEvents();
-                
             }
             
             return ret;

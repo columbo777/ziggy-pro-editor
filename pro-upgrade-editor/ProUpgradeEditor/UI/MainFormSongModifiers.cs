@@ -50,6 +50,7 @@ namespace ProUpgradeEditor.UI
             RefreshTextEvents();
             RefreshTrainer(GuitarTrainerType.ProGuitar);
             RefreshTrainer(GuitarTrainerType.ProBass);
+            RefreshTextEvents();
         }
 
         public void RefreshTextEvents()
@@ -109,8 +110,6 @@ namespace ProUpgradeEditor.UI
                     }
                     list.EndUpdate();
                 }
-
-
             }
             catch { }
 
@@ -132,12 +131,11 @@ namespace ProUpgradeEditor.UI
             listBox.Items.Clear();
 
 
-
             var modList = gt.Messages.GetModifiersByType(type).ToList();
 
             foreach (var obj in modList)
             {
-                listBox.Items.Add(new stringObject()
+                listBox.Items.Add(new StringObject()
                 {
                     Name = type.ToString() + (modList.IndexOf(obj)).ToString(),
                     Obj = obj,
@@ -171,7 +169,7 @@ namespace ProUpgradeEditor.UI
 
             if (listBox.Items.Count >= 0 && listBox.SelectedItem != null)
             {
-                var obj = (listBox.SelectedItem as stringObject).Obj as GuitarModifier;
+                var obj = (listBox.SelectedItem as StringObject).Obj as GuitarModifier;
                 if (obj != null)
                 {
                     obj.Selected = true;
@@ -207,7 +205,7 @@ namespace ProUpgradeEditor.UI
 
                 if (listBox3.SelectedItem != null)
                 {
-                    var o = listBox3.SelectedItem as stringObject;
+                    var o = listBox3.SelectedItem as StringObject;
                     var m = o.Obj as GuitarArpeggio;
                     
                     foreach (GuitarChord c in gt.Messages.Chords.ToList())
@@ -229,13 +227,7 @@ namespace ProUpgradeEditor.UI
         }
 
 
-        public class ListedModifier
-        {
-            public GuitarModifierType modifierType;
-            public ListBox modifierList;
-            public TextBox modifierStartBox;
-            public TextBox modifierEndBox;
-        }
+        
 
 
         public void RefreshSolosList()
@@ -305,7 +297,7 @@ namespace ProUpgradeEditor.UI
                     return;
 
 
-                var obj = (listBox.SelectedItem as stringObject).Obj as GuitarModifier;
+                var obj = (listBox.SelectedItem as StringObject).Obj as GuitarModifier;
                 if (obj != null)
                 {
                     obj.DeleteAll();
@@ -337,7 +329,7 @@ namespace ProUpgradeEditor.UI
                 return ret;
 
 
-            var obj = (listBox.SelectedItem as stringObject).Obj as GuitarModifier;
+            var obj = (listBox.SelectedItem as StringObject).Obj as GuitarModifier;
             if (obj != null)
             {
                 ret = obj;
@@ -363,7 +355,7 @@ namespace ProUpgradeEditor.UI
                     return;
 
 
-                var obj = (listBox.SelectedItem as stringObject).Obj as GuitarModifier;
+                var obj = (listBox.SelectedItem as StringObject).Obj as GuitarModifier;
                 if (obj != null)
                 {
                     var ms = obj.DownEvent;

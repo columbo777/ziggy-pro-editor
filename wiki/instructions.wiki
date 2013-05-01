@@ -1,0 +1,124 @@
+#summary Help Getting Started
+
+= Introduction =
+Aka, Building a PRO custom track for a custom CON song for RB3
+
+= Details =
+Building a PRO custom track for a custom CON song for RB3
+
+You want to add PRO guitar to RB or CUSTOM tracks? Here is the process to do this, based on build 57 of the tool.
+
+Prep Work
+Copy the track (CON File) to a USB stick via the XBOX.  *NOTE: If you dont have the CON file, you need to EXTRACT the track you want from your XBOX.  There are a number of tools to do this.  I have the USB HD to PC cable, and I can extract using Horizon , Party Buffalo, or 360 Content Manager v3.  Copying the track to USB and using the tools works just as well.  
+
+Optional but very useful
+On a PC, open the stick using Modio or Horizon, or tool of your choice and extract out the individual files.  (You will need the .mid file, the .dta file and the .mogg file)
+
+Using Audacity, convert the mogg file to mp3 (dont worry about a mono mix).
+
+Start the process:
+1.	Download the tool from the site and open up the editor.
+2.	If you did not extract necessary files from the CON file above, Load the CON original track into the editor.  NOTE: This is a 2-step process.
+a.	Click the Package Editor tab and OPEN the CON* file.  Extract the song.dta and the <title>.mid file
+b.	it is useful to also extract the songs.dta file
+
+3a. NOW, From the TOP menu, select File -> Open -> Open Guitar 5 midi
+3b. Now press the CREATE From Open Midi button
+
+4.	Next we Create the “empty” Pro track that will contain your pro guitar upgrade.
+a.	Go to the Track Editor Tab
+b.	Click the button, “Init from 5 button”.
+Various fields will populate based on this creation.  
+NOTE: The created file will be the _pro file for the track.  you need to SAVE this file as the PRO and then on the songs tab select this saved track as your pro.
+c.	If you extracted the songs.dta file, the songID box should be populated with ID and difficulties.
+d.	Supply the MP3 file (optional) to play as you review.
+
+5.	The Editor is going to has now created a PRO track with notes in it.  You can see what it has done by navigating to the Track Editor tab and scrolling the top navigation bars to a populated section.
+a.	in many cases, you wont make any changes to the Track Editor Section.    
+b.	There are buttons in the TRACK section to copy portions of the 5 button track to the pro track.
+d.	You are always going to chart the EXPERT guitar track.  (see radio button on right, set to EXPERT).
+ 
+6.	NOTE EDITOR TAB: (You can go two routes here)
+a.	CHART (place each note just like with EOF) best method.
+b.	PLAY CAPTURE (MIDI instrument and MIDI to USB cable required).
+i.	Play capture can be note by note or real time.
+
+7.	On the Note Editor tab you build your pro track.   A future build (v45?) will add the MP3 playback, but you will place notes based on the location of the 5 button notes to start.  
+
+a.	Click the PRO note (any red box will do)
+b.	In the columns in the far left, you can build the note or chord you want.  The notes will go from High E (Top) to Low E (bottom)
+
+For example, I am going to be using these chords for a song:
+C#m  	A    	B 	G#m
+X	5	7	4
+4	7	7	6
+6	7	9	6
+6	7	9	4
+5	6	8	x
+X	x	x	x
+
+C#m    A          B	          G#m	
+nowhere girl you`re living in a dream,
+
+c.	You need to careful as the note being edited is the one CLICKED (and in bold), not what is on the screen.  When you define the note/chord you will press the + key and the note will update on the upper portion of the screen.  NOTE: The cursor will jump to the NEXT note automatically.
+d.	I recommend creating the first verse and saving the work for testing at that point.
+e.	More on editing features below…
+
+7.	Save your PRO track (File, save, pro midi).  You are going to use RB3 maker to build the PRO from the saved midi file.
+a.	Define your CON package on the SONG TAB and build it.  The program runs auto checks to insure RB3 compatibility. 
+b.	Avoid trouble by checking your settings under the BATCH tab.  Make sure that copy guitar to bass in UNCHECKED if you built your own bass track or it will be destroyed.
+
+
+Editor Functions
+
+First off, the editor was built for speed.  To be efficient, you will have to memorize the keyboard shortcuts (often denoted in the editor) and master search and replace (below).  
+
+Here are the most commonly used features:
+
+1.	Copy, find and replace.  The holy grail of the editor since so many sequences of notes will repeat.  This will save your hours of single note plotting.
+a.	Let’s start with a simple Replacing of a string of repeating notes.  
+i.	Select the note pattern (mouse grab).  Use Control Key if you need to scroll and continue adding notes.
+ii.	In the left note box, change the note to the new desired notes and hit +
+b.	Next, let’s use Find/Replace a Chord function.
+i.	Take your “to be modified chord” STORE it by selecting it and then using the Store Chord (or G-key) in the CHORDS box on the right.  (in my case x57xxx).
+ii.	Somewhere in the chart, create the desired Chords (in my case xx023x).
+iii.	Select the new chord.
+iv.	Use the Copy Pattern function to propagate the change.
+c.	Finally, lets replace an entire sequence
+i.	FIND the string you wish to replace.  (in my case, an open G followed by 7 open Bs).
+ii.	Now edit that string to be what you would want it to be (for this case 67777777 A string)
+iii.	You can now use the copy pattern < and > buttons to look through the song and see the matches (which are based on the 5 button).  Navigate back to your string in step ii.
+iv.	Click the Replace Notes button under the Copy Pattern Box.
+
+Example:  I have an Expert chord played as x5777x (which defaults on MED as x57xxx) and I want to replace all the x57xxx with xx023x (Power Chord D).  
+v.	Grab the x5777x notes
+vi.	Type  0 2 3  in the NOTE box on left.
+vii.	Hit + and all the x57(7)xx become xx221xx
+
+
+2.	Creating lesser difficulties -  there are TWO methods of doing this:
+
+a.	is Auto creation using the GEN DIFFICULTIES button which utilizes finger reduction to simplify the gameplay.  On the TRACK EDITOR tab, you generate lesser difficulties AFTER completing the Expert track.  MAKE SURE you have the appropriate PRO track selected (guitar vs. bass); See Bass track creation below.
+
+b.	Is the Manual creation of the HARD/EASY track through musical reduction.  Although the auto-reduction works reasonably well for BASS, when reducing the PRO tracks, the auto-generation of difficulties will NOT attempt to keep the same note or even root.  (Hard reduction is fine).  Since I like to play on Medium at times, I attempt to make more friendly med/easy tracks by doing the following:
+i.	Select the MEDIUM track under difficulty and replace the expert chords with Basic Open Chords or Two Finger Power Chords.  For example and E (577655) could be reduced to 022100 or x221xx.  F is easily reduces to 13xxxx.  (x is un-played as in tab)
+ii.	For any Solos, drop slides, hammers and pull-offs.  Optionally, drop every 3rd note.
+iii.	Select the EASY track now and convert the chords to just the ROOT note.  This should be as a single string position in most cases.  
+iv.	For Solos, further reduce the Medium track by dropping any notes not on the 4/4 beat.
+(i.-iv. These are just recommendations, your mileage may vary.  Do what you want to see played.)
+
+1.	To create a BASS Track you need to create a Bass track from the 5 button (if not done already). 
+a.	As with guitar, chart your EXPERT bass track (note editor tab).  
+b.	With BASS selected on the Track Editor tab, AND THE COPY GUITAR TO BASS CHECKBOX UNCHECKED, press the Gen Difficulties button.  
+c.	In the case of simple bass lines, you are done.  In the case of say, Flea, your work has just begun?  (See guitar notes).
+
+To shrink or increase the notes viewer:
+From the NOTE screen, use – or + (not on the number pad) to increase or decrease the note fonts
+
+APPENDIX A
+Certain note type construction using the Modifiers tab
+
+when creating arpeggios (aka broken chord) use the 'add ghost notes' check box to automatically add helper arpeggio (inversions work the same way) notes: 
+
+Power-ups and Solos are also defined here by defining selecting a new (+) one and then selecting the start and end with the mouse clicks as prompted.
+TYPICALLY, you wont create these but use the COPY SOLOS button.

@@ -780,17 +780,17 @@ namespace ProUpgradeEditor.Common
         }
         public void ProcessErrors(Track track)
         {
-            var meta = track.Meta.Where(x => x.MetaMessage.Text.IsNotEmpty()).ToList().
-                Where(v => v.MetaMessage.Text.IsTrainerGuitar() || v.MetaMessage.Text.IsTrainerBass()).ToList();
+            var meta = track.Meta.Where(x => x.Text.IsNotEmpty()).ToList().
+                Where(v => v.Text.IsTrainerGuitar() || v.Text.IsTrainerBass()).ToList();
             if (meta.Any())
             {
-                var nullEvents = meta.Where(t => t.MetaMessage.Text.GetTrainerEventIndex().IsNull()).ToList();
+                var nullEvents = meta.Where(t => t.Text.GetTrainerEventIndex().IsNull()).ToList();
 
                 track.Remove(nullEvents);
 
                 if (track.Name.IsGuitarTrackName())
                 {
-                    var bt = meta.Where(v => v.MetaMessage.Text.IsTrainerBass()).ToList();
+                    var bt = meta.Where(v => v.Text.IsTrainerBass()).ToList();
                     if (bt.Any())
                     {
                         track.Remove(bt);
@@ -800,7 +800,7 @@ namespace ProUpgradeEditor.Common
                 {
                     if (track.Name.IsBassTrackName())
                     {
-                        var gt = meta.Where(v => v.MetaMessage.Text.IsGuitarTrackName()).ToList();
+                        var gt = meta.Where(v => v.Text.IsGuitarTrackName()).ToList();
                         if (gt.Any())
                         {
                             track.Remove(gt);
@@ -1220,8 +1220,8 @@ namespace ProUpgradeEditor.Common
                             visLyrics.AddRange(Sequence.GetVocalTrack().Meta.Where(x => x.IsTextEvent()).
                                 Where(x => x.AbsoluteTicks > visTicks.Down &&
                                     x.AbsoluteTicks < visTicks.Up).ToList()
-                                .Where(x => x.MetaMessage.Text.StartsWithEx("[") == false)
-                                .Select(x => GuitarTextEvent.GetTextEvent(guitarTrack.Messages, x)));
+                                .Where(x => x.Text.StartsWithEx("[") == false)
+                                .Select(x => new GuitarTextEvent(guitarTrack.Messages, x)));
                         }
                     }
                 }
@@ -1311,7 +1311,7 @@ namespace ProUpgradeEditor.Common
 
                 var p = point.ScreenPoint;
 
-                var endPoint = (next == null ? GetScreenPointFromTick(guitarTrack.GetTrack().Length) : next.ScreenPoint);
+                var endPoint = (next == null ? GetScreenPointFromTick(guitarTrack.GetTrack().Events.Last().AbsoluteTicks) : next.ScreenPoint);
                 var len = (endPoint - p).ToDouble();
 
                 if (len >= 3)
@@ -2239,7 +2239,7 @@ namespace ProUpgradeEditor.Common
                     if (VisibleTextEvents.CountOverlapping(ntr) == 0)
                     {
                         textRect = ntr;
-                        VisibleTextEvents.Add(GuitarTextEvent.GetTextEvent(Messages, screenTicks.Down, text),
+                        VisibleTextEvents.Add(new GuitarTextEvent(Messages, screenTicks.Down, text),
                             ntr);
                         break;
                     }
@@ -2565,26 +2565,6 @@ namespace ProUpgradeEditor.Common
             return snapped;
         }
 
-
-        public int GetNoteStringFromMouse()
-        {
-            int closestY = int.MaxValue;
-            var closestDist = int.MaxValue;
-            var mousePos = PointToClient(MousePosition);
-            int stringIndex = -1;
-            for (int x = 0; x < 6; x++)
-            {
-                int noteY = TopLineOffset + LineSpacing * (5 - x);
-                var delta = Math.Abs(mousePos.Y - noteY);
-                if (delta < closestDist)
-                {
-                    closestDist = delta;
-                    closestY = noteY;
-                    stringIndex = x;
-                }
-            }
-            return stringIndex;
-        }
 
 
         public List<Selector> visibleSelectors = new List<Selector>();
@@ -3567,9 +3547,9 @@ namespace ProUpgradeEditor.Common
                     {
                         GuitarChord.CreateChord(EditorPro.Messages, CurrentDifficulty,
                             SnapTickPairPro(chord5.TickPair),
-                            chord5.Notes.FretArrayZero,
+                            new GuitarChordConfig(chord5.Notes.FretArrayZero,
                             chord5.Notes.ChannelArrayZero,
-                            false, false, false, ChordStrum.Normal);
+                            false, false, false, ChordStrum.Normal));
                     });
                     EditorPro.Invalidate();
                 }

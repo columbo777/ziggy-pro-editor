@@ -47,7 +47,7 @@ namespace ProUpgradeEditor.Common
             int measureNumber = 0;
             double quarterCount = 0;
 
-            foreach (var tempo in editor.Messages.Tempos)
+            foreach (var tempo in editor.Messages.Tempos.ToList())
             {
                 var scale = 1.0 / ((int)unit).ToDouble();
 

@@ -9,16 +9,26 @@ namespace ProUpgradeEditor.Common
 {
     public class GuitarPowerup : GuitarModifier
     {
-        public GuitarPowerup(GuitarMessageList track, MidiEvent downEvent, MidiEvent upEvent) :
-            base(track, downEvent, upEvent, GuitarModifierType.Powerup, GuitarMessageType.GuitarPowerup) { }
-        public GuitarPowerup(MidiEventPair ev) :
-            base(ev, GuitarModifierType.Powerup, GuitarMessageType.GuitarPowerup) { }
-
-        public static GuitarPowerup CreatePowerup(GuitarMessageList track, TickPair ticks)
+        public GuitarPowerup(GuitarMessageList owner, TickPair pair)
+            : base(owner, pair, GuitarModifierType.Powerup, GuitarMessageType.GuitarPowerup)
         {
-            var ev = track.Insert(Utility.PowerupData1, 100, Utility.ChannelDefault, ticks);
+            this.Data1 = Utility.PowerupData1;
+            this.Data2 = 100;
+            Channel = 0;
+            this.SetTicks(pair);
+        }
+        public GuitarPowerup(MidiEventPair ev) :
+            base(ev, GuitarModifierType.Powerup, GuitarMessageType.GuitarPowerup) 
+        {
+            this.Data1 = Utility.PowerupData1;
+            this.Data2 = 100;
+            Channel = 0;
+            this.SetTicks(ev.TickPair);
+        }
 
-            var ret = new GuitarPowerup(track, ev.Down, ev.Up);
+        public static GuitarPowerup CreatePowerup(GuitarMessageList owner, TickPair ticks)
+        {
+            var ret = new GuitarPowerup(owner, ticks);
             ret.IsNew = true;
             ret.CreateEvents();
 

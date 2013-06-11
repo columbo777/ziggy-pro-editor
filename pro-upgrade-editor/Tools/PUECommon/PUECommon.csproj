@@ -114,6 +114,7 @@
     <Compile Include="GuitarArpeggioList.cs" />
     <Compile Include="GuitarBigRockEndingList.cs" />
     <Compile Include="GuitarBigRockEndingSubMessage.cs" />
+    <Compile Include="GuitarChordConfig.cs" />
     <Compile Include="GuitarChordList.cs" />
     <Compile Include="GuitarChordNoteList.cs" />
     <Compile Include="GuitarChordNoteListSorter.cs" />

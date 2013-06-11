@@ -93,6 +93,41 @@ namespace Sanford.Multimedia.Midi
     [ImmutableObject(true)]
     public sealed class SysRealtimeMessage : ShortMessage
     {
+        public static SysRealtimeMessage FromType(SysRealtimeType type)
+        {
+            SysRealtimeMessage e = null;
+            switch (type)
+            {
+                case SysRealtimeType.ActiveSense:
+                    e = SysRealtimeMessage.ActiveSenseMessage;
+                    break;
+
+                case SysRealtimeType.Clock:
+                    e = SysRealtimeMessage.ClockMessage;
+                    break;
+
+                case SysRealtimeType.Continue:
+                    e = SysRealtimeMessage.ContinueMessage;
+                    break;
+
+                case SysRealtimeType.Reset:
+                    e = SysRealtimeMessage.ResetMessage;
+                    break;
+
+                case SysRealtimeType.Start:
+                    e = SysRealtimeMessage.StartMessage;
+                    break;
+
+                case SysRealtimeType.Stop:
+                    e = SysRealtimeMessage.StopMessage;
+                    break;
+
+                case SysRealtimeType.Tick:
+                    e = SysRealtimeMessage.TickMessage;
+                    break;
+            }
+            return e;
+        }
         #region SysRealtimeMessage Members
 
         #region System Realtime Messages

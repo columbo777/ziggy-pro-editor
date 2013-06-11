@@ -23,12 +23,15 @@ namespace ProUpgradeEditor.Common
         public const int ChannelStrumMid = 14;
         public const int ChannelStrumHigh = 13;
         public const int ChannelSlideReversed = 11;
+        public const int ChannelSlide = 0;
         public const int ChannelTap = 4;
         public const int ChannelX = 3;
         public const int ChannelArpeggio = 1;
         public const int ChannelStringBend = 2;
         public const int ChannelDefault = 0;
+        public const int Data2Default = 100;
 
+        public static ChannelMessageBuilder CMBuilder = new ChannelMessageBuilder();
         public const int SingleStringTremeloData1 = 127;
         public const int MultiStringTremeloData1 = 126;
 
@@ -407,7 +410,7 @@ namespace ProUpgradeEditor.Common
                     return GuitarDifficulty.Easy;
 
                 else if (data1 == HandPositionData1)
-                    return GuitarDifficulty.Expert;
+                    return GuitarDifficulty.All;
 
                 else if (data1 == ExpertArpeggioData1)
                     return GuitarDifficulty.Expert;
@@ -465,17 +468,17 @@ namespace ProUpgradeEditor.Common
             {
                 if (ExpertData1StringsG5.Contains(data1))
                     return GuitarDifficulty.Expert;
+
                 if (HardData1StringsG5.Contains(data1))
                     return GuitarDifficulty.Hard;
+
                 if (MediumData1StringsG5.Contains(data1))
                     return GuitarDifficulty.Medium;
+
                 if (EasyData1StringsG5.Contains(data1))
                     return GuitarDifficulty.Easy;
 
-                if (data1 == ExpertSoloData1_G5)
-                    return GuitarDifficulty.All;
-
-                if (data1 == SoloData1)
+                if (data1 == ExpertSoloData1_G5 || data1 == SoloData1)
                     return GuitarDifficulty.All;
 
                 if (data1 == PowerupData1)
@@ -728,6 +731,11 @@ namespace ProUpgradeEditor.Common
             EasyData1LowE5, EasyData1A5, EasyData1D5,
         };
 
+        public static int GetNoteString(int data1, bool isPro)
+        {
+            return isPro ? GetNoteString(data1) : GetNoteString5(data1);
+        }
+
         public static int GetNoteString(int data1)
         {
             int ret = Int32.MinValue;
@@ -751,6 +759,53 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
+        public static int GetNoteData1(int stringOffset, GuitarDifficulty difficulty, bool isPro)
+        {
+            int ret = Int32.MinValue;
+
+            if (stringOffset >= 0)
+            {
+                if (isPro)
+                {
+                    if (difficulty == GuitarDifficulty.Expert && stringOffset < ExpertData1Strings.Length)
+                    {
+                        ret = ExpertData1Strings[stringOffset];
+                    }
+                    else if (difficulty == GuitarDifficulty.Hard && stringOffset < HardData1Strings.Length)
+                    {
+                        ret = HardData1Strings[stringOffset];
+                    }
+                    else if (difficulty == GuitarDifficulty.Medium && stringOffset < MediumData1Strings.Length)
+                    {
+                        ret = MediumData1Strings[stringOffset];
+                    }
+                    else if (difficulty == GuitarDifficulty.Easy && stringOffset < EasyData1Strings.Length)
+                    {
+                        ret = EasyData1Strings[stringOffset];
+                    }
+                }
+                else
+                {
+                    if (difficulty == GuitarDifficulty.Expert && stringOffset < ExpertData1StringsG5.Length)
+                    {
+                        ret = ExpertData1StringsG5[stringOffset];
+                    }
+                    else if (difficulty == GuitarDifficulty.Hard && stringOffset < HardData1StringsG5.Length)
+                    {
+                        ret = HardData1StringsG5[stringOffset];
+                    }
+                    else if (difficulty == GuitarDifficulty.Medium && stringOffset < MediumData1StringsG5.Length)
+                    {
+                        ret = MediumData1StringsG5[stringOffset];
+                    }
+                    else if (difficulty == GuitarDifficulty.Easy && stringOffset < EasyData1StringsG5.Length)
+                    {
+                        ret = EasyData1StringsG5[stringOffset];
+                    }
+                }
+            }
+            return ret;
+        }
         public static int GetNoteString5(int data1)
         {
             int ret = Int32.MinValue;
@@ -809,6 +864,16 @@ namespace ProUpgradeEditor.Common
             if (ExpertData1Strings.Contains(data1))
                 return GuitarDifficulty.Expert;
             return GuitarDifficulty.Unknown;
+        }
+
+        public static GuitarDifficulty GetStringDifficulty(int data1, bool isPro)
+        {
+            return isPro ? GetStringDifficulty6(data1) : GetStringDifficulty5(data1);
+        }
+
+        public static int GetStringLowE(GuitarDifficulty difficulty, bool isPro)
+        {
+            return isPro ? GetStringLowE(difficulty) : GetStringLowE5(difficulty);
         }
 
         public static int GetStringLowE(GuitarDifficulty difficulty)

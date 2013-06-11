@@ -9,88 +9,91 @@ using System.Diagnostics;
 
 namespace ProUpgradeEditor.Common
 {
-    
-    
+
+
     public abstract class SpecializedMessageList<T> : IEnumerable<T> where T : GuitarMessage
     {
-        public static implicit operator MessageList(SpecializedMessageList<T> list)
+        List<T> messages { get; set; }
+
+        public virtual TrackEditor Owner { get; internal set; }
+
+        public virtual IEnumerator<T> GetEnumerator()
         {
-            return list.messageList;
-        }
-        public IEnumerator<T> GetEnumerator()
-        {
-            return messageList.Cast<T>().GetEnumerator();
+            return messages.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return messageList.GetEnumerator();
+            return GetEnumerator();
         }
         public abstract GuitarMessageType MessageType { get; }
-
-        MessageList messageList;
 
 
         public SpecializedMessageList(TrackEditor owner)
         {
-            messageList = new MessageList(owner);
+            messages = new List<T>();
+            this.Owner = owner;
         }
-
 
         public void Add(GuitarMessage item)
         {
             if (item != null)
             {
-                item.IsDeleted = false;
+                var TItem = (T)item;
 
-                var idx = GetIndexFromTick(item.TickPair);
-                if (idx == -1 || idx >= this.Count())
+                TItem.IsDeleted = false;
+                if (!messages.Contains(item))
                 {
-                    messageList.Add(item);
+
+                    var items = messages.Where(x => x.AbsoluteTicks == TItem.AbsoluteTicks);
+                    if (items.Any())
+                    {
+                        if (TItem.Command == ChannelCommand.NoteOff)
+                        {
+                            messages.Insert(messages.IndexOf(items.First()), TItem);
+                        }
+                        else
+                        {
+                            messages.Insert(messages.IndexOf(items.Last()) + 1, TItem);
+                        }
+                    }
+                    else
+                    {
+                        var gt = messages.FirstOrDefault(x => x.AbsoluteTicks > TItem.AbsoluteTicks);
+                        if (gt == null)
+                        {
+                            messages.Add(TItem);
+                        }
+                        else
+                        {
+                            messages.Insert(messages.IndexOf(gt), TItem);
+                        }
+                    }
                 }
-                else
-                {
-                    messageList.Insert(idx, item);
-                }
-                
             }
         }
 
 
-        
+        public virtual void Remove(GuitarMessage mess)
+        {
+            if (mess != null)
+            {
+                var TMess = mess as T;
+                if (TMess != null && messages.Contains(TMess))
+                {
+                    messages.Remove(TMess);
+                    TMess.IsDeleted = true;
+                }
+
+            }
+        }
+
+
         public override string ToString()
         {
             return this.GetType().DeclaringType.Name.Replace("Guitar", "") + " " + this.Count();
         }
 
-        public virtual int GetIndexFromTick(TickPair itemTick)
-        {
-            if (!this.Any())
-            {
-                return 0;
-            }
-            else
-            {
-                if (itemTick.Down <= this.First().DownTick)
-                {
-                    return 0;
-                }
-                else if (itemTick.Down >= this.Last().DownTick)
-                {
-                    return -1;
-                }
-                else
-                {
-                    var idx=-1;
-                    var lastMatch = messageList.Where((x, i) => (x.TickPair == itemTick) && (idx = i) == i).ToList();
-                    if (lastMatch.Any())
-                    {
-                        return idx;
-                    }
-                }
-            }
-            return -1;
-        }
 
 
     }

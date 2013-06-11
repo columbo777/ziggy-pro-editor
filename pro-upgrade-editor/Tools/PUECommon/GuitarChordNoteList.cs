@@ -13,9 +13,7 @@ namespace ProUpgradeEditor.Common
     public class GuitarChordNoteList : IEnumerable<GuitarNote>
     {
         List<GuitarNote> notes;
-        GuitarMessageList track;
-
-        TickPair ticks;
+        GuitarChord owner;
 
         public bool NotesAligned
         {
@@ -84,20 +82,15 @@ namespace ProUpgradeEditor.Common
             });
             return ret;
         }
-        public GuitarChordNoteList(GuitarMessageList track)
+        public GuitarChordNoteList(GuitarChord owner)
         {
+            this.owner = owner;
             notes = new List<GuitarNote>();
-            this.track = track;
-            ticks = TickPair.NullValue;
         }
 
         public void Remove(GuitarNote note)
         {
             notes.Remove(note);
-            if (!notes.Any())
-            {
-                ticks = TickPair.NullValue;
-            }
         }
 
         public void SetNotes(IEnumerable<GuitarNote> notes)
@@ -106,26 +99,21 @@ namespace ProUpgradeEditor.Common
             if (notes != null)
             {
                 notes.ForEach(x => internalAddNote(x));
-                ticks = notes.GetTickPair();
             }
         }
         public void Clear()
         {
-            
             notes.ToList().ForEach(n => Remove(n));
-            
             notes.Clear();
-
-            ticks = TickPair.NullValue;
         }
 
         void internalAddNote(GuitarNote n)
         {
-            ticks.Down = n.DownTick;
-            ticks.Up = n.UpTick;
-            
+            n.OwnerList = this;
+            n.OwnerChord = this.owner;
             notes.Add(n);
         }
+
         public GuitarNote this[int noteString]
         {
             get
@@ -136,10 +124,6 @@ namespace ProUpgradeEditor.Common
                 return notes.SingleOrDefault(x => x.NoteString == noteString);
             }
         }
-
-        public int GetMinTick() { return ticks.Down; }
-        public int GetMaxTick() { return ticks.Up; }
-        public TickPair GetTickPair() { return ticks; }
 
         public IEnumerator<GuitarNote> GetEnumerator()
         {

@@ -247,25 +247,6 @@ namespace Sanford.Multimedia.Midi
             base.Reset();
         }
 
-        public void Write(MidiEvent e)
-        {
-            switch (e.MidiMessage.MessageType)
-            {
-                case MessageType.Channel:
-                case MessageType.SystemCommon:
-                case MessageType.SystemRealtime:
-                    Write(e.DeltaTicks, (ShortMessage)e.MidiMessage);
-                    break;
-
-                case MessageType.SystemExclusive:
-                    Write(e.DeltaTicks, (SysExMessage)e.MidiMessage);
-                    break;
-
-                case MessageType.Meta:
-                    Write(e.DeltaTicks, (MetaMessage)e.MidiMessage);
-                    break;
-            }
-        }
 
         private void Write(int deltaTicks, ShortMessage message)
         {

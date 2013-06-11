@@ -41,33 +41,36 @@ namespace Sanford.Multimedia.Midi
 
             stream.Write(TrackHeader, 0, TrackHeader.Length);
 
+            int absTick = 0;
 
-            foreach (MidiEvent e in track.Iterator())
+            foreach (MidiEvent e in track.AllIterator())
             {
-                WriteVariableLengthValue(e.DeltaTicks);
+                WriteVariableLengthValue(e.AbsoluteTicks - absTick);
 
-                switch (e.MidiMessage.MessageType)
+                absTick = e.AbsoluteTicks;
+
+                switch (e.MessageType)
                 {
                     case MessageType.Channel:
-                        Write((ChannelMessage)e.MidiMessage);
+                        Write((ChannelMessage)e.Clone());
                         break;
 
                     case MessageType.SystemExclusive:
-                        Write((SysExMessage)e.MidiMessage);
+                        Write((SysExMessage)e.Clone());
                         break;
 
                     case MessageType.Meta:
                         {
-                            Write((MetaMessage)e.MidiMessage);
+                            Write((MetaMessage)e.Clone());
                         }
                         break;
 
                     case MessageType.SystemCommon:
-                        Write((SysCommonMessage)e.MidiMessage);
+                        Write((SysCommonMessage)e.Clone());
                         break;
 
                     case MessageType.SystemRealtime:
-                        Write((SysRealtimeMessage)e.MidiMessage);
+                        Write((SysRealtimeMessage)e.Clone());
                         break;
                 }
             }

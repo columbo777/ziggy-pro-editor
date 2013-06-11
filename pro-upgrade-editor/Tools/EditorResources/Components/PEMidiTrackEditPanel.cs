@@ -344,6 +344,9 @@ namespace EditorResources.Components
                     }
                     Refresh();
                     SetSelectedItem(newTrack, SelectedDifficulty);
+
+                    t_TrackClicked(this, newTrack, SelectedDifficulty);
+                    
                 }
             });
             dragItem = null;
@@ -357,12 +360,20 @@ namespace EditorResources.Components
             o.IfObjectNotNull(op =>
             {
                 DoRequestBackup();
-                sender.Track.GetChanMessagesByDifficulty(difficulty).ToList().ForEach(x => sender.Track.Remove(x));
 
+                var messages = sender.Track.GetChanMessagesByDifficulty(difficulty);
+                sender.Track.Remove(messages);
+                
                 var otrack = o.MidiTrack.Track;
 
-                otrack.CloneDifficulty(o.Difficulty, difficulty, sender.Track.FileType).
-                    GetChanMessagesByDifficulty(difficulty).ForEach(x => sender.Track.Insert(x.AbsoluteTicks, x.ChannelMessage));
+                var clonedTrack = otrack.CloneDifficulty(o.Difficulty, difficulty, sender.Track.FileType);
+                
+                var clonedMessages = clonedTrack.GetChanMessagesByDifficulty(difficulty).ToList();
+                
+                foreach(var msg in clonedMessages)
+                {
+                    sender.Track.Insert(msg.AbsoluteTicks, msg.Clone());
+                }
 
                 SetSelectedItem(sender.Track, o.Difficulty);
                 

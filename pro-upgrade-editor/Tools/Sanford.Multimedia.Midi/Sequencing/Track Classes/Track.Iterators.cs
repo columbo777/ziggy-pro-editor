@@ -9,34 +9,16 @@ namespace Sanford.Multimedia.Midi
         #region Iterators
         public IEnumerable<MidiEvent> AllIterator()
         {
-            MidiEvent current = head;
-
-            while (current != null)
+            foreach (var ev in eventList)
             {
-                if (current.MidiMessage != null)
-                {
-                    yield return current;
-                }
-                current = current.Next;
+                yield return ev;
             }
 
-            current = endOfTrackMidiEvent;
-
-            yield return current;
+            yield return endOfTrackMidiEvent;
         }
         public IEnumerable<MidiEvent> Iterator()
         {
-            MidiEvent current = head;
-
-            while (current != null)
-            {
-                if (current.MidiMessage != null)
-                {
-                    yield return current;
-                }
-                current = current.Next;
-            }
-
+            return eventList;
         }
 
         public IEnumerable<int> DispatcherIterator(MessageDispatcher dispatcher)
@@ -47,7 +29,7 @@ namespace Sanford.Multimedia.Midi
             {
                 yield return enumerator.Current.AbsoluteTicks;
 
-                dispatcher.Dispatch(enumerator.Current.MidiMessage);
+                dispatcher.Dispatch(enumerator.Current.Clone());
             }
         }
 
@@ -59,19 +41,18 @@ namespace Sanford.Multimedia.Midi
             IEnumerator<MidiEvent> enumerator = Iterator().GetEnumerator();
 
             bool notFinished = enumerator.MoveNext();
-            IMidiMessage message;
-
+            
             while (notFinished && enumerator.Current.AbsoluteTicks < startPosition)
             {
-                message = enumerator.Current.MidiMessage;
+                var cur = enumerator.Current;
 
-                if (message.MessageType == MessageType.Channel)
+                if (cur.MessageType == MessageType.Channel)
                 {
-                    chaser.Process((ChannelMessage)message);
+                    chaser.Process((ChannelMessage)cur.Clone());
                 }
-                else if (message.MessageType == MessageType.Meta)
+                else if (cur.MessageType == MessageType.Meta)
                 {
-                    dispatcher.Dispatch(message);
+                    dispatcher.Dispatch(cur.Clone());
                 }
 
                 notFinished = enumerator.MoveNext();
@@ -94,7 +75,7 @@ namespace Sanford.Multimedia.Midi
 
                 while (notFinished && enumerator.Current.AbsoluteTicks == ticks)
                 {
-                    dispatcher.Dispatch(enumerator.Current.MidiMessage);
+                    dispatcher.Dispatch(enumerator.Current.Clone());
 
                     notFinished = enumerator.MoveNext();
                 }

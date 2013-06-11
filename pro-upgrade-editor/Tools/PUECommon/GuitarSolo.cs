@@ -10,15 +10,22 @@ namespace ProUpgradeEditor.Common
     public class GuitarSolo : GuitarModifier
     {
 
-        public GuitarSolo(GuitarMessageList track, MidiEvent downEvent = null, MidiEvent upEvent = null) :
-            base(track, downEvent, upEvent, GuitarModifierType.Solo, GuitarMessageType.GuitarSolo) { }
-        public GuitarSolo(MidiEventPair ev) :
-            base(ev, GuitarModifierType.Solo, GuitarMessageType.GuitarSolo) { }
-        public static GuitarSolo CreateSolo(GuitarMessageList track, TickPair ticks)
+        public GuitarSolo(GuitarMessageList owner, TickPair ticks) :
+            base(owner, ticks, GuitarModifierType.Solo, GuitarMessageType.GuitarSolo) 
         {
-            var ev = track.Insert(Utility.SoloData1, 100, Utility.ChannelDefault, ticks);
+            this.Data1 = Utility.SoloData1;
+            this.Data2 = 100;
+            Channel = 0;
+            this.SetTicks(ticks);
+        }
 
-            var ret = new GuitarSolo(track, ev.Down, ev.Up);
+        public GuitarSolo(MidiEventPair ev) :
+            base(ev, GuitarModifierType.Solo, GuitarMessageType.GuitarSolo) 
+        { 
+        }
+        public static GuitarSolo CreateSolo(GuitarMessageList owner, TickPair ticks)
+        {
+            var ret = new GuitarSolo(owner, ticks);
             ret.IsNew = true;
             ret.CreateEvents();
 

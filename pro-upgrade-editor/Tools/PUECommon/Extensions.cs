@@ -415,6 +415,10 @@ namespace ProUpgradeEditor.Common
         {
             return TryGetValue(delegate() { return str.IsEmpty() ? "" : Path.GetFileNameWithoutExtension(str); });
         }
+        public static string GetFileExtension(this string str)
+        {
+            return TryGetValue(delegate() { return str.IsEmpty() ? "" : Path.GetExtension(str); });
+        }
         public static string GetFileName(this string str)
         {
             return TryGetValue(delegate() { return str.IsEmpty() ? "" : Path.GetFileName(str); });
@@ -551,11 +555,11 @@ namespace ProUpgradeEditor.Common
         }
         public static bool IsTempoEvent(this MidiEvent ev)
         {
-            return ev.IsMetaEvent() && ev.MetaMessage.MetaType == MetaType.Tempo;
+            return ev.IsMetaEvent() && ev.MetaType == MetaType.Tempo;
         }
         public static bool IsTimeSigEvent(this MidiEvent ev)
         {
-            return ev.IsMetaEvent() && ev.MetaMessage.MetaType == MetaType.TimeSignature;
+            return ev.IsMetaEvent() && ev.MetaType == MetaType.TimeSignature;
         }
         public static bool IsTempoTimesigEvent(this MidiEvent ev)
         {
@@ -570,7 +574,7 @@ namespace ProUpgradeEditor.Common
         }
         public static bool IsMetaEvent(this MidiEvent ev)
         {
-            return ev != null && ev.MetaMessage != null;
+            return ev != null && ev.MessageType == MessageType.Meta;
         }
 
         public static void SetSelectedItem<T>(this ListBox list, T item) where T : class
@@ -618,13 +622,13 @@ namespace ProUpgradeEditor.Common
         }
         public static bool IsTextEvent(this MidiEvent ev)
         {
-            return ev != null && ev.MetaMessage != null && (ev.MetaMessage.MetaType != MetaType.EndOfTrack &&
-                ev.MetaMessage.MetaType != MetaType.TrackName && ev.MetaMessage.Text.IsNotEmpty());
+            return ev != null && ev.MessageType == MessageType.Meta && (ev.MetaType != MetaType.EndOfTrack &&
+                ev.MetaType != MetaType.TrackName && ev.Text.IsNotEmpty());
         }
 
         public static bool IsChannelEvent(this MidiEvent ev)
         {
-            return ev != null && ev.ChannelMessage != null;
+            return ev != null && ev.MessageType == MessageType.Channel;
         }
 
         public static bool IsFileTypePro(this Sequence seq) { return seq.FileType == FileType.Pro; }
@@ -636,11 +640,20 @@ namespace ProUpgradeEditor.Common
         public static bool IsFileTypeUnknown(this Sequence seq) { return seq.FileType == FileType.Unknown; }
         public static bool IsFileTypeUnknown(this Track t) { return t.FileType == FileType.Unknown; }
 
-        public static IEnumerable<MidiEvent> GetChanMessagesByDifficulty(this Track t, GuitarDifficulty diff)
+        public static IEnumerable<MidiEvent> GetChanMessagesByDifficulty(this Track track, GuitarDifficulty difficulty)
         {
-            return t.ChanMessages.Where(x =>
-                diff.HasFlag(x.Data1.GetData1Difficulty(t.IsFileTypePro()))
-                ).ToList();
+            var ret = new List<MidiEvent>();
+            var isPro = track.IsFileTypePro();
+            foreach (var msg in track.ChanMessages)
+            {
+                var diff = msg.Data1.GetData1Difficulty(isPro);
+                if (diff == difficulty)
+                {
+                    ret.Add(msg);
+                }
+            }
+
+            return ret;
         }
 
         public static bool HasDropObject<T>(this DragEventArgs args) where T : class
@@ -701,13 +714,6 @@ namespace ProUpgradeEditor.Common
             else { if (Else != null) { ret = Else(d); } }
             return ret ?? "";
         }
-
-        public static GuitarMessage ToGuitarMessage(this MidiEvent ev, GuitarMessageList track)
-        {
-            return new GuitarMessage(track, ev, null, GuitarMessageType.Unknown);
-        }
-
-
 
         public static bool IsCloseScreenPoint(this int i, int x)
         {
@@ -917,7 +923,7 @@ namespace ProUpgradeEditor.Common
         public static IEnumerable<MidiEvent> RemoveDifficulty(this Track track, GuitarDifficulty diff)
         {
             var ret = track.ChanMessages.Where(x =>
-                diff.HasFlag(x.ChannelMessage.Data1.GetData1Difficulty(track.IsFileTypePro()))).ToList();
+                diff.HasFlag(x.Data1.GetData1Difficulty(track.IsFileTypePro()))).ToList();
             track.Remove(ret);
             return ret;
         }
@@ -977,7 +983,7 @@ namespace ProUpgradeEditor.Common
                     var isPro = t5.IsFileTypePro();
                     foreach (var x in t5.ChanMessages.Where(x => targetDifficulty.HasFlag(x.Data1.GetData1Difficulty(isPro))).ToList())
                     {
-                        var proCM = x.ChannelMessage.ConvertToPro(targetDifficulty);
+                        var proCM = x.ConvertToPro(targetDifficulty);
                         if (proCM != null)
                         {
                             ret.Insert(x.AbsoluteTicks, proCM);
@@ -988,7 +994,7 @@ namespace ProUpgradeEditor.Common
                     {
                         t5.Meta.Where(meta => meta.IsTextEvent()).ForEach(meta =>
                         {
-                            ret.Insert(meta.AbsoluteTicks, meta.MetaMessage.CloneMeta());
+                            ret.Insert(meta.AbsoluteTicks, meta.Clone());
                         });
                     }
                 }
@@ -997,7 +1003,7 @@ namespace ProUpgradeEditor.Common
 
                     foreach (var cm in t5.ChanMessages)
                     {
-                        var proCM = cm.ChannelMessage.ConvertToPro(targetDifficulty);
+                        var proCM = cm.ConvertToPro(targetDifficulty);
                         if (proCM != null)
                         {
                             ret.Insert(cm.AbsoluteTicks, proCM);
@@ -1012,7 +1018,7 @@ namespace ProUpgradeEditor.Common
             }
             else
             {
-                
+
                 ret.Merge(t5);
             }
             return ret;
@@ -1041,7 +1047,7 @@ namespace ProUpgradeEditor.Common
         public static IEnumerable<MidiEvent> GetChanMessagesNotInDifficulty(this Track t, GuitarDifficulty diff)
         {
             return t.ChanMessages.Where(x =>
-                !diff.HasFlag(x.ChannelMessage.Data1.GetData1Difficulty(t.IsFileTypePro())));
+                !diff.HasFlag(x.Data1.GetData1Difficulty(t.IsFileTypePro())));
         }
 
         public static Track CloneDifficulty(this Track t, GuitarDifficulty sourceDifficulty, GuitarDifficulty destDifficulty, FileType type = FileType.Unknown)
@@ -1051,13 +1057,21 @@ namespace ProUpgradeEditor.Common
             var tmess = t.GetChanMessagesByDifficulty(sourceDifficulty);
 
             if (t.IsFileTypePro() && type == FileType.Guitar5)
-                tmess.ForEach(x => ret.Insert(x.AbsoluteTicks, x.ChannelMessage.ConvertToG5(destDifficulty)));
+            {
+                tmess.ForEach(x => ret.Insert(x.AbsoluteTicks, x.ConvertToG5(destDifficulty)));
+            }
             else if (t.IsFileTypePro() == false && type == FileType.Pro)
-                tmess.ForEach(x => ret.Insert(x.AbsoluteTicks, x.ChannelMessage.ConvertToPro(destDifficulty)));
+            {
+                tmess.ForEach(x => ret.Insert(x.AbsoluteTicks, x.ConvertToPro(destDifficulty)));
+            }
             else if (t.IsFileTypePro())
-                tmess.ForEach(x => ret.Insert(x.AbsoluteTicks, x.ChannelMessage.ConvertDifficultyPro(destDifficulty)));
+            {
+                tmess.ForEach(x => ret.Insert(x.AbsoluteTicks, x.ConvertDifficultyPro(destDifficulty)));
+            }
             else
-                tmess.ForEach(x => ret.Insert(x.AbsoluteTicks, x.ChannelMessage.ConvertDifficultyG5(destDifficulty)));
+            {
+                tmess.ForEach(x => ret.Insert(x.AbsoluteTicks, x.ConvertDifficultyG5(destDifficulty)));
+            }
 
             return ret;
         }
@@ -1066,10 +1080,10 @@ namespace ProUpgradeEditor.Common
         {
             var ret = new Track(FileType.Guitar5, t6.Name);
 
-            foreach(var cm in t6.ChanMessages.ToList())
+            foreach (var cm in t6.ChanMessages.ToList())
             {
-                var x = cm.ChannelMessage.ConvertToG5();
-                if(x != null)
+                var x = cm.ConvertToG5();
+                if (x != null)
                 {
                     ret.Insert(cm.AbsoluteTicks, new ChannelMessage(x.Message));
                 }
@@ -1077,7 +1091,7 @@ namespace ProUpgradeEditor.Common
 
             var metaText = t6.Meta.Where(meta => meta.IsTextEvent()).ToList();
 
-            metaText.ForEach(x=> ret.Insert(x.AbsoluteTicks, x.Clone()));
+            metaText.ForEach(x => ret.Insert(x.AbsoluteTicks, x.Clone()));
 
             return ret;
         }
@@ -1104,29 +1118,19 @@ namespace ProUpgradeEditor.Common
                 yield return GuitarDifficulty.Easy;
         }
 
-        public static MetaMessage CloneMeta(this MetaMessage mess)
-        {
-            return new MetaMessage(mess.MetaType, mess.GetBytes());
-        }
 
-        public static ChannelMessage ConvertDifficultyPro(this MidiEvent ev,
+        public static ChannelMessage ConvertDifficultyPro(this MidiEvent cm,
             GuitarDifficulty targetDifficulty)
         {
-            return ev.ChannelMessage.ConvertDifficultyPro(targetDifficulty);
-        }
-
-        public static ChannelMessage ConvertDifficultyPro(this ChannelMessage cm,
-            GuitarDifficulty targetDifficulty)
-        {
+            var cb = Utility.CMBuilder.Initialize(cm);
             ChannelMessage ret = null;
-            var cb = new ChannelMessageBuilder(cm);
 
             var noteString = cm.Data1.GetNoteString6();
-            if (noteString != -1)
+            if (noteString.IsNotNull())
             {
-                cb.Data2 = cm.Data2;
+                //cb.Data2 = cb.Data2;
                 cb.Data1 = targetDifficulty.GetStringLowEPro() + noteString;
-                cb.MidiChannel = cm.MidiChannel;
+                cb.MidiChannel = cm.Channel;
                 cb.Command = cm.Command;
                 cb.Build();
 
@@ -1135,11 +1139,11 @@ namespace ProUpgradeEditor.Common
             else
             {
                 var modData1 = Utility.GetModifierData1ForDifficulty(cm.Data1, cm.Data1.GetData1Difficulty(true), targetDifficulty);
-                if (modData1 != -1)
+                if (modData1.IsNotNull())
                 {
-                    cb.Data2 = cm.Data2;
+                    //cb.Data2 = cb.Data2;
                     cb.Data1 = modData1;
-                    cb.MidiChannel = cm.MidiChannel;
+                    cb.MidiChannel = cm.Channel;
                     cb.Command = cm.Command;
                     cb.Build();
 
@@ -1152,19 +1156,29 @@ namespace ProUpgradeEditor.Common
                     {
                         if (cm.Data1.IsSoloExpert(false))
                         {
-                            cb.Data2 = cm.Data2;
+                            //cb.Data2 = cb.Data2;
                             cb.Data1 = Utility.SoloData1;
-                            cb.MidiChannel = cm.MidiChannel;
+                            cb.MidiChannel = Utility.ChannelDefault;
                             cb.Command = cm.Command;
                             cb.Build();
 
                             ret = cb.Result;
                         }
-                        else if (cm.Data1.IsPowerup() || cm.Data1.IsBigRockEnding())
+                        else if (cm.Data1.IsPowerup())
                         {
-                            cb.Data2 = cm.Data2;
+                            //cb.Data2 = cb.Data2;
+                            cb.Data1 = Utility.PowerupData1;
+                            cb.MidiChannel = Utility.ChannelDefault;
+                            cb.Command = cm.Command;
+                            cb.Build();
+
+                            ret = cb.Result;
+                        }
+                        else if (cm.Data1.IsBigRockEnding())
+                        {
+                            //cb.Data2 = cb.Data2;
                             cb.Data1 = cm.Data1;
-                            cb.MidiChannel = cm.MidiChannel;
+                            cb.MidiChannel = Utility.ChannelDefault;
                             cb.Command = cm.Command;
                             cb.Build();
 
@@ -1177,18 +1191,18 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
-        public static ChannelMessage ConvertDifficultyG5(this ChannelMessage cm, GuitarDifficulty targetDifficulty)
+        public static ChannelMessage ConvertDifficultyG5(this MidiEvent cm, GuitarDifficulty targetDifficulty)
         {
             ChannelMessage ret = null;
-            var cb = new ChannelMessageBuilder(cm);
+            var cb = Utility.CMBuilder.Initialize(cm);
 
             var noteString = cm.Data1.GetNoteString5();
-            if (noteString != -1)
+            if (noteString.IsNotNull())
             {
                 cb.Data2 = cm.Command.GetData2();
-                cb.Command = cm.Command;
                 cb.Data1 = targetDifficulty.GetStringLowE5() + noteString;
                 cb.MidiChannel = Utility.ChannelDefault;
+                cb.Command = cm.Command;
 
                 cb.Build();
 
@@ -1208,7 +1222,7 @@ namespace ProUpgradeEditor.Common
             return x is GuitarNote || x is GuitarSlide || x is GuitarHammeron || x is GuitarChordStrum;
         }
 
-        public static ChannelMessage ConvertToPro(this ChannelMessage cm, GuitarDifficulty targetDifficulty = GuitarDifficulty.Unknown)
+        public static ChannelMessage ConvertToPro(this MidiEvent cm, GuitarDifficulty targetDifficulty = GuitarDifficulty.Unknown)
         {
             ChannelMessage ret = null;
 
@@ -1223,9 +1237,9 @@ namespace ProUpgradeEditor.Common
             }
             else
             {
-                var cb = new ChannelMessageBuilder(cm);
+                var cb = Utility.CMBuilder.Initialize(cm);
                 var noteString = cm.Data1.GetNoteString5();
-                if (noteString != -1)
+                if (noteString.IsNotNull())
                 {
                     cb.Data2 = cm.Command.GetData2();
                     cb.Command = cm.Command;
@@ -1240,7 +1254,7 @@ namespace ProUpgradeEditor.Common
                 {
                     var modData1 = Utility.GetModifierData1ForDifficulty(cm.Data1,
                         cm.Data1.GetData1Difficulty(false), targetDifficulty);
-                    if (modData1 != -1)
+                    if (modData1.IsNotNull())
                     {
                         cb.Data2 = cm.Command.GetData2();
                         cb.Command = cm.Command;
@@ -1273,7 +1287,18 @@ namespace ProUpgradeEditor.Common
 
                             ret = cb.Result;
                         }
-                        else if (cm.Data1.IsPowerup() || cm.Data1.IsBigRockEnding())
+                        else if (cm.Data1.IsPowerup())
+                        {
+                            cb.Data2 = cm.Command.GetData2();
+                            cb.Command = cm.Command;
+                            cb.Data1 = Utility.PowerupData1;
+                            cb.MidiChannel = Utility.ChannelDefault;
+
+                            cb.Build();
+
+                            ret = cb.Result;
+                        }
+                        else if (cm.Data1.IsBigRockEnding())
                         {
                             cb.Data2 = cm.Command.GetData2();
                             cb.Command = cm.Command;
@@ -1293,22 +1318,29 @@ namespace ProUpgradeEditor.Common
         {
             return Utility.BigRockEndingData1.Contains(data1);
         }
-        public static ChannelMessage ConvertToG5(this ChannelMessage cm, GuitarDifficulty targetDifficulty = GuitarDifficulty.Unknown)
+        public static ChannelMessage ConvertToG5(this MidiEvent cm, GuitarDifficulty targetDifficulty = GuitarDifficulty.Unknown)
         {
             ChannelMessage ret = null;
-            var cb = new ChannelMessageBuilder(cm);
+            var cb = Utility.CMBuilder.Initialize(cm);
 
             if (targetDifficulty.IsUnknown())
                 targetDifficulty = cm.Data1.GetData1Difficulty(true);
 
             if (cm.Data1.IsProStringData1())
             {
+                cb.Data1 = targetDifficulty.GetStringLowE5() + cm.Data1.GetNoteString6();
                 if (cm.Data1.GetNoteString6() == 5)
+                {
                     cb.MidiChannel = 1;
+                    cb.Data1 = cb.Data1 - 1;
+                }
+                else
+                {
+                    cb.MidiChannel = Utility.ChannelDefault;
+                }
 
                 cb.Data2 = cm.Command.GetData2();
-                cb.Data1 = targetDifficulty.GetStringLowE5() + cm.Data1.GetNoteString6();
-                cb.MidiChannel = Utility.ChannelDefault;
+                
                 cb.Command = cm.Command;
                 cb.Build();
 
@@ -1376,12 +1408,12 @@ namespace ProUpgradeEditor.Common
         }
         public static bool IsNoteString5(this int data1)
         {
-            return data1.GetNoteString5() != -1;
+            return data1.GetNoteString5().IsNotNull();
         }
 
         public static bool IsNoteString6(this int data1)
         {
-            return data1.GetNoteString6() != -1;
+            return data1.GetNoteString6().IsNotNull();
         }
         public static bool IsProTrackName(this string str)
         {
@@ -1630,11 +1662,11 @@ namespace ProUpgradeEditor.Common
         }
         public static TickPair GetTickPair<T>(this IEnumerable<T> list) where T : GuitarMessage
         {
-            return new TickPair(list.GetMinTick(), list.GetMaxTick());
+            return (list == null || !list.Any()) ? TickPair.NullValue : (new TickPair(list.GetMinTick(), list.GetMaxTick()));
         }
         public static TimePair GetTimePair<T>(this IEnumerable<T> list) where T : GuitarMessage
         {
-            return new TimePair(list.Min(x => x.StartTime), list.Max(x => x.EndTime));
+            return (list == null || !list.Any()) ? TimePair.NullValue : (new TimePair(list.Min(x => x.StartTime), list.Max(x => x.EndTime)));
         }
 
         public static bool AnyBetweenTick(this IEnumerable<MidiEvent> list, TickPair ticks)
@@ -1675,6 +1707,17 @@ namespace ProUpgradeEditor.Common
             if (list.Any())
             {
                 return list.Max(x => x.DownTick);
+            }
+            else
+            {
+                return valueIfNull;
+            }
+        }
+        public static int GetMinUpTick<T>(this IEnumerable<T> list, int valueIfNull = Int32.MinValue) where T : GuitarMessage
+        {
+            if (list.Any())
+            {
+                return list.Min(x => x.UpTick);
             }
             else
             {
@@ -1733,7 +1776,7 @@ namespace ProUpgradeEditor.Common
         public static IEnumerable<IGrouping<Data1ChannelPair, MidiEvent>> GroupByData1Channel(
             this IEnumerable<MidiEvent> list, IEnumerable<int> data1)
         {
-            return list.Where(d=> data1.Contains(d.Data1)).ToList().GroupBy(x => x.GetData1ChannelPair());
+            return list.Where(d => data1.Contains(d.Data1)).ToList().GroupBy(x => x.GetData1ChannelPair());
         }
 
 
@@ -1749,23 +1792,6 @@ namespace ProUpgradeEditor.Common
         {
             return list.GroupBy(x => x.DownTick, x => x, new TickCloseComparer(Utility.TickCloseWidth)).ToList();
         }
-        
-        public static IEnumerable<MidiEventPair> GetEventPairs(this IEnumerable<IGrouping<Data1ChannelPair, MidiEvent>> dic,
-            GuitarMessageList owner, int data1)
-        {
-            var ret = new List<MidiEventPair>();
-            try
-            {
-                foreach (var k in dic.Where(k => data1 == k.Key.Data1))
-                {
-                    ret.AddRange(k.GetEventPairsFromData1List(owner));
-                }
-
-                ret.Sort(new MidiEventPairInterlacingSorter());
-            }
-            catch { }
-            return ret.ToList();
-        }
 
 
         public static IEnumerable<MidiEventPair> GetEventPairs(this IEnumerable<IGrouping<Data1ChannelPair, MidiEvent>> dic,
@@ -1776,7 +1802,7 @@ namespace ProUpgradeEditor.Common
             {
                 foreach (var d1 in data1)
                 {
-                    foreach (var k in dic.Where(k => d1 == k.Key.Data1))
+                    foreach (var k in dic.Where(k => d1 == k.Key.Data1).ToList())
                     {
                         ret.AddRange(k.GetEventPairsFromData1List(owner));
                     }
@@ -1788,21 +1814,6 @@ namespace ProUpgradeEditor.Common
             return ret.ToList();
         }
 
-        public static IOrderedEnumerable<MidiEvent> OrderByTicks(this IEnumerable<MidiEvent> items)
-        {
-            return items.OrderBy(x => x.AbsoluteTicks);
-        }
-        public static IOrderedEnumerable<MidiEvent> OrderByCommand(this IEnumerable<MidiEvent> items, CommandSortEnum channelSort)
-        {
-            if (channelSort == CommandSortEnum.OffFirst)
-            {
-                return items.OrderBy(x => x.Command);
-            }
-            else
-            {
-                return items.OrderByDescending(x => x.Command);
-            }
-        }
         public static IEnumerable<IGrouping<int, MidiEvent>> GroupByMatchingTicks(this IEnumerable<MidiEvent> items)
         {
             return items.GroupBy(x => x.AbsoluteTicks);
@@ -1813,80 +1824,34 @@ namespace ProUpgradeEditor.Common
             var ret = new List<MidiEventPair>();
             try
             {
+
+                var tickGroups = items.GroupByMatchingTicks().ToList();
+
+
                 if (!items.Any())
                     return ret;
 
-                var removeList = new List<MidiEvent>();
 
-                var tickGroups = items.OrderByTicks().ToList().GroupByMatchingTicks().ToList();
-                MidiEvent downEvent = null;
-                MidiEvent upEvent = null;
-                var expectingOn = true;
-
-                foreach (var group in tickGroups)
+                var events = tickGroups.SelectMany(x => x).ToList();
+                foreach (var chanGroup in events.GroupBy(x => x.Channel))
                 {
-                    var offItems = group.Where(x => x.IsOff);
-                    var onItems = group.Where(x => x.IsOn);
-
-                    if (expectingOn)
+                    var ev = chanGroup.ToList();
+                    for (int x = 0; x < ev.Count - 1; x += 2)
                     {
-                        removeList.AddRange(offItems);
-                        if (onItems.Any())
-                        {
-                            downEvent = onItems.First();
-                            upEvent = null;
-                            if (onItems.Count() > 1)
-                            {
-                                removeList.AddRange(onItems.Skip(1));
-                            }
-                            expectingOn = false;
+                        var pair = new MidiEventPair(owner, ev[x], ev[x + 1]);
 
-                        }
-                    }
-                    else
-                    {
-                        if (offItems.Any() == false)
+                        if (pair.IsValid &&
+                            pair.Down.Command == ChannelCommand.NoteOn && (
+                            pair.Up.Command == ChannelCommand.NoteOff))
                         {
-                            removeList.AddRange(onItems);
+                            ret.Add(pair);
                         }
                         else
                         {
-                            upEvent = offItems.First();
-                            if (offItems.Count() > 1)
-                            {
-                                removeList.AddRange(offItems.Skip(1));
-                            }
-
-                            ret.Add(new MidiEventPair(owner, downEvent, upEvent));
-                            downEvent = null;
-                            upEvent = null;
-
-                            expectingOn = true;
-
-                            if (onItems.Any())
-                            {
-                                downEvent = onItems.First();
-                                if (onItems.Count() > 1)
-                                {
-                                    removeList.AddRange(onItems.Skip(1));
-                                }
-                                expectingOn = false;
-                            }
+                            Debug.WriteLine("invalid tick pair");
                         }
                     }
                 }
-                if (downEvent != null)
-                    removeList.Add(downEvent);
-
-                if (upEvent != null)
-                    removeList.Add(upEvent);
-                if (removeList.Any())
-                {
-                    owner.Remove(removeList);
-                }
-                return ret;
-
-
             }
             catch { }
             return ret;
@@ -2290,7 +2255,6 @@ namespace ProUpgradeEditor.Common
         {
             return v.ClosestPointOnRectangle(rect).Distance(v);
         }
-
 
     }
 

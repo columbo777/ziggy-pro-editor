@@ -46,7 +46,7 @@ namespace ProUpgradeEditor.Common
         AllowAny = (AllowGrow | AllowShrink | AllowShift),
     }
 
-    public class GuitarMessageList
+    public class GuitarMessageList : IEnumerable<GuitarMessage>
     {
 
 
@@ -80,16 +80,72 @@ namespace ProUpgradeEditor.Common
             
             foreach (var messageType in GetAllMessageTypes())
             {
-                var list = GetMessageListForType(messageType);
-                if(list != null)
+                switch (messageType)
                 {
-                    foreach (var item in list)
-                    {
-                        if (diff.HasFlag(item.Difficulty))
-                        {
-                            ret.Add(item);
-                        }
-                    }
+                    case GuitarMessageType.GuitarHandPosition:
+                        ret.AddRange(HandPositions.Where(x=> diff.HasFlag(x.Difficulty)));
+                        break;
+
+                    case GuitarMessageType.GuitarTextEvent:
+                        ret.AddRange(TextEvents.Where(x=> diff.HasFlag(x.Difficulty)));
+                        break;
+
+                    case GuitarMessageType.GuitarTrainer:
+                        ret.AddRange(Trainers.Where(x=> diff.HasFlag(x.Difficulty)));
+                        break;
+                    case GuitarMessageType.GuitarChordStrum:
+                        ret.AddRange(ChordStrums.Where(x=> diff.HasFlag(x.Difficulty)));
+                        break;
+                    case GuitarMessageType.GuitarChord:
+                        ret.AddRange(Chords.Where(x=> diff.HasFlag(x.Difficulty)));
+                        break;
+
+                    case GuitarMessageType.GuitarNote:
+                        ret.AddRange(Notes.Where(x=> diff.HasFlag(x.Difficulty)));
+                        break;
+
+                    case GuitarMessageType.GuitarPowerup:
+                        ret.AddRange(Powerups.Where(x=> diff.HasFlag(x.Difficulty)));
+                        break;
+
+                    case GuitarMessageType.GuitarSolo:
+                        ret.AddRange(Solos.Where(x=> diff.HasFlag(x.Difficulty)));
+                        break;
+
+                    case GuitarMessageType.GuitarTempo:
+                        ret.AddRange(Tempos.Where(x=> diff.HasFlag(x.Difficulty)));
+                        break;
+
+                    case GuitarMessageType.GuitarTimeSignature:
+                        ret.AddRange(TimeSignatures.Where(x=> diff.HasFlag(x.Difficulty)));
+                        break;
+
+                    case GuitarMessageType.GuitarArpeggio:
+                        ret.AddRange(Arpeggios.Where(x=> diff.HasFlag(x.Difficulty)));
+                        break;
+
+                    case GuitarMessageType.GuitarBigRockEnding:
+                        ret.AddRange(BigRockEndings.Where(x=> diff.HasFlag(x.Difficulty)));
+                        break;
+
+                    case GuitarMessageType.GuitarSingleStringTremelo:
+                        ret.AddRange(SingleStringTremelos.Where(x=> diff.HasFlag(x.Difficulty)));
+                        break;
+
+                    case GuitarMessageType.GuitarMultiStringTremelo:
+                        ret.AddRange(MultiStringTremelos.Where(x=> diff.HasFlag(x.Difficulty)));
+                        break;
+
+                    case GuitarMessageType.GuitarSlide:
+                        ret.AddRange(Slides.Where(x=> diff.HasFlag(x.Difficulty)));
+                        break;
+
+                    case GuitarMessageType.GuitarHammeron:
+                        ret.AddRange(Hammerons.Where(x => diff.HasFlag(x.Difficulty)));
+                        break;
+                    default:
+                        ("unknown message: " + messageType).OutputDebug();
+                        break;
                 }
             }
 
@@ -118,6 +174,7 @@ namespace ProUpgradeEditor.Common
         TrackEditor owner;
         public TrackEditor Owner { get { return owner; } }
 
+        public bool IsPro { get { return owner.IsPro; } }
 
         public GuitarMessageList(TrackEditor owner)
         {
@@ -212,76 +269,6 @@ namespace ProUpgradeEditor.Common
             ret.AddRange(SingleStringTremelos.GetBetweenTick(pair));
 
             return ret.ToList();
-        }
-
-        public MessageList GetMessageListForType(GuitarMessageType type)
-        {
-            MessageList ret = null;
-            switch (type)
-            {
-                case GuitarMessageType.GuitarHandPosition:
-                    ret = HandPositions;
-                    break;
-
-                case GuitarMessageType.GuitarTextEvent:
-                    ret = TextEvents;
-                    break;
-
-                case GuitarMessageType.GuitarTrainer:
-                    ret = Trainers;
-                    break;
-                case GuitarMessageType.GuitarChordStrum:
-                    ret = ChordStrums;
-                    break;
-                case GuitarMessageType.GuitarChord:
-                    ret = Chords;
-                    break;
-
-                case GuitarMessageType.GuitarNote:
-                    ret = Notes;
-                    break;
-
-                case GuitarMessageType.GuitarPowerup:
-                    ret = Powerups;
-                    break;
-
-                case GuitarMessageType.GuitarSolo:
-                    ret = Solos;
-                    break;
-
-                case GuitarMessageType.GuitarTempo:
-                    ret = Tempos;
-                    break;
-
-                case GuitarMessageType.GuitarTimeSignature:
-                    ret = TimeSignatures;
-                    break;
-
-                case GuitarMessageType.GuitarArpeggio:
-                    ret = Arpeggios;
-                    break;
-
-                case GuitarMessageType.GuitarBigRockEnding:
-                    ret = BigRockEndings;
-                    break;
-
-                case GuitarMessageType.GuitarSingleStringTremelo:
-                    ret = SingleStringTremelos;
-                    break;
-
-                case GuitarMessageType.GuitarMultiStringTremelo:
-                    ret = MultiStringTremelos;
-                    break;
-
-                case GuitarMessageType.GuitarSlide:
-                    ret = Slides;
-                    break;
-
-                case GuitarMessageType.GuitarHammeron:
-                    ret = Hammerons;
-                    break;
-            }
-            return ret;
         }
 
 
@@ -457,24 +444,79 @@ namespace ProUpgradeEditor.Common
         }
 
 
-        public void Add<T>(T mess) where T : GuitarMessage
+        public virtual void Add<T>(T mess) where T : GuitarMessage
         {
             if (mess != null)
             {
-                
-                var list = GetMessageListForType(mess.MessageType);
-                if (list != null)
+
+                switch (mess.MessageType)
                 {
-                    if (!list.Contains(mess))
-                    {
-                        list.Add(mess);
-                    }
-                    else
-                    {
-                        Debug.WriteLine("re-adding to list");
-                    }
-                    mess.IsDeleted = false;
+                    case GuitarMessageType.GuitarHandPosition:
+                        HandPositions.Add(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarTextEvent:
+                        TextEvents.Add(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarTrainer:
+                        Trainers.Add(mess);
+                        break;
+                    case GuitarMessageType.GuitarChordStrum:
+                        ChordStrums.Add(mess);
+                        break;
+                    case GuitarMessageType.GuitarChord:
+                        Chords.Add(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarNote:
+                        Notes.Add(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarPowerup:
+                        Powerups.Add(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarSolo:
+                        Solos.Add(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarTempo:
+                        Tempos.Add(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarTimeSignature:
+                        TimeSignatures.Add(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarArpeggio:
+                        Arpeggios.Add(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarBigRockEnding:
+                        BigRockEndings.Add(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarSingleStringTremelo:
+                        SingleStringTremelos.Add(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarMultiStringTremelo:
+                        MultiStringTremelos.Add(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarSlide:
+                        Slides.Add(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarHammeron:
+                        Hammerons.Add(mess);
+                        break;
+                    default:
+                        ("unknown message: " + mess.MessageType).OutputDebug();
+                        break;
                 }
+                
             }
         }
 
@@ -492,7 +534,10 @@ namespace ProUpgradeEditor.Common
         {
             internalRemove(mess);
         }
-
+        public void Remove(MidiEventPair pair)
+        {
+            owner.GuitarTrack.Remove(pair);
+        }
         public void Remove(MidiEvent mess)
         {
             owner.GuitarTrack.Remove(mess);
@@ -514,10 +559,255 @@ namespace ProUpgradeEditor.Common
         {
             if (mess != null)
             {
-                GetMessageListForType(mess.MessageType).Remove(mess);
+
+                switch (mess.MessageType)
+                {
+                    case GuitarMessageType.GuitarHandPosition:
+                        HandPositions.Remove(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarTextEvent:
+                        TextEvents.Remove(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarTrainer:
+                        Trainers.Remove(mess);
+                        break;
+                    case GuitarMessageType.GuitarChordStrum:
+                        ChordStrums.Remove(mess);
+                        break;
+                    case GuitarMessageType.GuitarChord:
+                        Chords.Remove(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarNote:
+                        Notes.Remove(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarPowerup:
+                        Powerups.Remove(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarSolo:
+                        Solos.Remove(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarTempo:
+                        Tempos.Remove(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarTimeSignature:
+                        TimeSignatures.Remove(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarArpeggio:
+                        Arpeggios.Remove(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarBigRockEnding:
+                        BigRockEndings.Remove(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarSingleStringTremelo:
+                        SingleStringTremelos.Remove(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarMultiStringTremelo:
+                        MultiStringTremelos.Remove(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarSlide:
+                        Slides.Remove(mess);
+                        break;
+
+                    case GuitarMessageType.GuitarHammeron:
+                        Hammerons.Remove(mess);
+                        break;
+                    default:
+                        ("unknown message: " + mess.MessageType).OutputDebug();
+                        break;
+                }
             }
         }
 
+        public IEnumerator<T> GetMessagesByType<T>(IEnumerable<GuitarMessageType> types) where T : GuitarMessage
+        {
+            foreach (var messageType in types)
+            {
+                switch (messageType)
+                {
+                    case GuitarMessageType.GuitarHandPosition:
+                        {
+                            var enumer = HandPositions.GetEnumerator();
+                            while (enumer.MoveNext())
+                            {
+                                yield return enumer.Current as T;
+                            }
+                        }
+                        break;
 
+                    case GuitarMessageType.GuitarTextEvent:
+                        {
+                            var enumer = TextEvents.GetEnumerator();
+                            while (enumer.MoveNext())
+                            {
+                                yield return enumer.Current as T;
+                            }
+                        }
+                        break;
+
+                    case GuitarMessageType.GuitarTrainer:
+                        {
+                            var enumer = Trainers.GetEnumerator();
+                            while (enumer.MoveNext())
+                            {
+                                yield return enumer.Current as T;
+                            }
+                        }
+                        break;
+                    case GuitarMessageType.GuitarChordStrum:
+                        {
+                            var enumer = ChordStrums.GetEnumerator();
+                            while (enumer.MoveNext())
+                            {
+                                yield return enumer.Current as T;
+                            }
+                        }
+                        break;
+                    case GuitarMessageType.GuitarChord:
+                        {
+                            var enumer = Chords.GetEnumerator();
+                            while (enumer.MoveNext())
+                            {
+                                yield return enumer.Current as T;
+                            }
+                        }
+                        break;
+
+                    case GuitarMessageType.GuitarNote:
+                        {
+                            var enumer = Notes.GetEnumerator();
+                            while (enumer.MoveNext())
+                            {
+                                yield return enumer.Current as T;
+                            }
+                        }
+                        break;
+
+                    case GuitarMessageType.GuitarPowerup:
+                        {
+                            var enumer = Powerups.GetEnumerator();
+                            while (enumer.MoveNext())
+                            {
+                                yield return enumer.Current as T;
+                            }
+                        }
+                        break;
+
+                    case GuitarMessageType.GuitarSolo:
+                        {
+                            var enumer = Solos.GetEnumerator();
+                            while (enumer.MoveNext())
+                            {
+                                yield return enumer.Current as T;
+                            }
+                        }
+                        break;
+
+                    case GuitarMessageType.GuitarTempo:
+                        {
+                            var enumer = Tempos.GetEnumerator();
+                            while (enumer.MoveNext())
+                            {
+                                yield return enumer.Current as T;
+                            }
+                        }
+                        break;
+
+                    case GuitarMessageType.GuitarTimeSignature:
+                        {
+                            var enumer = TimeSignatures.GetEnumerator();
+                            while (enumer.MoveNext())
+                            {
+                                yield return enumer.Current as T;
+                            }
+                        }
+                        break;
+
+                    case GuitarMessageType.GuitarArpeggio:
+                        {
+                            var enumer = Arpeggios.GetEnumerator();
+                            while (enumer.MoveNext())
+                            {
+                                yield return enumer.Current as T;
+                            }
+                        }
+                        break;
+
+                    case GuitarMessageType.GuitarBigRockEnding:
+                        {
+                            var enumer = BigRockEndings.GetEnumerator();
+                            while (enumer.MoveNext())
+                            {
+                                yield return enumer.Current as T;
+                            }
+                        }
+                        break;
+
+                    case GuitarMessageType.GuitarSingleStringTremelo:
+                        {
+                            var enumer = SingleStringTremelos.GetEnumerator();
+                            while (enumer.MoveNext())
+                            {
+                                yield return enumer.Current as T;
+                            }
+                        }
+                        break;
+
+                    case GuitarMessageType.GuitarMultiStringTremelo:
+                        {
+                            var enumer = MultiStringTremelos.GetEnumerator();
+                            while (enumer.MoveNext())
+                            {
+                                yield return enumer.Current as T;
+                            }
+                        }
+                        break;
+
+                    case GuitarMessageType.GuitarSlide:
+                        {
+                            var enumer = Slides.GetEnumerator();
+                            while (enumer.MoveNext())
+                            {
+                                yield return enumer.Current as T;
+                            }
+                        }
+                        break;
+
+                    case GuitarMessageType.GuitarHammeron:
+                        {
+                            var enumer = Hammerons.GetEnumerator();
+                            while (enumer.MoveNext())
+                            {
+                                yield return enumer.Current as T;
+                            }
+                        }
+                        break;
+                    default:
+                        ("unknown message: " + messageType).OutputDebug();
+                        break;
+                }
+            }
+        }
+
+        public IEnumerator<GuitarMessage> GetEnumerator()
+        {
+            return GetMessagesByType<GuitarMessage>(GetAllMessageTypes());
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 }

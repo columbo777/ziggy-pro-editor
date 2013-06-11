@@ -101,11 +101,16 @@ namespace Sanford.Multimedia.Midi
         /// <param name="message">
         /// The ChannelMessageEventArgs to use for initializing the ChannelMessageBuilder.
         /// </param>
-        public void Initialize(ChannelMessage message)
+        public ChannelMessageBuilder Initialize(ChannelMessage message)
         {
             this.message = message.Message;
+            return this;
         }
-
+        public ChannelMessageBuilder Initialize(MidiEvent ev)
+        {
+            this.message = ev.MessageData;
+            return this;
+        }
         /// <summary>
         /// Clears the ChannelMessageEventArgs cache.
         /// </summary>
@@ -249,7 +254,10 @@ namespace Sanford.Multimedia.Midi
                 // Add message to cache.
                 messageCache.Add(message, result);
             }
+
+            
         }
+
 
         #endregion
     }

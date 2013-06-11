@@ -11,5 +11,6 @@ namespace ProUpgradeEditor.Common
     {
         public TickPair Ticks;
         public int Fret;
+        public bool IsChord;
     }
 }

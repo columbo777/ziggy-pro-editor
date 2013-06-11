@@ -15,31 +15,47 @@ namespace ProUpgradeEditor.Common
     {
         protected GuitarMessageType messageType;
         protected MidiEventProps props;
-
         protected bool selected;
 
 
+        public GuitarMessage()
+        {
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            this.props = new MidiEventProps(null, TickPair.NullValue);
+            this.messageType = GuitarMessageType.Unknown;
+            Data1 = Int32.MinValue;
+            Data2 = Utility.Data2Default;
+            Channel = Utility.ChannelDefault;
+            TickPair = TickPair.NullValue;
+        }
+
         public GuitarMessage(GuitarMessageList owner, MidiEvent downEvent, MidiEvent upEvent, GuitarMessageType type)
-            : this(owner, new MidiEventPair(owner, downEvent, upEvent), type)
+            : this(new MidiEventPair(owner, downEvent, upEvent), type)
         {
 
         }
         public GuitarMessage(MidiEventPair pair, GuitarMessageType type)
-            : this(pair.Owner, pair, type)
+            : this()
         {
 
-        }
-        public GuitarMessage(GuitarMessageList owner, MidiEventProps props, GuitarMessageType type)
-        {
-            this.props = props.CloneToMemory(owner);
             this.messageType = type;
+            this.props = new MidiEventProps(pair, type);
+            SetTicks(pair.TickPair);
+        }
+        
+        public GuitarMessage(GuitarMessageList owner, TickPair pair, GuitarMessageType type)
+        {
+            this.messageType = type;
+            this.props = new MidiEventProps(owner, pair);
+
+            this.SetTicks(pair);
         }
 
-        public GuitarMessage(GuitarMessageList list, MidiEventPair pair, GuitarMessageType type)
-        {
-            this.messageType = type;
-            this.props = new MidiEventProps(list, pair);
-        }
+        public virtual bool IsPro { get { return Owner.IsPro; } }
 
         public virtual void UpdateEvents()
         {
@@ -56,12 +72,6 @@ namespace ProUpgradeEditor.Common
 
         public virtual void RemoveEvents()
         {
-            if (!IsBasicChannelEvent)
-            {
-                Debug.WriteLine("Invalid removeevents");
-            }
-
-
             if (UpEvent != null && Owner != null)
             {
                 Owner.Remove(UpEvent);
@@ -74,38 +84,8 @@ namespace ProUpgradeEditor.Common
 
                 SetDownEvent(null);
             }
-
         }
 
-        public virtual int DefaultData1
-        {
-            get
-            {
-                int ret = Int32.MinValue;
-                switch (messageType)
-                {
-                    case GuitarMessageType.GuitarHandPosition: { if (Difficulty.IsExpert()) { ret = Utility.HandPositionData1; } }
-                        break;
-                    case GuitarMessageType.GuitarPowerup: { if (Difficulty.IsExpert()) ret = Utility.PowerupData1; }
-                        break;
-                    case GuitarMessageType.GuitarSolo: { if (Difficulty.IsExpert()) ret = Utility.SoloData1; }
-                        break;
-                    case GuitarMessageType.GuitarArpeggio: { ret = Utility.GetArpeggioData1(Difficulty); }
-                        break;
-                    case GuitarMessageType.GuitarSingleStringTremelo: { if (Difficulty.IsExpert()) ret = Utility.SingleStringTremeloData1; }
-                        break;
-                    case GuitarMessageType.GuitarMultiStringTremelo: { if (Difficulty.IsExpert()) ret = Utility.MultiStringTremeloData1; }
-                        break;
-                    case GuitarMessageType.GuitarSlide: { ret = Utility.GetSlideData1(this.Difficulty); }
-                        break;
-                    case GuitarMessageType.GuitarHammeron: { ret = Utility.GetHammeronData1(this.Difficulty); }
-                        break;
-                }
-                if (ret == -1)
-                    ret = Int32.MinValue;
-                return ret;
-            }
-        }
 
         public virtual bool IsBasicChannelEvent
         {
@@ -122,7 +102,6 @@ namespace ProUpgradeEditor.Common
                     case GuitarMessageType.GuitarTrainer:
                     case GuitarMessageType.GuitarChord:
                     case GuitarMessageType.GuitarChordStrum:
-
                         ret = false;
                         break;
                 }
@@ -132,15 +111,29 @@ namespace ProUpgradeEditor.Common
 
         public virtual void AddToList()
         {
-            IsDeleted = false;
+            if (IsDeleted)
+            {
+                Debug.WriteLine("adding deleted");
+            }
+            
+            
             Owner.Add(this);
             IsNew = false;
+            IsDeleted = false;
+            
         }
 
         public virtual void RemoveFromList()
         {
-            Owner.Remove(this);
-            IsDeleted = true;
+            if (!IsDeleted)
+            {
+                Owner.Remove(this);
+                IsDeleted = true;
+            }
+            else
+            {
+                Debug.WriteLine("removing deleted");
+            }
         }
 
         public virtual void DeleteAll()
@@ -151,26 +144,28 @@ namespace ProUpgradeEditor.Common
 
         public virtual void CreateEvents()
         {
-
             if (!HasEvents)
             {
                 if (!IsBasicChannelEvent)
                 {
-                    Debug.WriteLine("Invalid createevents - " + this.ToString());
+                    ("create events non basic").OutputDebug();
+                    return;
                 }
 
                 if (Data2.IsNull())
                 {
-                    Data2 = 100;
+                    ("data2 missing").OutputDebug();
+                    return;
                 }
                 if (Data1.IsNull())
                 {
-                    Data1 = DefaultData1;
+                    ("data1 missing").OutputDebug();
+                    return;
                 }
 
-                if (Data1.IsNull() || TickPair.IsValid == false || Owner == null)
+                if (TickPair.IsValid == false || Owner == null)
                 {
-                    Debug.WriteLine("invalid properties - " + this.ToString());
+                    ("invalid data").OutputDebug();
                     return;
                 }
 
@@ -319,7 +314,7 @@ namespace ProUpgradeEditor.Common
 
 
         public virtual MidiEventPair EventPair { get { return props.EventPair; } }
-        public virtual TickPair TickPair { get { return new TickPair(DownTick, UpTick); } }
+        public virtual TickPair TickPair { get { return new TickPair(DownTick, UpTick); } set { props.TickPair = value; } }
         public virtual TimePair TimePair { get { return new TimePair(StartTime, EndTime); } }
         public virtual TickPair ScreenPointPair { get { return new TickPair(StartScreenPoint, EndScreenPoint); } }
 
@@ -431,7 +426,7 @@ namespace ProUpgradeEditor.Common
         {
             get
             {
-                return Utility.GetDifficulty(Data1, Owner.Owner.IsPro);
+                return Utility.GetDifficulty(Data1, IsPro);
             }
         }
 
@@ -445,8 +440,6 @@ namespace ProUpgradeEditor.Common
         }
 
 
-        public virtual ChannelMessage DownChannelMessage { get { return DownEvent.ChannelMessage; } }
-        public virtual ChannelMessage UpChannelMessage { get { return UpEvent.ChannelMessage; } }
 
         public virtual int TickLength { get { return UpTick - DownTick; } }
 
@@ -467,41 +460,6 @@ namespace ProUpgradeEditor.Common
             return TickPair.IsCloseUpUp(m2.TickPair);
         }
 
-        public override bool IsUpdated
-        {
-            get
-            {
-                return base.IsUpdated;
-            }
-            set
-            {
-                base.IsUpdated = value;
-            }
-        }
-
-        public override bool IsDeleted
-        {
-            get
-            {
-                return base.IsDeleted;
-            }
-            set
-            {
-                base.IsDeleted = value;
-            }
-        }
-
-        public override bool IsNew
-        {
-            get
-            {
-                return base.IsNew;
-            }
-            set
-            {
-                base.IsNew = value;
-            }
-        }
 
         private GuitarMessageType GetMessageType()
         {

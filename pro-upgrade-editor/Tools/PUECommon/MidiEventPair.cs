@@ -21,7 +21,6 @@ namespace ProUpgradeEditor.Common
         MidiEvent up;
         Data1ChannelPair dPair;
 
-
         public MidiEventPair(GuitarMessageList owner, MidiEventPair pair) : this(owner, pair.down, pair.up) { }
         public MidiEventPair(MidiEventPair pair) : this(pair.owner, pair.down, pair.up) { }
         public MidiEventPair(GuitarMessageList owner) : this(owner, null, null) { }
@@ -61,20 +60,6 @@ namespace ProUpgradeEditor.Common
 
         public bool IsUpDeleted { get { return HasUp ? Up.Deleted : false; } }
         public bool IsDownDeleted { get { return HasDown ? Down.Deleted : false; } }
-
-        public MidiEventPair GetInsertedClone(GuitarMessageList owner)
-        {
-            return new MidiEventPair(owner,
-                HasDown ? Down.GetInsertedClone(owner) : null,
-                HasUp ? Up.GetInsertedClone(owner) : null);
-        }
-
-        public MidiEventPair CloneToMemory(GuitarMessageList owner)
-        {
-            return new MidiEventPair(owner,
-                HasDown ? new MidiEvent(null, Down.AbsoluteTicks, Down.Clone()) : null,
-                HasUp ? new MidiEvent(null, Up.AbsoluteTicks, Up.Clone()) : null);
-        }
 
         public MidiEvent Down
         {

@@ -22,6 +22,10 @@ namespace ProUpgradeEditor.Common
             get { return GuitarMessageType.GuitarTempo; }
         }
 
+        public override IEnumerator<GuitarTempo> GetEnumerator()
+        {
+            return base.GetEnumerator();
+        }
         public GuitarTempo GetTempo(int tick)
         {
             var downTick = tick < 0 ? 0 : tick;

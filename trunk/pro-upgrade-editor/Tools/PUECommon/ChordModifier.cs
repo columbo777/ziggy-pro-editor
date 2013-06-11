@@ -13,17 +13,44 @@ namespace ProUpgradeEditor.Common
         public GuitarChord Chord { get; internal set; }
 
         public ChordModifier(GuitarChord chord, ChordModifierType type, GuitarMessageType gt) :
-            base(chord.Owner, null, null, gt)
+            base(chord.Owner, chord.TickPair, gt)
         {
             ModifierType = type;
             Chord = chord;
         }
 
         public ChordModifier(MidiEventPair pair, ChordModifierType type, GuitarMessageType gt) :
-            base(pair.Owner, pair, gt)
+            base(pair, gt)
         {
             Chord = null;
             ModifierType = type;
+        }
+
+
+        public override void AddToList()
+        {
+            
+            base.AddToList();
+            
+            IsDeleted = false;
+
+            IsNew = false;
+        }
+
+        public override void RemoveFromList()
+        {
+            Owner.Remove(this);
+            IsDeleted = true;
+        }
+
+        public override void DeleteAll()
+        {
+            base.DeleteAll();
+
+            if (Chord != null)
+            {
+                Chord.Modifiers.Remove(this);
+            }
         }
 
         public override GuitarDifficulty Difficulty

@@ -399,6 +399,7 @@ namespace ProUpgradeEditor.UI
                     EditorPro.PlaybackPosition = pos;
                     EditorPro.MidiPlaybackPosition = MidiPlaybackPosition;
 
+
                     if (checkBoxMidiPlaybackScroll.Checked)
                     {
                         EditorPro.ScrollToTick(ipos);
@@ -415,6 +416,12 @@ namespace ProUpgradeEditor.UI
                         }
                     }
                     catch { }
+
+
+                    if (MidiPlaybackPosition >= ProGuitarTrack.TotalSongTicks)
+                    {
+                        StopMidiPlayback();
+                    }
                 }
             }
             catch { }

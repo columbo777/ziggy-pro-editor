@@ -226,10 +226,10 @@ namespace ProUpgradeEditor.UI
                 }
                 catch { }
 
-                try { EditorPro.Close(); }
+                try { CloseProTrack(); }
                 catch { }
 
-                try { EditorG5.Close(); }
+                try { CloseG5Track(); }
                 catch { }
 
                 try
@@ -543,7 +543,7 @@ namespace ProUpgradeEditor.UI
             try
             {
                 return EditorPro.Tracks.Any(x =>
-                    x.ChanMessages.Any(cm => cm.ChannelMessage.Data1.GetData1Difficulty(true).IsEasyMediumHard()));
+                    x.ChanMessages.Any(cm => cm.Data1.GetData1Difficulty(true).IsEasyMediumHard()));
 
             }
             catch { }
@@ -741,9 +741,9 @@ namespace ProUpgradeEditor.UI
                             GuitarChord.CreateChord(EditorPro.Messages,
                                 ProGuitarTrack.CurrentDifficulty,
                                 EditorPro.SnapTickPairPro(ticks),
-                                ScreenFrets, ScreenChannels,
+                                new GuitarChordConfig(ScreenFrets, ScreenChannels,
                                 checkIsSlide.Checked, checkIsSlideReversed.Checked,
-                                checkIsHammeron.Checked, GetChordStrumFromScreen());
+                                checkIsHammeron.Checked, GetChordStrumFromScreen()));
                         }
                         else
                         {
@@ -759,8 +759,8 @@ namespace ProUpgradeEditor.UI
                                 GuitarChord.CreateChord(EditorPro.Messages,
                                     ProGuitarTrack.CurrentDifficulty,
                                     EditorPro.SnapTickPairPro(ticks),
-                                    ScreenFrets, ScreenChannels,
-                                    false, false, false, ChordStrum.Normal);
+                                    new GuitarChordConfig(ScreenFrets, ScreenChannels,
+                                    false, false, false, ChordStrum.Normal));
                             }
                         }
                     }
@@ -1064,13 +1064,11 @@ namespace ProUpgradeEditor.UI
             try
             {
                 
-                var gt = new GuitarTrainer(list, type);
+                var gt = new GuitarTrainer(list, ticks, type, loopable);
                 gt.IsNew = true;
-                gt.Loopable = loopable;
-                gt.SetTicks(ticks);
-
                 gt.CreateEvents();
 
+                EditorPro.SetCreationStateIdle();
                 EditorPro.SetSelectionStateIdle();
                 RefreshTextEvents();
                 RefreshTrainers();
@@ -1105,7 +1103,7 @@ namespace ProUpgradeEditor.UI
                             return;
                         }
 
-                        GuitarArpeggio.CreateArpeggio(EditorPro.Messages, EditorPro.CurrentDifficulty, new TickPair(downTick, upTick));
+                        GuitarArpeggio.CreateArpeggio(EditorPro.Messages, new TickPair(downTick, upTick), EditorPro.CurrentDifficulty);
 
                         if (createHelpers)
                         {
@@ -1156,7 +1154,7 @@ namespace ProUpgradeEditor.UI
                         }
                     }
                     EditorPro.SetSelectionStateIdle();
-
+                    EditorPro.SetCreationStateIdle();
 
                 }
             }
@@ -1248,11 +1246,11 @@ namespace ProUpgradeEditor.UI
         {
             return GuitarChord.GetChord(EditorPro.Messages, ProGuitarTrack.CurrentDifficulty,
                 GetChordTicksFromScreen(),
-                ScreenFrets,
+                new GuitarChordConfig(ScreenFrets,
                 ScreenChannels,
                 checkIsSlide.Checked,
                 checkIsSlideReversed.Checked, checkIsHammeron.Checked,
-                GetChordStrumFromScreen());
+                GetChordStrumFromScreen()));
         }
 
         public void ScrollToSelection()
@@ -1690,7 +1688,7 @@ namespace ProUpgradeEditor.UI
                 }
                 foreach (var t in tracks)
                 {
-                    if (EditorPro.SetTrack(t))
+                    if (EditorPro.SetTrack(t, GuitarDifficulty.Expert))
                     {
                         EditorPro.GuitarTrack.CreateHandPositionEvents(config);
                     }
@@ -1783,8 +1781,12 @@ namespace ProUpgradeEditor.UI
                 }
                 try
                 {
-                    var selectedChords = EditorPro.SelectedChords;
-                    var nextChord = EditorPro.GetNextChord(EditorPro.SelectedChord);
+
+                    var ticks = TickPair.NullValue;
+                    if (EditorPro.SelectedChords.Any())
+                    {
+                        ticks = EditorPro.SelectedChords.GetTickPair();
+                    }
 
                     if (ProGuitarTrack != null)
                     {
@@ -1795,23 +1797,30 @@ namespace ProUpgradeEditor.UI
                         Refresh108EventList();
                     }
 
-                    if (selectNext)
+                    if (!ticks.HasNull)
                     {
-                        if (selectNextEnum == SelectNextEnum.UseConfiguration &&
-                            checkKeepSelection.Checked)
+                        if (selectNext)
                         {
-                            var c = GetChordFromScreen();
-                            SetSelectedChord(EditorPro.GetStaleChord(nextChord, true), true);
-                            SetChordToScreen(c, false);
+                            EditorPro.ClearSelection();
+
+                            var nextChord = EditorPro.Messages.Chords.FirstOrDefault(x => x.DownTick >= ticks.Up);
+
+                            if (selectNextEnum == SelectNextEnum.UseConfiguration && checkKeepSelection.Checked)
+                            {
+                                var currentItem = GetChordFromScreen();
+                                SetSelectedChord(nextChord, true);
+                                SetChordToScreen(currentItem, false);
+                            }
+                            else
+                            {
+                                SetSelectedChord(nextChord, true);
+                            }
                         }
                         else
                         {
-                            SetSelectedChord(EditorPro.GetStaleChord(nextChord, true), true);
+                            EditorPro.ClearSelection();
+                            EditorPro.Messages.Chords.GetBetweenTick(ticks).ToList().ForEach(x => x.Selected = true);
                         }
-                    }
-                    else
-                    {
-                        ReloadStaleChords(selectedChords);
                     }
                 }
                 catch { ret = false; }
@@ -1823,30 +1832,6 @@ namespace ProUpgradeEditor.UI
 
             CheckQuickEditFocus();
             return ret;
-        }
-
-        public void ReloadStaleChords(IEnumerable<GuitarChord> selectedChords)
-        {
-            if (selectedChords != null)
-            {
-                var old = new List<GuitarChord>();
-                foreach (var sc in selectedChords)
-                {
-                    var stale = EditorPro.GetStaleChord(sc, false);
-                    if (stale != null)
-                    {
-                        if (!old.Contains(stale))
-                        {
-                            old.Add(stale);
-                        }
-                    }
-                }
-                EditorPro.ClearSelection();
-                foreach (var gc in old)
-                {
-                    gc.Selected = true;
-                }
-            }
         }
 
         private void UpdateControlsForDifficulty(GuitarDifficulty difficulty)
@@ -2608,9 +2593,11 @@ namespace ProUpgradeEditor.UI
                     }
                     else
                     {
+                        var copyGuitarToBass = SelectedSong != null && SelectedSong.CopyGuitarToBass;
+
                         foreach (var tr in EditorPro.Tracks)
                         {
-                            if (tr.Name.IsGuitarTrackName())
+                            if (copyGuitarToBass || tr.Name.IsGuitarTrackName())
                             {
                                 EditorG5.SetTrack5(EditorG5.GetGuitar5MidiTrack());
                                 EditorPro.SetTrack6(tr);
@@ -4017,7 +4004,7 @@ namespace ProUpgradeEditor.UI
                     }
                     fileName = ShowSaveFileDlg("Save CON Package",
                         DefaultConFileLocation,
-                        Path.Combine(DefaultConFileLocation, f));
+                        DefaultConFileLocation.PathCombine(f));
 
                     if (fileName.IsNotEmpty())
                     {
@@ -4029,8 +4016,6 @@ namespace ProUpgradeEditor.UI
                 if (fileName.IsNotEmpty())
                 {
                     byte[] proTrack = null;
-
-
 
                     using (var ms = EditorPro.Sequence.Save())
                     {
@@ -4575,8 +4560,9 @@ namespace ProUpgradeEditor.UI
                         mp3Player.Stop();
                     }
                 });
-                EditorG5.Close();
-                EditorPro.Close();
+                CloseG5Track();
+                CloseProTrack();
+
                 listBoxSongLibrary.SelectedItems.Clear();
 
 
@@ -4691,7 +4677,7 @@ namespace ProUpgradeEditor.UI
             try
             {
                 var sc = SelectedSong;
-                if (sc != null && !string.IsNullOrEmpty(sc.SongMP3Location) && File.Exists(sc.SongMP3Location))
+                if (sc != null && sc.SongMP3Location.FileExists())
                 {
                     EditorPro.MP3PlaybackStream = naudioPlayer.LoadMP3(sc.SongMP3Location);
                     EditorPro.MP3PlaybackOffset = sc.SongMP3PlaybackOffset;
@@ -4801,8 +4787,8 @@ namespace ProUpgradeEditor.UI
             foreach (SongCacheItem sc in SongList)
             {
                 if (sc.SongName.EqualsEx(songName) || sc.DTASongShortName.EqualsEx(songName) ||
-                    sc.G5FileName.GetFileName().EqualsEx(FileNameG5.GetFileName()) ||
-                    sc.G6FileName.GetFileName().EqualsEx(FileNamePro.GetFileName()))
+                    (sc.G5FileName.IsNotEmpty() && sc.G5FileName.GetFileName().EqualsEx(FileNameG5.GetFileName())) ||
+                    (sc.G6FileName.IsNotEmpty() && sc.G6FileName.GetFileName().EqualsEx(FileNamePro.GetFileName())))
                 {
                     SongList.SelectedSong = sc;
                     return OpenSongCacheItem(SongList.SelectedSong);

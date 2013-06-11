@@ -366,40 +366,7 @@ namespace Sanford.Multimedia.Midi
 
         private void ParseSysRealtimeMessage()
         {
-            SysRealtimeMessage e = null;
-
-            switch ((SysRealtimeType)status)
-            {
-                case SysRealtimeType.ActiveSense:
-                    e = SysRealtimeMessage.ActiveSenseMessage;
-                    break;
-
-                case SysRealtimeType.Clock:
-                    e = SysRealtimeMessage.ClockMessage;
-                    break;
-
-                case SysRealtimeType.Continue:
-                    e = SysRealtimeMessage.ContinueMessage;
-                    break;
-
-                case SysRealtimeType.Reset:
-                    e = SysRealtimeMessage.ResetMessage;
-                    break;
-
-                case SysRealtimeType.Start:
-                    e = SysRealtimeMessage.StartMessage;
-                    break;
-
-                case SysRealtimeType.Stop:
-                    e = SysRealtimeMessage.StopMessage;
-                    break;
-
-                case SysRealtimeType.Tick:
-                    e = SysRealtimeMessage.TickMessage;
-                    break;
-            }
-
-            newTrack.Insert(ticks, e);
+            newTrack.Insert(ticks, SysRealtimeMessage.FromType((SysRealtimeType)status));
         }
 
         private int ReadVariableLengthValue()

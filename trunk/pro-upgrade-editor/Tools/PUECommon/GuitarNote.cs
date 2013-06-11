@@ -10,63 +10,64 @@ namespace ProUpgradeEditor.Common
 {
     public class GuitarNote : GuitarMessage
     {
-        public GuitarNote(GuitarMessageList track, MidiEvent downEvent = null, MidiEvent upEvent = null)
-            : base(track, downEvent, upEvent, GuitarMessageType.GuitarNote)
-        {
-
-        }
-        public GuitarNote(MidiEventPair ev)
-            : base(ev, GuitarMessageType.GuitarNote)
-        {
-
-        }
-
-        public virtual int NoteString
-        {
-            get
-            {
-                return Owner.Owner.IsPro ?
-                    Utility.GetNoteString(Data1) :
-                    Utility.GetNoteString5(Data1);
-            }
-            set
-            {
-                if (Owner.Owner.IsPro)
-                {
-                    Data1 = Utility.GetStringLowE(Utility.GetStringDifficulty6(Data1)) + value;
-                }
-                else
-                {
-                    Data1 = Utility.GetStringLowE5(Utility.GetStringDifficulty5(Data1)) + value;
-                }
-
-                base.IsUpdated = true;
-            }
-        }
-
         
+        internal GuitarChordNoteList OwnerList { get; set; }
+        internal GuitarChord OwnerChord { get; set; }
 
-        public GuitarNote CloneToMemory(GuitarMessageList list)
+
+        public GuitarNote(GuitarMessageList owner, TickPair ticks)
+            : base(owner, ticks, GuitarMessageType.GuitarNote)
         {
-            return GetNote(list, Difficulty, this.TickPair, NoteString, NoteFretDown, IsTapNote, IsArpeggioNote, IsXNote);
+            Data2 = Utility.Data2Default;
+            Channel = Utility.ChannelDefault;
+            SetTicks(ticks);
         }
-        
-        public static GuitarNote GetNote(GuitarMessageList list, GuitarDifficulty diff,
+
+        public override void AddToList()
+        {
+            IsDeleted = false;
+            
+            IsNew = false;
+        }
+
+        public override void RemoveFromList()
+        {
+            Owner.Remove(this);
+            IsDeleted = true;
+        }
+
+        public override void DeleteAll()
+        {
+            base.DeleteAll();
+        }
+
+        public override void RemoveEvents()
+        {
+            if (UpEvent != null && Owner != null)
+            {
+                Owner.Remove(UpEvent);
+            }
+            if (DownEvent != null && Owner != null)
+            {
+                Owner.Remove(DownEvent);
+            }
+        }
+
+        public GuitarNote(MidiEventPair pair)
+            : base(pair, GuitarMessageType.GuitarNote)
+        {
+            Data1 = pair.Data1;
+            Data2 = pair.Data2;
+            Channel = pair.Channel;
+        }
+
+        public static GuitarNote GetNote(GuitarMessageList owner, GuitarDifficulty diff,
             TickPair ticks, int noteString, int noteFret, bool isTap, bool isArpeggio, bool isX)
         {
-            var ret = new GuitarNote(list);
-
-            if (list.Owner.IsPro)
-            {
-                ret.Data1 = Utility.GetStringLowE(diff) + noteString;
-            }
-            else
-            {
-                ret.Data1 = Utility.GetStringLowE5(diff) + noteString;
-            }
-
-            ret.Data2 = noteFret + 100;
-
+            var ret = new GuitarNote(owner, ticks);
+            ret.Data1 = Utility.GetNoteData1(noteString, diff, ret.IsPro);
+            ret.NoteFretDown = noteFret;
+            
             if (isX)
             {
                 ret.Channel = Utility.ChannelX;
@@ -79,25 +80,35 @@ namespace ProUpgradeEditor.Common
             {
                 ret.Channel = Utility.ChannelTap;
             }
-            else
-            {
-                ret.Channel = Utility.ChannelDefault;
-            }
-
-            ret.SetTicks(ticks);
-
+            
             return ret;
         }
 
-        public static GuitarNote CreateNote(GuitarMessageList list, GuitarDifficulty diff, TickPair ticks,
+        public virtual int NoteString
+        {
+            get
+            {
+                var ret = Utility.GetNoteString(Data1, IsPro);
+                
+                return ret;
+            }
+            set
+            {
+                Data1 = Utility.GetNoteData1(value, Difficulty, IsPro);
+            }
+        }
+
+        public GuitarNote CloneToMemory(GuitarMessageList owner)
+        {
+            return GetNote(owner, Difficulty, this.TickPair, NoteString, NoteFretDown, IsTapNote, IsArpeggioNote, IsXNote);
+        }
+
+
+        public static GuitarNote CreateNote(GuitarMessageList owner, GuitarDifficulty diff, TickPair ticks,
             int noteString, int noteFret, bool isTap, bool isArpeggio, bool isX)
         {
-            var ret = GetNote(list, diff, ticks, noteString, noteFret, isTap, isArpeggio, isX);
+            var ret = GetNote(owner, diff, ticks, noteString, noteFret, isTap, isArpeggio, isX);
 
-            var ev = list.Insert(ret.Data1, ret.Data2, ret.Channel, ticks);
-
-            ret.SetDownEvent(ev.Down);
-            ret.SetUpEvent(ev.Up);
             ret.IsNew = true;
             ret.CreateEvents();
 
@@ -118,14 +129,26 @@ namespace ProUpgradeEditor.Common
 
         public bool IsTapNote
         {
-            get { return Channel == Utility.ChannelTap; }
+            get 
+            { 
+                return Channel == Utility.ChannelTap; 
+            }
         }
 
-        public bool IsArpeggioNote { get { return Channel == Utility.ChannelArpeggio; } }
+        public bool IsArpeggioNote 
+        { 
+            get 
+            { 
+                return Channel == Utility.ChannelArpeggio; 
+            } 
+        }
 
         public bool IsXNote
         {
-            get { return Channel == Utility.ChannelX; }
+            get 
+            { 
+                return Channel == Utility.ChannelX; 
+            }
         }
 
         public override string ToString()

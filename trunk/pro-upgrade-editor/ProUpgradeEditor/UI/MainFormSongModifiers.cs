@@ -47,10 +47,9 @@ namespace ProUpgradeEditor.UI
 
         public void RefreshTrainers()
         {
-            RefreshTextEvents();
             RefreshTrainer(GuitarTrainerType.ProGuitar);
             RefreshTrainer(GuitarTrainerType.ProBass);
-            RefreshTextEvents();
+            RefreshTextEvents();   
         }
 
         public void RefreshTextEvents()
@@ -65,12 +64,10 @@ namespace ProUpgradeEditor.UI
                 foreach (var mev in ProGuitarTrack.Messages.TextEvents)
                 {
                     if ((checkBoxShowTrainersInTextEvents.Checked == true &&
-                        mev.TrainerType != GuitarTrainerMetaEventType.Unknown) ||
-                        mev.TrainerType == GuitarTrainerMetaEventType.Unknown)
+                        mev.IsTrainerEvent) || mev.IsTrainerEvent == false)
                     {
                         listTextEvents.Items.Add(mev);
                     }
-
                 }
             }
 
@@ -103,7 +100,7 @@ namespace ProUpgradeEditor.UI
                     list.Items.Clear();
                     if (EditorPro.IsLoaded)
                     {
-                        foreach (var trainer in ProGuitarTrack.Messages.Trainers.Where(t=> t.TrainerType == type))
+                        foreach (var trainer in ProGuitarTrack.Messages.Trainers.Where(t=> t.TrainerType == type).ToList())
                         {
                             list.Items.Add(trainer);
                         }

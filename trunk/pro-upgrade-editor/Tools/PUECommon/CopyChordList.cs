@@ -24,21 +24,19 @@ namespace ProUpgradeEditor.Common
 
         public void Clear()
         {
-            
-            var allLists = GetAllMessageTypes().Select(x => GetMessageListForType(x));
-
-            foreach(var messageList in allLists)
-            {
-                foreach (var elem in messageList.ToList())
-                {
-                    elem.RemoveFromList();
-                }
-            }
+            this.ToList().ForEach(x => x.RemoveFromList());
         }
 
-        public void Add(GuitarChord chord)
+        public override void Add<T>(T mess)
         {
-            base.Add(chord.CloneToMemory(this));
+            if (mess is GuitarChord)
+            {
+                Chords.Add((mess as GuitarChord).CloneToMemory(this, Owner.CurrentDifficulty));
+            }
+            else
+            {
+                base.Add(mess);
+            }
         }
 
         public void AddRange(IEnumerable<GuitarChord> chords)

@@ -18,47 +18,43 @@ namespace ProUpgradeEditor.Common
             }
         }
 
-        
+        public GuitarTextEvent(GuitarMessageList owner, int tick, string text) :
+            base(owner, new TickPair(tick, Int32.MinValue), GuitarMessageType.GuitarTextEvent)
+        {
+            this.Text = text;
+        }
 
-        public static GuitarTextEvent GetTextEvent(GuitarMessageList track, MidiEvent ev)
+        public GuitarTextEvent(GuitarMessageList list, MidiEvent ev) :
+            base(list, ev, null, GuitarMessageType.GuitarTextEvent)
         {
-            if (ev != null)
-            {
-                return new GuitarTextEvent(track, ev.AbsoluteTicks, ev.MetaMessage.Text, ev, ev.MetaMessage.Text.GetGuitarTrainerMetaEventType());
-            }
-            else
-            {
-                return new GuitarTextEvent(track, Int32.MinValue, string.Empty, null, GuitarTrainerMetaEventType.Unknown);
-            }
+            this.Text = ev.Text;
         }
-        public static GuitarTextEvent GetTextEvent(GuitarMessageList track, int tick, string text)
+        
+        public static GuitarTextEvent CreateTextEvent(GuitarMessageList owner, int absoluteTicks, string text)
         {
-            return new GuitarTextEvent(track, tick, text, null, text.GetGuitarTrainerMetaEventType());
-        }
-        public static GuitarTextEvent CreateTextEvent(GuitarMessageList track, int absoluteTicks, string text)
-        {
-            var ret = new GuitarTextEvent(track, absoluteTicks, text,
-                track.Insert(absoluteTicks, MetaTextBuilder.Create(MetaType.Text, text)),
-                text.GetGuitarTrainerMetaEventType());
+            var ret = new GuitarTextEvent(owner, absoluteTicks, text);
             ret.IsNew = true;
             ret.CreateEvents();
-
             return ret;
         }
 
-        private GuitarTextEvent(GuitarMessageList track, int tick, string text, MidiEvent midiEvent, GuitarTrainerMetaEventType type) :
-            base(track, midiEvent, null, GuitarMessageType.GuitarTextEvent)
+        public override void AddToList()
         {
-            this.Text = text;
-            SetDownTick(tick);
+            IsDeleted = false;
+
+            IsNew = false;
         }
 
+        public override void RemoveFromList()
+        {
+            Owner.Remove(this);
+            IsDeleted = true;
+        }
 
         public override string ToString()
         {
             return Text;
         }
-
 
         public bool IsTrainerEvent
         {
@@ -67,9 +63,12 @@ namespace ProUpgradeEditor.Common
 
         public override void CreateEvents()
         {
-            SetDownEvent(Owner.Insert(DownTick, MetaTextBuilder.Create(MetaType.Text, Text)));
+            props.SetUpdatedEventPair(Owner.Insert(DownTick, MetaTextBuilder.Create(MetaType.Text, Text)));
 
-            AddToList();
+            if (IsNew)
+            {
+                AddToList();
+            }
         }
 
 

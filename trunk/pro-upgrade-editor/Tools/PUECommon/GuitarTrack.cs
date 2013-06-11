@@ -70,10 +70,20 @@ namespace ProUpgradeEditor.Common
                 message.RemoveEvents();
 
                 message.RemoveFromList();
-
             }
         }
 
+        public void Remove(MidiEventPair ev)
+        {
+            if (ev.Down != null && !ev.Down.Deleted)
+            {
+                midiTrack.Remove(ev.Down);
+            }
+            if (ev.Up != null && !ev.Up.Deleted)
+            {
+                midiTrack.Remove(ev.Up);
+            }
+        }
 
         public void Remove(MidiEvent ev)
         {
@@ -91,7 +101,7 @@ namespace ProUpgradeEditor.Common
         {
             foreach (var e in ev)
             {
-                if(e.HasDown)
+                if (e.HasDown)
                     Remove(e.Down);
                 if (e.HasUp)
                     Remove(e.Up);
@@ -203,14 +213,12 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
-        public IEnumerable<GuitarTempo> GetTempoMessages(GuitarMessageList list, Track tempoTrack)
+        public IEnumerable<GuitarTempo> GetTempoMessages(GuitarMessageList owner, Track tempoTrack)
         {
             var ret = new List<GuitarTempo>();
-
             try
             {
-
-                var tempos = internalGetTempo(list, tempoTrack);
+                var tempos = internalGetTempo(owner, tempoTrack);
 
                 int nextTick = 0;
 
@@ -253,16 +261,16 @@ namespace ProUpgradeEditor.Common
             return Messages.TimeSignatures.LastOrDefault(x => x.StartTime <= time);
         }
 
-        IEnumerable<GuitarTimeSignature> GetTimeSignaturesFromTrack(GuitarMessageList list, Track tempoTrack)
+        IEnumerable<GuitarTimeSignature> GetTimeSignaturesFromTrack(GuitarMessageList owner, Track tempoTrack)
         {
             var ret = new List<GuitarTimeSignature>();
             if (tempoTrack != null && tempoTrack.TimeSig.Any())
             {
-                ret.AddRange(tempoTrack.TimeSig.Select(t => new GuitarTimeSignature(list, t)));
+                ret.AddRange(tempoTrack.TimeSig.Select(t => new GuitarTimeSignature(owner, t)));
             }
             else
             {
-                ret.Add(GuitarTimeSignature.GetDefaultTimeSignature(list));
+                ret.Add(GuitarTimeSignature.GetDefaultTimeSignature(owner));
             }
             return ret;
         }
@@ -272,11 +280,16 @@ namespace ProUpgradeEditor.Common
         {
             get
             {
-                var time = Messages.Tempos.Sum(x => x.TickLength * x.SecondsPerTick);
-                return TickToTime(midiTrack.Length);
+                return TickToTime(midiTrack.Events.Last().AbsoluteTicks);
             }
         }
-
+        public int TotalSongTicks
+        {
+            get
+            {
+                return midiTrack.Events.Last().AbsoluteTicks;
+            }
+        }
 
 
         public TickPair TimeToTick(TimePair times)
@@ -398,6 +411,8 @@ namespace ProUpgradeEditor.Common
             }
         }
 
+
+
         void checkForInvalidNotes(Track track)
         {
             try
@@ -412,21 +427,115 @@ namespace ProUpgradeEditor.Common
                         track.Insert(x.AbsoluteTicks, new ChannelMessage(ChannelCommand.NoteOff, x.Data1, 0, x.Channel));
                     }
                 }
+
+                if (track.Name.IsGuitarTrackName6())
+                {
+                    var bassTrainers = track.Meta.Where(x => x.Text.IsTrainerBass()).ToList();
+                    var guitarTrainers = track.Meta.Where(x => x.Text.IsTrainerGuitar()).ToList();
+
+                    if (bassTrainers.Any())
+                    {
+                        bassTrainers.ForEach(x => x.Owner.Remove(x));
+                    }
+                }
+
+                if (track.Name.IsBassTrackName6())
+                {
+                    var bassTrainers = track.Meta.Where(x => x.Text.IsTrainerBass()).ToList();
+
+                    var guitarTrainers = track.Meta.Where(x => x.Text.IsTrainerGuitar()).ToList();
+                    if (guitarTrainers.Any())
+                    {
+                        guitarTrainers.ForEach(x => x.Owner.Remove(x));
+                    }
+                }
+
+                if (track.Name.IsBassTrackName6() || track.Name.IsGuitarTrackName6())
+                {
+                    var distinctData1 = track.ChanMessages.Select(x => x.Data1).Distinct().ToList();
+
+
+                    foreach (var data1 in distinctData1)
+                    {
+                        var msgs = track.ChanMessages.Where(x => x.Data1 == data1).GroupByMatchingTicks().ToList();
+
+                        var expectingOn = true;
+                        int onTick = Int32.MinValue;
+                        int offTick = Int32.MinValue;
+
+                        var invalidEvents = new List<MidiEvent>();
+                        foreach (var item in msgs)
+                        {
+
+                            var expected = item.FirstOrDefault(x => x.IsOn == expectingOn);
+                            if (expected == null)
+                            {
+                                track.Remove(item);
+                            }
+                            else
+                            {
+                                if (item.Count() == 1)
+                                {
+                                    if (expectingOn)
+                                    {
+                                        onTick = expected.AbsoluteTicks;
+                                    }
+                                    else
+                                    {
+                                        offTick = expected.AbsoluteTicks;
+                                        if (offTick > onTick)
+                                        {
+                                        }
+                                        else
+                                        {
+                                        }
+                                    }
+                                    expectingOn = !expectingOn;
+
+                                }
+                                else
+                                {
+                                    var offItem = item.FirstOrDefault(x => x.IsOff);
+                                    var onItem = item.FirstOrDefault(x => x.IsOn);
+
+                                    if (expectingOn == false)
+                                    {
+                                        if (onItem != null && offItem != null && item.IndexOf(offItem) < item.IndexOf(onItem))
+                                        {
+                                        }
+                                        else
+                                        {
+                                            track.Remove(item.Where(x => x != offItem && x != onItem));
+                                            if (onItem != null)
+                                            {
+                                                var c1 = offItem.Clone();
+                                                var c2 = onItem.Clone();
+                                                track.Remove(offItem);
+                                                track.Remove(onItem);
+                                                var new1 = track.Insert(offItem.AbsoluteTicks, c1);
+                                                var new2 = track.Insert(offItem.AbsoluteTicks, c2);
+                                            }
+                                            else
+                                            {
+                                                expectingOn = !expectingOn;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        track.Remove(item.Where(x => x != onItem));
+                                        expectingOn = !expectingOn;
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
             }
             catch { }
         }
 
-        void CheckForInvalidMessages()
-        {
-            Messages.Chords.Where(chord => chord.Notes.Any(x => x.IsXNote) && chord.Notes.Any(x => x.IsXNote == false)).ToList().ForEach(chord =>
-            {
-                chord.Notes.Where(x => x.IsXNote == false).ToList().ForEach(note =>
-                {
-                    note.Channel = Utility.ChannelX;
-                    note.UpdateEvents();
-                });
-            });
-        }
 
         void BuildMessages5()
         {
@@ -436,30 +545,29 @@ namespace ProUpgradeEditor.Common
 
         }
 
-        IEnumerable<GuitarBigRockEnding> GetBigRockEndings(GuitarMessageList list, IEnumerable<IGrouping<Data1ChannelPair, MidiEvent>> events)
+        GuitarBigRockEnding GetBigRockEnding(GuitarMessageList owner, IEnumerable<IGrouping<Data1ChannelPair, MidiEvent>> events)
         {
-            var ret = new List<GuitarBigRockEnding>();
-            var data1List = Utility.GetBigRockEndingData1(list.Owner.IsPro);
+            GuitarBigRockEnding ret = null;
+            var data1List = Utility.GetBigRockEndingData1(owner.IsPro);
 
-            var breEvents = events.GetEventPairs(list, data1List).ToList();
+            var breEvents = events.GetEventPairs(owner, data1List).ToList();
 
             if (breEvents != null && breEvents.Any())
             {
-                var pair = breEvents.GetTickPair();
-                
-                if(breEvents.Count() != data1List.Count())
-                {
-                    list.Remove(breEvents);
+                var ticks = breEvents.GetTickPair();
 
-                    breEvents = new List<MidiEventPair>();
-                    foreach(var d1 in data1List)
-                    {
-                        breEvents.Add(list.Insert(d1, 100, 0, pair));
-                    }
+                if (breEvents.Count() != data1List.Count())
+                {
+                    breEvents.ToList().ForEach(x => owner.Remove(x));
+
+                    ret = GuitarBigRockEnding.CreateBigRockEnding(owner, ticks);
+                }
+                else
+                {
+                    ret = new GuitarBigRockEnding(owner, ticks, breEvents);
+                    ret.AddToList();
                 }
 
-                ret.Add(new GuitarBigRockEnding(list, breEvents));
-                
             }
             return ret;
         }
@@ -492,7 +600,7 @@ namespace ProUpgradeEditor.Common
                 if (currentDifficulty != value)
                 {
                     dirtyItems |= DirtyItem.Difficulty;
-
+                    currentDifficulty = value;
                     RebuildEvents();
                 }
             }
@@ -501,8 +609,10 @@ namespace ProUpgradeEditor.Common
 
         public void GetMessages(GuitarDifficulty difficulty, bool includeDifficultyAll = true)
         {
-            checkForInvalidNotes(midiTrack);
-
+            if (midiTrack.Dirty)
+            {
+                checkForInvalidNotes(midiTrack);
+            }
             Messages = new GuitarMessageList(owner);
             var ret = Messages;
             var tempoTrack = GetTempoTrack();
@@ -513,67 +623,67 @@ namespace ProUpgradeEditor.Common
                 if (difficulty.IsAll())
                     difficulty = difficulty ^ GuitarDifficulty.All;
 
-                var validData1List = Utility.GetKnownData1ForDifficulty(IsPro, 
+                var validData1List = Utility.GetKnownData1ForDifficulty(IsPro,
                     includeDifficultyAll ? GuitarDifficulty.All | difficulty : difficulty).ToList();
 
-                var events = midiTrack.ChanMessages.GroupByData1Channel(validData1List);
+                var events = midiTrack.ChanMessages.GroupByData1Channel(validData1List).ToList();
 
                 if (IsPro)
                 {
 
                     events.GetEventPairs(ret, Utility.AllArpeggioData1).Select(x => new GuitarArpeggio(x)).ToList().ForEach(x => x.AddToList());
-                    
-                    events.GetEventPairs(ret, Utility.SoloData1).Select(x => new GuitarSolo(x)).ToList().ForEach(x => x.AddToList());
-                    events.GetEventPairs(ret, Utility.PowerupData1).Select(x => new GuitarPowerup(x)).ToList().ForEach(x => x.AddToList());
-                    events.GetEventPairs(ret, Utility.MultiStringTremeloData1).Select(x => new GuitarMultiStringTremelo(x)).ToList().ForEach(x => x.AddToList());
-                    events.GetEventPairs(ret, Utility.SingleStringTremeloData1).Select(x => new GuitarSingleStringTremelo(x)).ToList().ForEach(x => x.AddToList());
-                    
-                    GetBigRockEndings(ret, events).ForEach(x => x.AddToList());
+
+                    events.GetEventPairs(ret, Utility.SoloData1.MakeEnumerable()).Select(x => new GuitarSolo(x)).ToList().ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.PowerupData1.MakeEnumerable()).Select(x => new GuitarPowerup(x)).ToList().ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.MultiStringTremeloData1.MakeEnumerable()).Select(x => new GuitarMultiStringTremelo(x)).ToList().ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.SingleStringTremeloData1.MakeEnumerable()).Select(x => new GuitarSingleStringTremelo(x)).ToList().ForEach(x => x.AddToList());
+
+                    GetBigRockEnding(ret, events);
 
                     events.GetEventPairs(ret, Utility.AllSlideData1).Select(x => new GuitarSlide(x)).ToList().ForEach(x => x.AddToList());
                     events.GetEventPairs(ret, Utility.AllHammeronData1).Select(x => new GuitarHammeron(x)).ToList().ForEach(x => x.AddToList());
                     events.GetEventPairs(ret, Utility.AllStrumData1).Select(x => new GuitarChordStrum(x)).ToList().ForEach(x => x.AddToList());
 
-                    var notes = events.GetEventPairs(ret, Utility.GetStringsForDifficulty6(difficulty)).Select(x => new GuitarNote(x));
+                    var notes = events.GetEventPairs(ret, Utility.GetStringsForDifficulty6(difficulty)).Select(x => new GuitarNote(x)).ToList();
                     notes.ForEach(x => x.AddToList());
                     if (notes.Any())
                     {
                         var closeNotes = notes.GroupByCloseTick().ToList();
-                        var chordNotes = closeNotes.Select(n => GuitarChord.GetChord(ret, n, true)).Where(x => x != null).ToList();
+                        var chordNotes = closeNotes.Select(n => GuitarChord.GetChord(ret, difficulty, n, true)).Where(x => x != null).ToList();
                         chordNotes.ForEach(x => x.AddToList());
                     }
 
-                    var textEvents = midiTrack.Meta.Where(x => x.IsTextEvent()).Select(x => GuitarTextEvent.GetTextEvent(ret, x));
+                    var textEvents = midiTrack.Meta.Where(x => x.IsTextEvent()).Select(x => new GuitarTextEvent(ret, x)).ToList();
                     textEvents.ForEach(x => x.AddToList());
 
-                    LoadTrainers(ret, textEvents).ForEach(x=> x.AddToList());
+                    LoadTrainers(ret, ret.TextEvents).ToList().ForEach(x => x.AddToList());
 
-                    events.GetEventPairs(ret, Utility.HandPositionData1).Select(x => new GuitarHandPosition(x)).ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.HandPositionData1.MakeEnumerable()).Select(x => new GuitarHandPosition(x)).ToList().ForEach(x => x.AddToList());
                 }
                 else
                 {
-                    events.GetEventPairs(ret, new[] { Utility.ExpertSoloData1_G5, Utility.SoloData1 }).ToList().Select(x => new GuitarSolo(x)).ForEach(x=> x.AddToList());
-                    events.GetEventPairs(ret, Utility.PowerupData1).Select(x => new GuitarPowerup(x)).ForEach(x => x.AddToList());
-                    
-                    var notes = events.GetEventPairs(ret, Utility.GetStringsForDifficulty5(difficulty)).Select(x => new GuitarNote(x));
-                    notes.ForEach(x=> x.AddToList());
+                    events.GetEventPairs(ret, new[] { Utility.ExpertSoloData1_G5, Utility.SoloData1 }).ToList().Select(x => new GuitarSolo(x)).ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.PowerupData1.MakeEnumerable()).Select(x => new GuitarPowerup(x)).ForEach(x => x.AddToList());
+
+                    var notes = events.GetEventPairs(ret, Utility.GetStringsForDifficulty5(difficulty)).Select(x => new GuitarNote(x)).ToList();
+                    notes.ForEach(x => x.AddToList());
 
                     if (notes.Any())
                     {
                         var closeNotes = notes.GroupByCloseTick().ToList();
-                        var chordNotes = closeNotes.Select(x => GuitarChord.GetChord(ret, x, false)).Where(x=> x != null).ToList();
+                        var chordNotes = closeNotes.Select(x => GuitarChord.GetChord(ret, difficulty, x, false)).Where(x => x != null).ToList();
                         chordNotes.ForEach(x => x.AddToList());
                     }
-                    
-                    var textEvents = midiTrack.Meta.Where(x => x.IsTextEvent()).ToList().Select(x => GuitarTextEvent.GetTextEvent(ret, x));
+
+                    var textEvents = midiTrack.Meta.Where(x => x.IsTextEvent()).ToList().Select(x => new GuitarTextEvent(ret, x)).ToList();
                     textEvents.ForEach(x => x.AddToList());
 
-                    GetBigRockEndings(ret, events).ForEach(x => x.AddToList());
+                    GetBigRockEnding(ret, events);
                 }
-                CheckForInvalidMessages();
+
             }
             catch { }
-            
+
         }
 
         bool LoadEvents6()
@@ -706,30 +816,37 @@ namespace ProUpgradeEditor.Common
             return TrackNames22.Contains(t);
         }
 
-        public GuitarTrack SetTrack(Track t, GuitarDifficulty diff)
+        public GuitarTrack SetTrack(Track selectedTrack, GuitarDifficulty diff)
         {
-            if (t == null || midiTrack == null)
+            if (selectedTrack == null || midiTrack == null)
             {
                 midiTrack = null;
                 dirtyItems |= DirtyItem.Track;
             }
-            if (t != null)
+            if (selectedTrack != null)
             {
-                midiTrack = t;
-                currentDifficulty = diff;
-
-                if (midiTrack == null || midiTrack.Sequence == null)
+                if (midiTrack == selectedTrack && !midiTrack.Dirty && currentDifficulty == diff && dirtyItems == DirtyItem.None)
                 {
-                    this.SequenceDivision = 480;
                 }
                 else
                 {
-                    this.SequenceDivision = midiTrack.Sequence.Division;
+                    midiTrack = selectedTrack;
+                    currentDifficulty = diff;
+
+                    if (midiTrack == null || midiTrack.Sequence == null)
+                    {
+                        this.SequenceDivision = 480;
+                    }
+                    else
+                    {
+                        this.SequenceDivision = midiTrack.Sequence.Division;
+                    }
+
+                    RebuildEvents();
+
+                    this.dirtyItems = DirtyItem.None;
+                    selectedTrack.Dirty = false;
                 }
-
-                RebuildEvents();
-
-                this.dirtyItems = DirtyItem.None;
             }
             return this;
         }
@@ -746,52 +863,54 @@ namespace ProUpgradeEditor.Common
             return Messages.Trainers.Where(x => x.TrainerType == type && x.TrainerIndex == index).FirstOrDefault();
         }
 
-        public IEnumerable<GuitarTrainer> LoadTrainers(GuitarMessageList list, IEnumerable<GuitarTextEvent> te)
+        public IEnumerable<GuitarTrainer> LoadTrainers(GuitarMessageList owner, IEnumerable<GuitarTextEvent> textEventList)
         {
             var ret = new List<GuitarTrainer>();
 
             try
             {
-                var textEvents = te.Where(v => v.IsTrainerEvent).ToList();
+                var trainerEvents = textEventList.Where(v => v.IsTrainerEvent).ToList();
+                var validTrainerEvents = trainerEvents.Where(x => x.Text.GetTrainerEventIndex().IsNotNull());
 
-                list.Remove(textEvents.Where(v => v.Text.GetTrainerEventIndex().IsNull()).ToList());
+                var invalidTrainerEvents = trainerEvents.Where(v => v.Text.GetTrainerEventIndex().IsNull());
+                invalidTrainerEvents.ToList().ForEach(x => x.DeleteAll());
+
+
 
                 var removeEvents = new List<GuitarMessage>();
 
-                var groups = textEvents.Where(v => v.IsDeleted == false).ToList().GroupBy(v => v.TrainerType.IsTrainerGuitar());
+                var groups = validTrainerEvents.ToList().GroupBy(v => v.TrainerType.IsTrainerGuitar());
 
                 foreach (var group in groups)
                 {
-                    var indexGroups = group.OrderBy(v => v.Text.GetTrainerEventIndex()).GroupBy(v => v.Text.GetTrainerEventIndex()).ToList();
+                    var indexGroups = group.OrderBy(v => v.Text.GetTrainerEventIndex()).GroupBy(v => v.Text.GetTrainerEventIndex());
 
-                    foreach (var trainer in indexGroups)
+                    foreach (var trainer in indexGroups.ToList())
                     {
                         var index = trainer.Key;
 
-                        var begin = trainer.Where(v => v.TrainerType == GuitarTrainerMetaEventType.BeginProGuitar || v.TrainerType == GuitarTrainerMetaEventType.BeginProBass);
-                        var end = trainer.Where(v => v.TrainerType == GuitarTrainerMetaEventType.EndProGuitar || v.TrainerType == GuitarTrainerMetaEventType.EndProBass);
-                        var norm = trainer.Where(v => v.TrainerType == GuitarTrainerMetaEventType.ProGuitarNorm || v.TrainerType == GuitarTrainerMetaEventType.ProBassNorm);
+                        var begin = trainer.Where(v => v.TrainerType.IsTrainerBegin());
+                        var end = trainer.Where(v => v.TrainerType.IsTrainerEnd());
+                        var norm = trainer.Where(v => v.TrainerType.IsTrainerNorm());
 
                         if (begin.Any() && end.Any())
                         {
                             var trainerType = group.Key == true ? GuitarTrainerType.ProGuitar : GuitarTrainerType.ProBass;
-                            
-                            var gt = new GuitarTrainer(list, trainerType);
-                            
-                            gt.Start = begin.First();
-                            gt.End = end.First();
-                            if (norm.Any())
-                            {
-                                gt.Norm = norm.First();
-                            }
+
+                            var startEv = begin.First();
+                            var endEv = end.First();
+                            var normEv = norm.FirstOrDefault();
+
+                            var gt = new GuitarTrainer(owner, new TickPair(startEv.AbsoluteTicks, endEv.AbsoluteTicks), trainerType, startEv, endEv, normEv);
+
                             ret.Add(gt);
 
-                            removeEvents.AddRange(begin.Skip(1));
-                            removeEvents.AddRange(end.Skip(1));
-                            
+                            removeEvents.AddRange(begin.Skip(1).ToList());
+                            removeEvents.AddRange(end.Skip(1).ToList());
+
                             if (norm.Any())
                             {
-                                removeEvents.AddRange(norm.Skip(1));
+                                removeEvents.AddRange(norm.Skip(1).ToList());
                             }
                         }
                         else
@@ -800,12 +919,12 @@ namespace ProUpgradeEditor.Common
                         }
                     }
                 }
-                removeEvents.ToList().ForEach(x => x.RemoveEvents());
+                removeEvents.ToList().ForEach(x => x.DeleteAll());
             }
             catch { }
 
-            
-            return ret.Where(v=> v.IsDeleted==false).ToList();
+
+            return ret.Where(v => v.IsDeleted == false).ToList();
         }
 
 
@@ -820,239 +939,83 @@ namespace ProUpgradeEditor.Common
         {
             try
             {
-                
-                CurrentDifficulty = GuitarDifficulty.Expert;
                 Remove(Messages.HandPositions.ToList());
-                GuitarHandPosition.CreateEvent(Messages, 
-                    new TickPair(Utility.HandPositionMarkerFirstBeginOffset, Utility.HandPositionMarkerFirstEndOffset), 0);
 
-                if (!Utility.HandPositionMarkerByDifficulty)
+                var x108 = Generate108(config);
+
+                var sorted = x108.ToList().OrderBy(x => x.Ticks.Down).ToList();
+
+                for (int x = 0; x < sorted.Count; x++)
                 {
-                    if (Messages.Chords.Any(x => x.HighestFret >= Utility.HandPositionMarkerMinFret))
-                    {
-                        var x108 = Generate108(config);
+                    var item = sorted[x];
 
-
-                        var sorted = x108.ToList().OrderBy(x => x.Ticks.Down).ToList();
-                        int lastUp = -1;
-                        for (int x = 0; x < sorted.Count; x++)
-                        {
-                            var item = sorted[x];
-                            if (item.Ticks.Down >= lastUp)
-                            {
-                                lastUp = item.Ticks.Up;
-                                GuitarHandPosition.CreateEvent(Messages, item.Ticks, item.Fret);
-                            }
-                        }
-                        
-                    }
-                }
-                else
-                {
-                    var currDiff = CurrentDifficulty;
-
-                    var ex = GetChordsByDifficulty(GuitarDifficulty.Expert);
-                    var ha = GetChordsByDifficulty(GuitarDifficulty.Hard);
-                    var me = GetChordsByDifficulty(GuitarDifficulty.Medium);
-                    var ea = GetChordsByDifficulty(GuitarDifficulty.Easy);
-
-                    bool hasAboveMin =
-                        ex.Any(adc => adc.HighestFret > Utility.HandPositionMarkerMinFret) ||
-                        ha.Any(adc => adc.HighestFret > Utility.HandPositionMarkerMinFret) ||
-                        me.Any(adc => adc.HighestFret > Utility.HandPositionMarkerMinFret) ||
-                        ea.Any(adc => adc.HighestFret > Utility.HandPositionMarkerMinFret);
-
-
-                    if (hasAboveMin)
-                    {
-                        bool isGuitar = IsGuitarTrackName(Name);
-
-                        if (isGuitar)
-                        {
-                            if (config.EnableProGuitarHard == false)
-                            {
-                                foreach (var n in ha.ToList())
-                                {
-                                    if (ex.HasDownTickAtTick(n.DownTick) &&
-                                        !ex.HasDownTickAtTick(n.DownTick - 1))
-                                    {
-                                        n.SetTicks(n.TickPair - 1);
-                                        n.UpdateEvents();
-                                    }
-                                }
-
-                            }
-                            if (config.EnableProGuitarMedium == false)
-                            {
-                                foreach (var n in me.ToList())
-                                {
-                                    if ((ha.HasDownTickAtTick(n.DownTick) ||
-                                        ex.HasDownTickAtTick(n.DownTick)) &&
-                                        !(ex.HasDownTickAtTick(n.DownTick - 2) ||
-                                          ha.HasDownTickAtTick(n.DownTick - 2)))
-                                    {
-                                        n.SetTicks(n.TickPair - 2);
-                                        n.UpdateEvents();
-                                    }
-                                }
-
-                            }
-                            if (config.EnableProGuitarEasy == false)
-                            {
-                                foreach (var hn in ea)
-                                {
-                                    if ((me.HasDownTickAtTick(hn.DownTick) ||
-                                        ha.HasDownTickAtTick(hn.DownTick) ||
-                                        ex.HasDownTickAtTick(hn.DownTick)) &&
-                                        !(ex.HasDownTickAtTick(hn.DownTick - 3) ||
-                                          ha.HasDownTickAtTick(hn.DownTick - 3) ||
-                                          me.HasDownTickAtTick(hn.DownTick - 3)))
-                                    {
-                                        hn.SetTicks(hn.TickPair - 3);
-                                        hn.UpdateEvents();
-                                    }
-                                }
-
-                            }
-                        }
-                        else
-                        {
-                            if (config.EnableProBassHard == false)
-                            {
-                                foreach (var hn in ha)
-                                {
-                                    if (ex.HasDownTickAtTick(hn.DownTick) &&
-                                        !ex.HasDownTickAtTick(hn.DownTick - 1))
-                                    {
-                                        hn.SetTicks(hn.TickPair - 1);
-                                        hn.UpdateEvents();
-                                    }
-                                }
-
-                            }
-                            if (config.EnableProBassMedium == false)
-                            {
-                                foreach (var hn in me)
-                                {
-                                    if ((ha.HasDownTickAtTick(hn.DownTick) ||
-                                        ex.HasDownTickAtTick(hn.DownTick)) &&
-                                        !(ex.HasDownTickAtTick(hn.DownTick - 2) ||
-                                          ha.HasDownTickAtTick(hn.DownTick - 2)))
-                                    {
-                                        hn.SetTicks(hn.TickPair - 2);
-                                        hn.UpdateEvents();
-                                    }
-                                }
-
-                            }
-                            if (config.EnableProBassEasy == false)
-                            {
-                                foreach (var hn in ea)
-                                {
-                                    if ((me.HasDownTickAtTick(hn.DownTick) ||
-                                        ha.HasDownTickAtTick(hn.DownTick) ||
-                                        ex.HasDownTickAtTick(hn.DownTick)) &&
-                                        !(ex.HasDownTickAtTick(hn.DownTick - 3) ||
-                                          ha.HasDownTickAtTick(hn.DownTick - 3) ||
-                                          me.HasDownTickAtTick(hn.DownTick - 3)))
-                                    {
-                                        hn.SetTicks(hn.TickPair - 3);
-                                        hn.UpdateEvents();
-                                    }
-                                }
-                            }
-                        }
-
-
-
-                        CurrentDifficulty = GuitarDifficulty.Expert;
-                        var x108 = Generate108(config);
-
-                        CurrentDifficulty = GuitarDifficulty.Hard;
-                        var h108 = Generate108(config);
-
-                        CurrentDifficulty = GuitarDifficulty.Medium;
-                        var m108 = Generate108(config);
-
-                        CurrentDifficulty = GuitarDifficulty.Easy;
-                        var e108 = Generate108(config);
-
-                        CurrentDifficulty = GuitarDifficulty.Expert;
-
-                        var items = new List<GuitarHandPositionMeta>();
-                        items.AddRange(x108);
-                        items.AddRange(h108);
-                        items.AddRange(m108);
-                        items.AddRange(e108);
-
-                        var sorted = items.OrderBy(x => x.Ticks.Down).ToList();
-                        int lastUp = -1;
-                        for (int x = 0; x < sorted.Count; x++)
-                        {
-                            var item = sorted[x];
-                            if (item.Ticks.Down >= lastUp)
-                            {
-                                lastUp = item.Ticks.Up;
-                                GuitarHandPosition.CreateEvent(Messages, item.Ticks, item.Fret);
-                            }
-                        }
-
-                        
-                    }
+                    GuitarHandPosition.CreateEvent(Messages, item.Ticks, item.Fret);
                 }
 
-                
-                CurrentDifficulty = GuitarDifficulty.Expert;
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine(ex.ToString());
                 return false;
             }
         }
 
-        
+
 
         private IEnumerable<GuitarHandPositionMeta> Generate108(GenDiffConfig config)
         {
             var ret = new List<GuitarHandPositionMeta>();
-            int last108Fret = -1;
-            int last108UpTick = 40;
 
-            foreach (var chord in Messages.Chords.ToList())
+            var sorted = Messages.Chords.OrderBy(x => x.DownTick).ToList();
+
+            ret.Add(new GuitarHandPositionMeta()
             {
-                int lowestNonZero = chord.LowestNonZeroFret;
-                var highestFret = chord.HighestFret;
+                Fret = 0,
+                Ticks = new TickPair(Utility.HandPositionMarkerFirstBeginOffset, Utility.HandPositionMarkerFirstEndOffset),
+                IsChord = false,
+            });
 
-                var noteFret = 0;
-                if (highestFret >= Utility.HandPositionMarkerMinFret)
+
+            if (sorted.Any())
+            {
+                foreach (var chord in sorted)
                 {
-                    noteFret = lowestNonZero;
-                    if (noteFret > Utility.HandPositionMarkerMaxFret)
-                        noteFret = Utility.HandPositionMarkerMaxFret;
-                }
-                
-                if (noteFret != last108Fret)
-                {
-                    var down = chord.DownTick + Utility.HandPositionMarkerStartOffset;
-                    var up = chord.UpTick + Utility.HandPositionMarkerEndOffset;
+                    int lowestNonZero = chord.LowestNonZeroFret;
+                    var highestFret = chord.HighestFret;
 
-                    if (up <= down)
-                        up = down + 1;
-
-                    if (down >= last108UpTick)
+                    ret.Add(new GuitarHandPositionMeta()
                     {
-                        last108Fret = noteFret;
+                        Ticks = chord.TickPair,
+                        Fret = lowestNonZero,
+                        IsChord = chord.NoteFrets.Count() > 1
+                    });
+                }
 
-                        last108UpTick = up;
+                var retArray = ret.ToArray();
 
+                ret = new List<GuitarHandPositionMeta>();
 
-                        ret.Add(new GuitarHandPositionMeta() { Ticks = new TickPair(down, up), Fret = noteFret });
+                ret.Add(retArray.First());
+
+                int lastFret = retArray.First().Fret;
+                bool lastIsChord = false;
+
+                for (int x = 1; x < retArray.Length; x++)
+                {
+                    var cur = retArray[x];
+                    if ((cur.Fret != lastFret) || cur.IsChord || (cur.IsChord != lastIsChord))
+                    {
+                        ret.Add(cur);
+                        lastFret = cur.Fret;
+                        lastIsChord = cur.IsChord;
                     }
                 }
+
             }
             return ret;
         }
 
     }
+
 }

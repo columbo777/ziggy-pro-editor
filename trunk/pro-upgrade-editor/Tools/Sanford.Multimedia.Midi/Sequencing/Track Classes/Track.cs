@@ -6,16 +6,26 @@ using System.Diagnostics;
 namespace Sanford.Multimedia.Midi
 {
 
-    public sealed partial class Track
+    public sealed partial class Track : IEnumerable<MidiEvent>
     {
-
+        List<MidiEvent> eventList;
         string name;
+
+        public Track(FileType fileType, string name = null)
+        {
+            eventList = new List<MidiEvent>();
+
+            this.FileType = fileType;
+            endOfTrackMidiEvent = new MidiEvent(this, Length, MetaMessage.EndOfTrackMessage);
+            this.Name = name;
+            Dirty = true;
+        }
 
         MidiEvent getNameEvent()
         {
             if (Count > 0)
             {
-                return Meta.FirstOrDefault(x => x.MetaMessage.MetaType == MetaType.TrackName);
+                return Meta.FirstOrDefault(x => x.MetaType == MetaType.TrackName);
             }
 
             return null;
@@ -59,79 +69,23 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
-        public void ReplaceEvent(MidiEvent evOld, MidiEvent evNew)
-        {
-            if (evOld.Previous != null)
-            {
-                evNew.Previous = evOld.Previous;
-                evOld.Previous.Next = evNew;
-            }
-            else
-            {
-                evNew.Previous = null;
-                head = evNew;
-            }
-
-            if (evOld.Next != null)
-            {
-                evNew.Next = evOld.Next;
-                evNew.Next.Previous = evNew;
-            }
-            else
-            {
-                evNew.Next = null;
-                tail = evNew;
-
-
-            }
-
-            endOfTrackMidiEvent.SetAbsoluteTicks(Length);
-            endOfTrackMidiEvent.Previous = tail;
-
-            evOld.Next = evOld.Previous = null;
-
-        }
-
-
-        // The number of MidiEvents in the Track. Will always be at least 1
-        // because the Track will always have an end of track message.
-        private int count = 1;
 
         // The number of ticks to offset the end of track message.
         private int endOfTrackOffset = 0;
 
-        // The first MidiEvent in the Track.
-        private MidiEvent head = null;
-
-        // The last MidiEvent in the Track, not including the end of track
-        // message.
-        private MidiEvent tail = null;
 
         // The end of track MIDI event.
         private MidiEvent endOfTrackMidiEvent;
-
-        //
-
-        // Construction
-
-        public Track(FileType fileType, string name = null)
-        {
-            this.FileType = fileType;
-            endOfTrackMidiEvent = new MidiEvent(this, Length, MetaMessage.EndOfTrackMessage);
-            this.Name = name;
-
-        }
 
         public override string ToString()
         {
             return Name;
         }
 
-        Sequence sequence;
         public Sequence Sequence
         {
-            get { return sequence; }
-            internal set { sequence = value; }
+            get;
+            internal set;
         }
 
         public IEnumerable<MidiEvent> Events
@@ -148,7 +102,7 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                return Events.Where(x => x.MessageType == MessageType.Meta && x.MetaType != MetaType.EndOfTrack).ToList();
+                return Events.Where(x => x.MessageType == MessageType.Meta);
             }
         }
 
@@ -157,7 +111,7 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                return Meta.Where(x => x.MetaMessage.MetaType == MetaType.TimeSignature).ToList();
+                return Meta.Where(x => x.MetaType == MetaType.TimeSignature);
             }
         }
 
@@ -166,7 +120,7 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                return Meta.Where(x => x.MetaMessage.MetaType == MetaType.Tempo).ToList();
+                return Meta.Where(x => x.MetaType == MetaType.Tempo);
             }
         }
 
@@ -175,85 +129,110 @@ namespace Sanford.Multimedia.Midi
         {
             get
             {
-                return Events.Where(x =>
-                    x.MessageType == MessageType.Channel &&
-                    (x.ChannelMessage.Command == ChannelCommand.NoteOn || 
-                    x.ChannelMessage.Command == ChannelCommand.NoteOff)).ToList();
+                return Events.Where(x => x.MessageType == MessageType.Channel);
             }
         }
 
-
-
-
-        public MidiEvent Insert(int position, IMidiMessage message)
+        void InsertAt(int index, MidiEvent message)
         {
-            var newMidiEvent = new MidiEvent(this, position, message);
-
-
-            if (head == null)
+            eventList.Insert(index, message);
+        }
+        void AddEvent(MidiEvent message)
+        {
+            if (message.MessageType == MessageType.Meta && message.MetaType == MetaType.TrackName)
             {
-                head = newMidiEvent;
-                tail = newMidiEvent;
-            }
-            else if (position >= tail.AbsoluteTicks)
-            {
-                newMidiEvent.Previous = tail;
-                tail.Next = newMidiEvent;
-                tail = newMidiEvent;
-
+                eventList.Insert(0, message);
             }
             else
             {
-                var current = head;
+                eventList.Add(message);
+            }
+        }
 
-                while (current.AbsoluteTicks < position)
+        public MidiEvent Insert(int position, IMidiMessage message)
+        {
+            
+            var newMidiEvent = new MidiEvent(this, position, message);
+            if (newMidiEvent.Command == ChannelCommand.NoteOn && newMidiEvent.Data2 == 0)
+            {
+                newMidiEvent.SetChanMessageData(ChannelMessage.PackCommand(newMidiEvent.MessageData, ChannelCommand.NoteOff));
+            }
+
+            var isAtEnd = position >= Length - 1;
+            var isChanMessage = newMidiEvent.MessageType == MessageType.Channel;
+
+            if (isAtEnd)
+            {
+                AddEvent(newMidiEvent);
+            }
+            else
+            {
+                var after = eventList.SkipWhile(x => x.AbsoluteTicks < position);
+
+                if (!after.Any())
                 {
-                    current = current.Next;
-                }
-
-                newMidiEvent.Next = current;
-                newMidiEvent.Previous = current.Previous;
-
-                if (current.Previous != null)
-                {
-                    current.Previous.Next = newMidiEvent;
+                    AddEvent(newMidiEvent);
                 }
                 else
                 {
-                    head = newMidiEvent;
+                    var eq = after.TakeWhile(x => x.AbsoluteTicks == position).ToList();
+                    if (!eq.Any())
+                    {
+                        InsertAt(eventList.IndexOf(after.First()), newMidiEvent);
+                    }
+                    else
+                    {
+                        if (message.MessageType == MessageType.Channel)
+                        {
+                            var eqChan = eq.Where(x => x.MessageType == MessageType.Channel);
+                            if (!eqChan.Any())
+                            {
+                                InsertAt(eventList.IndexOf(eq.First()), newMidiEvent);
+                            }
+                            else
+                            {
+                                if (newMidiEvent.Command == ChannelCommand.NoteOn)
+                                {
+                                    InsertAt(eventList.IndexOf(eqChan.Last()) + 1, newMidiEvent);
+                                }
+                                else
+                                {
+                                    InsertAt(eventList.IndexOf(eqChan.First()), newMidiEvent);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            InsertAt(eventList.IndexOf(eq.First()), newMidiEvent);
+                        }
+                    }
                 }
-
-                current.Previous = newMidiEvent;
             }
+            
             endOfTrackMidiEvent.SetAbsoluteTicks(Length);
-            endOfTrackMidiEvent.Previous = tail;
-            count++;
-
+            Dirty = true;
             return newMidiEvent;
         }
 
-        bool dirty = false;
+
         public bool Dirty
         {
-            get
-            {
-                return this.dirty;
-            }
-            set
-            {
-                this.dirty = value;
-            }
+            get;
+            set;
         }
 
 
         public void Clear()
         {
-            head = tail = null;
-            count = 1;
+            Dirty = true;
+            eventList.Clear();
+            endOfTrackMidiEvent.SetAbsoluteTicks(Length);
+           
         }
 
         public void Remove(IEnumerable<MidiEvent> ev)
         {
+            
             foreach (var e in ev)
             {
                 Remove(e);
@@ -282,108 +261,21 @@ namespace Sanford.Multimedia.Midi
                 return;
             }
 
-            this.dirty = true;
+            Dirty = true;
 
             ev.Deleted = true;
-
-            if (ev.Previous != null)
-            {
-                ev.Previous.Next = ev.Next;
-            }
-            else
-            {
-                head = head.Next;
-            }
-
-            if (ev.Next != null)
-            {
-                ev.Next.Previous = ev.Previous;
-            }
-            else
-            {
-                tail = tail.Previous;
-
-                endOfTrackMidiEvent.SetAbsoluteTicks(Length);
-                endOfTrackMidiEvent.Previous = tail;
-            }
-
-            ev.Next = ev.Previous = null;
-            count--;
-        }
-
-
-        public void Move(MidiEvent e, int newPosition)
-        {
-            if (e == null)
-                return;
-
-            MidiEvent previous = e.Previous;
-            MidiEvent next = e.Next;
-
-            if (e.Previous != null && e.Previous.AbsoluteTicks > newPosition)
-            {
-                e.Previous.Next = e.Next;
-
-                if (e.Next != null)
-                {
-                    e.Next.Previous = e.Previous;
-                }
-
-                while (previous != null && previous.AbsoluteTicks > newPosition)
-                {
-                    next = previous;
-                    previous = previous.Previous;
-                }
-            }
-            else if (e.Next != null && e.Next.AbsoluteTicks < newPosition)
-            {
-                e.Next.Previous = e.Previous;
-
-                if (e.Previous != null)
-                {
-                    e.Previous.Next = e.Next;
-                }
-
-                while (next != null && next.AbsoluteTicks < newPosition)
-                {
-                    previous = next;
-                    next = next.Next;
-                }
-            }
-
-            if (previous != null)
-            {
-                previous.Next = e;
-            }
-
-            if (next != null)
-            {
-                next.Previous = e;
-            }
-
-            e.Previous = previous;
-            e.Next = next;
-            e.SetAbsoluteTicks(newPosition);
-
-            if (newPosition < head.AbsoluteTicks)
-            {
-                head = e;
-            }
-
-            if (newPosition > tail.AbsoluteTicks)
-            {
-                tail = e;
-            }
-
+            eventList.Remove(ev);
             endOfTrackMidiEvent.SetAbsoluteTicks(Length);
-            endOfTrackMidiEvent.Previous = tail;
+            
         }
+
+
 
         public int Count
         {
             get
             {
-                return count;
+                return eventList.Count;
             }
         }
 
@@ -396,9 +288,9 @@ namespace Sanford.Multimedia.Midi
             {
                 int length = EndOfTrackOffset;
 
-                if (tail != null)
+                if (eventList.Any())
                 {
-                    length += tail.AbsoluteTicks;
+                    length += eventList.Last().AbsoluteTicks;
                 }
 
                 return length + 1;
@@ -414,7 +306,8 @@ namespace Sanford.Multimedia.Midi
         public void Merge(Track trk)
         {
             trk.ChanMessages.ToList().ForEach(x => this.Insert(x.AbsoluteTicks, x.Clone()));
-            trk.Meta.Where(x=> x.MetaType != MetaType.TrackName && x.MetaType != MetaType.EndOfTrack).ToList().ForEach(x => this.Insert(x.AbsoluteTicks, x.Clone()));
+            trk.Meta.Where(x=> x.MetaType != MetaType.TrackName && x.MetaType != MetaType.EndOfTrack).
+                ToList().ForEach(x => this.Insert(x.AbsoluteTicks, x.Clone()));
             
         }
         /// <summary>
@@ -433,6 +326,16 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
+
+        public IEnumerator<MidiEvent> GetEnumerator()
+        {
+            return Iterator().GetEnumerator();
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 
 }

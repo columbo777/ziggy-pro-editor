@@ -12,8 +12,8 @@ namespace ProUpgradeEditor.Common
     {
         public GuitarModifierType ModifierType;
 
-        public GuitarModifier(GuitarMessageList track, MidiEvent downEvent, MidiEvent upEvent, GuitarModifierType type, GuitarMessageType mt) :
-            base(track, new MidiEventPair(track, downEvent, upEvent), mt)
+        public GuitarModifier(GuitarMessageList owner, TickPair ticks, GuitarModifierType type, GuitarMessageType mt) :
+            base(owner, ticks, mt)
         {
             this.ModifierType = type;
         }

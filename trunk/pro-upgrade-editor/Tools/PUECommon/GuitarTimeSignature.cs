@@ -11,9 +11,9 @@ namespace ProUpgradeEditor.Common
 {
     public class GuitarTimeSignature : GuitarMessage
     {
-        public static GuitarTimeSignature GetDefaultTimeSignature(GuitarMessageList track)
+        public static GuitarTimeSignature GetDefaultTimeSignature(GuitarMessageList owner)
         {
-            return new GuitarTimeSignature(track, null);
+            return new GuitarTimeSignature(owner, null);
         }
 
         public double Numerator = 4;
@@ -26,14 +26,14 @@ namespace ProUpgradeEditor.Common
             return "TimeSig: " + DownTick + " - " + UpTick + " - " + (int)Numerator + "/" + (int)Denominator;
         }
 
-        public static GuitarTimeSignature GetTimeSignature(GuitarMessageList track,
+        public static GuitarTimeSignature GetTimeSignature(GuitarMessageList owner,
             int startTick = 0,
             int numerator = 4,
             int denominator = 4,
             int clocksPerMetronomeClick = 24,
             int thirtySecondNotesPerQuarterNote = 8)
         {
-            var ret = new GuitarTimeSignature(track, null);
+            var ret = new GuitarTimeSignature(owner, null);
             ret.Numerator = numerator;
             ret.Denominator = denominator;
             ret.ClocksPerMetronomeClick = clocksPerMetronomeClick;
@@ -55,24 +55,24 @@ namespace ProUpgradeEditor.Common
         }
 
         public static GuitarTimeSignature CreateTimeSignature(
-            GuitarMessageList track,
+            GuitarMessageList owner,
             int startTick = 0,
             int numerator = 4,
             int denominator = 4,
             int clocksPerMetronomeClick = 24,
             int thirtySecondNotesPerQuarterNote = 8)
         {
-            var ret = GetTimeSignature(track, startTick,
+            var ret = GetTimeSignature(owner, startTick,
                 numerator, denominator, clocksPerMetronomeClick, thirtySecondNotesPerQuarterNote);
 
-            ret.SetDownEvent(track.Insert(startTick, ret.BuildMessage()));
+            ret.IsNew = true;
+            ret.CreateEvents();
 
-            track.Add(ret);
             return ret;
         }
 
-        public GuitarTimeSignature(GuitarMessageList track, MidiEvent ev)
-            : base(track, ev, null, GuitarMessageType.GuitarTimeSignature)
+        public GuitarTimeSignature(GuitarMessageList owner, MidiEvent ev)
+            : base(owner, ev, null, GuitarMessageType.GuitarTimeSignature)
         {
 
             if (ev == null)
@@ -83,7 +83,7 @@ namespace ProUpgradeEditor.Common
             {
                 SetDownEvent(ev);
 
-                var builder = new TimeSignatureBuilder(ev.MetaMessage);
+                var builder = new TimeSignatureBuilder((MetaMessage)ev.Clone());
 
                 Numerator = builder.Numerator;
                 Denominator = builder.Denominator;

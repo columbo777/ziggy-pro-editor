@@ -12,8 +12,8 @@ namespace ProUpgradeEditor.Common
     public class GuitarTempo : GuitarMessage
     {
         public double Tempo;
-        public GuitarTempo(GuitarMessageList track, MidiEvent ev)
-            : base(track, ev, null, GuitarMessageType.GuitarTempo)
+        public GuitarTempo(GuitarMessageList owner, MidiEvent ev)
+            : base(owner, ev, null, GuitarMessageType.GuitarTempo)
         {
             if (ev == null)
             {
@@ -21,7 +21,7 @@ namespace ProUpgradeEditor.Common
             }
             else
             {
-                var cb = new TempoChangeBuilder(ev.MetaMessage);
+                var cb = new TempoChangeBuilder((MetaMessage)ev.Clone());
                 this.Tempo = cb.Tempo;
             }
         }

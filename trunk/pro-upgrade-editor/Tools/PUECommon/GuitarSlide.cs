@@ -24,12 +24,17 @@ namespace ProUpgradeEditor.Common
             : base(chord,
             isReversed ?  ChordModifierType.SlideReverse : ChordModifierType.Slide, GuitarMessageType.GuitarSlide)
         {
-            
+            Data1 = Utility.GetSlideData1(chord.Difficulty);
+            Data2 = Utility.Data2Default;
+            Channel = isReversed ? Utility.ChannelSlideReversed : Utility.ChannelSlide;
         }
         public GuitarSlide(MidiEventPair pair)
             : base(pair, pair.Channel == Utility.ChannelSlideReversed  ? ChordModifierType.SlideReverse : ChordModifierType.Slide, 
             GuitarMessageType.GuitarSlide)
         {
+            Data1 = Utility.GetSlideData1(pair.Data1.GetData1Difficulty(IsPro));
+            Data2 = Utility.Data2Default;
+            Channel = pair.Channel.GetIfNull(Utility.ChannelSlide);
         }
         public static GuitarSlide CreateSlide(GuitarChord chord, bool reversed)
         {

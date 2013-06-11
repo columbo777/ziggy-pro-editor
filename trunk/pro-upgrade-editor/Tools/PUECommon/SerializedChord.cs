@@ -66,11 +66,11 @@ namespace ProUpgradeEditor.Common
             bool isHammeron;
             GetProperties(out frets, out channels, out chordStrum, out isSlide, out isSlideReverse, out isHammeron);
 
-            var ret = GuitarChord.CreateChord(owner, diff, ticks, frets, channels,
+            var ret = GuitarChord.CreateChord(owner, diff, ticks, new GuitarChordConfig(frets, channels,
                 isSlide,
                 isSlideReverse,
                 isHammeron,
-                chordStrum);
+                chordStrum));
 
             return ret;
         }

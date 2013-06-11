@@ -9,16 +9,22 @@ namespace ProUpgradeEditor.Common
 {
     public class GuitarMultiStringTremelo : GuitarModifier
     {
-        public GuitarMultiStringTremelo(GuitarMessageList track, MidiEvent downEvent, MidiEvent upEvent) :
-            base(track, downEvent, upEvent, GuitarModifierType.MultiStringTremelo, GuitarMessageType.GuitarMultiStringTremelo) { }
-        public GuitarMultiStringTremelo(MidiEventPair ev) :
-            base(ev, GuitarModifierType.MultiStringTremelo, GuitarMessageType.GuitarMultiStringTremelo) { }
-
-        public static GuitarMultiStringTremelo CreateMultiStringTremelo(GuitarMessageList track, TickPair ticks)
+        public GuitarMultiStringTremelo(GuitarMessageList owner, TickPair pair)
+            : base(owner, pair, GuitarModifierType.MultiStringTremelo, GuitarMessageType.GuitarMultiStringTremelo)
         {
-            var ev = track.Insert(Utility.MultiStringTremeloData1, 100, 0, ticks);
+            this.Data1 = Utility.MultiStringTremeloData1;
+            this.Data2 = 100;
+            Channel = 0;
+            this.SetTicks(pair);
+        }
+        public GuitarMultiStringTremelo(MidiEventPair ev) :
+            base(ev, GuitarModifierType.MultiStringTremelo, GuitarMessageType.GuitarMultiStringTremelo) 
+        { 
+        }
 
-            var ret = new GuitarMultiStringTremelo(track, ev.Down, ev.Up);
+        public static GuitarMultiStringTremelo CreateMultiStringTremelo(GuitarMessageList owner, TickPair ticks)
+        {
+            var ret = new GuitarMultiStringTremelo(owner, ticks);
             ret.IsNew = true;
             ret.CreateEvents();
 

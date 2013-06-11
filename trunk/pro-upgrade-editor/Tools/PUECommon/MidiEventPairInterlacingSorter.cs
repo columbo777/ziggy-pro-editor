@@ -22,6 +22,7 @@ namespace ProUpgradeEditor.Common
                 return -1;
             if (a.DownTick > b.DownTick)
                 return 1;
+
             return 0;
         }
     }

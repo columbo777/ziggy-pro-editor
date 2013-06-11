@@ -1,149 +1,145 @@
 using System;
 using System.Text;
 using System.Diagnostics;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Sanford.Multimedia.Midi
 {
-    public class MidiEvent 
+    public class MidiEventComparer : IComparer<MidiEvent>
     {
-        private Track owner = null;
-
-        private int absoluteTicks;
-
-        private IMidiMessage message;
-
-        private MidiEvent next = null;
-
-        private MidiEvent previous = null;
-
-        bool deleted;
-        int data1;
-        int data2;
-        public int Data1
+        public int Compare(MidiEvent x, MidiEvent y)
         {
-            get
-            {
-                return data1;
-                
-            }
+            if (x == null && y == null)
+                return 0;
+            return x.CompareTo(y);
         }
-        public int Data2
-        {
-            get
-            {
-                return data2;
-                
-            }
-        }
-        int channelCommand;
-        public ChannelCommand Command
-        {
-            get
-            {
-                return (ChannelCommand)channelCommand;
-            }
-        }
+    }
+    public class MidiEvent : IComparable<MidiEvent>
+    {
+        public int AbsoluteTicks { get; internal set; }
+        
+        
+        public int Data1 { get; internal set; }
+        public int Data2 { get; internal set; }
+        public ChannelCommand Command { get; internal set; }
+        public int Channel { get; internal set; }
+        
+        public bool IsOn { get { return Command == ChannelCommand.NoteOn; } }
+        public bool IsOff { get { return Command == ChannelCommand.NoteOff; } }
 
-        public bool IsOn { get { return channelCommand == (int)ChannelCommand.NoteOn; } }
-        public bool IsOff { get { return channelCommand == (int)ChannelCommand.NoteOff; } }
+        public MessageType MessageType { get; internal set; }
+        public MetaType MetaType {get;internal set; }
 
-        public int Channel { get { return this.ChannelMessage != null ? this.ChannelMessage.MidiChannel : int.MinValue; } }
+        public string Text{get;internal set; }
 
-        public MessageType MessageType
-        {
-            get { return message == null ? MessageType.Unknown : message.MessageType; }
-        }
-        public MetaType MetaType
-        {
-            get { return MetaMessage == null ? MetaType.Unknown : MetaMessage.MetaType; }
-        }
+        public Track Owner{get;internal set; }
+
+        public bool Deleted{get;internal set; }
 
         public override string ToString()
         {
-            var ret = new StringBuilder(64);
+            return Text;
+        }
 
-            if (message != null)
-            {
-                if (MessageType == MessageType.Meta)
-                {
-                    var meta = message as MetaMessage;
-                    if (meta.MetaType == Midi.MetaType.TrackName)
-                    {
-                        ret.Append(meta.Text);
-                    }
-                    else
-                    {
-                        ret.Append(AbsoluteTicks.ToString());
-                        ret.Append(" - ");
-                        ret.Append(this.MetaMessage.ToString());
-                    }
-                }
-                else if (MessageType == Midi.MessageType.Channel)
-                {
-                    int msg = (message as ChannelMessage).Message;
-                    ret.Append(AbsoluteTicks.ToString());
-                    ret.Append(" cmd: ");
-                    ret.Append(ChannelMessage.UnpackCommand(msg));
+        public int MessageData { get; internal set; }
 
-                    ret.Append(" chan: ");
-                    ret.Append(ChannelMessage.UnpackMidiChannel(msg));
+        byte[] byteData;
+        SysRealtimeType realtimeType;
 
-                    ret.Append(" d1: ");
-                    ret.Append(ChannelMessage.UnpackData1(msg));
-
-                    ret.Append(" d2: ");
-                    ret.Append(ChannelMessage.UnpackData2(msg));
-
-                    ret.Append(" - stat: ");
-                    ret.Append(ChannelMessage.UnpackStatus(msg));
-                }
-                else if (message is ShortMessage)
-                {
-                    var msg = (message as ShortMessage).Message;
-                    ret.Append(AbsoluteTicks.ToString());
-                    ret.Append(" - d1: ");
-                    ret.Append(ShortMessage.UnpackData1(msg));
-
-                    ret.Append(" - d2: ");
-                    ret.Append(ShortMessage.UnpackData2(msg));
-
-                    ret.Append(" - stat: ");
-                    ret.Append(ShortMessage.UnpackStatus(msg));
-                }
-                else
-                {
-                    ret.Append(AbsoluteTicks.ToString());
-                    ret.Append(this.MessageType.ToString());
-                }
-            }
-            return ret.ToString();
+        public void SetChanMessageData(int data)
+        {
+            MessageData = data;
+            Command = ChannelMessage.UnpackCommand(MessageData);
+            Channel = ChannelMessage.UnpackMidiChannel(MessageData);
+            Data1 = ChannelMessage.UnpackData1(MessageData);
+            Data2 = ChannelMessage.UnpackData2(MessageData);
+            Text = GetText();
         }
 
         public MidiEvent(Track owner, int absoluteTicks, IMidiMessage message)
         {
-            this.owner = owner;
-            this.absoluteTicks = absoluteTicks;
-            this.message = message;
-            deleted = false;
+            MessageType = message.MessageType;
+            MessageData = Int32.MinValue;
+            byteData = null;
 
-            data2 = data1 = Int32.MinValue;
-            channelCommand = 0;
+            this.Owner = owner;
+            this.AbsoluteTicks = absoluteTicks;
+            
+            Deleted = false;
 
-            if (message is ChannelMessage)
+            Data2 = Data1 = Int32.MinValue;
+            MetaType = Midi.MetaType.Unknown;
+            Command = ChannelCommand.Invalid;
+            
+            if (MessageType == Midi.MessageType.Channel)
             {
-                int msg = (message as ChannelMessage).Message;
-                channelCommand = (int)ChannelMessage.UnpackCommand(msg);
-                data1 = ChannelMessage.UnpackData1(msg);
-                data2 = ChannelMessage.UnpackData2(msg);
+                SetChanMessageData((message as ChannelMessage).Message);
             }
-            else if (message is ShortMessage)
+            else if(MessageType == Midi.MessageType.Meta)
             {
-                var msg = (message as ShortMessage).Message;
-                data1 = ShortMessage.UnpackData1(msg);
-                data2 = ShortMessage.UnpackData2(msg);
+                var msg = (message as MetaMessage);
+                this.byteData = msg.GetBytes();
+                this.MetaType = msg.MetaType;
+                Text = msg.Text ?? "";
             }
+            else if(MessageType == Midi.MessageType.SystemRealtime)
+            {
+                this.realtimeType = (message as SysRealtimeMessage).SysRealtimeType;
+                Text = GetText();
+            }
+            else if (MessageType == Midi.MessageType.SystemExclusive)
+            {
+                var sysEx = message as Midi.SysExMessage;
+                
+                this.MessageData = sysEx.Status;
+                
+                byteData = message.GetBytes();
+                Text = GetText();
+            }
+            else
+            {
+                MessageData = (message as ShortMessage).Message;
+                Data1 = ShortMessage.UnpackData1(MessageData);
+                Data2 = ShortMessage.UnpackData2(MessageData);
+                byteData = message.GetBytes();
+                Text = GetText();
+            }
+            
         }
 
+        string GetText()
+        {
+            var ret = new StringBuilder(64);
+            if (MessageType == Midi.MessageType.Channel)
+            {
+                    
+                ret.Append(AbsoluteTicks.ToString());
+                    
+                ret.Append("[");
+                ret.Append(Channel);
+                ret.Append("]");
+
+                ret.Append("[");
+                ret.Append(Data1);
+
+                ret.Append(",");
+                ret.Append(Data2);
+                ret.Append("]");
+
+                ret.Append(" ");
+                ret.Append(IsOn?"on":"off");
+
+            }
+            else
+            {
+                ret.Append(AbsoluteTicks.ToString());
+                ret.Append(" ");
+                ret.Append(this.MessageType.ToString());
+            }
+            
+            return ret.ToString();
+        }
 
         public IMidiMessage Clone()
         {
@@ -151,138 +147,53 @@ namespace Sanford.Multimedia.Midi
 
             if (this.MessageType == MessageType.Channel)
             {
-                ret = new ChannelMessage(ChannelMessage.Message);
+                ret = new ChannelMessage(MessageData);
             }
             else if (this.MessageType == MessageType.Meta)
             {
-                ret = new MetaMessage(this.MetaType, this.MetaMessage.GetBytes());
+                ret = new MetaMessage(this.MetaType, byteData);
             }
             else if (this.MessageType == MessageType.SystemCommon)
             {
-                ret = new SysCommonMessage((this.MidiMessage as SysCommonMessage).Message);
+                ret = new SysCommonMessage(MessageData);
             }
             else if (this.MessageType == MessageType.SystemExclusive)
             {
-                ret = new SysExMessage((this.MidiMessage as SysExMessage).GetBytes());
+                ret = new SysExMessage(byteData);
             }
             else if (this.MessageType == MessageType.SystemRealtime)
             {
-                ret = (this.MidiMessage as SysRealtimeMessage);
+                ret = SysRealtimeMessage.FromType(realtimeType);;
             }
             return ret;
         }
 
+        
+
         internal void SetAbsoluteTicks(int absoluteTicks)
         {
-            this.absoluteTicks = absoluteTicks;
+            this.AbsoluteTicks = absoluteTicks;
         }
 
-        public Track Owner
-        {
-            get
-            {
-                return owner;
-            }
-        }
 
-        public int AbsoluteTicks
+        public int CompareTo(MidiEvent other)
         {
-            get
+            if (AbsoluteTicks < other.AbsoluteTicks)
+                return -1;
+            if (AbsoluteTicks > other.AbsoluteTicks)
+                return 1;
+
+            if (MessageType == other.MessageType && MessageType == Midi.MessageType.Channel)
             {
-                return absoluteTicks;
-            }
-            set
-            {
-                if (absoluteTicks != value)
+                if (Command != other.Command)
                 {
-                    absoluteTicks = value;
-                    if (!deleted)
-                    {
-                        if (this.message != null && owner != null)
-                        {
-                            owner.Move(this, absoluteTicks);
-                        }
-                    }
-                    else
-                    {
-                        Debug.WriteLine("moving deleted event");
-                    }
+                    if (Command == ChannelCommand.NoteOff)
+                        return -1;
+                    if (Command == ChannelCommand.NoteOn)
+                        return 1;
                 }
             }
+            return 0;
         }
-
-        public int DeltaTicks
-        {
-            get
-            {
-                int deltaTicks;
-
-                if (Previous != null)
-                {
-                    deltaTicks = AbsoluteTicks - previous.AbsoluteTicks;
-                }
-                else
-                {
-                    deltaTicks = AbsoluteTicks;
-                }
-
-                return deltaTicks;
-            }
-        }
-
-        public IMidiMessage MidiMessage
-        {
-            get
-            {
-                return message;
-            }
-        }
-
-        public MidiEvent Next
-        {
-            get
-            {
-                return next;
-            }
-            set
-            {
-                next = value;
-            }
-        }
-
-        public MidiEvent Previous
-        {
-            get
-            {
-                return previous;
-            }
-            set
-            {
-                previous = value;
-            }
-        }
-
-        public bool Deleted
-        {
-            get { return deleted; }
-            set { deleted = value; }
-        }
-
-        public ChannelMessage ChannelMessage
-        {
-            get
-            {
-                return this.MidiMessage as ChannelMessage;
-            }
-        }
-
-        public MetaMessage MetaMessage
-        {
-            get
-            {
-                return this.MidiMessage as MetaMessage;
-            }
-        }
-        
     }
 }

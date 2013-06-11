@@ -13,87 +13,44 @@ using System.IO;
 namespace ProUpgradeEditor.Common
 {
 
-    
-
-    
-
-    
-
     public class GuitarChord : GuitarMessage
     {
-        public IEnumerable<GuitarNote> HighStrumNotes
-        {
-            get
-            {
-                var ret = new List<GuitarNote>();
-                if (NoteFrets[4].IsNotNull())
-                    ret.Add(Notes[4]);
-                if (NoteFrets[5].IsNotNull())
-                    ret.Add(Notes[5]);
-                
-                return ret;
-            }
-        }
-        public IEnumerable<GuitarNote> MidStrumNotes
-        {
-            get
-            {
-                var ret = new List<GuitarNote>();
-                if (NoteFrets[2].IsNotNull())
-                    ret.Add(Notes[2]);
-                if (NoteFrets[3].IsNotNull())
-                    ret.Add(Notes[3]);
-                
-                return ret;
-            }
-        }
-        public IEnumerable<GuitarNote> LowStrumNotes
-        {
-            get
-            {
-                var ret = new List<GuitarNote>();
-                if (NoteFrets[0].IsNotNull())
-                    ret.Add(Notes[0]);
-                if (NoteFrets[1].IsNotNull())
-                    ret.Add(Notes[1]);
-                
-                return ret;
-            }
-        }
-        public SerializedChord Serialize()
-        {
-            var ret = new SerializedChord();
+        public GuitarChordNoteList Notes { get; internal set; }
+        public List<ChordModifier> Modifiers { get; internal set; }
 
-            ret.TickLength = TickLength;
-            ret.TimeLength = TimeLength;
+        public GuitarChord(GuitarMessageList owner, TickPair pair, GuitarDifficulty difficulty, IEnumerable<GuitarNote> notes)
+            : base(owner, pair, GuitarMessageType.GuitarChord)
+        {
+            Notes = new GuitarChordNoteList(this);
+            Modifiers = new List<ChordModifier>();
 
-            ret.Notes.AddRange(Notes.Select(x => new SerializedChordNote() { Fret = x.NoteFretDown, String = x.NoteString, Channel = x.Channel }));
-            ret.Modifiers.AddRange(Modifiers.Select(x => new SerializedChordModifier() { Type = (int)x.ModifierType }));
-
-            return ret;
+            Notes.SetNotes(notes);
+            SetTicks(pair);
         }
 
+        public GuitarChord(MidiEventPair pair)
+            : base(pair, GuitarMessageType.GuitarChord)
+        {
+            Notes = new GuitarChordNoteList(this);
+            Modifiers = new List<ChordModifier>();
+        }
 
-        public static GuitarChord CreateChord(GuitarMessageList list,
-            GuitarDifficulty difficulty,
-            TickPair ticks,
-            int[] frets, int[] channels,
-            bool isSlide, bool isSlideReverse, bool isHammeron, ChordStrum strumMode = ChordStrum.Normal)
+        public static GuitarChord CreateChord(GuitarMessageList owner, GuitarDifficulty difficulty, TickPair ticks,
+           GuitarChordConfig config)
         {
             GuitarChord ret = null;
 
-            ret = GetChord(list, difficulty, ticks, frets, channels, isSlide, isSlideReverse, isHammeron, strumMode);
+            ret = GetChord(owner, difficulty, ticks, config);
 
             if (ret != null)
             {
                 ret.IsNew = true;
-                ret.Modifiers.ForEach(x => x.IsNew = true);
                 ret.CreateEvents();
             }
             return ret;
         }
 
-        public static GuitarChord GetChord(GuitarMessageList list, IEnumerable<GuitarNote> notes, bool findModifiers = true)
+        public static GuitarChord GetChord(GuitarMessageList owner, GuitarDifficulty difficulty, IEnumerable<GuitarNote> notes, bool findModifiers = true)
         {
             GuitarChord ret = null;
             try
@@ -104,25 +61,40 @@ namespace ProUpgradeEditor.Common
                     {
                         Debug.WriteLine("getting deleted note");
                     }
-                    ret = new GuitarChord(list);
-                    ret.Notes.SetNotes(notes.ToList());
 
+                    var tickPair = notes.GetTickPair();
+
+                    if (tickPair.TickLength <= 1)
+                    {
+                        Debug.WriteLine("short chord");
+                        return ret;
+                    }
+                    ret = new GuitarChord(owner, tickPair, difficulty, notes.ToList());
+                    
                     if (findModifiers)
                     {
-                        ret.Modifiers.AddRange(list.Hammerons.GetBetweenTick(ret.TickPair).ToList());
-                        ret.Modifiers.AddRange(list.Slides.GetBetweenTick(ret.TickPair).ToList());
-                        ret.Modifiers.AddRange(list.ChordStrums.GetBetweenTick(ret.TickPair).ToList());
+                        ret.Modifiers.AddRange(owner.Hammerons.GetBetweenTick(ret.TickPair).ToList());
+                        ret.Modifiers.AddRange(owner.Slides.GetBetweenTick(ret.TickPair).ToList());
+                        ret.Modifiers.AddRange(owner.ChordStrums.GetBetweenTick(ret.TickPair).ToList());
+
+                        var mods = ret.Modifiers.Where(x=> x.TickPair != ret.TickPair).ToList();
+                        foreach (var mod in mods)
+                        {
+                            mod.SetTicks(ret.TickPair);
+                            mod.UpdateEvents();
+                        }
+                        mods.ForEach(x => x.Chord = ret);
                     }
                 }
             }
             catch (Exception ex) { Debug.WriteLine("GetChord: " + ex.Message); }
             return ret;
         }
-        public static GuitarChord GetChord(GuitarMessageList list,
+
+        public static GuitarChord GetChord(GuitarMessageList owner,
             GuitarDifficulty difficulty,
             TickPair ticks,
-            int[] frets, int[] channels,
-            bool isSlide, bool isSlideReverse, bool isHammeron, ChordStrum strumMode)
+            GuitarChordConfig config)
         {
             GuitarChord ret = null;
 
@@ -130,41 +102,44 @@ namespace ProUpgradeEditor.Common
 
             var notes = new List<GuitarNote>();
 
-            bool isXNote = channels.Any(x => x == Utility.ChannelX);
-
-            for (int x = 0; x < frets.Length; x++)
+            for (int x = 0; x < config.Frets.Length; x++)
             {
-                var fret = frets[x];
-                var channel = channels[x];
+                var fret = config.Frets[x];
+                var channel = config.Channels[x];
 
                 if (!fret.IsNull() && fret >= 0 && fret <= 23)
                 {
-                    var note = GuitarNote.GetNote(list,
+                    var note = GuitarNote.GetNote(owner,
                             difficulty, ticks, x, fret,
-                            !isXNote && (channel == Utility.ChannelTap),
-                            !isXNote && (channel == Utility.ChannelArpeggio),
-                            isXNote);
+                            channel == Utility.ChannelTap,
+                            channel == Utility.ChannelArpeggio,
+                            channel == Utility.ChannelX);
 
-                    if(note != null)
+                    if (note != null && note.NoteFretDown.IsNotNull() && note.NoteString.IsNotNull())
+                    {
                         notes.Add(note);
+                    }
+                    else
+                    {
+                    }
                 }
             }
 
             if (notes.Any())
             {
-                ret = new GuitarChord(list);
-                ret.Notes.SetNotes(notes);
+                ret = new GuitarChord(owner, ticks, difficulty, notes);
+                
                 if (ret != null)
                 {
-                    if (isSlide || isSlideReverse)
+                    if (config.IsSlide || config.IsSlideReverse)
                     {
-                        ret.AddSlide(isSlideReverse);
+                        ret.AddSlide(config.IsSlideReverse);
                     }
 
-                    if (isHammeron)
+                    if (config.IsHammeron)
                         ret.AddHammeron();
 
-                    ret.AddStrum(strumMode);
+                    ret.AddStrum(config.StrumMode);
                     
                 }
             }
@@ -172,14 +147,8 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
-        public GuitarChord(GuitarMessageList track)
-            : base(track, null, null, GuitarMessageType.GuitarChord)
-        {
-            Notes = new GuitarChordNoteList(track);
-            Modifiers = new List<ChordModifier>();
-        }
 
-        public GuitarChordNoteList Notes;
+        
 
         public GuitarChord NextChord
         {
@@ -249,9 +218,6 @@ namespace ProUpgradeEditor.Common
             get { return Notes.All(x => x.Channel == Utility.ChannelArpeggio); }
         }
 
-
-        public List<ChordModifier> Modifiers;
-
         public ChordStrum StrumMode
         {
             get
@@ -293,6 +259,17 @@ namespace ProUpgradeEditor.Common
             }
         }
 
+        public override TickPair TickPair
+        {
+            get
+            {
+                return base.TickPair;
+            }
+            set
+            {
+                base.TickPair = value;
+            }
+        }
 
         public bool HasNotes
         {
@@ -341,30 +318,16 @@ namespace ProUpgradeEditor.Common
         }
 
 
-        public override GuitarDifficulty Difficulty
-        {
-            get
-            {
-                var ret = GuitarDifficulty.Unknown;
-                var n = Notes.FirstOrDefault();
-                if (n != null)
-                {
-                    ret = n.Data1.GetData1Difficulty(Owner.Owner.IsPro);
-                }
-                return ret;
-            }
-        }
-
         public GuitarChord CloneAtTime(
-            GuitarMessageList list,
+            GuitarMessageList owner,
             TickPair ticks,
             int stringOffset = int.MinValue)
         {
-            return GuitarChord.CreateChord(list, list.Owner.CurrentDifficulty,
-                list.Owner.SnapLeftRightTicks(ticks, new SnapConfig(true, true, true)),
-                Notes.GetFretsAtStringOffset(stringOffset.GetIfNull(0)),
+            return GuitarChord.CreateChord(owner, owner.Owner.CurrentDifficulty,
+                owner.Owner.SnapLeftRightTicks(ticks, new SnapConfig(true, true, true)),
+                new GuitarChordConfig(Notes.GetFretsAtStringOffset(stringOffset.GetIfNull(0)),
                 Notes.GetChannelsAtStringOffset(stringOffset.GetIfNull(0)),
-                HasSlide, HasSlideReversed, HasHammeron, StrumMode);
+                HasSlide, HasSlideReversed, HasHammeron, StrumMode));
         }
 
         public override void DeleteAll()
@@ -377,9 +340,6 @@ namespace ProUpgradeEditor.Common
 
                 Notes.ToList().ForEach(x => x.DeleteAll());
                 Modifiers.ToList().ForEach(x => x.DeleteAll());
-
-                Notes.Clear();
-                Modifiers.Clear();
 
                 this.SetTicks(tp);
 
@@ -398,15 +358,37 @@ namespace ProUpgradeEditor.Common
         }
         public override void CreateEvents()
         {
-            Owner.Chords.GetBetweenTick(TickPair).Where(x=> x != this).ToList().ForEach(x => x.DeleteAll());
+            var between = Owner.Chords.GetBetweenTick(TickPair).ToList();
+            between.ForEach(x => x.DeleteAll());
 
+            if (!IsNew)
+            {
+                IsNew = IsDeleted;
+            }
             if (Notes.Any(x => x.IsXNote))
             {
                 Notes.ToList().ForEach(x => x.Channel = Utility.ChannelX);
             }
-            Notes.ForEach(x => x.CreateEvents());
-            Modifiers.ForEach(x => x.CreateEvents());
-            AddToList();
+            Notes.ForEach(x =>
+            {
+                x.CreateEvents();
+            });
+            Modifiers.ForEach(x =>
+            {
+                x.CreateEvents();
+            });
+            if (IsNew)
+            {
+                AddToList();
+            }
+        }
+
+        public override void AddToList()
+        {
+            Notes.ForEach(x => x.AddToList());
+            Modifiers.ToList().ForEach(x => x.AddToList());
+
+            base.AddToList();
         }
 
         public override bool HasDownEvent
@@ -428,9 +410,14 @@ namespace ProUpgradeEditor.Common
         public override void SetTicks(TickPair ticks)
         {
             base.SetTicks(ticks);
-
-            Notes.ForEach(x => x.SetTicks(ticks));
-            Modifiers.ForEach(x => x.SetTicks(ticks));
+            if (Notes != null)
+            {
+                Notes.ForEach(x => x.SetTicks(ticks));
+            }
+            if (Modifiers != null)
+            {
+                Modifiers.ForEach(x => x.SetTicks(ticks));
+            }
 
         }
         public override void UpdateEvents()
@@ -443,16 +430,15 @@ namespace ProUpgradeEditor.Common
         {
             Notes.ForEach(x => x.RemoveEvents());
             Modifiers.ForEach(x => x.RemoveEvents());
-            
         }
 
-        public GuitarChord CloneToMemory(GuitarMessageList list)
+        public GuitarChord CloneToMemory(GuitarMessageList owner, GuitarDifficulty difficulty)
         {
             GuitarChord ret = null;
-            var notes = Notes.Select(x => x.CloneToMemory(list)).Where(x=> x != null).ToList();
+            var notes = Notes.Select(x => x.CloneToMemory(owner)).Where(x => x != null).ToList();
             if (notes.Any())
             {
-                ret = GuitarChord.GetChord(list, notes, false);
+                ret = GuitarChord.GetChord(owner, difficulty, notes, false);
                 if (ret != null)
                 {
                     if (HasSlide)
@@ -575,6 +561,19 @@ namespace ProUpgradeEditor.Common
             }
         }
 
+        public override GuitarDifficulty Difficulty
+        {
+            get
+            {
+                var diff = Owner.Owner.CurrentDifficulty;
+                if (Notes.Any())
+                {
+                    diff = Notes.FirstOrDefault().Difficulty;
+                }
+                return diff;
+            }
+        }
+
 
         void RemoveModifier(ChordModifierType type)
         {
@@ -667,6 +666,58 @@ namespace ProUpgradeEditor.Common
             {
                 return Notes.Any(x => x.IsXNote);
             }
+        }
+
+        public IEnumerable<GuitarNote> HighStrumNotes
+        {
+            get
+            {
+                var ret = new List<GuitarNote>();
+                if (NoteFrets[4].IsNotNull())
+                    ret.Add(Notes[4]);
+                if (NoteFrets[5].IsNotNull())
+                    ret.Add(Notes[5]);
+
+                return ret;
+            }
+        }
+        public IEnumerable<GuitarNote> MidStrumNotes
+        {
+            get
+            {
+                var ret = new List<GuitarNote>();
+                if (NoteFrets[2].IsNotNull())
+                    ret.Add(Notes[2]);
+                if (NoteFrets[3].IsNotNull())
+                    ret.Add(Notes[3]);
+
+                return ret;
+            }
+        }
+        public IEnumerable<GuitarNote> LowStrumNotes
+        {
+            get
+            {
+                var ret = new List<GuitarNote>();
+                if (NoteFrets[0].IsNotNull())
+                    ret.Add(Notes[0]);
+                if (NoteFrets[1].IsNotNull())
+                    ret.Add(Notes[1]);
+
+                return ret;
+            }
+        }
+        public SerializedChord Serialize()
+        {
+            var ret = new SerializedChord();
+
+            ret.TickLength = TickLength;
+            ret.TimeLength = TimeLength;
+
+            ret.Notes.AddRange(Notes.Select(x => new SerializedChordNote() { Fret = x.NoteFretDown, String = x.NoteString, Channel = x.Channel }));
+            ret.Modifiers.AddRange(Modifiers.Select(x => new SerializedChordModifier() { Type = (int)x.ModifierType }));
+
+            return ret;
         }
     }
 }

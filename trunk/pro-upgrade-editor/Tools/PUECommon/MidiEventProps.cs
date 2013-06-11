@@ -37,12 +37,32 @@ namespace ProUpgradeEditor.Common
 
         }
 
-        public MidiEventProps(GuitarMessageList owner = null)
+        public MidiEventProps(GuitarMessageList owner, TickPair ticks)
         {
             resetProps(owner);
+            TickPair = ticks;
+        }
+        public MidiEventProps(MidiEventPair pair, GuitarMessageType type)
+        {
+            if (type == GuitarMessageType.GuitarTempo)
+            {
+                setEventPair(pair, false);
+                TickPair = pair.TickPair;
+            }
+            else
+            {
+                setEventPair(pair);
+                TickPair = pair.TickPair;
+            }
         }
 
-        private void resetProps(GuitarMessageList owner = null)
+        public MidiEventProps(MidiEventPair pair)
+        {
+            setEventPair(pair);
+            TickPair = pair.TickPair;
+        }
+
+        private void resetProps(GuitarMessageList owner)
         {
             Owner = owner;
             Data1 = Int32.MinValue;
@@ -55,36 +75,12 @@ namespace ProUpgradeEditor.Common
             _eventPair = new MidiEventPair(owner);
         }
 
-        public MidiEventProps CloneToMemory(GuitarMessageList owner)
-        {
-            var ret = new MidiEventProps(owner);
-            ret.setEventPair(EventPair.CloneToMemory(owner));
-            ret.Owner = Owner;
-            ret.Data1 = Data1;
-            ret.Data2 = Data2;
-            ret.Channel = Channel;
-            ret.Command = Command;
-            ret.Text = Text;
-            ret.TickPair = new TickPair(TickPair);
-            ret.TimePair = new TimePair(TimePair);
-            return ret;
-        }
-
-        public MidiEventProps(GuitarMessageList owner, MidiEvent down, MidiEvent up)
-            : this(owner, new MidiEventPair(owner, down, up))
-        {
-
-        }
-        public MidiEventProps(GuitarMessageList owner, MidiEventPair pair)
-            : this(owner)
-        {
-            setEventPair(pair);
-        }
 
         public void SetDownEvent(MidiEvent ev)
         {
             _eventPair.Down = ev;
         }
+
         public void SetUpEvent(MidiEvent ev)
         {
             _eventPair.Up = ev;
@@ -92,13 +88,18 @@ namespace ProUpgradeEditor.Common
 
         public void SetUpdatedEventPair(MidiEventPair pair)
         {
-            resetProps(Owner);
             setEventPair(pair);
         }
-
-        private void setEventPair(MidiEventPair pair)
+        public void SetUpdatedEventPair(MidiEvent ev)
         {
-            _eventPair = new MidiEventPair(pair);
+            setEventPair(new MidiEventPair(Owner, ev));
+        }
+
+        private void setEventPair(MidiEventPair pair, bool calcTime=true)
+        {
+            resetProps(pair.Owner);
+
+            _eventPair = pair;
 
             if (_eventPair.Down != null)
             {
@@ -109,14 +110,27 @@ namespace ProUpgradeEditor.Common
                     Channel = _eventPair.Down.Channel;
                     Command = _eventPair.Down.Command;
                 }
+
                 if (_eventPair.Down.IsTextEvent())
                 {
-                    Text = _eventPair.Down.MetaMessage.Text;
+                    Text = _eventPair.Down.Text;
                 }
             }
 
             this.TickPair = new TickPair((_eventPair.Down == null ? Int32.MinValue : _eventPair.Down.AbsoluteTicks),
                                      (_eventPair.Up == null ? Int32.MinValue : _eventPair.Up.AbsoluteTicks));
+            if (calcTime)
+            {
+                if (TickPair.IsValid)
+                {
+                    this.TimePair = new TimePair(Owner.Owner.GuitarTrack.TickToTime(TickPair));
+                }
+                else if (TickPair.Down.IsNotNull())
+                {
+                    var time = Owner.Owner.GuitarTrack.TickToTime(TickPair.Down);
+                    this.TimePair = new TimePair(time, time);
+                }
+            }
         }
     }
 }

@@ -10,34 +10,47 @@ namespace ProUpgradeEditor.Common
 
     public class GuitarTrainer : GuitarMessage
     {
-        GuitarTextEvent start, end, norm;
-
-
-        public GuitarTextEvent Start { get { return start; } set { start = value; } }
-        public GuitarTextEvent End { get { return end; } set { end = value; } }
-        public GuitarTextEvent Norm
+        public GuitarTrainer(GuitarMessageList owner, TickPair ticks, GuitarTrainerType type, GuitarTextEvent start, GuitarTextEvent end, GuitarTextEvent norm)
+            : base(owner, ticks, GuitarMessageType.GuitarTrainer)
         {
-            get
-            {
-                return norm;
-            }
-            set
-            {
-                norm = value;
-                if (value == null)
-                {
-                    Loopable = false;
-                }
-                else
-                {
-                    Loopable = norm.Text.GetGuitarTrainerMetaEventType().IsTrainerNorm();
-                }
-            }
+            this.TrainerType = type;
+            
+            this.TrainerIndex = (owner.Trainers.Where(x => x.TrainerType == type).Count() + 1);
+
+            Start = start;
+            End = end;
+            Norm = norm;
+
+            this.Loopable = norm != null;
+
+            SetTicks(ticks);
         }
 
-        int trainerIndex = int.MinValue;
-        GuitarTrainerType trainerType;
+        public GuitarTrainer(GuitarMessageList owner, TickPair ticks, GuitarTrainerType type, bool loopable, int index=Int32.MinValue)
+            : base(owner, ticks, GuitarMessageType.GuitarTrainer)
+        {
+            this.TrainerType = type;
+            this.TrainerIndex = index.IsNull() ? (owner.Trainers.Where(x=> x.TrainerType == type).Count()+1) : index;
+            this.Loopable = loopable;
 
+            Start = new GuitarTextEvent(owner, ticks.Down, GetStartText(TrainerType, TrainerIndex));
+            End = new GuitarTextEvent(owner, ticks.Up, GetEndText(TrainerType, TrainerIndex));
+
+            if (Loopable)
+            {
+                Norm = new GuitarTextEvent(owner, GetNormTick(ticks), GetNormText(TrainerType, TrainerIndex, Loopable));
+            }
+            
+            SetTicks(ticks);
+        }
+
+
+        public GuitarTextEvent Start { get; internal set; }
+        public GuitarTextEvent End { get; internal set; }
+        public GuitarTextEvent Norm { get; internal set; }
+
+        public GuitarTrainerType TrainerType { get; internal set; }
+        public int TrainerIndex { get; internal set; }
         public bool Loopable { get; set; }
 
         public bool Valid
@@ -49,131 +62,128 @@ namespace ProUpgradeEditor.Common
                     End.Text.GetGuitarTrainerMetaEventType().IsTrainerEnd();
             }
         }
-        public GuitarTrainerType TrainerType
+
+        int ParseTrainerIndex()
         {
-            get { return trainerType; }
+            var ret = Int32.MinValue;
+            var mt = Start.Text;
+            if (!mt.IsEmpty() && mt.Contains(']') && mt.Contains('_'))
+            {
+                var li = mt.LastIndexOf('_');
+                var li2 = mt.LastIndexOf(']');
+                var idx = mt.Substring(li + 1, li2 - (li + 1));
+                ret = idx.ToInt();
+            }
+            return ret;
+        }
+        
+
+        public static string GetStartText(GuitarTrainerType type, int index)
+        {
+            if (type == GuitarTrainerType.ProGuitar)
+            {
+                return Utility.TextEventBeginTag +
+                    Utility.SongTrainerBeginPGText + " " +
+                    Utility.SongTrainerPGText + index.ToStringEx() +
+                    Utility.TextEventEndTag;
+            }
+            else if (type == GuitarTrainerType.ProBass)
+            {
+                return Utility.TextEventBeginTag +
+                   Utility.SongTrainerBeginPBText + " " +
+                   Utility.SongTrainerPBText + index.ToStringEx() +
+                   Utility.TextEventEndTag;
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
 
-        public int TrainerIndex
+        public static string GetEndText(GuitarTrainerType type, int index)
         {
-            get
+            if (type == GuitarTrainerType.ProGuitar)
             {
-                if (trainerIndex.IsNull() && start != null)
+                return Utility.TextEventBeginTag +
+                   Utility.SongTrainerEndPGText + " " +
+                   Utility.SongTrainerPGText + index.ToStringEx() +
+                   Utility.TextEventEndTag;
+            }
+            else if (type == GuitarTrainerType.ProBass)
+            {
+                return Utility.TextEventBeginTag +
+                   Utility.SongTrainerEndPBText + " " +
+                   Utility.SongTrainerPBText + index.ToStringEx() +
+                   Utility.TextEventEndTag;
+            }
+            return string.Empty;
+        }
+
+        public static string GetNormText(GuitarTrainerType type, int index, bool loopable)
+        {
+            if (loopable)
+            {
+                if (type == GuitarTrainerType.ProGuitar)
                 {
-                    var mt = start.Text;
-                    if (!mt.IsEmpty() && mt.Contains(']') && mt.Contains('_'))
-                    {
-                        var li = mt.LastIndexOf('_');
-                        var li2 = mt.LastIndexOf(']');
-                        var idx = mt.Substring(li + 1, li2 - (li + 1));
-                        trainerIndex = idx.ToInt();
-                    }
+                    return Utility.TextEventBeginTag +
+                       Utility.SongTrainerNormPGText + " " +
+                       Utility.SongTrainerPGText + index.ToStringEx() +
+                       Utility.TextEventEndTag;
                 }
-                return trainerIndex;
+                else if (type == GuitarTrainerType.ProBass)
+                {
+                    return Utility.TextEventBeginTag +
+                       Utility.SongTrainerNormPBText + " " +
+                       Utility.SongTrainerPBText + index.ToStringEx() +
+                       Utility.TextEventEndTag;
+                }
             }
-            set
-            {
-                trainerIndex = value;
-            }
+            return string.Empty;
         }
 
         public string StartText
         {
             get
             {
-
-                if (TrainerType == GuitarTrainerType.ProGuitar)
-                {
-                    return Utility.TextEventBeginTag +
-                        Utility.SongTrainerBeginPGText + " " +
-                        Utility.SongTrainerPGText + TrainerIndex.ToStringEx() +
-                        Utility.TextEventEndTag;
-                }
-                else if (TrainerType == GuitarTrainerType.ProBass)
-                {
-                    return Utility.TextEventBeginTag +
-                       Utility.SongTrainerBeginPBText + " " +
-                       Utility.SongTrainerPBText + TrainerIndex.ToStringEx() +
-                       Utility.TextEventEndTag;
-                }
-                return string.Empty;
+                return GetStartText(TrainerType, TrainerIndex);
             }
         }
         public string NormText
         {
             get
             {
-                if (Loopable)
-                {
-                    if (TrainerType == GuitarTrainerType.ProGuitar)
-                    {
-                        return Utility.TextEventBeginTag +
-                           Utility.SongTrainerNormPGText + " " +
-                           Utility.SongTrainerPGText + TrainerIndex.ToStringEx() +
-                           Utility.TextEventEndTag;
-                    }
-                    else if (TrainerType == GuitarTrainerType.ProBass)
-                    {
-                        return Utility.TextEventBeginTag +
-                           Utility.SongTrainerNormPBText + " " +
-                           Utility.SongTrainerPBText + TrainerIndex.ToStringEx() +
-                           Utility.TextEventEndTag;
-                    }
-                }
-                return string.Empty;
+                return GetNormText(TrainerType, TrainerIndex, Loopable);
             }
         }
         public string EndText
         {
             get
             {
-                if (TrainerType == GuitarTrainerType.ProGuitar)
-                {
-                    return Utility.TextEventBeginTag +
-                       Utility.SongTrainerEndPGText + " " +
-                       Utility.SongTrainerPGText + TrainerIndex.ToStringEx() +
-                       Utility.TextEventEndTag;
-                }
-                else if (TrainerType == GuitarTrainerType.ProBass)
-                {
-                    return Utility.TextEventBeginTag +
-                       Utility.SongTrainerEndPBText + " " +
-                       Utility.SongTrainerPBText + TrainerIndex.ToStringEx() +
-                       Utility.TextEventEndTag;
-                }
-                return string.Empty;
+                return GetEndText(TrainerType, TrainerIndex);
             }
         }
 
-        public void SetStart(MidiEvent ev)
+        public void SetStart(GuitarTextEvent ev)
         {
-            var t = ev.MetaMessage.Text.GetGuitarTrainerMetaEventType();
-            start = GuitarTextEvent.GetTextEvent(Owner, ev);
-            trainerIndex = StartText.GetTrainerEventIndex();
+            Start = ev;
         }
 
-        public void SetEnd(MidiEvent ev)
+        public void SetEnd(GuitarTextEvent ev)
         {
-            end = GuitarTextEvent.GetTextEvent(Owner, ev);
+            End = ev;
         }
 
-        public void SetNorm(MidiEvent ev)
+        public void SetNorm(GuitarTextEvent ev)
         {
-            if (ev != null)
+            Norm = ev;
+            if (ev == null)
             {
-                norm.SetDownEvent(ev);
+                Loopable = false;
             }
-        }
-
-        public GuitarTrainer(GuitarMessageList track, GuitarTrainerType type)
-            : base(track, null, null, GuitarMessageType.GuitarTrainer)
-        {
-            Start = GuitarTextEvent.GetTextEvent(track, null);
-            End = GuitarTextEvent.GetTextEvent(track, null);
-            Norm = GuitarTextEvent.GetTextEvent(track, null);
-
-            this.trainerType = type;
-            Loopable = false;
+            else
+            {
+                Loopable = true;
+            }
         }
 
         public override int DownTick
@@ -182,7 +192,6 @@ namespace ProUpgradeEditor.Common
             {
                 return Start.AbsoluteTicks;
             }
-
         }
 
         public override int UpTick
@@ -195,47 +204,46 @@ namespace ProUpgradeEditor.Common
 
         public override void SetTicks(TickPair ticks)
         {
-            if (ticks.IsValid)
-            {
-                Start.SetDownTick(ticks.Down);
-                End.SetDownTick(ticks.Up);
-
-                if (Loopable)
-                {
-                    Norm.SetDownTick(GetNormTick(ticks));
-                }
-            }
+            Start.IfObjectNotNull(n=> n.SetDownTick(ticks.Down));
+            End.IfObjectNotNull(n=> n.SetDownTick(ticks.Up));
+            Norm.IfObjectNotNull(n=> n.SetDownTick(GetNormTick(ticks)));
+            
+            base.SetTicks(ticks);
         }
 
 
         public override void CreateEvents()
         {
-
-            TrainerIndex = Owner.Trainers.Where(g => g.TrainerType == this.TrainerType).Count() + 1;
+            if (TrainerIndex.IsNull())
+            {
+                TrainerIndex = Owner.Trainers.Where(g => g.TrainerType == this.TrainerType).Count() + 1;
+            }
 
             if (Start != null)
             {
                 Start.SetDownTick(TickPair.Down);
                 Start.Text = StartText;
                 Start.CreateEvents();
-                
             }
+
             if (End != null)
             {
                 End.SetDownTick(TickPair.Up);
                 End.Text = EndText;
                 End.CreateEvents();
-               
             }
 
             if (this.Loopable)
             {
-                Norm.SetDownTick(GetNormTick(TickPair));
-                Norm.Text = NormText;
-                Norm.CreateEvents();
-                
+                if (Norm != null)
+                {
+                    Norm.SetDownTick(GetNormTick(TickPair));
+                    Norm.Text = NormText;
+                    Norm.CreateEvents();
+                }
             }
-            AddToList();
+
+            base.CreateEvents();
         }
 
         public override void UpdateEvents()
@@ -246,6 +254,7 @@ namespace ProUpgradeEditor.Common
                 Start.Text = StartText;
                 Start.UpdateEvents();
             }
+
             if (End != null)
             {
                 End.SetDownTick(TickPair.Up);
@@ -261,28 +270,54 @@ namespace ProUpgradeEditor.Common
             }
             else
             {
-                if (Norm != null && Norm.MidiEvent != null)
+                if (Norm != null)
                 {
-                    Owner.Remove(Norm);
-                    Norm.SetMidiEvent(null);
+                    Norm.DeleteAll();
+                    Norm = null;
                 }
             }
+            base.UpdateEvents();
         }
 
         public override void RemoveEvents()
         {
-            Start.Owner.Remove(Start);
-            Start.RemoveEvents();
-            if (Norm != null && Norm.Owner != null)
-            {
-                Norm.Owner.Remove(Norm);
-            }
-            Norm.RemoveEvents();
-            End.Owner.Remove(End);
-            End.RemoveEvents();
+            Start.IfObjectNotNull(n => n.RemoveEvents());
+            End.IfObjectNotNull(n => n.RemoveEvents());
+            Norm.IfObjectNotNull(n => n.RemoveEvents());
+            base.RemoveEvents();
         }
 
+        public override void AddToList()
+        {
+            Start.IfObjectNotNull(n => n.AddToList());
+            End.IfObjectNotNull(n => n.AddToList());
+            Norm.IfObjectNotNull(n => n.AddToList());
 
+            base.AddToList();
+        }
+
+        public override void DeleteAll()
+        {
+            Start.IfObjectNotNull(n => n.DeleteAll());
+            Start = null;
+            End.IfObjectNotNull(n => n.DeleteAll());
+            End = null;
+            Norm.IfObjectNotNull(n => n.DeleteAll());
+            Norm = null;
+
+            base.DeleteAll();
+        }
+
+        public override void RemoveFromList()
+        {
+            Start.IfObjectNotNull(n => n.RemoveFromList());
+            End.IfObjectNotNull(n => n.RemoveFromList());
+            Norm.IfObjectNotNull(n => n.RemoveFromList());
+            
+            base.RemoveFromList();
+        }
+
+        
         int GetNormTick(TickPair ticks)
         {
             return ticks.Down + (int)((ticks.TickLength) * Utility.SongTrainerNormOffset);

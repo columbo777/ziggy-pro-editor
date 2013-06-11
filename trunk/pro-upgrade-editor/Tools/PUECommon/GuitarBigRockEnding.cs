@@ -11,14 +11,62 @@ namespace ProUpgradeEditor.Common
 
     public class GuitarBigRockEnding : GuitarModifier
     {
-        List<GuitarBigRockEndingSubMessage> childEvents;
-
-        public GuitarBigRockEnding(GuitarMessageList track, IEnumerable<MidiEventPair> eventList) :
-            base(track, null, null, GuitarModifierType.BigRockEnding, GuitarMessageType.GuitarBigRockEnding)
+        List<GuitarBigRockEndingSubMessage> childEvents = new List<GuitarBigRockEndingSubMessage>();
+        public GuitarBigRockEnding(GuitarMessageList owner, TickPair ticks, IEnumerable<MidiEventPair> events) :
+            this(owner, ticks)
         {
-            this.childEvents = new List<GuitarBigRockEndingSubMessage>();
-            SetTicks(eventList.GetTickPair());
-            this.childEvents.AddRange( eventList.Select(x => new GuitarBigRockEndingSubMessage(this, x)));
+            
+            events.ToList().ForEach(ev => AddSubMessage(new GuitarBigRockEndingSubMessage(this, ev)));
+
+            SetTicks(ticks);
+        }
+
+        public GuitarBigRockEnding(GuitarMessageList owner, TickPair ticks) : 
+            base(owner,ticks,GuitarModifierType.BigRockEnding, GuitarMessageType.GuitarBigRockEnding)
+        {
+            
+            foreach (var data1 in Utility.GetBigRockEndingData1(IsPro))
+            {
+                childEvents.Add(new GuitarBigRockEndingSubMessage(this, ticks, data1));
+            }
+
+            SetTicks(ticks);
+        }
+
+        public void RemoveSubMessage(GuitarBigRockEndingSubMessage msg)
+        {
+            if (childEvents.Contains(msg))
+            {
+                childEvents.Remove(msg);
+            }
+        }
+
+        public void AddSubMessage(GuitarBigRockEndingSubMessage msg)
+        {
+            if (!childEvents.Contains(msg))
+            {
+                childEvents.Add(msg);
+            }
+        }
+
+        public override bool IsNew
+        {
+            get
+            {
+                return base.IsNew;
+            }
+            set
+            {
+                base.IsNew = value;
+                foreach (var ev in childEvents)
+                    ev.IsNew = value;
+            }
+        }
+
+        public override void RemoveFromList()
+        {
+            childEvents.ToList().ForEach(x => x.RemoveFromList());
+            base.RemoveFromList();
         }
 
         public override void RemoveEvents()
@@ -30,7 +78,11 @@ namespace ProUpgradeEditor.Common
 
         public override void CreateEvents()
         {
-            childEvents.ToList().ForEach(x => x.CreateEvents());
+            childEvents.ToList().ForEach(x =>
+            {
+                x.IsNew = this.IsNew;
+                x.CreateEvents();
+            });
 
             base.CreateEvents();
         }
@@ -40,8 +92,8 @@ namespace ProUpgradeEditor.Common
             base.SetTicks(ticks);
 
             childEvents.ToList().ForEach(x => x.SetTicks(ticks));
-
         }
+
         public override void UpdateEvents()
         {
             childEvents.ToList().ForEach(x => x.UpdateEvents());
@@ -58,15 +110,9 @@ namespace ProUpgradeEditor.Common
         public IEnumerable<GuitarBigRockEndingSubMessage> Events { get { return childEvents; } }
 
 
-        public static GuitarBigRockEnding CreateBigRockEnding(GuitarMessageList list, TickPair ticks)
+        public static GuitarBigRockEnding CreateBigRockEnding(GuitarMessageList owner, TickPair ticks)
         {
-            var data1 = Utility.GetBigRockEndingData1(list.Owner.IsPro);
-            var events = new List<MidiEventPair>();
-            foreach(var d1 in data1)
-            {
-                events.Add(list.Insert(d1, 100, Utility.ChannelDefault, ticks));
-            }
-            var ret = new GuitarBigRockEnding(list, events);
+            var ret = new GuitarBigRockEnding(owner, ticks);
             
             ret.IsNew = true;
             ret.CreateEvents();

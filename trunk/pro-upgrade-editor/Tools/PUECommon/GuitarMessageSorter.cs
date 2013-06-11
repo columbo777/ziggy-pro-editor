@@ -33,10 +33,6 @@ namespace ProUpgradeEditor.Common
                         ret = -1;
                     else if (x.IsOn && y.IsOff)
                         ret = 1;
-                    else if ((int)x.Difficulty < (int)y.Difficulty)
-                        return -1;
-                    else if ((int)x.Difficulty > (int)y.Difficulty)
-                        return 1;
                 }
             }
             return ret;

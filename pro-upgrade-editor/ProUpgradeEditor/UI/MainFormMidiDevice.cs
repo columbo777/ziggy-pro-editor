@@ -761,22 +761,22 @@ namespace ProUpgradeEditor.UI
             switch (ns)
             {
                 case 0:
-                    note = 44;
+                    note = 40;
                     break;
                 case 1:
-                    note = 49;
+                    note = 45;
                     break;
                 case 2:
-                    note = 54;
+                    note = 50;
                     break;
                 case 3:
-                    note = 59;
+                    note = 55;
                     break;
                 case 4:
-                    note = 63;
+                    note = 59;
                     break;
                 case 5:
-                    note = 68;
+                    note = 64;
                     break;
             }
 
@@ -947,45 +947,16 @@ namespace ProUpgradeEditor.UI
                     return;
 
                 var messages = new List<ChannelMessage>();
-                var note = -1;
+                var note = Int32.MinValue;
                 var hb = GetHoldBoxes();
                 for (int x = 0; x < 6; x++)
                 {
                     int fret = hb[5 - x].Text.ToInt();
                     if (!fret.IsNull())
                     {
-                        switch (x)
-                        {
-                            case 0:
-                                note = 44;
-                                break;
-                            case 1:
-                                note = 49;
-                                break;
-                            case 2:
-                                note = 54;
-                                break;
-                            case 3:
-                                note = 59;
-                                break;
-                            case 4:
-                                note = 63;
-                                break;
-                            case 5:
-                                note = 68;
-                                break;
-                        }
-                        note += fret;
-
-                        var sci = SelectedSong;
-                        if (sci != null)
-                        {
-                            int tuning = sci.GuitarTuning[x].ToInt();
-                            if (!tuning.IsNull())
-                            {
-                                note += tuning;
-                            }
-                        }
+                        
+                        note = GetTunedNote(Utility.GetStringLowE(EditorPro.CurrentDifficulty) + x,
+                            100 + fret);
 
                         messages.Add(new ChannelMessage(ChannelCommand.NoteOn, note, 100));
                     }

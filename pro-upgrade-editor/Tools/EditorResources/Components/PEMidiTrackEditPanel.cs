@@ -155,10 +155,9 @@ namespace EditorResources.Components
             }
             if (Sequence != null)
             {
-                panelTracks.SuspendLayout();
-
+                
                 panelTracks.Controls.Clear();
-                foreach (var tr in sequence)
+                foreach (var tr in sequence.ToList())
                 {
                     var peTrack = new PEMidiTrack(tr);
                     peTrack.TabIndex = panelTracks.Controls.Count;
@@ -181,7 +180,6 @@ namespace EditorResources.Components
                     peTrack.BringToFront();
                 }
 
-                panelTracks.ResumeLayout(true);
 
                 if (osel != null)
                 {

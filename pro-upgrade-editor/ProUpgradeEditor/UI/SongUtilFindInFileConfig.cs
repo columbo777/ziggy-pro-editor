@@ -27,6 +27,8 @@ namespace ProUpgradeEditor.UI
     public class SongUtilFindInFileConfig
     {
         public bool FindDistinctText;
+        public bool FindInProOnly;
+        public string SearchFolder;
 
         public bool FirstMatchOnly;
         public bool MatchCountOnly;

@@ -308,12 +308,7 @@ namespace Sanford.Multimedia.Midi
         public MetaMessage(MetaType type, byte[] data)
         {
             this.type = type;
-
-            // Create storage for meta message data.
-            this.data = new byte[data.Length];
-
-            // Copy data into storage.
-            data.CopyTo(this.data, 0);
+            this.data = data;
         }
 
         public MetaMessage(MetaType type, string data)
@@ -324,7 +319,7 @@ namespace Sanford.Multimedia.Midi
 
         public byte[] GetBytes()
         {
-            return (byte[])data.Clone();
+            return data;
         }
 
         public override int GetHashCode()

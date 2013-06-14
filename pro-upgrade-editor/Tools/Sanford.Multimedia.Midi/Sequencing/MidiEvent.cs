@@ -15,27 +15,26 @@ namespace Sanford.Multimedia.Midi
             return x.CompareTo(y);
         }
     }
+    
     public class MidiEvent : IComparable<MidiEvent>
     {
         public int AbsoluteTicks { get; internal set; }
-        
-        
+
+
         public int Data1 { get; internal set; }
         public int Data2 { get; internal set; }
         public ChannelCommand Command { get; internal set; }
         public int Channel { get; internal set; }
-        
+
         public bool IsOn { get { return Command == ChannelCommand.NoteOn; } }
         public bool IsOff { get { return Command == ChannelCommand.NoteOff; } }
 
         public MessageType MessageType { get; internal set; }
-        public MetaType MetaType {get;internal set; }
+        public MetaType MetaType { get; internal set; }
 
-        public string Text{get;internal set; }
+        public string Text { get; internal set; }
 
-        public Track Owner{get;internal set; }
-
-        public bool Deleted{get;internal set; }
+        public bool Deleted { get; internal set; }
 
         public override string ToString()
         {
@@ -57,33 +56,32 @@ namespace Sanford.Multimedia.Midi
             Text = GetText();
         }
 
-        public MidiEvent(Track owner, int absoluteTicks, IMidiMessage message)
+        public MidiEvent(int absoluteTicks, IMidiMessage message)
         {
             MessageType = message.MessageType;
             MessageData = Int32.MinValue;
             byteData = null;
 
-            this.Owner = owner;
             this.AbsoluteTicks = absoluteTicks;
-            
+
             Deleted = false;
 
             Data2 = Data1 = Int32.MinValue;
             MetaType = Midi.MetaType.Unknown;
             Command = ChannelCommand.Invalid;
-            
+
             if (MessageType == Midi.MessageType.Channel)
             {
                 SetChanMessageData((message as ChannelMessage).Message);
             }
-            else if(MessageType == Midi.MessageType.Meta)
+            else if (MessageType == Midi.MessageType.Meta)
             {
                 var msg = (message as MetaMessage);
                 this.byteData = msg.GetBytes();
                 this.MetaType = msg.MetaType;
                 Text = msg.Text ?? "";
             }
-            else if(MessageType == Midi.MessageType.SystemRealtime)
+            else if (MessageType == Midi.MessageType.SystemRealtime)
             {
                 this.realtimeType = (message as SysRealtimeMessage).SysRealtimeType;
                 Text = GetText();
@@ -91,9 +89,9 @@ namespace Sanford.Multimedia.Midi
             else if (MessageType == Midi.MessageType.SystemExclusive)
             {
                 var sysEx = message as Midi.SysExMessage;
-                
+
                 this.MessageData = sysEx.Status;
-                
+
                 byteData = message.GetBytes();
                 Text = GetText();
             }
@@ -105,17 +103,17 @@ namespace Sanford.Multimedia.Midi
                 byteData = message.GetBytes();
                 Text = GetText();
             }
-            
+
         }
 
         string GetText()
         {
-            var ret = new StringBuilder(64);
+            var ret = new StringBuilder();
             if (MessageType == Midi.MessageType.Channel)
             {
-                    
+
                 ret.Append(AbsoluteTicks.ToString());
-                    
+
                 ret.Append("[");
                 ret.Append(Channel);
                 ret.Append("]");
@@ -128,7 +126,7 @@ namespace Sanford.Multimedia.Midi
                 ret.Append("]");
 
                 ret.Append(" ");
-                ret.Append(IsOn?"on":"off");
+                ret.Append(IsOn ? "on" : "off");
 
             }
             else
@@ -137,7 +135,7 @@ namespace Sanford.Multimedia.Midi
                 ret.Append(" ");
                 ret.Append(this.MessageType.ToString());
             }
-            
+
             return ret.ToString();
         }
 
@@ -163,12 +161,13 @@ namespace Sanford.Multimedia.Midi
             }
             else if (this.MessageType == MessageType.SystemRealtime)
             {
-                ret = SysRealtimeMessage.FromType(realtimeType);;
+                ret = SysRealtimeMessage.FromType(realtimeType);
+                ;
             }
             return ret;
         }
 
-        
+
 
         internal void SetAbsoluteTicks(int absoluteTicks)
         {

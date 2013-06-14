@@ -97,6 +97,11 @@ namespace ProUpgradeEditor.UI
 
         void EditorPro_OnStatusIdle(object sender, EventArgs e)
         {
+            RefreshLists();
+        }
+
+        public void RefreshLists()
+        {
             RefreshModifierListBoxes();
             RefreshTrainers();
             RefreshTextEvents();
@@ -902,7 +907,11 @@ namespace ProUpgradeEditor.UI
             this.FileNamePro = "";
 
             editor.SetHScrollMaximum(0);
-
+            midiTrackEditorPro.SetTrack(null, GuitarDifficulty.Expert);
+            midiTrackEditorPro.Refresh();
+            panelProEditor.Height = panelTrackEditorG6TitleBar.Height;
+            RefreshTracks6();
+            RefreshLists();
         }
 
         void trackEditorG5_OnClose(TrackEditor editor)
@@ -910,7 +919,11 @@ namespace ProUpgradeEditor.UI
             labelStatusIconEditor5.ImageKey = "music--exclamation.png";
             this.FileNameG5 = "";
             editor.SetHScrollMaximum(0);
-
+            midiTrackEditorG5.SetTrack(null, GuitarDifficulty.Expert);
+            midiTrackEditorG5.Refresh();
+            panel5ButtonEditor.Height = panelTrackEditorG5TitleBar.Height;
+            RefreshTracks5();
+            RefreshLists();
         }
 
         void trackEditorG5_OnLoadTrack(TrackEditor editor, Sequence seq, Track t)
@@ -919,8 +932,12 @@ namespace ProUpgradeEditor.UI
             FileNameG5 = editor.LoadedFileName;
             editor.visibleSelectors.Clear();
             RefreshTracks5();
-            RefreshModifierListBoxes();
-            this.toolStripFileName5.Text = Path.GetFileName(editor.LoadedFileName);
+
+            this.toolStripFileName5.Text = editor.LoadedFileName.GetFileName();
+
+            this.panel5ButtonEditor.Size = new System.Drawing.Size(1103, 139);
+
+            RefreshLists();
         }
 
 
@@ -934,13 +951,12 @@ namespace ProUpgradeEditor.UI
 
             editor.visibleSelectors.Clear();
 
-
             RefreshTracks6();
 
+            this.toolStripFileName6.Text = editor.LoadedFileName.GetFileName();
 
-            RefreshModifierListBoxes();
-            this.toolStripFileName6.Text = Path.GetFileName(editor.LoadedFileName);
-
+            this.panelProEditor.Size = new System.Drawing.Size(1103, 139);
+            RefreshLists();
         }
 
         private void CheckLoadLastFile()
@@ -986,15 +1002,6 @@ namespace ProUpgradeEditor.UI
             UpdateMidiInstrument(false);
         }
 
-        private void button94_Click_1(object sender, EventArgs e)
-        {
-            PlayMidiFromSelection();
-        }
-
-        private void button95_Click_1(object sender, EventArgs e)
-        {
-            StopMidiPlayback();
-        }
 
         private void button98_Click(object sender, EventArgs e)
         {
@@ -2152,7 +2159,6 @@ namespace ProUpgradeEditor.UI
 
             SelectedModifierChanged(GuitarModifierType.SingleStringTremelo);
 
-
             try
             {
                 if (GetSelectedModifier(GuitarModifierType.SingleStringTremelo) != null)
@@ -3232,7 +3238,7 @@ namespace ProUpgradeEditor.UI
             {
                 var songs = SongList.GetBatchSongList(checkBoxMultiSelectionSongList.Checked);
 
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
                 foreach (SongCacheItem item in songs)
                 {
                     sb.AppendLine(item.ToString());
@@ -6577,8 +6583,7 @@ namespace ProUpgradeEditor.UI
         public void CloseG5Track()
         {
             trackEditorG5.Close();
-            midiTrackEditorG5.SetTrack(null, GuitarDifficulty.Expert);
-            midiTrackEditorG5.Refresh();
+
         }
 
         private void buttonCloseG6Track_Click(object sender, EventArgs e)
@@ -6589,8 +6594,7 @@ namespace ProUpgradeEditor.UI
         public void CloseProTrack()
         {
             trackEditorG6.Close();
-            midiTrackEditorPro.SetTrack(null, GuitarDifficulty.Expert);
-            midiTrackEditorPro.Refresh();
+
         }
 
         private void treePackageContents_DoubleClick(object sender, EventArgs e)
@@ -8751,7 +8755,7 @@ namespace ProUpgradeEditor.UI
                             type = "MultiStringTremelo";
                         else if (msg.MidiEvent.IsSingleStringTremeloEvent())
                             type = "SingleStringTremelo";
-                        else if (msg.MidiEvent.IsSoloEvent())
+                        else if (msg.MidiEvent.IsSoloEvent(true))
                             type = "Solo";
                         else if (msg.MidiEvent.IsPowerupEvent())
                             type = "Powerup";
@@ -8888,7 +8892,7 @@ namespace ProUpgradeEditor.UI
                         var type = string.Empty;
                         if (msg.MidiEvent.IsBigRockEnding())
                             type = "BigRockEnding";
-                        else if (msg.MidiEvent.IsSoloEvent())
+                        else if (msg.MidiEvent.IsSoloEvent(false))
                             type = "Solo";
                         else if (msg.MidiEvent.IsPowerupEvent())
                             type = "Powerup";
@@ -9833,7 +9837,8 @@ namespace ProUpgradeEditor.UI
             config.SelectedSongOnly = checkBoxSongUtilFindInFileSelectedSongOnly.Checked;
             config.OpenResults = checkBoxSongUtilFindInFileResultsOpenCompleted.Checked;
             config.MatchWholeWord = checkBoxSongUtilFindInFileMatchWholeWord.Checked;
-            config.RootFolder = textBoxSongUtilSearchFolder.Text;
+            config.RootFolder = textBoxSongUtilFindFolder.Text;
+            config.FindInProOnly = checkBoxSongUtilFindInProOnly.Checked;
             if (config.RootFolder.FolderExists() == false)
             {
                 if (DefaultMidiFileLocationPro.IsNotEmpty() && DefaultMidiFileLocationPro.FolderExists())
@@ -9916,76 +9921,91 @@ namespace ProUpgradeEditor.UI
                     if (seq == null)
                         continue;
 
-                    var tracks = seq.Tracks.ToList();
-
-                    if (config.FindDistinctText)
+                    using (seq)
                     {
-                        var meta = tracks.Where(v => v.Meta.Any()).SelectMany(v => v.Meta).ToList();
-                        meta = meta.Where(m => m.Text.IsNotEmpty()).ToList();
-                        if (meta.Any())
+                        var tracks = seq.Tracks.ToList();
+
+                        if (config.FindInProOnly)
                         {
-                            res.Matches.AddRange(meta);
+                            tracks = tracks.Where(x => x.Name.IsProTrackName()).ToList();
                         }
-                    }
-                    else
-                    {
-                        var txt = config.FindText.ToLower();
-                        if (txt.IsNotEmpty())
-                        {
-                            var meta = tracks.Where(v => v.Meta.Any()).SelectMany(v => v.Meta).ToList().Where(v => v.Text.IsNotEmpty()).ToList();
-                            meta = meta.Where(m => m.Text.IsNotEmpty()).ToList();
 
-                            if (meta.Any())
+                        if (config.FindDistinctText)
+                        {
+                            var metaTracks = tracks.Where(v => v.Meta.Any()).ToList();
+                            foreach (var track in metaTracks)
                             {
-                                var mt = new List<MidiEvent>();
-                                if (config.MatchWholeWord)
+                                var meta = track.Meta.Where(m => m.Text.IsNotEmpty()).ToList();
+                                if (meta.Any())
                                 {
-                                    mt.AddRange(meta.Where(v => v.Text.EqualsEx(txt)).ToList());
-                                }
-                                else
-                                {
-                                    mt.AddRange(meta.Where(v => v.Text.ToLower().Contains(txt)).ToList());
-                                }
-                                if (mt.Any())
-                                {
-                                    res.Matches.AddRange(mt);
+                                    res.Matches.AddRange(meta.Select(x => new SongUtilSearchResultItem(track.Name, x)));
                                 }
                             }
                         }
-
-
-                        if (config.FindData1.IsNull() == false || config.FindData2.IsNull() == false || config.FindChannel.IsNull() == false)
+                        else
                         {
-                            tracks = tracks.Where(cm => cm.ChanMessages.Any()).ToList();
-
-                            foreach (var track in tracks)
+                            var txt = config.FindText.ToLower();
+                            if (txt.IsNotEmpty())
                             {
-
-                                var cmlist = track.ChanMessages.Where(cm =>
-                                    (config.FindData1.IsNull() ? true : cm.Data1 == config.FindData1) &&
-                                    (config.FindData2.IsNull() ? true : cm.Data2 == config.FindData2) &&
-                                    (config.FindChannel.IsNull() ? true : cm.Channel == config.FindChannel)
-                                    );
-                                if (cmlist.Any())
+                                var metaTracks = tracks.Where(v => v.Meta.Any()).ToList();
+                                foreach (var track in metaTracks)
                                 {
-                                    if (config.FirstMatchOnly)
-                                    {
-                                        res.Matches.Add(cmlist.First());
+                                    var meta = track.Meta.Where(m => m.Text.IsNotEmpty()).ToList();
 
-                                    }
-                                    else
+                                    if (meta.Any())
                                     {
-                                        res.Matches.AddRange(cmlist);
+                                        var mt = new List<MidiEvent>();
+                                        if (config.MatchWholeWord)
+                                        {
+                                            mt.AddRange(meta.Where(v => v.Text.EqualsEx(txt)).ToList());
+                                        }
+                                        else
+                                        {
+                                            mt.AddRange(meta.Where(v => v.Text.ToLower().Contains(txt)).ToList());
+                                        }
+                                        if (mt.Any())
+                                        {
+                                            res.Matches.AddRange(mt.Select(x => new SongUtilSearchResultItem(track.Name, x)));
+                                        }
                                     }
                                 }
                             }
+
+
+                            if (config.FindData1.IsNull() == false || config.FindData2.IsNull() == false || config.FindChannel.IsNull() == false)
+                            {
+                                tracks = tracks.Where(cm => cm.ChanMessages.Any()).ToList();
+
+                                foreach (var track in tracks)
+                                {
+
+                                    var cmlist = track.ChanMessages.Where(cm =>
+                                        (config.FindData1.IsNull() ? true : cm.Data1 == config.FindData1) &&
+                                        (config.FindData2.IsNull() ? true : cm.Data2 == config.FindData2) &&
+                                        (config.FindChannel.IsNull() ? true : cm.Channel == config.FindChannel)
+                                        );
+                                    if (cmlist.Any())
+                                    {
+                                        if (config.FirstMatchOnly)
+                                        {
+                                            res.Matches.Add(new SongUtilSearchResultItem(track.Name, cmlist.First()));
+
+                                        }
+                                        else
+                                        {
+                                            res.Matches.AddRange(cmlist.ToList().Select(x => new SongUtilSearchResultItem(track.Name, x)));
+
+                                        }
+                                    }
+                                }
+                            }
+
                         }
 
-                    }
-
-                    if (res.Matches.Any())
-                    {
-                        results.Add(res);
+                        if (res.Matches.Any())
+                        {
+                            results.Add(res);
+                        }
                     }
                 }
 
@@ -10002,7 +10022,7 @@ namespace ProUpgradeEditor.UI
                     if (config.FindDistinctText)
                     {
 
-                        var resList = results.SelectMany(vm => vm.Matches.Select(v => v.Text)).ToList().Distinct().ToList();
+                        var resList = results.SelectMany(vm => vm.Matches.Select(v => v.Event.Text)).ToList().Distinct().ToList();
                         resList.OrderBy(v => v).ToList().ForEach(r => sb.AppendLine(r));
 
                         sb.AppendLine("");
@@ -10014,11 +10034,11 @@ namespace ProUpgradeEditor.UI
                         {
                             sb.AppendLine(res.MidiPath);
 
-                            foreach (var trackGroup in res.Matches.GroupBy(o => o.Owner))
+                            foreach (var trackGroup in res.Matches.GroupBy(o => o.TrackName))
                             {
 
                                 sb.Append("\t");
-                                sb.AppendLine(trackGroup.Key.Name ?? "");
+                                sb.AppendLine(trackGroup.Key ?? "");
                                 if (config.MatchCountOnly)
                                 {
                                     sb.Append("\t\t");
@@ -10031,11 +10051,11 @@ namespace ProUpgradeEditor.UI
                                     foreach (var match in trackGroup)
                                     {
                                         sb.Append("\t\t");
-                                        sb.Append(match.AbsoluteTicks);
+                                        sb.Append(match.Event.AbsoluteTicks);
                                         sb.Append(" ");
-                                        sb.Append(match.MetaType);
+                                        sb.Append(match.Event.MetaType);
                                         sb.Append(" ");
-                                        sb.AppendLine(match.ToString());
+                                        sb.AppendLine(match.Event.ToString());
                                     }
                                 }
                             }
@@ -10050,10 +10070,10 @@ namespace ProUpgradeEditor.UI
                         {
                             sb.AppendLine(res.MidiPath);
 
-                            foreach (var trackGroup in res.Matches.GroupBy(o => o.Owner))
+                            foreach (var trackGroup in res.Matches.GroupBy(o => o.TrackName))
                             {
                                 sb.Append("\t");
-                                sb.AppendLine(trackGroup.Key.Name ?? "");
+                                sb.AppendLine(trackGroup.Key ?? "");
                                 if (config.MatchCountOnly)
                                 {
                                     sb.Append("\t\t");
@@ -10222,6 +10242,21 @@ namespace ProUpgradeEditor.UI
 
                 MessageBox.Show("" + count + " chords snapped");
             }
+        }
+
+        private void buttonSongUtilFindFolder_Click(object sender, EventArgs e)
+        {
+            OpenExplorerFolder(textBoxSongUtilFindFolder.Text);
+        }
+
+        private void checkChordNameHide_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button96_Click(object sender, EventArgs e)
+        {
+
         }
 
     }

@@ -266,7 +266,7 @@ namespace Sanford.Multimedia.Midi
             events.AddRange(streamID);
 
             // Event code.
-            byte[] eventCode = message.GetBytes();
+            byte[] eventCode = (byte[])message.GetBytes();
             eventCode[eventCode.Length - 1] = MEVT_SHORTMSG;
             events.AddRange(eventCode);
 

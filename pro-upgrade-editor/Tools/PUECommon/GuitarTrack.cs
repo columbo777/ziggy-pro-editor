@@ -435,7 +435,7 @@ namespace ProUpgradeEditor.Common
 
                     if (bassTrainers.Any())
                     {
-                        bassTrainers.ForEach(x => x.Owner.Remove(x));
+                        bassTrainers.ForEach(x => track.Remove(x));
                     }
                 }
 
@@ -446,7 +446,7 @@ namespace ProUpgradeEditor.Common
                     var guitarTrainers = track.Meta.Where(x => x.Text.IsTrainerGuitar()).ToList();
                     if (guitarTrainers.Any())
                     {
-                        guitarTrainers.ForEach(x => x.Owner.Remove(x));
+                        guitarTrainers.ForEach(x => track.Remove(x));
                     }
                 }
 
@@ -649,7 +649,7 @@ namespace ProUpgradeEditor.Common
                     if (notes.Any())
                     {
                         var closeNotes = notes.GroupByCloseTick().ToList();
-                        var chordNotes = closeNotes.Select(n => GuitarChord.GetChord(ret, difficulty, n, true)).Where(x => x != null).ToList();
+                        var chordNotes = closeNotes.Select(n => GuitarChord.GetChord(ret, difficulty, n, true)).ToList().Where(x => x != null).ToList();
                         chordNotes.ForEach(x => x.AddToList());
                     }
 
@@ -658,7 +658,7 @@ namespace ProUpgradeEditor.Common
 
                     LoadTrainers(ret, ret.TextEvents).ToList().ForEach(x => x.AddToList());
 
-                    events.GetEventPairs(ret, Utility.HandPositionData1.MakeEnumerable()).Select(x => new GuitarHandPosition(x)).ToList().ForEach(x => x.AddToList());
+                    events.GetEventPairs(ret, Utility.HandPositionData1.MakeEnumerable()).ToList().Select(x => new GuitarHandPosition(x)).ToList().ForEach(x => x.AddToList());
                 }
                 else
                 {
@@ -672,7 +672,7 @@ namespace ProUpgradeEditor.Common
                     {
                         var closeNotes = notes.GroupByCloseTick().ToList();
                         var chordNotes = closeNotes.Select(x => GuitarChord.GetChord(ret, difficulty, x, false)).Where(x => x != null).ToList();
-                        chordNotes.ForEach(x => x.AddToList());
+                        chordNotes.OrderBy(x=> x.DownTick).ToList().ForEach(x => x.AddToList());
                     }
 
                     var textEvents = midiTrack.Meta.Where(x => x.IsTextEvent()).ToList().Select(x => new GuitarTextEvent(ret, x)).ToList();
@@ -935,21 +935,35 @@ namespace ProUpgradeEditor.Common
             return Messages.Chords.ToList();
         }
 
-        public bool CreateHandPositionEvents(GenDiffConfig config)
+        public void ClearChordNames()
+        {
+            var ownerTrack = Messages.Owner.MidiTrack;
+
+            ownerTrack.Remove(ownerTrack.ChanMessages.Where(x => x.Data1 <= 19).ToList());
+
+            var x108 = Generate108();
+
+            foreach (var item in x108)
+            {
+                ownerTrack.Insert(item.Ticks.Down, new ChannelMessage(ChannelCommand.NoteOn, 17, item.Fret));
+                ownerTrack.Insert(item.Ticks.Up, new ChannelMessage(ChannelCommand.NoteOff, 17, 0));
+            }
+        }
+
+        public bool CreateHandPositionEvents()
         {
             try
             {
                 Remove(Messages.HandPositions.ToList());
 
-                var x108 = Generate108(config);
+                var ownerTrack = Messages.Owner.MidiTrack;
 
-                var sorted = x108.ToList().OrderBy(x => x.Ticks.Down).ToList();
+                var x108 = Generate108();
 
-                for (int x = 0; x < sorted.Count; x++)
+                foreach (var item in x108)
                 {
-                    var item = sorted[x];
-
                     GuitarHandPosition.CreateEvent(Messages, item.Ticks, item.Fret);
+
                 }
 
                 return true;
@@ -963,7 +977,7 @@ namespace ProUpgradeEditor.Common
 
 
 
-        private IEnumerable<GuitarHandPositionMeta> Generate108(GenDiffConfig config)
+        private IEnumerable<GuitarHandPositionMeta> Generate108()
         {
             var ret = new List<GuitarHandPositionMeta>();
 
@@ -975,7 +989,6 @@ namespace ProUpgradeEditor.Common
                 Ticks = new TickPair(Utility.HandPositionMarkerFirstBeginOffset, Utility.HandPositionMarkerFirstEndOffset),
                 IsChord = false,
             });
-
 
             if (sorted.Any())
             {
@@ -1013,7 +1026,7 @@ namespace ProUpgradeEditor.Common
                 }
 
             }
-            return ret;
+            return ret.OrderBy(x => x.Ticks.Down).ToList();
         }
 
     }

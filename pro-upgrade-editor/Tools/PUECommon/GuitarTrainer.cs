@@ -14,23 +14,23 @@ namespace ProUpgradeEditor.Common
             : base(owner, ticks, GuitarMessageType.GuitarTrainer)
         {
             this.TrainerType = type;
-            
-            this.TrainerIndex = (owner.Trainers.Where(x => x.TrainerType == type).Count() + 1);
 
             Start = start;
             End = end;
             Norm = norm;
+
+            this.TrainerIndex = ParseTrainerIndex();
 
             this.Loopable = norm != null;
 
             SetTicks(ticks);
         }
 
-        public GuitarTrainer(GuitarMessageList owner, TickPair ticks, GuitarTrainerType type, bool loopable, int index=Int32.MinValue)
+        public GuitarTrainer(GuitarMessageList owner, TickPair ticks, GuitarTrainerType type, bool loopable, int index = Int32.MinValue)
             : base(owner, ticks, GuitarMessageType.GuitarTrainer)
         {
             this.TrainerType = type;
-            this.TrainerIndex = index.IsNull() ? (owner.Trainers.Where(x=> x.TrainerType == type).Count()+1) : index;
+            this.TrainerIndex = index.IsNull() ? (owner.Trainers.Where(x => x.TrainerType == type).Count() + 1) : index;
             this.Loopable = loopable;
 
             Start = new GuitarTextEvent(owner, ticks.Down, GetStartText(TrainerType, TrainerIndex));
@@ -40,7 +40,7 @@ namespace ProUpgradeEditor.Common
             {
                 Norm = new GuitarTextEvent(owner, GetNormTick(ticks), GetNormText(TrainerType, TrainerIndex, Loopable));
             }
-            
+
             SetTicks(ticks);
         }
 
@@ -76,7 +76,7 @@ namespace ProUpgradeEditor.Common
             }
             return ret;
         }
-        
+
 
         public static string GetStartText(GuitarTrainerType type, int index)
         {
@@ -204,10 +204,10 @@ namespace ProUpgradeEditor.Common
 
         public override void SetTicks(TickPair ticks)
         {
-            Start.IfObjectNotNull(n=> n.SetDownTick(ticks.Down));
-            End.IfObjectNotNull(n=> n.SetDownTick(ticks.Up));
-            Norm.IfObjectNotNull(n=> n.SetDownTick(GetNormTick(ticks)));
-            
+            Start.IfObjectNotNull(n => n.SetDownTick(ticks.Down));
+            End.IfObjectNotNull(n => n.SetDownTick(ticks.Up));
+            Norm.IfObjectNotNull(n => n.SetDownTick(GetNormTick(ticks)));
+
             base.SetTicks(ticks);
         }
 
@@ -313,11 +313,11 @@ namespace ProUpgradeEditor.Common
             Start.IfObjectNotNull(n => n.RemoveFromList());
             End.IfObjectNotNull(n => n.RemoveFromList());
             Norm.IfObjectNotNull(n => n.RemoveFromList());
-            
+
             base.RemoveFromList();
         }
 
-        
+
         int GetNormTick(TickPair ticks)
         {
             return ticks.Down + (int)((ticks.TickLength) * Utility.SongTrainerNormOffset);

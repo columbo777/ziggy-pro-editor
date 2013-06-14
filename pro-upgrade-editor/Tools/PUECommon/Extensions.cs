@@ -103,14 +103,9 @@ namespace ProUpgradeEditor.Common
             var ret = FileType.Unknown;
             try
             {
-                var seq = new Sequence(FileType.Unknown, localMidiFile);
-                if (seq.Tracks.Any(x => x.Name.IsProTrackName()))
+                using (var seq = new Sequence(FileType.Unknown, localMidiFile))
                 {
-                    ret = FileType.Pro;
-                }
-                else
-                {
-                    ret = FileType.Guitar5;
+                    ret = seq.FindFileType();
                 }
             }
             catch { }
@@ -138,6 +133,7 @@ namespace ProUpgradeEditor.Common
             try
             {
                 ret = new Sequence(FileType.Unknown);
+                
                 using (var ms = new MemoryStream(data))
                 {
                     ret.Load(ms);
@@ -156,8 +152,7 @@ namespace ProUpgradeEditor.Common
             {
                 if (localFileName.FileExists())
                 {
-                    ret = new Sequence(FileType.Unknown, localFileName);
-                    ret.FileType = ret.FindFileType();
+                    ret = localFileName.ReadFileBytes().LoadSequence();
                 }
             }
             catch { }
@@ -777,9 +772,9 @@ namespace ProUpgradeEditor.Common
         {
             return Utility.PowerupData1 == ev.Data1;
         }
-        public static bool IsSoloEvent(this MidiEvent ev)
+        public static bool IsSoloEvent(this MidiEvent ev, bool isPro)
         {
-            return ev.Data1.IsSolo(ev.Owner.IsFileTypePro());
+            return ev.Data1.IsSolo(isPro);
         }
         public static bool IsMultiStringTremeloEvent(this MidiEvent ev)
         {
@@ -1132,7 +1127,7 @@ namespace ProUpgradeEditor.Common
                 cb.Data1 = targetDifficulty.GetStringLowEPro() + noteString;
                 cb.MidiChannel = cm.Channel;
                 cb.Command = cm.Command;
-                cb.Build();
+                
 
                 ret = cb.Result;
             }
@@ -1145,7 +1140,7 @@ namespace ProUpgradeEditor.Common
                     cb.Data1 = modData1;
                     cb.MidiChannel = cm.Channel;
                     cb.Command = cm.Command;
-                    cb.Build();
+                    
 
                     ret = cb.Result;
                 }
@@ -1160,7 +1155,7 @@ namespace ProUpgradeEditor.Common
                             cb.Data1 = Utility.SoloData1;
                             cb.MidiChannel = Utility.ChannelDefault;
                             cb.Command = cm.Command;
-                            cb.Build();
+                            
 
                             ret = cb.Result;
                         }
@@ -1170,7 +1165,7 @@ namespace ProUpgradeEditor.Common
                             cb.Data1 = Utility.PowerupData1;
                             cb.MidiChannel = Utility.ChannelDefault;
                             cb.Command = cm.Command;
-                            cb.Build();
+                            
 
                             ret = cb.Result;
                         }
@@ -1180,7 +1175,7 @@ namespace ProUpgradeEditor.Common
                             cb.Data1 = cm.Data1;
                             cb.MidiChannel = Utility.ChannelDefault;
                             cb.Command = cm.Command;
-                            cb.Build();
+                            
 
                             ret = cb.Result;
                         }
@@ -1204,7 +1199,7 @@ namespace ProUpgradeEditor.Common
                 cb.MidiChannel = Utility.ChannelDefault;
                 cb.Command = cm.Command;
 
-                cb.Build();
+                
 
                 ret = cb.Result;
             }
@@ -1246,7 +1241,7 @@ namespace ProUpgradeEditor.Common
                     cb.Data1 = targetDifficulty.GetStringLowEPro() + noteString;
                     cb.MidiChannel = Utility.ChannelDefault;
 
-                    cb.Build();
+                    
 
                     ret = cb.Result;
                 }
@@ -1261,7 +1256,7 @@ namespace ProUpgradeEditor.Common
                         cb.Data1 = modData1;
                         cb.MidiChannel = Utility.ChannelDefault;
 
-                        cb.Build();
+                        
 
                         ret = cb.Result;
                     }
@@ -1283,7 +1278,7 @@ namespace ProUpgradeEditor.Common
                             cb.Data1 = Utility.SoloData1;
                             cb.MidiChannel = Utility.ChannelDefault;
 
-                            cb.Build();
+                            
 
                             ret = cb.Result;
                         }
@@ -1294,7 +1289,7 @@ namespace ProUpgradeEditor.Common
                             cb.Data1 = Utility.PowerupData1;
                             cb.MidiChannel = Utility.ChannelDefault;
 
-                            cb.Build();
+                            
 
                             ret = cb.Result;
                         }
@@ -1305,7 +1300,7 @@ namespace ProUpgradeEditor.Common
                             cb.Data1 = cm.Data1;
                             cb.MidiChannel = Utility.ChannelDefault;
 
-                            cb.Build();
+                            
 
                             ret = cb.Result;
                         }
@@ -1342,7 +1337,7 @@ namespace ProUpgradeEditor.Common
                 cb.Data2 = cm.Command.GetData2();
                 
                 cb.Command = cm.Command;
-                cb.Build();
+                
 
                 ret = cb.Result;
             }
@@ -1356,7 +1351,7 @@ namespace ProUpgradeEditor.Common
                         cb.Data1 = Utility.GetSoloData1_G5(targetDifficulty);
                         cb.MidiChannel = Utility.ChannelDefault;
                         cb.Command = cm.Command;
-                        cb.Build();
+                        
                         ret = cb.Result;
                     }
                     else if (cm.Data1.IsPowerup())
@@ -1365,7 +1360,7 @@ namespace ProUpgradeEditor.Common
                         cb.Data1 = Utility.PowerupData1;
                         cb.MidiChannel = Utility.ChannelDefault;
                         cb.Command = cm.Command;
-                        cb.Build();
+                        
                         ret = cb.Result;
                     }
                 }

@@ -16,19 +16,16 @@ namespace Sanford.Multimedia.Midi
             eventList = new List<MidiEvent>();
 
             this.FileType = fileType;
-            endOfTrackMidiEvent = new MidiEvent(this, Length, MetaMessage.EndOfTrackMessage);
             this.Name = name;
+
+            endOfTrackMidiEvent = new MidiEvent(Length, MetaMessage.EndOfTrackMessage);
+
             Dirty = true;
         }
 
         MidiEvent getNameEvent()
         {
-            if (Count > 0)
-            {
-                return Meta.FirstOrDefault(x => x.MetaType == MetaType.TrackName);
-            }
-
-            return null;
+            return Meta.FirstOrDefault(x => x.MetaType == MetaType.TrackName);
         }
 
         public string Name
@@ -55,15 +52,13 @@ namespace Sanford.Multimedia.Midi
 
                     var tn = getNameEvent();
 
-                    if (tn != null)
+                    while (tn != null)
                     {
                         Remove(tn);
+                        tn = getNameEvent();
                     }
 
-                    var mb = new MetaTextBuilder(MetaType.TrackName, name);
-                    mb.Build();
-
-                    Insert(0, mb.Result);
+                    Insert(0, new MetaMessage(MetaType.TrackName, name));
 
                 }
             }
@@ -151,8 +146,8 @@ namespace Sanford.Multimedia.Midi
 
         public MidiEvent Insert(int position, IMidiMessage message)
         {
-            
-            var newMidiEvent = new MidiEvent(this, position, message);
+
+            var newMidiEvent = new MidiEvent(position, message);
             if (newMidiEvent.Command == ChannelCommand.NoteOn && newMidiEvent.Data2 == 0)
             {
                 newMidiEvent.SetChanMessageData(ChannelMessage.PackCommand(newMidiEvent.MessageData, ChannelCommand.NoteOff));
@@ -167,7 +162,7 @@ namespace Sanford.Multimedia.Midi
             }
             else
             {
-                var after = eventList.SkipWhile(x => x.AbsoluteTicks < position);
+                var after = eventList.SkipWhile(x => x.AbsoluteTicks < position).ToList();
 
                 if (!after.Any())
                 {
@@ -208,8 +203,7 @@ namespace Sanford.Multimedia.Midi
                     }
                 }
             }
-            
-            endOfTrackMidiEvent.SetAbsoluteTicks(Length);
+
             Dirty = true;
             return newMidiEvent;
         }
@@ -225,22 +219,22 @@ namespace Sanford.Multimedia.Midi
         public void Clear()
         {
             Dirty = true;
+
             eventList.Clear();
-            endOfTrackMidiEvent.SetAbsoluteTicks(Length);
-           
+
+
         }
 
         public void Remove(IEnumerable<MidiEvent> ev)
         {
-            
-            foreach (var e in ev)
+            foreach (var e in ev.ToList())
             {
                 Remove(e);
             }
         }
         public void Remove(MidiEvent ev)
         {
-            
+
             if (ev == null)
                 return;
             if (ev == endOfTrackMidiEvent)
@@ -255,7 +249,7 @@ namespace Sanford.Multimedia.Midi
                 return;
             }
 
-            if (ev.Owner != this)
+            if (eventList.Contains(ev) == false)
             {
                 Debug.WriteLine("wrong track for event");
                 return;
@@ -265,8 +259,7 @@ namespace Sanford.Multimedia.Midi
 
             ev.Deleted = true;
             eventList.Remove(ev);
-            endOfTrackMidiEvent.SetAbsoluteTicks(Length);
-            
+
         }
 
 
@@ -306,9 +299,9 @@ namespace Sanford.Multimedia.Midi
         public void Merge(Track trk)
         {
             trk.ChanMessages.ToList().ForEach(x => this.Insert(x.AbsoluteTicks, x.Clone()));
-            trk.Meta.Where(x=> x.MetaType != MetaType.TrackName && x.MetaType != MetaType.EndOfTrack).
+            trk.Meta.Where(x => x.MetaType != MetaType.TrackName).
                 ToList().ForEach(x => this.Insert(x.AbsoluteTicks, x.Clone()));
-            
+
         }
         /// <summary>
         /// Gets or sets the end of track meta message position offset.

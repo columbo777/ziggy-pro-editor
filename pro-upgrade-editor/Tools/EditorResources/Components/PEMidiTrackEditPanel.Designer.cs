@@ -120,6 +120,13 @@
             // 
             this.textBoxTrackName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxTrackName.AutoCompleteCustomSource.AddRange(new string[] {
+            "PART REAL_GUITAR",
+            "PART REAL_GUITAR_22",
+            "PART REAL_BASS",
+            "PART REAL_BASS_22"});
+            this.textBoxTrackName.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.textBoxTrackName.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.textBoxTrackName.Location = new System.Drawing.Point(3, 304);
             this.textBoxTrackName.Name = "textBoxTrackName";
             this.textBoxTrackName.Size = new System.Drawing.Size(160, 20);

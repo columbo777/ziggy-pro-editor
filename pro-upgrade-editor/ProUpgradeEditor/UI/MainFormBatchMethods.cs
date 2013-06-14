@@ -517,6 +517,11 @@ namespace ProUpgradeEditor.UI
                     Set108Events(config);
                 }
 
+                if (Utility.ClearChordNames)
+                {
+                    EditorPro.GuitarTrack.ClearChordNames();
+                }
+
                 ret = true;
             }
             catch { ret = false; }
@@ -694,7 +699,7 @@ namespace ProUpgradeEditor.UI
                 else if (targetDifficulty == GuitarDifficulty.Hard)
                 {
                     foreach (var note in g6c.Notes)
-                    {                        
+                    {
                         frets[note.NoteString] = note.NoteFretDown;
                         channels[note.NoteString] = note.Channel;
                         noteCount++;
@@ -1181,7 +1186,25 @@ namespace ProUpgradeEditor.UI
             var fileErrors = new List<string>();
             try
             {
-
+                if (midiSequence.FirstOrDefault() == null)
+                {
+                    fileErrors.Add("No Tracks");
+                }
+                else
+                {
+                    var proTracks = midiSequence.Skip(1).ToList();
+                    foreach (var track in proTracks)
+                    {
+                        if (track.Name != null && track.Name == "(no name)")
+                        {
+                            fileErrors.Add("******** Missing Track Name: " + (track.Name ?? ""));
+                        }
+                        else if (track.Name.IsProTrackName() == false)
+                        {
+                            fileErrors.Add("Invalid Track Name: " + (track.Name ?? ""));
+                        }
+                    }
+                }
                 foreach (var track in midiSequence)
                 {
                     if (track.Name.IsEmpty())
@@ -1422,9 +1445,9 @@ namespace ProUpgradeEditor.UI
                         if (shortChords.Any())
                         {
                             fileErrors.Add(currentTrackName + " invalid chord length found: " + diff);
-                            
-                            shortChords.ForEach(x=> fileErrors.Add("  " + x.ToString()));
-                            
+
+                            shortChords.ForEach(x => fileErrors.Add("  " + x.ToString()));
+
                         }
 
                         var invStrum = chords.Where(x =>

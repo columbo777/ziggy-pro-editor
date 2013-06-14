@@ -218,12 +218,16 @@
             this.button75 = new System.Windows.Forms.Button();
             this.tabSongLibSongUtility = new System.Windows.Forms.TabPage();
             this.groupBox47 = new System.Windows.Forms.GroupBox();
-            this.buttonSongUtilFindInFileDistinctText = new System.Windows.Forms.Button();
             this.groupBox49 = new System.Windows.Forms.GroupBox();
             this.buttonSongUtilFindInFileResultsOpenWindow = new System.Windows.Forms.Button();
             this.checkBoxSongUtilFindInFileResultsOpenCompleted = new System.Windows.Forms.CheckBox();
             this.textBoxSongUtilFindInFileResults = new System.Windows.Forms.TextBox();
             this.groupBoxSongUtilFindInFile = new System.Windows.Forms.GroupBox();
+            this.textBoxSongUtilFindFolder = new System.Windows.Forms.TextBox();
+            this.checkBoxSongUtilFindInProOnly = new System.Windows.Forms.CheckBox();
+            this.label60 = new System.Windows.Forms.Label();
+            this.buttonSongUtilFindFolder = new System.Windows.Forms.Button();
+            this.buttonSongUtilFindInFileDistinctText = new System.Windows.Forms.Button();
             this.checkBoxSongUtilFindInFileMatchWholeWord = new System.Windows.Forms.CheckBox();
             this.checkBoxSongUtilFindInFileMatchCountOnly = new System.Windows.Forms.CheckBox();
             this.checkBoxSongUtilFindInFileFirstMatchOnly = new System.Windows.Forms.CheckBox();
@@ -3162,7 +3166,6 @@
             // groupBox47
             // 
             this.groupBox47.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(248)))), ((int)(((byte)(248)))));
-            this.groupBox47.Controls.Add(this.buttonSongUtilFindInFileDistinctText);
             this.groupBox47.Controls.Add(this.groupBox49);
             this.groupBox47.Controls.Add(this.groupBoxSongUtilFindInFile);
             this.groupBox47.Controls.Add(this.buttonSongUtilSearchFolderExplore);
@@ -3177,20 +3180,6 @@
             this.groupBox47.TabStop = false;
             this.groupBox47.Text = "Song Utilities";
             // 
-            // buttonSongUtilFindInFileDistinctText
-            // 
-            this.buttonSongUtilFindInFileDistinctText.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.buttonSongUtilFindInFileDistinctText.ImageIndex = 68;
-            this.buttonSongUtilFindInFileDistinctText.ImageList = this.imageList1;
-            this.buttonSongUtilFindInFileDistinctText.Location = new System.Drawing.Point(351, 116);
-            this.buttonSongUtilFindInFileDistinctText.Name = "buttonSongUtilFindInFileDistinctText";
-            this.buttonSongUtilFindInFileDistinctText.Size = new System.Drawing.Size(161, 24);
-            this.buttonSongUtilFindInFileDistinctText.TabIndex = 12;
-            this.buttonSongUtilFindInFileDistinctText.Text = "Distinct Text Events";
-            this.buttonSongUtilFindInFileDistinctText.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.buttonSongUtilFindInFileDistinctText.UseVisualStyleBackColor = true;
-            this.buttonSongUtilFindInFileDistinctText.Click += new System.EventHandler(this.buttonSongUtilFindInFileDistinctText_Click);
-            // 
             // groupBox49
             // 
             this.groupBox49.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
@@ -3200,7 +3189,7 @@
             this.groupBox49.Controls.Add(this.checkBoxSongUtilFindInFileResultsOpenCompleted);
             this.groupBox49.Controls.Add(this.textBoxSongUtilFindInFileResults);
             this.groupBox49.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
-            this.groupBox49.Location = new System.Drawing.Point(6, 248);
+            this.groupBox49.Location = new System.Drawing.Point(6, 218);
             this.groupBox49.Name = "groupBox49";
             this.groupBox49.Size = new System.Drawing.Size(798, 235);
             this.groupBox49.TabIndex = 14;
@@ -3253,6 +3242,11 @@
             // 
             // groupBoxSongUtilFindInFile
             // 
+            this.groupBoxSongUtilFindInFile.Controls.Add(this.textBoxSongUtilFindFolder);
+            this.groupBoxSongUtilFindInFile.Controls.Add(this.checkBoxSongUtilFindInProOnly);
+            this.groupBoxSongUtilFindInFile.Controls.Add(this.label60);
+            this.groupBoxSongUtilFindInFile.Controls.Add(this.buttonSongUtilFindFolder);
+            this.groupBoxSongUtilFindInFile.Controls.Add(this.buttonSongUtilFindInFileDistinctText);
             this.groupBoxSongUtilFindInFile.Controls.Add(this.checkBoxSongUtilFindInFileMatchWholeWord);
             this.groupBoxSongUtilFindInFile.Controls.Add(this.checkBoxSongUtilFindInFileMatchCountOnly);
             this.groupBoxSongUtilFindInFile.Controls.Add(this.checkBoxSongUtilFindInFileFirstMatchOnly);
@@ -3267,12 +3261,65 @@
             this.groupBoxSongUtilFindInFile.Controls.Add(this.label56);
             this.groupBoxSongUtilFindInFile.Controls.Add(this.label57);
             this.groupBoxSongUtilFindInFile.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
-            this.groupBoxSongUtilFindInFile.Location = new System.Drawing.Point(6, 82);
+            this.groupBoxSongUtilFindInFile.Location = new System.Drawing.Point(6, 52);
             this.groupBoxSongUtilFindInFile.Name = "groupBoxSongUtilFindInFile";
-            this.groupBoxSongUtilFindInFile.Size = new System.Drawing.Size(321, 160);
+            this.groupBoxSongUtilFindInFile.Size = new System.Drawing.Size(701, 160);
             this.groupBoxSongUtilFindInFile.TabIndex = 0;
             this.groupBoxSongUtilFindInFile.TabStop = false;
             this.groupBoxSongUtilFindInFile.Text = "Find";
+            // 
+            // textBoxSongUtilFindFolder
+            // 
+            this.textBoxSongUtilFindFolder.Location = new System.Drawing.Point(317, 36);
+            this.textBoxSongUtilFindFolder.Name = "textBoxSongUtilFindFolder";
+            this.textBoxSongUtilFindFolder.Size = new System.Drawing.Size(209, 23);
+            this.textBoxSongUtilFindFolder.TabIndex = 14;
+            // 
+            // checkBoxSongUtilFindInProOnly
+            // 
+            this.checkBoxSongUtilFindInProOnly.ForeColor = System.Drawing.Color.Black;
+            this.checkBoxSongUtilFindInProOnly.Location = new System.Drawing.Point(139, 85);
+            this.checkBoxSongUtilFindInProOnly.Name = "checkBoxSongUtilFindInProOnly";
+            this.checkBoxSongUtilFindInProOnly.Size = new System.Drawing.Size(150, 19);
+            this.checkBoxSongUtilFindInProOnly.TabIndex = 17;
+            this.checkBoxSongUtilFindInProOnly.Text = "Find In Pro Only";
+            this.checkBoxSongUtilFindInProOnly.UseVisualStyleBackColor = true;
+            // 
+            // label60
+            // 
+            this.label60.AutoSize = true;
+            this.label60.ForeColor = System.Drawing.Color.Black;
+            this.label60.Location = new System.Drawing.Point(314, 19);
+            this.label60.Name = "label60";
+            this.label60.Size = new System.Drawing.Size(81, 15);
+            this.label60.TabIndex = 16;
+            this.label60.Text = "Search Folder:";
+            // 
+            // buttonSongUtilFindFolder
+            // 
+            this.buttonSongUtilFindFolder.ImageKey = "folder_explore.png";
+            this.buttonSongUtilFindFolder.ImageList = this.imageList1;
+            this.buttonSongUtilFindFolder.Location = new System.Drawing.Point(532, 35);
+            this.buttonSongUtilFindFolder.Name = "buttonSongUtilFindFolder";
+            this.buttonSongUtilFindFolder.Size = new System.Drawing.Size(24, 24);
+            this.buttonSongUtilFindFolder.TabIndex = 15;
+            this.toolTip1.SetToolTip(this.buttonSongUtilFindFolder, "Explore File Location");
+            this.buttonSongUtilFindFolder.UseVisualStyleBackColor = true;
+            this.buttonSongUtilFindFolder.Click += new System.EventHandler(this.buttonSongUtilFindFolder_Click);
+            // 
+            // buttonSongUtilFindInFileDistinctText
+            // 
+            this.buttonSongUtilFindInFileDistinctText.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.buttonSongUtilFindInFileDistinctText.ImageIndex = 68;
+            this.buttonSongUtilFindInFileDistinctText.ImageList = this.imageList1;
+            this.buttonSongUtilFindInFileDistinctText.Location = new System.Drawing.Point(314, 129);
+            this.buttonSongUtilFindInFileDistinctText.Name = "buttonSongUtilFindInFileDistinctText";
+            this.buttonSongUtilFindInFileDistinctText.Size = new System.Drawing.Size(161, 24);
+            this.buttonSongUtilFindInFileDistinctText.TabIndex = 12;
+            this.buttonSongUtilFindInFileDistinctText.Text = "Distinct Text Events";
+            this.buttonSongUtilFindInFileDistinctText.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.buttonSongUtilFindInFileDistinctText.UseVisualStyleBackColor = true;
+            this.buttonSongUtilFindInFileDistinctText.Click += new System.EventHandler(this.buttonSongUtilFindInFileDistinctText_Click);
             // 
             // checkBoxSongUtilFindInFileMatchWholeWord
             // 
@@ -3359,7 +3406,7 @@
             this.buttonSongUtilFindInFileSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonSongUtilFindInFileSearch.ImageIndex = 29;
             this.buttonSongUtilFindInFileSearch.ImageList = this.imageList1;
-            this.buttonSongUtilFindInFileSearch.Location = new System.Drawing.Point(291, 130);
+            this.buttonSongUtilFindInFileSearch.Location = new System.Drawing.Point(532, 129);
             this.buttonSongUtilFindInFileSearch.Name = "buttonSongUtilFindInFileSearch";
             this.buttonSongUtilFindInFileSearch.Size = new System.Drawing.Size(24, 24);
             this.buttonSongUtilFindInFileSearch.TabIndex = 9;
@@ -3421,7 +3468,7 @@
             this.buttonSongUtilSearchForG5FromOpenPro.ForeColor = System.Drawing.SystemColors.ControlText;
             this.buttonSongUtilSearchForG5FromOpenPro.ImageIndex = 68;
             this.buttonSongUtilSearchForG5FromOpenPro.ImageList = this.imageList1;
-            this.buttonSongUtilSearchForG5FromOpenPro.Location = new System.Drawing.Point(6, 52);
+            this.buttonSongUtilSearchForG5FromOpenPro.Location = new System.Drawing.Point(251, 21);
             this.buttonSongUtilSearchForG5FromOpenPro.Name = "buttonSongUtilSearchForG5FromOpenPro";
             this.buttonSongUtilSearchForG5FromOpenPro.Size = new System.Drawing.Size(239, 24);
             this.buttonSongUtilSearchForG5FromOpenPro.TabIndex = 11;
@@ -3568,10 +3615,10 @@
             this.tabNoteEditor.Controls.Add(this.groupBoxStrumMarkers);
             this.tabNoteEditor.ForeColor = System.Drawing.SystemColors.ControlText;
             this.tabNoteEditor.ImageIndex = 13;
-            this.tabNoteEditor.Location = new System.Drawing.Point(4, 23);
+            this.tabNoteEditor.Location = new System.Drawing.Point(4, 24);
             this.tabNoteEditor.Name = "tabNoteEditor";
             this.tabNoteEditor.Padding = new System.Windows.Forms.Padding(3);
-            this.tabNoteEditor.Size = new System.Drawing.Size(1095, 523);
+            this.tabNoteEditor.Size = new System.Drawing.Size(1095, 522);
             this.tabNoteEditor.TabIndex = 2;
             this.tabNoteEditor.Text = "Note Editor";
             this.tabNoteEditor.Click += new System.EventHandler(this.tabPage2_Click);
@@ -3604,157 +3651,144 @@
             // 
             // checkChordNameEb
             // 
-            this.checkChordNameEb.AutoSize = true;
             this.checkChordNameEb.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameEb.Location = new System.Drawing.Point(86, 110);
+            this.checkChordNameEb.Location = new System.Drawing.Point(91, 107);
             this.checkChordNameEb.Name = "checkChordNameEb";
-            this.checkChordNameEb.Size = new System.Drawing.Size(39, 17);
+            this.checkChordNameEb.Size = new System.Drawing.Size(42, 17);
             this.checkChordNameEb.TabIndex = 14;
             this.checkChordNameEb.Text = "Eb";
             this.checkChordNameEb.UseVisualStyleBackColor = true;
             // 
             // checkChordNameD
             // 
-            this.checkChordNameD.AutoSize = true;
             this.checkChordNameD.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameD.Location = new System.Drawing.Point(86, 93);
+            this.checkChordNameD.Location = new System.Drawing.Point(91, 90);
             this.checkChordNameD.Name = "checkChordNameD";
-            this.checkChordNameD.Size = new System.Drawing.Size(34, 17);
+            this.checkChordNameD.Size = new System.Drawing.Size(37, 17);
             this.checkChordNameD.TabIndex = 13;
             this.checkChordNameD.Text = "D";
             this.checkChordNameD.UseVisualStyleBackColor = true;
             // 
             // checkChordNameDb
             // 
-            this.checkChordNameDb.AutoSize = true;
             this.checkChordNameDb.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameDb.Location = new System.Drawing.Point(86, 76);
+            this.checkChordNameDb.Location = new System.Drawing.Point(91, 73);
             this.checkChordNameDb.Name = "checkChordNameDb";
-            this.checkChordNameDb.Size = new System.Drawing.Size(40, 17);
+            this.checkChordNameDb.Size = new System.Drawing.Size(43, 17);
             this.checkChordNameDb.TabIndex = 12;
             this.checkChordNameDb.Text = "Db";
             this.checkChordNameDb.UseVisualStyleBackColor = true;
             // 
             // checkChordNameC
             // 
-            this.checkChordNameC.AutoSize = true;
             this.checkChordNameC.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameC.Location = new System.Drawing.Point(86, 59);
+            this.checkChordNameC.Location = new System.Drawing.Point(91, 56);
             this.checkChordNameC.Name = "checkChordNameC";
-            this.checkChordNameC.Size = new System.Drawing.Size(33, 17);
+            this.checkChordNameC.Size = new System.Drawing.Size(36, 17);
             this.checkChordNameC.TabIndex = 11;
             this.checkChordNameC.Text = "C";
             this.checkChordNameC.UseVisualStyleBackColor = true;
             // 
             // checkChordNameG
             // 
-            this.checkChordNameG.AutoSize = true;
             this.checkChordNameG.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameG.Location = new System.Drawing.Point(5, 110);
+            this.checkChordNameG.Location = new System.Drawing.Point(5, 107);
             this.checkChordNameG.Name = "checkChordNameG";
-            this.checkChordNameG.Size = new System.Drawing.Size(34, 17);
+            this.checkChordNameG.Size = new System.Drawing.Size(37, 17);
             this.checkChordNameG.TabIndex = 10;
             this.checkChordNameG.Text = "G";
             this.checkChordNameG.UseVisualStyleBackColor = true;
             // 
             // checkChordNameGb
             // 
-            this.checkChordNameGb.AutoSize = true;
             this.checkChordNameGb.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameGb.Location = new System.Drawing.Point(5, 93);
+            this.checkChordNameGb.Location = new System.Drawing.Point(5, 90);
             this.checkChordNameGb.Name = "checkChordNameGb";
-            this.checkChordNameGb.Size = new System.Drawing.Size(40, 17);
+            this.checkChordNameGb.Size = new System.Drawing.Size(43, 17);
             this.checkChordNameGb.TabIndex = 9;
             this.checkChordNameGb.Text = "Gb";
             this.checkChordNameGb.UseVisualStyleBackColor = true;
             // 
             // checkChordNameB
             // 
-            this.checkChordNameB.AutoSize = true;
             this.checkChordNameB.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameB.Location = new System.Drawing.Point(46, 110);
+            this.checkChordNameB.Location = new System.Drawing.Point(49, 107);
             this.checkChordNameB.Name = "checkChordNameB";
-            this.checkChordNameB.Size = new System.Drawing.Size(33, 17);
+            this.checkChordNameB.Size = new System.Drawing.Size(35, 17);
             this.checkChordNameB.TabIndex = 8;
             this.checkChordNameB.Text = "B";
             this.checkChordNameB.UseVisualStyleBackColor = true;
             // 
             // checkChordNameBb
             // 
-            this.checkChordNameBb.AutoSize = true;
             this.checkChordNameBb.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameBb.Location = new System.Drawing.Point(46, 93);
+            this.checkChordNameBb.Location = new System.Drawing.Point(49, 90);
             this.checkChordNameBb.Name = "checkChordNameBb";
-            this.checkChordNameBb.Size = new System.Drawing.Size(39, 17);
+            this.checkChordNameBb.Size = new System.Drawing.Size(41, 17);
             this.checkChordNameBb.TabIndex = 7;
             this.checkChordNameBb.Text = "Bb";
             this.checkChordNameBb.UseVisualStyleBackColor = true;
             // 
             // checkChordNameA
             // 
-            this.checkChordNameA.AutoSize = true;
             this.checkChordNameA.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameA.Location = new System.Drawing.Point(46, 76);
+            this.checkChordNameA.Location = new System.Drawing.Point(49, 73);
             this.checkChordNameA.Name = "checkChordNameA";
-            this.checkChordNameA.Size = new System.Drawing.Size(33, 17);
+            this.checkChordNameA.Size = new System.Drawing.Size(35, 17);
             this.checkChordNameA.TabIndex = 6;
             this.checkChordNameA.Text = "A";
             this.checkChordNameA.UseVisualStyleBackColor = true;
             // 
             // checkChordNameAb
             // 
-            this.checkChordNameAb.AutoSize = true;
             this.checkChordNameAb.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameAb.Location = new System.Drawing.Point(46, 59);
+            this.checkChordNameAb.Location = new System.Drawing.Point(49, 56);
             this.checkChordNameAb.Name = "checkChordNameAb";
-            this.checkChordNameAb.Size = new System.Drawing.Size(39, 17);
+            this.checkChordNameAb.Size = new System.Drawing.Size(41, 17);
             this.checkChordNameAb.TabIndex = 5;
             this.checkChordNameAb.Text = "Ab";
             this.checkChordNameAb.UseVisualStyleBackColor = true;
             // 
             // checkChordNameF
             // 
-            this.checkChordNameF.AutoSize = true;
             this.checkChordNameF.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameF.Location = new System.Drawing.Point(6, 76);
+            this.checkChordNameF.Location = new System.Drawing.Point(5, 73);
             this.checkChordNameF.Name = "checkChordNameF";
-            this.checkChordNameF.Size = new System.Drawing.Size(32, 17);
+            this.checkChordNameF.Size = new System.Drawing.Size(35, 17);
             this.checkChordNameF.TabIndex = 4;
             this.checkChordNameF.Text = "F";
             this.checkChordNameF.UseVisualStyleBackColor = true;
             // 
             // checkChordNameE
             // 
-            this.checkChordNameE.AutoSize = true;
             this.checkChordNameE.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameE.Location = new System.Drawing.Point(6, 59);
+            this.checkChordNameE.Location = new System.Drawing.Point(5, 56);
             this.checkChordNameE.Name = "checkChordNameE";
-            this.checkChordNameE.Size = new System.Drawing.Size(33, 17);
+            this.checkChordNameE.Size = new System.Drawing.Size(36, 17);
             this.checkChordNameE.TabIndex = 3;
             this.checkChordNameE.Text = "E";
             this.checkChordNameE.UseVisualStyleBackColor = true;
             // 
             // checkChordNameSlash
             // 
-            this.checkChordNameSlash.AutoSize = true;
             this.checkChordNameSlash.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameSlash.Location = new System.Drawing.Point(6, 42);
+            this.checkChordNameSlash.Location = new System.Drawing.Point(5, 39);
             this.checkChordNameSlash.Name = "checkChordNameSlash";
-            this.checkChordNameSlash.Size = new System.Drawing.Size(83, 17);
+            this.checkChordNameSlash.Size = new System.Drawing.Size(111, 17);
             this.checkChordNameSlash.TabIndex = 2;
             this.checkChordNameSlash.Text = "Slash Chord";
             this.checkChordNameSlash.UseVisualStyleBackColor = true;
             // 
             // checkChordNameHide
             // 
-            this.checkChordNameHide.AutoSize = true;
             this.checkChordNameHide.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameHide.Location = new System.Drawing.Point(6, 25);
+            this.checkChordNameHide.Location = new System.Drawing.Point(5, 22);
             this.checkChordNameHide.Name = "checkChordNameHide";
-            this.checkChordNameHide.Size = new System.Drawing.Size(115, 17);
+            this.checkChordNameHide.Size = new System.Drawing.Size(138, 17);
             this.checkChordNameHide.TabIndex = 1;
             this.checkChordNameHide.Text = "Hide Chord Names";
             this.checkChordNameHide.UseVisualStyleBackColor = true;
+            this.checkChordNameHide.CheckedChanged += new System.EventHandler(this.checkChordNameHide_CheckedChanged);
             // 
             // groupBox42
             // 
@@ -4352,6 +4386,7 @@
             this.button96.TabIndex = 4;
             this.toolTip1.SetToolTip(this.button96, "Play");
             this.button96.UseVisualStyleBackColor = true;
+            
             this.button96.MouseDown += new System.Windows.Forms.MouseEventHandler(this.button96_MouseDown);
             this.button96.MouseUp += new System.Windows.Forms.MouseEventHandler(this.button96_MouseUp);
             // 
@@ -6333,10 +6368,10 @@
             this.tabPageEvents.Controls.Add(this.groupBoxProBassTrainers);
             this.tabPageEvents.Controls.Add(this.groupBoxProGuitarTrainers);
             this.tabPageEvents.ImageIndex = 59;
-            this.tabPageEvents.Location = new System.Drawing.Point(4, 23);
+            this.tabPageEvents.Location = new System.Drawing.Point(4, 24);
             this.tabPageEvents.Name = "tabPageEvents";
             this.tabPageEvents.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageEvents.Size = new System.Drawing.Size(1095, 523);
+            this.tabPageEvents.Size = new System.Drawing.Size(1095, 522);
             this.tabPageEvents.TabIndex = 10;
             this.tabPageEvents.Text = "Events";
             // 
@@ -6480,6 +6515,722 @@
             // 
             // textBoxEventText
             // 
+            this.textBoxEventText.AutoCompleteCustomSource.AddRange(new string[] {
+            "[bonusfx]",
+            "[bonusfx_optional]",
+            "[chorus]",
+            "[chrd0  ]",
+            "[chrd0 Ab5]",
+            "[chrd0 Bb]",
+            "[chrd0 Bb5]",
+            "[chrd0 C5]",
+            "[chrd0 Cmin]",
+            "[chrd0 Dmin]",
+            "[chrd0 Eb/Bb]",
+            "[chrd0 Eb/G]",
+            "[chrd0 Eb]",
+            "[chrd0 Eb5/Bb]",
+            "[chrd0 Eb5]",
+            "[chrd0 F5]",
+            "[chrd1  ]",
+            "[chrd1 Ab5]",
+            "[chrd1 Bb]",
+            "[chrd1 Bb5]",
+            "[chrd1 C5]",
+            "[chrd1 Cmin]",
+            "[chrd1 D]",
+            "[chrd1 D5]",
+            "[chrd1 Dmin]",
+            "[chrd1 E5]",
+            "[chrd1 Eb/Bb]",
+            "[chrd1 Eb/G]",
+            "[chrd1 Eb]",
+            "[chrd1 Eb5/Bb]",
+            "[chrd1 Eb5]",
+            "[chrd1 F]",
+            "[chrd1 F5]",
+            "[chrd1 G5]",
+            "[chrd2  ]",
+            "[chrd2 A#min]",
+            "[chrd2 A]",
+            "[chrd2 A5]",
+            "[chrd2 Ab5]",
+            "[chrd2 Asus4]",
+            "[chrd2 B(b5)]",
+            "[chrd2 B]",
+            "[chrd2 B5]",
+            "[chrd2 Bb]",
+            "[chrd2 Bb5]",
+            "[chrd2 Bend]",
+            "[chrd2 C#5]",
+            "[chrd2 C5/G]",
+            "[chrd2 C5]",
+            "[chrd2 Cmin]",
+            "[chrd2 D<gtr>4</gtr>]",
+            "[chrd2 D5/A]",
+            "[chrd2 D5]",
+            "[chrd2 Dmin]",
+            "[chrd2 Dsus4]",
+            "[chrd2 E/G#]",
+            "[chrd2 E]",
+            "[chrd2 E5/B]",
+            "[chrd2 E5]",
+            "[chrd2 E5add7]",
+            "[chrd2 E7]",
+            "[chrd2 E7sus4]",
+            "[chrd2 Eb/Bb]",
+            "[chrd2 Eb/G]",
+            "[chrd2 Eb]",
+            "[chrd2 Eb5/Bb]",
+            "[chrd2 Eb5]",
+            "[chrd2 Em]",
+            "[chrd2 F#5/C#]",
+            "[chrd2 F#5]",
+            "[chrd2 F#min]",
+            "[chrd2 F]",
+            "[chrd2 F5/C]",
+            "[chrd2 F5]",
+            "[chrd2 G]",
+            "[chrd2 G5]",
+            "[chrd3  ]",
+            "[chrd3 A#min]",
+            "[chrd3 A]",
+            "[chrd3 A5]",
+            "[chrd3 Ab5]",
+            "[chrd3 Asus4]",
+            "[chrd3 B]",
+            "[chrd3 B5/F#]",
+            "[chrd3 B7]",
+            "[chrd3 Bb]",
+            "[chrd3 Bb5]",
+            "[chrd3 Bend]",
+            "[chrd3 C5/G]",
+            "[chrd3 Cmaj]",
+            "[chrd3 Cmin]",
+            "[chrd3 D5/A]",
+            "[chrd3 Dmin]",
+            "[chrd3 E]",
+            "[chrd3 E5/B]",
+            "[chrd3 Eb/Bb]",
+            "[chrd3 Eb/G]",
+            "[chrd3 Eb]",
+            "[chrd3 Eb5/Bb]",
+            "[chrd3 Eb5]",
+            "[chrd3 F#5/C#]",
+            "[chrd3 F#min]",
+            "[chrd3 F5/C]",
+            "[clap_end]",
+            "[clap_start]",
+            "[coda]",
+            "[coop_all_behind]",
+            "[coop_all_far]",
+            "[coop_all_near]",
+            "[coop_b_behind]",
+            "[coop_b_near]",
+            "[coop_bg_near]",
+            "[coop_bv_near]",
+            "[coop_d_behind]",
+            "[coop_d_near]",
+            "[coop_front_near]",
+            "[coop_g_behind]",
+            "[coop_g_closeup_hand]",
+            "[coop_g_closeup_head]",
+            "[coop_g_near]",
+            "[coop_gv_behind]",
+            "[coop_gv_near]",
+            "[coop_v_behind]",
+            "[coop_v_closeup]",
+            "[coop_v_near]",
+            "[corwd_normal]",
+            "[cowbell_end]",
+            "[cowbell_start]",
+            "[crowd_clap]",
+            "[crowd_fists_off]",
+            "[crowd_fists_on]",
+            "[crowd_horns_off]",
+            "[crowd_horns_on]",
+            "[crowd_intense]",
+            "[crowd_intsense]",
+            "[crowd_lighters_off]",
+            "[crowd_lighters_on]",
+            "[crowd_mello]",
+            "[crowd_mellow]",
+            "[crowd_noclap]",
+            "[crowd_normal]",
+            "[crowd_notclap]",
+            "[crowd_realtime]",
+            "[directed_all]",
+            "[directed_all_cam]",
+            "[directed_duo_gb]",
+            "[directed_guitar]",
+            "[directed_guitar_cls]",
+            "[do_directed_cut directed_all]",
+            "[do_directed_cut directed_all_cam]",
+            "[do_directed_cut directed_all_lt]",
+            "[do_directed_cut directed_all_yeah]",
+            "[do_directed_cut directed_bass]",
+            "[do_directed_cut directed_bass]",
+            "[do_directed_cut directed_bass_cam]",
+            "[do_directed_cut directed_bass_cls]",
+            "[do_directed_cut directed_bass_np]",
+            "[do_directed_cut directed_bre]",
+            "[do_directed_cut directed_bre]",
+            "[do_directed_cut directed_brej]",
+            "[do_directed_cut directed_brej]",
+            "[do_directed_cut directed_crowd_b]",
+            "[do_directed_cut directed_crowd_g]",
+            "[do_directed_cut directed_drums]",
+            "[do_directed_cut directed_drums]",
+            "[do_directed_cut directed_drums_kd]",
+            "[do_directed_cut directed_drums_lt]",
+            "[do_directed_cut directed_drums_np]",
+            "[do_directed_cut directed_drums_pnt]",
+            "[do_directed_cut directed_duo_bass]",
+            "[do_directed_cut directed_duo_drums]",
+            "[do_directed_cut directed_duo_gb]",
+            "[do_directed_cut directed_duo_guitar]",
+            "[do_directed_cut directed_guitar]",
+            "[do_directed_cut directed_guitar_cam]",
+            "[do_directed_cut directed_guitar_cls]",
+            "[do_directed_cut directed_guitar_np]",
+            "[do_directed_cut directed_stagedive]",
+            "[do_directed_cut directed_vocals]",
+            "[do_directed_cut directed_vocals_cam]",
+            "[do_directed_cut directed_vocals_cls]",
+            "[do_directed_cut directed_vocals_np]",
+            "[do_optional_cut directed_all]",
+            "[end]",
+            "[FogOff]",
+            "[FogOn]",
+            "[FogOn]",
+            "[gtr_break]",
+            "[idle]",
+            "[idle_intense]",
+            "[idle_realtime]",
+            "[intense]",
+            "[lighting ()]",
+            "[lighting (blackout_fast)]",
+            "[lighting (blackout_slow)]",
+            "[lighting (blackout_spot)]",
+            "[lighting (bre)]",
+            "[lighting (chorus)]",
+            "[lighting (dischord)]",
+            "[lighting (flare_fast)]",
+            "[lighting (flare_slow)]",
+            "[lighting (frenzy)]",
+            "[lighting (harmony)]",
+            "[lighting (intro)]",
+            "[lighting (loop_cool)]",
+            "[lighting (loop_warm)]",
+            "[lighting (manual_cool)]",
+            "[lighting (manual_warm)]",
+            "[lighting (searchlights)]",
+            "[lighting (silhouettes)]",
+            "[lighting (silhouettes_spot)]",
+            "[lighting (stomp)]",
+            "[lighting (strobe_fast)]",
+            "[lighting (strobe_slow)]",
+            "[lighting (sweep)]",
+            "[lighting (verse)]",
+            "[lighting(silhouettes_spot)]",
+            "[map DropD2]",
+            "[map HandMap_AllBend]",
+            "[map Handmap_AllChords]",
+            "[map HandMap_C]",
+            "[map HandMap_Chord_A]",
+            "[map HandMap_Chord_C]",
+            "[map HandMap_Chord_D]",
+            "[map HandMap_Chord_Default]",
+            "[map HandMap_D]",
+            "[map handMap_Default]",
+            "[map HandMap_DropD]",
+            "[map HandMap_DropD2]",
+            "[map HandMap_NoChords]",
+            "[map HandMap_Solo]",
+            "[map StrumMap_Default]",
+            "[map StrumMap_Pick]",
+            "[map StrumMap_SlapBass]",
+            "[mellow]",
+            "[mix 0 drums0]",
+            "[mix 0 drums1]",
+            "[mix 0 drums1d]",
+            "[mix 0 drums1easy]",
+            "[mix 0 drums1easynokick]",
+            "[mix 0 drums2]",
+            "[mix 0 drums2d]",
+            "[mix 0 drums2easy]",
+            "[mix 0 drums2easynokick]",
+            "[mix 0 drums3]",
+            "[mix 0 drums3d]",
+            "[mix 0 drums3easy]",
+            "[mix 0 drums3easynokick]",
+            "[mix 0 drums4]",
+            "[mix 0 drums4easynokick]",
+            "[mix 1 drums0]",
+            "[mix 1 drums1]",
+            "[mix 1 drums1easynokick]",
+            "[mix 1 drums2]",
+            "[mix 1 drums2d]",
+            "[mix 1 drums2easynokick]",
+            "[mix 1 drums3]",
+            "[mix 1 drums3d]",
+            "[mix 1 drums3easy]",
+            "[mix 1 drums3easynokick]",
+            "[mix 1 drums4]",
+            "[mix 1 drums4easynokick]",
+            "[mix 2 drums0]",
+            "[mix 2 drums1]",
+            "[mix 2 drums2]",
+            "[mix 2 drums2d]",
+            "[mix 2 drums3]",
+            "[mix 2 drums3d]",
+            "[mix 2 drums4]",
+            "[mix 3 drums0]",
+            "[mix 3 drums0d]",
+            "[mix 3 drums1]",
+            "[mix 3 drums1d]",
+            "[mix 3 drums2]",
+            "[mix 3 drums2d]",
+            "[mix 3 drums3]",
+            "[mix 3 drums3d]",
+            "[mix 3 drums4]",
+            "[mix 3 drums4d]",
+            "[music_end]",
+            "[music_start]",
+            "[next]",
+            "[play solo]",
+            "[play]",
+            "[play_solo]",
+            "[prc_alt_chorus]",
+            "[prc_alt_chorus_a]",
+            "[prc_alt_chorus_b]",
+            "[prc_alt_verse]",
+            "[prc_alt_verse_a]",
+            "[prc_band_enters]",
+            "[prc_bass_riff]",
+            "[prc_big_riff]",
+            "[prc_big_riff_1]",
+            "[prc_bre]",
+            "[prc_breakdown]",
+            "[prc_bridge]",
+            "[prc_bridge_1]",
+            "[prc_bridge_1a]",
+            "[prc_bridge_1b]",
+            "[prc_bridge_2]",
+            "[prc_bridge_2a]",
+            "[prc_bridge_2b]",
+            "[prc_bridge_a]",
+            "[prc_bridge_b]",
+            "[prc_bridge_c]",
+            "[prc_build_up]",
+            "[prc_chorus_1]",
+            "[prc_chorus_1a]",
+            "[prc_chorus_1b]",
+            "[prc_chorus_2]",
+            "[prc_chorus_2a]",
+            "[prc_chorus_2b]",
+            "[prc_chorus_3]",
+            "[prc_chorus_3a]",
+            "[prc_chorus_3b]",
+            "[prc_chorus_3c]",
+            "[prc_chorus_3d]",
+            "[prc_chorus_4]",
+            "[prc_chorus_4a]",
+            "[prc_chorus_4b]",
+            "[prc_chorus_4c]",
+            "[prc_drum_intro]",
+            "[prc_ending]",
+            "[prc_fast_part_1]",
+            "[prc_fast_part_1a]",
+            "[prc_fast_part_1b]",
+            "[prc_fast_riff_1]",
+            "[prc_fast_riff_2]",
+            "[prc_fast_riff_2a]",
+            "[prc_fast_riff_a]",
+            "[prc_fast_riff_b]",
+            "[prc_gtr_break]",
+            "[prc_gtr_intro]",
+            "[prc_gtr_intro_a]",
+            "[prc_gtr_intro_b]",
+            "[prc_gtr_lead]",
+            "[prc_gtr_lead_a]",
+            "[prc_gtr_lead_b]",
+            "[prc_gtr_lead_c]",
+            "[prc_gtr_line_1]",
+            "[prc_gtr_line_2]",
+            "[prc_gtr_melody_1]",
+            "[prc_gtr_melody_2]",
+            "[prc_gtr_riff]",
+            "[prc_gtr_riff_1]",
+            "[prc_gtr_riff_2]",
+            "[prc_gtr_solo]",
+            "[prc_gtr_solo_1]",
+            "[prc_gtr_solo_1a]",
+            "[prc_gtr_solo_2]",
+            "[prc_gtr_solo_2a]",
+            "[prc_gtr_solo_3]",
+            "[prc_gtr_solo_3a]",
+            "[prc_gtr_solo_3b]",
+            "[prc_gtr_solo_4]",
+            "[prc_gtr_solo_a]",
+            "[prc_gtr_solo_b]",
+            "[prc_gtr_solo_c]",
+            "[prc_heavy_riff]",
+            "[prc_heavy_riff_1]",
+            "[prc_heavy_riff_2]",
+            "[prc_interlude]",
+            "[prc_intro]",
+            "[prc_intro_a]",
+            "[prc_intro_b]",
+            "[prc_intro_c]",
+            "[prc_intro_riff]",
+            "[prc_intro_verse]",
+            "[prc_main_riff]",
+            "[prc_main_riff_1]",
+            "[prc_main_riff_1a]",
+            "[prc_main_riff_1b]",
+            "[prc_main_riff_2]",
+            "[prc_main_riff_3]",
+            "[prc_main_riff_4]",
+            "[prc_melody]",
+            "[prc_odd_riff]",
+            "[prc_odd_riff_1]",
+            "[prc_odd_riff_2]",
+            "[prc_outro]",
+            "[prc_outro_a]",
+            "[prc_outro_b]",
+            "[prc_outro_solo]",
+            "[prc_postchorus_1]",
+            "[prc_postchorus_2]",
+            "[prc_postchorus_a]",
+            "[prc_postchorus_b]",
+            "[prc_postchorus_c]",
+            "[prc_prechorus_1]",
+            "[prc_prechorus_1a]",
+            "[prc_prechorus_2]",
+            "[prc_prechorus_2a]",
+            "[prc_prechorus_3]",
+            "[prc_prechorus_3a]",
+            "[prc_prechorus_a]",
+            "[prc_prechorus_b]",
+            "[prc_prechorus_c]",
+            "[prc_preverse_1]",
+            "[prc_preverse_2]",
+            "[prc_quiet_part_a]",
+            "[prc_quiet_part_b]",
+            "[prc_quiet_part_c]",
+            "[prc_slow_riff]",
+            "[prc_slow_riff_1]",
+            "[prc_slow_riff_1a]",
+            "[prc_vamp]",
+            "[prc_verse_1]",
+            "[prc_verse_1a]",
+            "[prc_verse_1b]",
+            "[prc_verse_2]",
+            "[prc_verse_2a]",
+            "[prc_verse_2b]",
+            "[prc_verse_3]",
+            "[prc_verse_3a]",
+            "[prc_verse_3b]",
+            "[prc_verse_3c]",
+            "[prc_verse_4]",
+            "[prc_verse_5a]",
+            "[prc_verse_5b]",
+            "[prc_verse_6]",
+            "[prc_verse_7]",
+            "[prc_verse_riff]",
+            "[prc_verse_riff_1]",
+            "[prc_verse_riff_2]",
+            "[prc_vocal_break]",
+            "[preview]",
+            "[ProFilm_a.pp]",
+            "[ride_side_true]",
+            "[secrion main_riff_1]",
+            "[secrion main_riff_2]",
+            "[secrion main_riff_3]",
+            "[section aco_gtr_intro]",
+            "[section band_enters]",
+            "[section bass_intro]",
+            "[section bass_solo]",
+            "[section big_riff_1]",
+            "[section big_riff_2]",
+            "[section big_rock_ending]",
+            "[section break]",
+            "[section break_1]",
+            "[section break_2]",
+            "[section break_a]",
+            "[section break_b]",
+            "[section breakdown]",
+            "[section bridge]",
+            "[section bridge_1]",
+            "[section bridge_1a]",
+            "[section bridge_1b]",
+            "[section bridge_2]",
+            "[section bridge_2a]",
+            "[section bridge_2b]",
+            "[section bridge_2c]",
+            "[section bridge_3]",
+            "[section bridge_3a]",
+            "[section bridge_3b]",
+            "[section bridge_3c]",
+            "[section bridge_a]",
+            "[section bridge_b]",
+            "[section bridge_c]",
+            "[section bridge_d]",
+            "[section buildup]",
+            "[section chorus]",
+            "[section chorus_1]",
+            "[section chorus_1a]",
+            "[section chorus_1b]",
+            "[section chorus_1c]",
+            "[section chorus_2]",
+            "[section chorus_2a]",
+            "[section chorus_2b]",
+            "[section chorus_2c]",
+            "[section chorus_3]",
+            "[section chorus_3]",
+            "[section chorus_3a]",
+            "[section chorus_3b]",
+            "[section chorus_3c]",
+            "[section chorus_4]",
+            "[section chorus_4a]",
+            "[section chorus_5]",
+            "[section chorus_6]",
+            "[section chorus_riff]",
+            "[section drum_intro]",
+            "[section drum_roll_1]",
+            "[section drum_roll_2]",
+            "[section drum_solo]",
+            "[section drums_enter]",
+            "[section end]",
+            "[section ending]",
+            "[section fast_part]",
+            "[section fast_picking]",
+            "[section gtr_break]",
+            "[section gtr_break_1]",
+            "[section gtr_break_2]",
+            "[section gtr_break_3]",
+            "[section gtr_enters]",
+            "[section gtr_hook]",
+            "[section gtr_hook_1]",
+            "[section gtr_hook_2]",
+            "[section gtr_hook_3]",
+            "[section gtr_intro]",
+            "[section gtr_intro_a]",
+            "[section gtr_intro_b]",
+            "[section gtr_intro_c]",
+            "[section gtr_intro_d]",
+            "[section gtr_intro_e]",
+            "[section gtr_lead]",
+            "[section gtr_lead_1]",
+            "[section gtr_lead_2]",
+            "[section gtr_lead_3]",
+            "[section gtr_lick]",
+            "[section gtr_lick_1]",
+            "[section gtr_lick_2]",
+            "[section gtr_lick_3]",
+            "[section gtr_lick_4]",
+            "[section gtr_line]",
+            "[section gtr_line_1]",
+            "[section gtr_line_2]",
+            "[section gtr_line_3]",
+            "[section gtr_mel_1]",
+            "[section gtr_mel_2]",
+            "[section gtr_melody]",
+            "[section gtr_riff]",
+            "[section gtr_riff_1]",
+            "[section gtr_riff_1a]",
+            "[section gtr_riff_1b]",
+            "[section gtr_riff_2]",
+            "[section gtr_riff_2a]",
+            "[section gtr_riff_2b]",
+            "[section gtr_riff_3]",
+            "[section gtr_solo]",
+            "[section gtr_solo_1]",
+            "[section gtr_solo_1a]",
+            "[section gtr_solo_1b]",
+            "[section gtr_solo_1c]",
+            "[section gtr_solo_1d]",
+            "[section gtr_solo_1e]",
+            "[section gtr_solo_1f]",
+            "[section gtr_solo_1g]",
+            "[section gtr_solo_1h]",
+            "[section gtr_solo_2]",
+            "[section gtr_solo_2a]",
+            "[section gtr_solo_2b]",
+            "[section gtr_solo_2c]",
+            "[section gtr_solo_2d]",
+            "[section gtr_solo_2e]",
+            "[section gtr_solo_2f]",
+            "[section gtr_solo_3]",
+            "[section gtr_solo_3a]",
+            "[section gtr_solo_3b]",
+            "[section gtr_solo_3c]",
+            "[section gtr_solo_3d]",
+            "[section gtr_solo_3e]",
+            "[section gtr_solo_4]",
+            "[section gtr_solo_4a]",
+            "[section gtr_solo_4b]",
+            "[section gtr_solo_4c]",
+            "[section gtr_solo_4d]",
+            "[section gtr_solo_5]",
+            "[section gtr_solo_6]",
+            "[section gtr_solo_7]",
+            "[section gtr_solo_8]",
+            "[section gtr_solo_a]",
+            "[section gtr_solo_b]",
+            "[section gtr_solo_c]",
+            "[section gtr_solo_d]",
+            "[section gtr_solo_e]",
+            "[section gtr_solo_f]",
+            "[section harmonica_solo]",
+            "[section hook_1]",
+            "[section hook_2]",
+            "[section hook_3]",
+            "[section hvy_part]",
+            "[section intro]",
+            "[section intro_a]",
+            "[section intro_b]",
+            "[section intro_c]",
+            "[section intro_d]",
+            "[section intro_fast]",
+            "[section intro_heavy]",
+            "[section intro_riff]",
+            "[section intro_riff_a]",
+            "[section intro_riff_b]",
+            "[section intro_verse]",
+            "[section jam]",
+            "[section keyboard_solo]",
+            "[section kick_it]",
+            "[section loud_part]",
+            "[section main_riff]",
+            "[section main_riff_1]",
+            "[section main_riff_2]",
+            "[section main_riff_3]",
+            "[section main_riff_4]",
+            "[section main_riff_5]",
+            "[section main_riff_6]",
+            "[section melody_1]",
+            "[section melody_2]",
+            "[section noise_build]",
+            "[section noise_intro]",
+            "[section odd_riff_1]",
+            "[section odd_riff_2]",
+            "[section odd_riff_3]",
+            "[section organ_break]",
+            "[section organ_intro]",
+            "[section organ_solo]",
+            "[section organ_solo_a]",
+            "[section organ_solo_b]",
+            "[section outro]",
+            "[section outro_a]",
+            "[section outro_b]",
+            "[section outro_c]",
+            "[section outro_d]",
+            "[section outro_solo]",
+            "[section outro_solo_a]",
+            "[section piano_intro]",
+            "[section postchorus_1]",
+            "[section postchorus_2]",
+            "[section postchorus_3]",
+            "[section postverse]",
+            "[section postverse_1]",
+            "[section postverse_2]",
+            "[section postverse_3]",
+            "[section prechorus_1]",
+            "[section prechorus_2]",
+            "[section prechorus_3]",
+            "[section prechorus_4]",
+            "[section preverse_1]",
+            "[section preverse_2]",
+            "[section preverse_3]",
+            "[section preverse_4]",
+            "[section quiet_intro]",
+            "[section quiet_part]",
+            "[section quiet_part_1]",
+            "[section quiet_part_2]",
+            "[section quiet_verse]",
+            "[section sax_solo]",
+            "[section slow_part]",
+            "[section slow_part_a]",
+            "[section slow_part_b]",
+            "[section space_jam]",
+            "[section spacey]",
+            "[section speedup]",
+            "[section speedup_a]",
+            "[section speedup_b]",
+            "[section swing_riff_1]",
+            "[section swing_riff_2]",
+            "[section swing_riff_3]",
+            "[section swing_riff_4]",
+            "[section synth_break]",
+            "[section synth_solo]",
+            "[section trippy_part]",
+            "[section ugc_section_10_0]",
+            "[section ugc_section_10_10]",
+            "[section ugc_section_10_20]",
+            "[section ugc_section_10_30]",
+            "[section ugc_section_10_40]",
+            "[section ugc_section_10_50]",
+            "[section ugc_section_10_60]",
+            "[section ugc_section_10_70]",
+            "[section ugc_section_10_80]",
+            "[section ugc_section_10_90]",
+            "[section ugc_section_5_0]",
+            "[section ugc_section_5_10]",
+            "[section ugc_section_5_15]",
+            "[section ugc_section_5_20]",
+            "[section ugc_section_5_25]",
+            "[section ugc_section_5_30]",
+            "[section ugc_section_5_35]",
+            "[section ugc_section_5_40]",
+            "[section ugc_section_5_45]",
+            "[section ugc_section_5_5]",
+            "[section ugc_section_5_50]",
+            "[section ugc_section_5_55]",
+            "[section ugc_section_5_60]",
+            "[section ugc_section_5_65]",
+            "[section ugc_section_5_70]",
+            "[section ugc_section_5_75]",
+            "[section ugc_section_5_80]",
+            "[section ugc_section_5_85]",
+            "[section ugc_section_5_90]",
+            "[section ugc_section_5_95]",
+            "[section verse_1]",
+            "[section verse_1a]",
+            "[section verse_1b]",
+            "[section verse_1c]",
+            "[section verse_2]",
+            "[section verse_2a]",
+            "[section verse_2b]",
+            "[section verse_2c]",
+            "[section verse_3]",
+            "[section verse_3a]",
+            "[section verse_3b]",
+            "[section verse_4]",
+            "[section verse_4a]",
+            "[section verse_4b]",
+            "[section verse_5]",
+            "[section verse_5a]",
+            "[section verse_6]",
+            "[section verse_6a]",
+            "[section verse_6b]",
+            "[section verse_7]",
+            "[section verse_8]",
+            "[section verse_riff]",
+            "[section verse_riff_1]",
+            "[section verse_riff_2]",
+            "[section verse_riff_3]",
+            "[section vocal_break]",
+            "[section vocal_break_1]",
+            "[section vocal_break_2]",
+            "[section vocal_intro]",
+            "[short_version]",
+            "[tambourine_end]",
+            "[tambourine_start]",
+            "[verse]"});
+            this.textBoxEventText.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.textBoxEventText.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.textBoxEventText.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxEventText.Location = new System.Drawing.Point(9, 243);
             this.textBoxEventText.Name = "textBoxEventText";
@@ -6964,7 +7715,7 @@
             this.textBoxPackageDTAText.Name = "textBoxPackageDTAText";
             this.textBoxPackageDTAText.ReadOnly = true;
             this.textBoxPackageDTAText.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBoxPackageDTAText.Size = new System.Drawing.Size(614, 349);
+            this.textBoxPackageDTAText.Size = new System.Drawing.Size(614, 351);
             this.textBoxPackageDTAText.TabIndex = 5;
             this.textBoxPackageDTAText.WordWrap = false;
             // 
@@ -9095,7 +9846,6 @@
             this.groupBox41.PerformLayout();
             this.tabNoteEditor.ResumeLayout(false);
             this.groupBox44.ResumeLayout(false);
-            this.groupBox44.PerformLayout();
             this.groupBox42.ResumeLayout(false);
             this.groupBox40.ResumeLayout(false);
             this.groupBox37.ResumeLayout(false);
@@ -9857,6 +10607,10 @@
         private System.Windows.Forms.Button buttonSongUtilFindInFileDistinctText;
         private System.Windows.Forms.CheckBox checkBoxSongUtilFindInFileMatchWholeWord;
         private System.Windows.Forms.Button buttonSongToolSnapNotes;
+        private System.Windows.Forms.Label label60;
+        private System.Windows.Forms.Button buttonSongUtilFindFolder;
+        private System.Windows.Forms.TextBox textBoxSongUtilFindFolder;
+        private System.Windows.Forms.CheckBox checkBoxSongUtilFindInProOnly;
 
 
     }

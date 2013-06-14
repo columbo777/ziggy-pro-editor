@@ -82,8 +82,7 @@ namespace Sanford.Multimedia.Midi
                 ChannelMessage.MidiChannelMaxValue)
             {
                 cmBuilder.Message = message;
-                cmBuilder.Build();
-
+                
                 OnChannelMessageReceived(new ChannelMessageEventArgs(cmBuilder.Result));
             }
             else if (status == (int)SysCommonType.MidiTimeCode ||

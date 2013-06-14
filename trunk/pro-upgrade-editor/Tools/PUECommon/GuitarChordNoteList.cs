@@ -121,7 +121,7 @@ namespace ProUpgradeEditor.Common
                 if (noteString < 0 || noteString > 5)
                     return null;
 
-                return notes.SingleOrDefault(x => x.NoteString == noteString);
+                return notes.FirstOrDefault(x => x.NoteString == noteString);
             }
         }
 

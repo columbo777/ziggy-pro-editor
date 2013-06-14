@@ -9,7 +9,7 @@ using Sanford.Multimedia.Midi;
 
 namespace ProUpgradeEditor.Common
 {
-    
+
 
 
     public static class Utility
@@ -139,6 +139,8 @@ namespace ProUpgradeEditor.Common
 
         public static GuitarDifficulty[] EasyMediumHardExpert = { GuitarDifficulty.Easy, GuitarDifficulty.Medium, GuitarDifficulty.Hard, GuitarDifficulty.Expert };
 
+        public static bool ClearChordNames = true;
+
         public static bool HandPositionGenerationEnabled = true;
         public static bool HandPositionMarkerByDifficulty = false;
         public static int HandPositionMarkerFirstBeginOffset = 20;
@@ -202,7 +204,7 @@ namespace ProUpgradeEditor.Common
         public static string StoredChordStrumHigh = "[SH]";
 
         public static int DummyTempo = 405405;
-        
+
 
         public static StringFormat GetStringFormatNoWrap()
         {
@@ -274,7 +276,7 @@ namespace ProUpgradeEditor.Common
 
         public static int GetHammeronData1(GuitarDifficulty diff)
         {
-            
+
             if (diff.IsExpertAll())
             {
                 return ExpertHammeronData1;
@@ -355,7 +357,7 @@ namespace ProUpgradeEditor.Common
         public static SolidBrush noteBGBrush = new SolidBrush(Color.FromArgb(252, 183, 180));
         public static SolidBrush noteTapBrush = new SolidBrush(Color.FromArgb(242, 223, 220));
         public static SolidBrush noteXBrush = new SolidBrush(Color.FromArgb(152, 152, 247));
-        public static SolidBrush noteArpeggioBrush = new SolidBrush(Color.FromArgb(defaultAlpha, 159, 253, 222));
+        public static SolidBrush noteArpeggioBrush = new SolidBrush(Color.FromArgb(200, 159, 253, 222));
         public static SolidBrush notePowerupBrush = new SolidBrush(Color.FromArgb(defaultAlpha, 242, 253, 200));
         public static SolidBrush noteSoloBrush = new SolidBrush(Color.FromArgb(defaultAlpha, 202, 203, 250));
         public static SolidBrush noteBREBrush = new SolidBrush(Color.FromArgb(defaultAlpha, 152, 203, 250));
@@ -391,11 +393,11 @@ namespace ProUpgradeEditor.Common
             ret.Add(GuitarDifficulty.Medium);
             ret.Add(GuitarDifficulty.Hard);
             ret.Add(GuitarDifficulty.Expert);
-            if(sortExpertToEasy)
+            if (sortExpertToEasy)
                 ret.Reverse();
             return ret.ToList();
         }
-            
+
         public static GuitarDifficulty GetDifficulty(int data1, bool isPro)
         {
             if (isPro)
@@ -501,7 +503,7 @@ namespace ProUpgradeEditor.Common
                 {
                     ret.Add(x);
                 }
-                else if(d.IsExpert() && diff.IsExpert())
+                else if (d.IsExpert() && diff.IsExpert())
                 {
                     ret.Add(x);
                 }
@@ -955,5 +957,5 @@ namespace ProUpgradeEditor.Common
         public static bool ModifyWebTabScale = false;
     }
 
-    
+
 }

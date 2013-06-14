@@ -11,8 +11,6 @@ namespace ProUpgradeEditor.Common
 {
     public class GuitarTextEventList : SpecializedMessageList<GuitarTextEvent>
     {
-
-
         public GuitarTextEventList(TrackEditor owner) : base(owner) { }
         public override GuitarMessageType MessageType
         {

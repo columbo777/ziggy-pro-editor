@@ -274,6 +274,7 @@
     <Content Include="Resources\clear-left.png" />
     <Content Include="Resources\clipboard-sign-out.png" />
     <Content Include="Resources\copy.png" />
+    <Content Include="textEvents.txt" />
     <None Include="Resources\cross.png" />
     <Content Include="Resources\disk.png" />
     <Content Include="Resources\document-music-playlist.png" />

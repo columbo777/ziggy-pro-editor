@@ -13,6 +13,7 @@ namespace Sanford.Multimedia.Midi
             {
                 yield return ev;
             }
+            endOfTrackMidiEvent.SetAbsoluteTicks(Length);
 
             yield return endOfTrackMidiEvent;
         }
@@ -23,7 +24,7 @@ namespace Sanford.Multimedia.Midi
 
         public IEnumerable<int> DispatcherIterator(MessageDispatcher dispatcher)
         {
-            IEnumerator<MidiEvent> enumerator = Iterator().GetEnumerator();
+            var enumerator = Iterator().GetEnumerator();
 
             while (enumerator.MoveNext())
             {
@@ -36,9 +37,7 @@ namespace Sanford.Multimedia.Midi
         public IEnumerable<int> TickIterator(int startPosition,
             ChannelChaser chaser, MessageDispatcher dispatcher)
         {
-
-
-            IEnumerator<MidiEvent> enumerator = Iterator().GetEnumerator();
+            var enumerator = Iterator().GetEnumerator();
 
             bool notFinished = enumerator.MoveNext();
             

@@ -176,9 +176,6 @@ namespace Sanford.Multimedia.Midi
         public void Continue()
         {
 
-
-
-
             lock (lockObject)
             {
                 Stop();

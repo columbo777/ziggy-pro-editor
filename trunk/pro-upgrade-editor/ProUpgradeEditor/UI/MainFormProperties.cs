@@ -462,6 +462,11 @@ namespace ProUpgradeEditor.UI
         {
             switch (p.Description)
             {
+                case "Clear Chord Names":
+                    {
+                        Utility.ClearChordNames = (bool)p.Data;
+                    }
+                    break;
                 case "108 Generation Enabled": { Utility.HandPositionGenerationEnabled = (bool)p.Data; }
                     break;
                 case "108 Marker Start Offset": { Utility.HandPositionMarkerStartOffset = (int)p.Data; }
@@ -709,8 +714,6 @@ namespace ProUpgradeEditor.UI
                 settings = new SettingMgr();
             }
             settings.LoadSettings();
-
-
 
             checkBoxAutoSelectNext.Checked = settings.GetValueBool("checkBoxAutoSelectNext", true);
             checkBatchOpenWhenCompleted.Checked = settings.GetValueBool("checkBatchOpenWhenCompleted", true);

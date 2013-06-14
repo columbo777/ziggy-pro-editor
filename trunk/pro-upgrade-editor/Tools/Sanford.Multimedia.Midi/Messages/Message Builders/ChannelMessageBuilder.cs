@@ -42,30 +42,10 @@ namespace Sanford.Multimedia.Midi
     /// </summary>
     public class ChannelMessageBuilder : IMessageBuilder
     {
-        #region ChannelMessageBuilder Members
-
-        #region Class Fields
-
-        // Stores the ChannelMessages.
-        private static Hashtable messageCache = Hashtable.Synchronized(new Hashtable());
-
-        #endregion
-
-        #region Fields
-
+        
         // The channel message as a packed integer.
         private int message = 0;
 
-        // The built ChannelMessage
-        private ChannelMessage result = null;
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Initializes a new instance of the ChannelMessageBuilder class.
-        /// </summary>
         public ChannelMessageBuilder()
         {
             Command = ChannelCommand.Controller;
@@ -74,33 +54,11 @@ namespace Sanford.Multimedia.Midi
             Data2 = 0;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the ChannelMessageBuilder class with
-        /// the specified ChannelMessageEventArgs.
-        /// </summary>
-        /// <param name="message">
-        /// The ChannelMessageEventArgs to use for initializing the ChannelMessageBuilder.
-        /// </param>
-        /// <remarks>
-        /// The ChannelMessageBuilder uses the specified ChannelMessageEventArgs to 
-        /// initialize its property values.
-        /// </remarks>
         public ChannelMessageBuilder(ChannelMessage message)
         {
             Initialize(message);
         }
 
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// Initializes the ChannelMessageBuilder with the specified 
-        /// ChannelMessageEventArgs.
-        /// </summary>
-        /// <param name="message">
-        /// The ChannelMessageEventArgs to use for initializing the ChannelMessageBuilder.
-        /// </param>
         public ChannelMessageBuilder Initialize(ChannelMessage message)
         {
             this.message = message.Message;
@@ -111,43 +69,15 @@ namespace Sanford.Multimedia.Midi
             this.message = ev.MessageData;
             return this;
         }
-        /// <summary>
-        /// Clears the ChannelMessageEventArgs cache.
-        /// </summary>
-        public static void Clear()
-        {
-            messageCache.Clear();
-        }
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets the number of messages in the ChannelMessageEventArgs cache.
-        /// </summary>
-        public static int Count
-        {
-            get
-            {
-                return messageCache.Count;
-            }
-        }
-
-        /// <summary>
-        /// Gets the built ChannelMessageEventArgs.
-        /// </summary>
+        
         public ChannelMessage Result
         {
             get
             {
-                return result;
+                return new ChannelMessage(message);
             }
         }
 
-        /// <summary>
-        /// Gets or sets the ChannelMessageEventArgs as a packed integer. 
-        /// </summary>
         internal int Message
         {
             get
@@ -160,10 +90,6 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
-        /// <summary>
-        /// Gets or sets the Command value to use for building the 
-        /// ChannelMessageEventArgs.
-        /// </summary>
         public ChannelCommand Command
         {
             get
@@ -176,13 +102,6 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
-        /// <summary>
-        /// Gets or sets the MIDI channel to use for building the 
-        /// ChannelMessageEventArgs.
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// MidiChannel is set to a value less than zero or greater than 15.
-        /// </exception>
         public int MidiChannel
         {
             get
@@ -195,13 +114,6 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
-        /// <summary>
-        /// Gets or sets the first data value to use for building the 
-        /// ChannelMessageEventArgs.
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// Data1 is set to a value less than zero or greater than 127.
-        /// </exception>
         public int Data1
         {
             get
@@ -214,13 +126,6 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
-        /// <summary>
-        /// Gets or sets the second data value to use for building the 
-        /// ChannelMessageEventArgs.
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// Data2 is set to a value less than zero or greater than 127.
-        /// </exception>
         public int Data2
         {
             get
@@ -233,32 +138,5 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
-        #endregion
-
-        #endregion
-
-        #region IMessageBuilder Members
-
-        /// <summary>
-        /// Builds a ChannelMessageEventArgs.
-        /// </summary>
-        public void Build()
-        {
-            result = (ChannelMessage)messageCache[message];
-
-            // If the message does not exist.
-            if (result == null)
-            {
-                result = new ChannelMessage(message);
-
-                // Add message to cache.
-                messageCache.Add(message, result);
-            }
-
-            
-        }
-
-
-        #endregion
     }
 }

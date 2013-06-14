@@ -24,11 +24,33 @@ using ZipLib.SharpZipLib.Zip;
 
 namespace ProUpgradeEditor.UI
 {
+    public class SongUtilSearchResultItem
+    {
+        public MidiEvent Event { get; internal set; }
+        public string TrackName { get; internal set; }
+
+        public SongUtilSearchResultItem(string trackName, MidiEvent ev)
+        {
+            this.Event = ev;
+            this.TrackName = TrackName;
+        }
+
+        public override string ToString()
+        {
+            return Event.ToString();
+        }
+    }
+
     public class SongUtilSearchResult
     {
-        public string MidiPath;
-        public List<MidiEvent> Matches;
+        public string MidiPath { get; internal set; }
+        public List<SongUtilSearchResultItem> Matches { get; internal set; }
 
-        public SongUtilSearchResult(string path) { MidiPath = path; Matches = new List<MidiEvent>(); }
+        public SongUtilSearchResult(string path) 
+        { 
+            MidiPath = path;
+            Matches = new List<SongUtilSearchResultItem>(); 
+        }
+
     }
 }

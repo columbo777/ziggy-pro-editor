@@ -28,6 +28,8 @@ namespace NAudio.Gui
         /// </summary>
         public PanSlider()
         {
+            pan = 0.0f;
+
             // This call is required by the Windows.Forms Form Designer.
             InitializeComponent();
 
@@ -54,11 +56,13 @@ namespace NAudio.Gui
         /// </summary>
         private void InitializeComponent()
         {
+            this.SuspendLayout();
             // 
             // PanSlider
             // 
             this.Name = "PanSlider";
             this.Size = new System.Drawing.Size(104, 16);
+            this.ResumeLayout(false);
 
         }
         #endregion
@@ -92,7 +96,7 @@ namespace NAudio.Gui
             pe.Graphics.DrawString(panValue, this.Font,
                 Brushes.Black, this.ClientRectangle, format);
             // Calling the base class OnPaint
-            //base.OnPaint(pe);
+            base.OnPaint(pe);
         }
 
         /// <summary>

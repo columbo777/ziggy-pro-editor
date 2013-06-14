@@ -464,17 +464,18 @@ namespace ProUpgradeEditor.Common
             }
             ClearBackups();
 
-            if (OnClose != null)
-            {
-                OnClose(this);
-            }
-
             if (WaveViewer != null)
             {
                 WaveViewer.UnloadMemory();
                 WaveViewer.Dispose();
                 WaveViewer = null;
             }
+
+            if (OnClose != null)
+            {
+                OnClose(this);
+            }
+
         }
 
         public bool CreatedBackup = false;
@@ -1311,7 +1312,7 @@ namespace ProUpgradeEditor.Common
 
                 var p = point.ScreenPoint;
 
-                var endPoint = (next == null ? GetScreenPointFromTick(guitarTrack.GetTrack().Events.Last().AbsoluteTicks) : next.ScreenPoint);
+                var endPoint = (next == null ? GetScreenPointFromTick(guitarTrack.TotalSongTicks) : next.ScreenPoint);
                 var len = (endPoint - p).ToDouble();
 
                 if (len >= 3)
@@ -4101,6 +4102,7 @@ namespace ProUpgradeEditor.Common
                     {
                         noteTxt = Utility.ArpeggioHelperPrefix + noteTxt + Utility.ArpeggioHelperSuffix;
                         sb = Utility.noteArpeggioBrush;
+
                     }
 
                     if (chord.IsXNote)
@@ -4208,14 +4210,14 @@ namespace ProUpgradeEditor.Common
                                     if (chord.IsXNote && Utility.XNoteText.Trim().IsNotEmpty())
                                     {
                                         noteTxt = Utility.XNoteText.Trim();
-                                        noteX += Utility.XNoteTextXOffset;
-                                        noteY += Utility.XNoteTextYOffset;
                                     }
-                                    else
+                                    if (note.IsArpeggioNote)
                                     {
-                                        noteX += Utility.NoteTextXOffset;
-                                        noteY += Utility.NoteTextYOffset;
+                                        noteY--;
                                     }
+                                    noteX += Utility.NoteTextXOffset;
+                                    noteY += Utility.NoteTextYOffset;
+                                    
                                     g.DrawString(noteTxt,
                                         font,
                                         Utility.fretBrush,
@@ -4227,7 +4229,7 @@ namespace ProUpgradeEditor.Common
                     }
                     if (chord.Selected)
                     {
-                        using (var brush = new System.Drawing.SolidBrush(Color.FromArgb(200, Utility.noteBGBrushSel.Color)))
+                        using (var brush = new SolidBrush(Color.FromArgb(200, Utility.noteBGBrushSel.Color)))
                         {
                             g.FillRectangle(Utility.noteBGBrushSel, noteRect);
                         }

@@ -41,8 +41,10 @@ namespace ProUpgradeEditor.Common
         public override void AddToList()
         {
             IsDeleted = false;
-
+            
             IsNew = false;
+
+            Owner.Add(this);
         }
 
         public override void RemoveFromList()

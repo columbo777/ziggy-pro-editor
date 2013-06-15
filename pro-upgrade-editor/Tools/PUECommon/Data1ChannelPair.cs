@@ -29,6 +29,11 @@ namespace ProUpgradeEditor.Common
             this.Channel = channel;
         }
 
+        public override string ToString()
+        {
+            return "Data1: " + Data1.ToStringEx() + " Channel: " + Channel.ToStringEx();
+        }
+
         public int CompareTo(Data1ChannelPair other)
         {
             if (Data1 < other.Data1)

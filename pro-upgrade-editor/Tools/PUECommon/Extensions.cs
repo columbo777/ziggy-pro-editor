@@ -68,6 +68,34 @@ namespace ProUpgradeEditor.Common
             return o != null ? func(o) : elseFunc != null ? elseFunc(o) : null;
         }
 
+        public static void IfNotNull<T>(this T o, Action<T> func, Action elseFunc = null)
+        {
+            if (o != null)
+            {
+                func(o);
+            }
+            else
+            {
+                if (elseFunc != null)
+                {
+                    elseFunc();
+                }
+            }
+        }
+        public static void IfIsNull<T>(this T o, Action func, Action<T> elseFunc = null) where T : class
+        {
+            if (o == null)
+            {
+                func();
+            }
+            else
+            {
+                if (elseFunc != null)
+                {
+                    elseFunc(o);
+                }
+            }
+        }
         public static T TryGetValue<T>(Func<T> func) where T : class
         {
             T ret = null;
@@ -669,22 +697,22 @@ namespace ProUpgradeEditor.Common
         public static bool IsEmpty(this string str) { return string.IsNullOrEmpty(str); }
         public static bool IsNotEmpty(this string str) { return !str.IsEmpty(); }
 
-        public static void IfNotNull(this double d, Action<double> func, Action<double> Else = null)
+        public static void IfNotNull(this double d, Action<double> func, Action Else = null)
         {
             if (!d.IsNull())
             {
                 func(d);
             }
-            else { if (Else != null) { Else(d); } }
+            else { if (Else != null) { Else(); } }
         }
 
-        public static void IfNotNull(this DateTime d, Action<DateTime> func, Action<DateTime> Else = null)
+        public static void IfNotNull(this DateTime d, Action<DateTime> func, Action Else = null)
         {
             if (!d.IsNull())
             {
                 func(d);
             }
-            else { if (Else != null) { Else(d); } }
+            else { if (Else != null) { Else(); } }
         }
 
         public static bool EqualsEx(this string str, string str2, bool ignoreCase = true)
@@ -840,13 +868,13 @@ namespace ProUpgradeEditor.Common
                 return dt;
             }
         }
-        public static void IfNotNull(this int d, Action<int> func, Action<int> Else = null)
+        public static void IfNotNull(this int d, Action<int> func, Action Else = null)
         {
             if (!d.IsNull())
             {
                 func(d);
             }
-            else { if (Else != null) { Else(d); } }
+            else { if (Else != null) { Else(); } }
         }
 
         public static int GetIfNull(this int i, int value, int nullValue = int.MinValue)
@@ -1659,6 +1687,20 @@ namespace ProUpgradeEditor.Common
         {
             return (list == null || !list.Any()) ? TickPair.NullValue : (new TickPair(list.GetMinTick(), list.GetMaxTick()));
         }
+        public static TickPair GetTickPairSmallest<T>(this IEnumerable<T> list) where T : GuitarMessage
+        {
+            if(list == null || !list.Any())
+            {
+                return TickPair.NullValue ;
+            }
+            else
+            {
+                var downTicks = list.Select(x => x.DownTick).Where(x=> x.IsNull()==false);
+                var upTicks = list.Select(x => x.UpTick).Where(x=> x.IsNull()==false);
+
+                return new TickPair(downTicks.Any() ? downTicks.Max() : Int32.MinValue, upTicks.Any() ? upTicks.Min() : Int32.MinValue);
+            }
+        }
         public static TimePair GetTimePair<T>(this IEnumerable<T> list) where T : GuitarMessage
         {
             return (list == null || !list.Any()) ? TimePair.NullValue : (new TimePair(list.Min(x => x.StartTime), list.Max(x => x.EndTime)));
@@ -1769,9 +1811,13 @@ namespace ProUpgradeEditor.Common
         }
 
         public static IEnumerable<IGrouping<Data1ChannelPair, MidiEvent>> GroupByData1Channel(
-            this IEnumerable<MidiEvent> list, IEnumerable<int> data1)
+            this IEnumerable<MidiEvent> list,  IEnumerable<int> data1)
         {
-            return list.Where(d => data1.Contains(d.Data1)).ToList().GroupBy(x => x.GetData1ChannelPair());
+            if(data1 != null)
+            {
+                list = list.Where(d => data1.Contains(d.Data1));
+            }
+            return list.ToList().GroupBy(x => x.GetData1ChannelPair()).ToList();
         }
 
 
@@ -1785,28 +1831,141 @@ namespace ProUpgradeEditor.Common
         }
         public static IEnumerable<IEnumerable<T>> GroupByCloseTick<T>(this IEnumerable<T> list) where T : GuitarMessage
         {
-            return list.GroupBy(x => x.DownTick, x => x, new TickCloseComparer(Utility.TickCloseWidth)).ToList();
+            return list.GroupBy(x => x.AbsoluteTicks, x => x, new TickCloseComparer(Utility.TickCloseWidth)).ToList();
         }
 
-
-        public static IEnumerable<MidiEventPair> GetEventPairs(this IEnumerable<IGrouping<Data1ChannelPair, MidiEvent>> dic,
-            GuitarMessageList owner, IEnumerable<int> data1)
+        public static IEnumerable<MidiEventPair> GetEventPairs(this IEnumerable<Data1ChannelEventList> list, IEnumerable<int> data1)
         {
-            var ret = new List<MidiEventPair>();
-            try
+            var ret = list.Where(x => data1.Contains(x.Data1)).SelectMany(x=> x.Events.ToList()).ToList();
+            ret.Sort(new Data1ChannelEventInterlacingSorter());
+            return ret;
+        }
+
+        public static IEnumerable<Data1ChannelEventList> GetCleanMessageList(this Track track, IEnumerable<int> data1List=null, GuitarMessageList owner=null)
+        {
+            var ret = new List<Data1ChannelEventList>();
+
+            var data1ChannelGroup = track.ChanMessages.GroupByData1Channel(data1List).ToList();
+            
+
+            foreach (var data1chan in data1ChannelGroup)
             {
-                foreach (var d1 in data1)
+                MidiEvent downEvent = null;
+
+                var list = new Data1ChannelEventList(data1chan.Key);
+                ret.Add(list);
+                var expectingOn = true;
+
+                var matching = data1chan.GroupByMatchingTicks().ToList();
+                foreach (var item in matching)
                 {
-                    foreach (var k in dic.Where(k => d1 == k.Key.Data1).ToList())
+
+                    var offItem = item.Where(x => x.IsOff);
+                    var onItem = item.Where(x => x.IsOn);
+                    while (offItem.Count() > 1)
                     {
-                        ret.AddRange(k.GetEventPairsFromData1List(owner));
+                        track.Remove(offItem.First());
+                        offItem = offItem.Skip(1);
                     }
+                    while (onItem.Count() > 1)
+                    {
+                        track.Remove(onItem.First());
+                        onItem = onItem.Skip(1);
+                    }
+
+                    if (expectingOn == false)
+                    {
+                        if (offItem.Any())
+                        {
+                            if (downEvent != null)
+                            {
+                                list.Events.Add(new MidiEventPair(owner, downEvent, offItem.Single()));
+                                downEvent = null;
+                                expectingOn = !expectingOn;
+
+                                if (onItem.Any())
+                                {
+                                    downEvent = onItem.Single();
+                                    expectingOn = !expectingOn;
+                                }
+                            }
+                            else
+                            {
+                                "down event is null".OutputDebug();
+                                track.Remove(offItem);
+                                track.Remove(onItem);
+                            }
+                        }
+                        else
+                        {
+                            if (onItem.Any())
+                            {
+                                "not expecting on".OutputDebug();
+                                if (downEvent != null)
+                                {
+                                    track.Remove(downEvent);
+                                    downEvent = onItem.Single();
+                                }
+                            }
+                        }
+                    }
+                    else //expecting on == true
+                    {
+                        if (onItem.Any())
+                        {
+                            if (downEvent != null)
+                            {
+                                "down event not null".OutputDebug();
+                                track.Remove(offItem);
+                                track.Remove(onItem);
+                            }
+                            else
+                            {
+                                downEvent = onItem.Single();
+                                expectingOn = !expectingOn;
+
+                                if (offItem.Any())
+                                {
+                                    "off too soon".OutputDebug();
+
+                                    var next = matching.ElementAtOrDefault(matching.IndexOf(item) + 1);
+                                    if (next != null)
+                                    {
+                                        if (next.Any(x => x.IsOff))
+                                        {
+                                            track.Remove(offItem);
+                                        }
+                                        else
+                                        {
+                                            track.Remove(onItem);
+                                            track.Remove(offItem);
+                                            downEvent = null;
+                                            expectingOn = !expectingOn;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        track.Remove(offItem);
+                                    }
+
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (offItem.Any())
+                            {
+                                "expecting on item".OutputDebug();
+                                track.Remove(offItem);
+                            }
+                        }
+
+                    }
+
                 }
 
-                ret.Sort(new MidiEventPairInterlacingSorter());
             }
-            catch { }
-            return ret.ToList();
+            return ret;
         }
 
         public static IEnumerable<IGrouping<int, MidiEvent>> GroupByMatchingTicks(this IEnumerable<MidiEvent> items)
@@ -1814,43 +1973,6 @@ namespace ProUpgradeEditor.Common
             return items.GroupBy(x => x.AbsoluteTicks);
         }
 
-        public static IEnumerable<MidiEventPair> GetEventPairsFromData1List(this IEnumerable<MidiEvent> items, GuitarMessageList owner)
-        {
-            var ret = new List<MidiEventPair>();
-            try
-            {
-
-                var tickGroups = items.GroupByMatchingTicks().ToList();
-
-
-                if (!items.Any())
-                    return ret;
-
-
-                var events = tickGroups.SelectMany(x => x).ToList();
-                foreach (var chanGroup in events.GroupBy(x => x.Channel))
-                {
-                    var ev = chanGroup.ToList();
-                    for (int x = 0; x < ev.Count - 1; x += 2)
-                    {
-                        var pair = new MidiEventPair(owner, ev[x], ev[x + 1]);
-
-                        if (pair.IsValid &&
-                            pair.Down.Command == ChannelCommand.NoteOn && (
-                            pair.Up.Command == ChannelCommand.NoteOff))
-                        {
-                            ret.Add(pair);
-                        }
-                        else
-                        {
-                            Debug.WriteLine("invalid tick pair");
-                        }
-                    }
-                }
-            }
-            catch { }
-            return ret;
-        }
 
         private static void swap<T>(T[] array, int i1, int i2)
         {
@@ -2179,6 +2301,14 @@ namespace ProUpgradeEditor.Common
         public static bool IsNotNull(this int d)
         {
             return d != Int32.MinValue;
+        }
+        public static bool IsNull(this object o)
+        {
+            return o == null;
+        }
+        public static bool IsNotNull(this object o)
+        {
+            return o != null;
         }
         public static string ToStringEx(this int d, string nullValue = "")
         {

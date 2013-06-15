@@ -1,4 +1,5 @@
-﻿namespace ProUpgradeEditor.UI
+﻿using ProUpgradeEditor.Common;
+namespace ProUpgradeEditor.UI
 {
     partial class MainForm
     {
@@ -832,7 +833,7 @@
             this.midiTrackEditorG5.Location = new System.Drawing.Point(0, 0);
             this.midiTrackEditorG5.Margin = new System.Windows.Forms.Padding(0);
             this.midiTrackEditorG5.Name = "midiTrackEditorG5";
-            this.midiTrackEditorG5.SelectedDifficulty = ProUpgradeEditor.GuitarDifficulty.Expert;
+            this.midiTrackEditorG5.SelectedDifficulty = GuitarDifficulty.Expert;
             this.midiTrackEditorG5.Size = new System.Drawing.Size(214, 385);
             this.midiTrackEditorG5.TabIndex = 0;
             this.midiTrackEditorG5.TrackAdded += new EditorResources.Components.TrackEditPanelEventHandler(this.midiTrackEditorG5_TrackAdded);
@@ -1392,7 +1393,7 @@
             this.midiTrackEditorPro.Location = new System.Drawing.Point(0, 0);
             this.midiTrackEditorPro.Margin = new System.Windows.Forms.Padding(0);
             this.midiTrackEditorPro.Name = "midiTrackEditorPro";
-            this.midiTrackEditorPro.SelectedDifficulty = ProUpgradeEditor.GuitarDifficulty.Expert;
+            this.midiTrackEditorPro.SelectedDifficulty = GuitarDifficulty.Expert;
             this.midiTrackEditorPro.Size = new System.Drawing.Size(235, 385);
             this.midiTrackEditorPro.TabIndex = 0;
             this.midiTrackEditorPro.TrackAdded += new EditorResources.Components.TrackEditPanelEventHandler(this.midiTrackEditorPro_TrackAdded);
@@ -3615,10 +3616,10 @@
             this.tabNoteEditor.Controls.Add(this.groupBoxStrumMarkers);
             this.tabNoteEditor.ForeColor = System.Drawing.SystemColors.ControlText;
             this.tabNoteEditor.ImageIndex = 13;
-            this.tabNoteEditor.Location = new System.Drawing.Point(4, 24);
+            this.tabNoteEditor.Location = new System.Drawing.Point(4, 23);
             this.tabNoteEditor.Name = "tabNoteEditor";
             this.tabNoteEditor.Padding = new System.Windows.Forms.Padding(3);
-            this.tabNoteEditor.Size = new System.Drawing.Size(1095, 522);
+            this.tabNoteEditor.Size = new System.Drawing.Size(1095, 523);
             this.tabNoteEditor.TabIndex = 2;
             this.tabNoteEditor.Text = "Note Editor";
             this.tabNoteEditor.Click += new System.EventHandler(this.tabPage2_Click);
@@ -4386,7 +4387,6 @@
             this.button96.TabIndex = 4;
             this.toolTip1.SetToolTip(this.button96, "Play");
             this.button96.UseVisualStyleBackColor = true;
-            
             this.button96.MouseDown += new System.Windows.Forms.MouseEventHandler(this.button96_MouseDown);
             this.button96.MouseUp += new System.Windows.Forms.MouseEventHandler(this.button96_MouseUp);
             // 
@@ -6368,10 +6368,10 @@
             this.tabPageEvents.Controls.Add(this.groupBoxProBassTrainers);
             this.tabPageEvents.Controls.Add(this.groupBoxProGuitarTrainers);
             this.tabPageEvents.ImageIndex = 59;
-            this.tabPageEvents.Location = new System.Drawing.Point(4, 24);
+            this.tabPageEvents.Location = new System.Drawing.Point(4, 23);
             this.tabPageEvents.Name = "tabPageEvents";
             this.tabPageEvents.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageEvents.Size = new System.Drawing.Size(1095, 522);
+            this.tabPageEvents.Size = new System.Drawing.Size(1095, 523);
             this.tabPageEvents.TabIndex = 10;
             this.tabPageEvents.Text = "Events";
             // 
@@ -9267,7 +9267,7 @@
             // trackEditorG5
             // 
             this.trackEditorG5.AllowDrop = true;
-            this.trackEditorG5.CurrentDifficulty = ProUpgradeEditor.GuitarDifficulty.Expert;
+            this.trackEditorG5.CurrentDifficulty = GuitarDifficulty.Expert;
             this.trackEditorG5.Cursor = System.Windows.Forms.Cursors.Default;
             this.trackEditorG5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.trackEditorG5.EditMode = ProUpgradeEditor.Common.TrackEditor.EEditMode.Chords;
@@ -9397,7 +9397,7 @@
             // trackEditorG6
             // 
             this.trackEditorG6.AllowDrop = true;
-            this.trackEditorG6.CurrentDifficulty = ProUpgradeEditor.GuitarDifficulty.Expert;
+            this.trackEditorG6.CurrentDifficulty = GuitarDifficulty.Expert;
             this.trackEditorG6.Cursor = System.Windows.Forms.Cursors.Default;
             this.trackEditorG6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.trackEditorG6.EditMode = ProUpgradeEditor.Common.TrackEditor.EEditMode.Chords;

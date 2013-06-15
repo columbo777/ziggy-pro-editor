@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Sanford.Multimedia.Midi;
 
-namespace ProUpgradeEditor
+namespace ProUpgradeEditor.Common
 {
     [Flags()]
     public enum GuitarDifficulty

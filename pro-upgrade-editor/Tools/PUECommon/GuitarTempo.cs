@@ -96,32 +96,32 @@ namespace ProUpgradeEditor.Common
         public double GetTicksPerBeat(TimeUnit unit)
         {
             var scale = 1.0 / (double)unit;
-            return TicksPerWholeNote / scale;
+            return TicksPerWholeNote * scale;
         }
 
         public double TicksPerOneTwentyEigthNote
         {
-            get { return TickLengthDouble / NumOneTwentyEigthNotes; }
+            get { return TicksPerSixtyFourth / 2.0; }
         }
         public double TicksPerSixtyFourth
         {
-            get { return TickLengthDouble / NumSixtyFourthNotes; }
+            get { return TicksPerThirtySecondNote / 2.0; }
         }
         public double TicksPerThirtySecondNote
         {
-            get { return TickLengthDouble / NumThirtySecondNotes; }
+            get { return TicksPerSixteenthNote / 2.0; }
         }
         public double TicksPerSixteenthNote
         {
-            get { return TickLengthDouble / NumSixteenthNotes; }
+            get { return TicksPerEigthNote / 2.0; }
         }
         public double TicksPerEigthNote
         {
-            get { return TickLengthDouble / NumEigthNotes; }
+            get { return TicksPerQuarterNote / 2.0; }
         }
         public double TicksPerQuarterNote
         {
-            get { return TickLengthDouble / NumQuarterNotes; }
+            get { return TicksPerSecond / QuarterNotesPerSecond; }
         }
 
         public double TicksPerWholeNote
@@ -132,22 +132,17 @@ namespace ProUpgradeEditor.Common
         public double GetSecondsPerBeat(TimeUnit unit)
         {
             var scale = 1.0 / (double)unit;
-            return SecondsPerWholeNote / scale;
-        }
-
-        public double SecondsPerOneTwentyEight
-        {
-            get { return SecondsPerQuarterNote / 32.0; }
+            return SecondsPerQuarterNote * scale;
         }
 
         public double SecondsPerEigthNote
         {
-            get { return SecondsPerQuarterNote / 4.0; }
+            get { return SecondsPerQuarterNote / 2.0; }
         }
 
         public double SecondsPerSixteenthNote
         {
-            get { return SecondsPerEigthNote / 4.0; }
+            get { return SecondsPerEigthNote / 2.0; }
         }
 
         public double SecondsPerQuarterNote
@@ -162,7 +157,7 @@ namespace ProUpgradeEditor.Common
 
         public double SecondsPerWholeNote
         {
-            get { return SecondsPerQuarterNote * 4.0; }
+            get { return SecondsPerHalfNote * 2.0; }
         }
         public double WholeNotesPerSecond
         {

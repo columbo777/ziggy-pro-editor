@@ -15,6 +15,7 @@ namespace ProUpgradeEditor.Common
             : base(owner.Owner, ticks, GuitarMessageType.GuitarBigRockEndingSubMessage)
         {
             this.Data1 = data1;
+            this.Data2 = 100;
             this.owner = owner;
             this.SetTicks(ticks);
         }
@@ -23,6 +24,7 @@ namespace ProUpgradeEditor.Common
             : base(events, GuitarMessageType.GuitarBigRockEndingSubMessage)
         {
             this.owner = owner;
+            this.Data2 = 100;
             this.Data1 = events.Data1;
         }
 

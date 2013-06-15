@@ -13,7 +13,7 @@ using ProUpgradeEditor;
 
 namespace EditorResources.Components
 {
-    
+
 
     public partial class PEWebTabImportPanel : UserControl
     {
@@ -23,9 +23,9 @@ namespace EditorResources.Components
 
         public PEWebTabImportPanel(Sequence seqImport)
         {
-            
+
             this.Sequence = seqImport;
-            
+
             InitializeComponent();
 
         }
@@ -84,7 +84,7 @@ namespace EditorResources.Components
             PEPopupWindow parent = (PEPopupWindow)(Parent);
             parent.Opacity = 0.9;
         }
-        
+
         public List<WebTabTrackProperties> TrackProperties = new List<WebTabTrackProperties>();
         Track lastTrack = null;
         private void trackEditorPro_TrackClicked(PEMidiTrackEditPanel sender, Sequence sequence, Track track, GuitarDifficulty difficulty)
@@ -107,10 +107,10 @@ namespace EditorResources.Components
 
                 lastTrack = track;
 
-                
+
                 if (!TrackProperties.Any(x => x.Track == track))
                 {
-                    TrackProperties.Add(new WebTabTrackProperties(track));
+                    TrackProperties.Add(new WebTabTrackProperties(track, EditorPro));
                 }
 
             }
@@ -127,7 +127,7 @@ namespace EditorResources.Components
         void UpdateWebTabTrack(WebTabTrackProperties prop)
         {
             prop.Scale = ProScale.Text.ToDouble();
-            
+
             prop.Offset = ProOffset.Text.ToDouble();
             prop.Import = ImportTrack.Checked;
         }
@@ -171,7 +171,7 @@ namespace EditorResources.Components
                             tr.Add(Sequence[x]);
                     }
 
-                    tr.ToList().ForEach(t=> Sequence.Remove(t));
+                    tr.ToList().ForEach(t => Sequence.Remove(t));
 
                     if (Sequence.Count > 1)
                     {
@@ -183,10 +183,10 @@ namespace EditorResources.Components
                     MessageBox.Show("No tracks marked for import");
                 }
             }
-            
+
         }
 
-        
+
 
         private void UpdateTrack(Track track)
         {
@@ -195,7 +195,7 @@ namespace EditorResources.Components
 
                 TrackProperties.FirstOrDefault(x => x.Track == track).IfObjectNotNull(trackProp =>
                 {
-                     
+
                     if (trackProp.Track.ChanMessages.Count() > 5)
                     {
 
@@ -203,31 +203,35 @@ namespace EditorResources.Components
                         {
                             track.Remove(track.ChanMessages.ToList());
 
-                            var ev = trackProp.Events.Select(x => x.Clone()).ToList();
+                            var ev = trackProp.Events.Chords.ToList();
+
                             var scale = trackProp.Scale;
                             if (scale < 0.001)
                                 scale = 0.001;
 
                             var offset = trackProp.Offset;
-                            double offsetMul = 1.0;
-                            if (offset < 0)
-                            {
-                                offset = -offset;
-                                offsetMul = -1.0;
-                            }
 
-                            List<AbsoluteMidiEvent> newEv = new List<AbsoluteMidiEvent>();
-                            foreach (var m in ev)
+                            var firstTime = ev.First().TimePair;
+                            var firstTick = ev.First().TickPair;
+
+                            ev.ForEach(x =>
                             {
-                                newEv.Add(new AbsoluteMidiEvent() { Tick = ((EditorPro.Editor5.GuitarTrack.TimeToTick(offset) * offsetMul) + (m.Tick * scale)).Round(), Message = m.Message });
-                            }
-                            foreach (var m in newEv)
-                            {
-                                track.Insert(m.Tick, m.Message);
-                            }
+                                x.Notes.ForEach(n =>
+                                {
+                                    var scaledLength = x.TimeLength * scale;
+                                    var scaledStart = (x.StartTime - firstTime.Down) * scale + offset;
+
+                                    var downTick = EditorPro.GuitarTrack.TimeToTick(scaledStart);
+                                    var upTick = EditorPro.GuitarTrack.TimeToTick(scaledStart + scaledLength);
+                                    var data1 = Utility.GetStringLowE(GuitarDifficulty.Expert) + n.NoteString;
+                                    track.Insert((int)(downTick), new ChannelMessage(ChannelCommand.NoteOn, data1, n.NoteFretDown + 100, n.Channel));
+                                    track.Insert((int)(upTick), new ChannelMessage(ChannelCommand.NoteOff, data1, 0, n.Channel));
+                                });
+                            });
+
                         }
                     }
-                    
+
                 });
             }
             catch { }
@@ -258,7 +262,7 @@ namespace EditorResources.Components
                     UpdateTrack(track.Track);
 
                     EditorPro.SetTrack6(track.Track, GuitarDifficulty.Expert);
-                    EditorPro.ReloadTrack();
+                    
                     EditorPro.ClearSelection();
                     if (EditorPro.IsLoaded && EditorPro.Messages.Chords.Any())
                     {
@@ -276,7 +280,7 @@ namespace EditorResources.Components
             EditorPro.Invalidate();
             EditorPro.Editor5.Invalidate();
             Application.DoEvents();
-            
+
         }
 
         private void peCheckBox1_CheckedChanged(object sender, EventArgs e)
@@ -287,13 +291,13 @@ namespace EditorResources.Components
 
         private void ProScale_TextChanged(object sender, EventArgs e)
         {
-            if (AutoRefresh.Checked && ProScale.Text.ToDouble().IsNull()==false && ProOffset.Text.ToDouble().IsNull()==false)
+            if (AutoRefresh.Checked && ProScale.Text.ToDouble().IsNull() == false && ProOffset.Text.ToDouble().IsNull() == false)
                 PreviewChanges();
         }
 
         private void ImportTrack_CheckedChanged(object sender, EventArgs e)
         {
-            
+
         }
 
         private void ImportTrack_Validating(object sender, CancelEventArgs e)

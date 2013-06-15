@@ -2872,6 +2872,10 @@ namespace ProUpgradeEditor.Common
         public delegate void SetChordToScreenHandler(TrackEditor editor, GuitarChord chord, bool ignoreKeepSelection);
         public event SetChordToScreenHandler OnSetChordToScreen;
 
+
+        public delegate IEnumerable<GuitarChord> AddChordHandler(TrackEditor editor, GuitarChord chord);
+        public event AddChordHandler OnAddChordHandler;
+
         public delegate void SelectionStateChangeHandler(TrackEditor editor, EditorSelectionState oldState, EditorSelectionState newState);
         public event SelectionStateChangeHandler OnSelectionStateChange;
 
@@ -2905,7 +2909,14 @@ namespace ProUpgradeEditor.Common
                             EditorPro.BackupSequence();
 
                             sel.Chord.SetTicks(tickPair);
-                            sel.Chord.UpdateEvents();
+
+                            var newChords = OnAddChordHandler(this, sel.Chord);
+
+                            currentSelector = null;
+                            if (newChords.Any())
+                            {
+                                SetSelected(newChords);
+                            }
                         }
                         ret = true;
                     }
@@ -3544,14 +3555,23 @@ namespace ProUpgradeEditor.Common
                 {
                     BackupSequence();
 
+                    var newChords = new List<GuitarChord>();
                     Editor5.SelectedChords.ToList().ForEach(chord5 =>
                     {
-                        GuitarChord.CreateChord(EditorPro.Messages, CurrentDifficulty,
+                        var newChord = GuitarChord.CreateChord(EditorPro.Messages, CurrentDifficulty,
                             SnapTickPairPro(chord5.TickPair),
                             new GuitarChordConfig(chord5.Notes.FretArrayZero,
                             chord5.Notes.ChannelArrayZero,
                             false, false, false, ChordStrum.Normal));
+
+                        if (newChord != null)
+                        {
+                            newChords.Add(newChord);
+                        }
                     });
+
+                    SetSelected(newChords);
+
                     EditorPro.Invalidate();
                 }
             }
@@ -3658,7 +3678,13 @@ namespace ProUpgradeEditor.Common
                             guitarTrack.TimeToTick(pasteTime.Down + delta),
                             guitarTrack.TimeToTick(pasteTime.Down + delta + c.TimeLength));
 
-                        c.CloneAtTime(Messages, SnapLeftRightTicks(startEndTick, new SnapConfig(true, true, true)), stringOffset).IfObjectNotNull(x => newChords.Add(x));
+                        var snappedTicks = SnapLeftRightTicks(startEndTick, new SnapConfig(true, true, true));
+
+                        var newChord = c.CloneAtTime(Messages, snappedTicks, stringOffset);
+                        if (newChord != null)
+                        {
+                            newChords.Add(newChord);
+                        }
                     }
 
                     ClearSelection();
@@ -4217,7 +4243,7 @@ namespace ProUpgradeEditor.Common
                                     }
                                     noteX += Utility.NoteTextXOffset;
                                     noteY += Utility.NoteTextYOffset;
-                                    
+
                                     g.DrawString(noteTxt,
                                         font,
                                         Utility.fretBrush,

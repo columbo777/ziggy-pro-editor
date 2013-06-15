@@ -15,14 +15,30 @@ namespace ProUpgradeEditor.Common
         public GuitarModifier(GuitarMessageList owner, TickPair ticks, GuitarModifierType type, GuitarMessageType mt) :
             base(owner, ticks, mt)
         {
+            Data2 = 100;
+            Channel = 0;
             this.ModifierType = type;
         }
 
         public GuitarModifier(MidiEventPair ev, GuitarModifierType type, GuitarMessageType mt) :
             base(ev, mt)
         {
+            Data2 = 100;
+            Channel = 0;
             this.ModifierType = type;
         }
 
+
+        public override void RemoveEvents()
+        {
+            if (UpEvent != null && Owner != null)
+            {
+                Owner.Remove(UpEvent);
+            }
+            if (DownEvent != null && Owner != null)
+            {
+                Owner.Remove(DownEvent);
+            }
+        }
     }
 }

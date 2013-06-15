@@ -84,7 +84,10 @@ namespace ProUpgradeEditor.Common
                 x.CreateEvents();
             });
 
-            base.CreateEvents();
+            if (IsNew)
+            {
+                AddToList();
+            }
         }
 
         public override void SetTicks(TickPair ticks)

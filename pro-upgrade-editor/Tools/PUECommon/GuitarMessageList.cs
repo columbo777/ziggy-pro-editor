@@ -127,7 +127,9 @@ namespace ProUpgradeEditor.Common
                     case GuitarMessageType.GuitarBigRockEnding:
                         ret.AddRange(BigRockEndings.Where(x=> diff.HasFlag(x.Difficulty)));
                         break;
-
+                    case GuitarMessageType.GuitarBigRockEndingSubMessage:
+                        
+                        break;
                     case GuitarMessageType.GuitarSingleStringTremelo:
                         ret.AddRange(SingleStringTremelos.Where(x=> diff.HasFlag(x.Difficulty)));
                         break;
@@ -496,7 +498,8 @@ namespace ProUpgradeEditor.Common
                     case GuitarMessageType.GuitarBigRockEnding:
                         BigRockEndings.Add(mess);
                         break;
-
+                    case GuitarMessageType.GuitarBigRockEndingSubMessage:
+                        break;
                     case GuitarMessageType.GuitarSingleStringTremelo:
                         SingleStringTremelos.Add(mess);
                         break;
@@ -607,7 +610,8 @@ namespace ProUpgradeEditor.Common
                     case GuitarMessageType.GuitarBigRockEnding:
                         BigRockEndings.Remove(mess);
                         break;
-
+                    case GuitarMessageType.GuitarBigRockEndingSubMessage:
+                        break;
                     case GuitarMessageType.GuitarSingleStringTremelo:
                         SingleStringTremelos.Remove(mess);
                         break;
@@ -752,6 +756,10 @@ namespace ProUpgradeEditor.Common
                                 yield return enumer.Current as T;
                             }
                         }
+                        break;
+
+                    case GuitarMessageType.GuitarBigRockEndingSubMessage:
+                        
                         break;
 
                     case GuitarMessageType.GuitarSingleStringTremelo:

@@ -62,26 +62,32 @@ namespace ProUpgradeEditor.Common
                         Debug.WriteLine("getting deleted note");
                     }
 
-                    var tickPair = notes.GetTickPair();
-
-                    if (tickPair.TickLength <= 1)
+                    var tickPair = notes.GetTickPairSmallest();
+                    
+                    if (!tickPair.IsValid)
                     {
                         Debug.WriteLine("short chord");
                         return ret;
                     }
+                    
+                    var unfit = notes.Where(x => x.TickPair != tickPair);
+                    if (unfit.Any())
+                    {
+                        unfit.ForEach(x => x.SetTicks(tickPair));
+                    }
+
                     ret = new GuitarChord(owner, tickPair, difficulty, notes.ToList());
                     
                     if (findModifiers)
                     {
-                        ret.Modifiers.AddRange(owner.Hammerons.GetBetweenTick(ret.TickPair).ToList());
-                        ret.Modifiers.AddRange(owner.Slides.GetBetweenTick(ret.TickPair).ToList());
-                        ret.Modifiers.AddRange(owner.ChordStrums.GetBetweenTick(ret.TickPair).ToList());
+                        ret.Modifiers.AddRange(owner.Hammerons.Where(x => x.Chord == null).GetBetweenTick(ret.TickPair).ToList());
+                        ret.Modifiers.AddRange(owner.Slides.Where(x => x.Chord == null).GetBetweenTick(ret.TickPair).ToList());
+                        ret.Modifiers.AddRange(owner.ChordStrums.Where(x=> x.Chord == null).GetBetweenTick(ret.TickPair).ToList());
 
                         var mods = ret.Modifiers.Where(x=> x.TickPair != ret.TickPair).ToList();
                         foreach (var mod in mods)
                         {
                             mod.SetTicks(ret.TickPair);
-                            mod.UpdateEvents();
                         }
                         mods.ForEach(x => x.Chord = ret);
                     }
@@ -133,13 +139,13 @@ namespace ProUpgradeEditor.Common
                 {
                     if (config.IsSlide || config.IsSlideReverse)
                     {
-                        ret.AddSlide(config.IsSlideReverse);
+                        ret.AddSlide(config.IsSlideReverse, false);
                     }
 
                     if (config.IsHammeron)
-                        ret.AddHammeron();
+                        ret.AddHammeron(false);
 
-                    ret.AddStrum(config.StrumMode);
+                    ret.AddStrum(config.StrumMode, false);
                     
                 }
             }
@@ -442,11 +448,11 @@ namespace ProUpgradeEditor.Common
                 if (ret != null)
                 {
                     if (HasSlide)
-                        ret.AddSlide(HasSlideReversed);
+                        ret.AddSlide(HasSlideReversed, false);
                     if (HasStrum)
-                        ret.AddStrum(StrumMode);
+                        ret.AddStrum(StrumMode, false);
                     if (HasHammeron)
-                        ret.AddHammeron();
+                        ret.AddHammeron(false);
                     
                 }
             }
@@ -533,31 +539,67 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
-        public void AddStrum(ChordStrum strum)
+        public void AddStrum(ChordStrum strum, bool createEvents)
         {
             if (strum != ChordStrum.Normal && !HasStrum)
             {
                 if (strum.HasFlag(ChordStrum.High))
                 {
-                    GuitarChordStrum.CreateStrum(this, ChordStrum.High).IfObjectNotNull(o => Modifiers.Add(o));
+                    var gs = new GuitarChordStrum(this, ChordModifierType.ChordStrumHigh);
+                    
+                    gs.IsNew = true;
+                    
+                    Modifiers.Add(gs);
+
+                    if (createEvents)
+                    {
+                        gs.CreateEvents();
+                    }
+                    
                 }
                 if (strum.HasFlag(ChordStrum.Mid))
                 {
-                    GuitarChordStrum.CreateStrum(this, ChordStrum.Mid).IfObjectNotNull(o => Modifiers.Add(o));
+                    var gs = new GuitarChordStrum(this, ChordModifierType.ChordStrumMed);
+                    
+                    gs.IsNew = true;
+
+                    Modifiers.Add(gs);
+
+                    if (createEvents)
+                    {
+                        gs.CreateEvents();
+                    }
                 }
                 if (strum.HasFlag(ChordStrum.Low))
                 {
-                    GuitarChordStrum.CreateStrum(this, ChordStrum.Low).IfObjectNotNull(o => Modifiers.Add(o));
+                    var gs = new GuitarChordStrum(this, ChordModifierType.ChordStrumLow);
+                    
+                    gs.IsNew = true;
+
+                    Modifiers.Add(gs);
+
+                    if (createEvents)
+                    {
+                        gs.CreateEvents();
+                    }
                 }
             }
         }
 
 
-        public void AddSlide(bool reversed)
+        public void AddSlide(bool reversed, bool createEvents)
         {
             if (!HasSlide)
             {
-                GuitarSlide.CreateSlide(this, reversed).IfObjectNotNull(s => Modifiers.Add(s));
+                var slide = new GuitarSlide(this, reversed);
+                slide.IsNew = true;
+
+                Modifiers.Add(slide);
+
+                if (createEvents)
+                {
+                    slide.CreateEvents();
+                }
             }
         }
 
@@ -588,11 +630,19 @@ namespace ProUpgradeEditor.Common
             RemoveModifier(ChordModifierType.Hammeron);
         }
 
-        public void AddHammeron()
+        public void AddHammeron(bool createEvents)
         {
             if (!HasHammeron)
             {
-                GuitarHammeron.CreateHammeron(this).IfObjectNotNull(o => Modifiers.Add(o));
+                var ho = new GuitarHammeron(this);
+                Modifiers.Add(ho);
+
+                ho.IsNew = true;
+                
+                if (createEvents)
+                {
+                    ho.CreateEvents();
+                }
             }
         }
 

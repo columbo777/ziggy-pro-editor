@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.ComponentModel.Design;
 using Sanford.Multimedia.Midi;
 using ProUpgradeEditor;
+using ProUpgradeEditor.Common;
 
 namespace EditorResources.Components
 {

@@ -67,6 +67,27 @@ namespace Sanford.Multimedia.Midi
             return ms;
         }
 
+        public static Sequence FromStream(MemoryStream ms)
+        {
+            Sequence ret = null;
+            try
+            {
+                var seq = new Sequence(FileType.Unknown, 480);
+                seq.Load(ms);
+                ret = seq;
+
+                if (ret.Any(x => x.Name != null && x.Name.EndsWith("_22")))
+                {
+                    ret.FileType = FileType.Pro;
+                }
+                else if (ret.Any(x => x.Name != null && (x.Name.ToLower()=="part guitar" || x.Name.ToLower()=="part bass")))
+                {
+                    ret.FileType = FileType.Guitar5;
+                }
+            }
+            catch (Exception ex) { Debug.WriteLine(ex.Message); }
+            return ret;
+        }
         public void Load(MemoryStream ms)
         {
             ms.Seek(0, SeekOrigin.Begin);
@@ -87,7 +108,6 @@ namespace Sanford.Multimedia.Midi
 
             properties = newProperties;
             tracks = newTracks;
-
         }
 
         // Events
@@ -99,16 +119,14 @@ namespace Sanford.Multimedia.Midi
         /// <summary>
         /// Initializes a new instance of the Sequence class.
         /// </summary>
-        public Sequence(FileType type, int division = int.MinValue)
+        public Sequence(FileType type, int division)
         {
             this.dirty = true;
             this.FileType = type;
-            if (division != int.MinValue)
-            {
-                properties.Division = division;
-                properties.Format = 1;
-            }
-
+            
+            properties.Division = division == Int32.MinValue ? 480 : division;
+            properties.Format = 1;
+            
         }
 
         /// <summary>
@@ -372,14 +390,10 @@ namespace Sanford.Multimedia.Midi
         public bool Remove(Track item)
         {
             bool ret = false;
-            if (tracks.Contains(item))
+            if (tracks.Contains(item) && tracks.Remove(item))
             {
-                ret = tracks.Remove(item);
-
-                if (ret)
-                {
-                    properties.TrackCount = tracks.Count;
-                }
+                properties.TrackCount = tracks.Count;
+                ret = true;
             }
             return ret;
         }

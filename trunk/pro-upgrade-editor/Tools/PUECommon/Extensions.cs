@@ -46,7 +46,12 @@ namespace ProUpgradeEditor.Common
 
         public static IEnumerable<T> MakeEnumerable<T>(this T o)
         {
-            return new[] { o };
+            var ret = new List<T>();
+            if (o != null)
+            {
+                ret.Add(o);
+            }
+            return ret;
         }
         public static void IfIsType<T2>(this object o, Action<T2> func) where T2 : class
         {
@@ -66,6 +71,11 @@ namespace ProUpgradeEditor.Common
             where TRet : class
         {
             return o != null ? func(o) : elseFunc != null ? elseFunc(o) : null;
+        }
+
+        public static T GetIfNull<T>(this T o, Func<T> func)
+        {
+            return o == null ? func() : o;
         }
 
         public static void IfNotNull<T>(this T o, Action<T> func, Action elseFunc = null)
@@ -160,13 +170,14 @@ namespace ProUpgradeEditor.Common
             Sequence ret = null;
             try
             {
-                ret = new Sequence(FileType.Unknown);
-                
                 using (var ms = new MemoryStream(data))
                 {
-                    ret.Load(ms);
+                    ret = Sequence.FromStream(ms);
                 }
-                ret.FileType = ret.FindFileType();
+                if (ret.FileType == FileType.Unknown)
+                {
+                    ret.FileType = ret.FindFileType();
+                }
             }
             catch { }
             return ret;
@@ -1050,19 +1061,29 @@ namespace ProUpgradeEditor.Common
 
         public static Track Clone(this Track t, FileType targetType = FileType.Unknown)
         {
-            Track ret = new Track(targetType == FileType.Unknown ? t.FileType : targetType, t.Name);
+            var ret = new Track(targetType == FileType.Unknown ? t.FileType : targetType, t.Name);
 
-            if (t.FileType != ret.FileType && t.FileType == FileType.Pro)
+            if (t.IsTempo())
             {
-                ret.Merge(t.ConvertToG5());
-            }
-            else if (t.FileType != ret.FileType && t.FileType == FileType.Guitar5)
-            {
-                ret.Merge(t.ConvertToPro());
+                foreach (var ev in t)
+                {
+                    ret.Insert(ev.AbsoluteTicks, ev.Clone());
+                }
             }
             else
             {
-                ret.Merge(t);
+                if (t.FileType != ret.FileType && t.FileType == FileType.Pro)
+                {
+                    ret.Merge(t.ConvertToG5());
+                }
+                else if (t.FileType != ret.FileType && t.FileType == FileType.Guitar5)
+                {
+                    ret.Merge(t.ConvertToPro());
+                }
+                else
+                {
+                    ret.Merge(t);
+                }
             }
             return ret;
         }
@@ -1155,7 +1176,7 @@ namespace ProUpgradeEditor.Common
                 cb.Data1 = targetDifficulty.GetStringLowEPro() + noteString;
                 cb.MidiChannel = cm.Channel;
                 cb.Command = cm.Command;
-                
+
 
                 ret = cb.Result;
             }
@@ -1168,7 +1189,7 @@ namespace ProUpgradeEditor.Common
                     cb.Data1 = modData1;
                     cb.MidiChannel = cm.Channel;
                     cb.Command = cm.Command;
-                    
+
 
                     ret = cb.Result;
                 }
@@ -1183,7 +1204,7 @@ namespace ProUpgradeEditor.Common
                             cb.Data1 = Utility.SoloData1;
                             cb.MidiChannel = Utility.ChannelDefault;
                             cb.Command = cm.Command;
-                            
+
 
                             ret = cb.Result;
                         }
@@ -1193,7 +1214,7 @@ namespace ProUpgradeEditor.Common
                             cb.Data1 = Utility.PowerupData1;
                             cb.MidiChannel = Utility.ChannelDefault;
                             cb.Command = cm.Command;
-                            
+
 
                             ret = cb.Result;
                         }
@@ -1203,7 +1224,7 @@ namespace ProUpgradeEditor.Common
                             cb.Data1 = cm.Data1;
                             cb.MidiChannel = Utility.ChannelDefault;
                             cb.Command = cm.Command;
-                            
+
 
                             ret = cb.Result;
                         }
@@ -1227,7 +1248,7 @@ namespace ProUpgradeEditor.Common
                 cb.MidiChannel = Utility.ChannelDefault;
                 cb.Command = cm.Command;
 
-                
+
 
                 ret = cb.Result;
             }
@@ -1269,7 +1290,7 @@ namespace ProUpgradeEditor.Common
                     cb.Data1 = targetDifficulty.GetStringLowEPro() + noteString;
                     cb.MidiChannel = Utility.ChannelDefault;
 
-                    
+
 
                     ret = cb.Result;
                 }
@@ -1284,7 +1305,7 @@ namespace ProUpgradeEditor.Common
                         cb.Data1 = modData1;
                         cb.MidiChannel = Utility.ChannelDefault;
 
-                        
+
 
                         ret = cb.Result;
                     }
@@ -1306,7 +1327,7 @@ namespace ProUpgradeEditor.Common
                             cb.Data1 = Utility.SoloData1;
                             cb.MidiChannel = Utility.ChannelDefault;
 
-                            
+
 
                             ret = cb.Result;
                         }
@@ -1317,7 +1338,7 @@ namespace ProUpgradeEditor.Common
                             cb.Data1 = Utility.PowerupData1;
                             cb.MidiChannel = Utility.ChannelDefault;
 
-                            
+
 
                             ret = cb.Result;
                         }
@@ -1328,7 +1349,7 @@ namespace ProUpgradeEditor.Common
                             cb.Data1 = cm.Data1;
                             cb.MidiChannel = Utility.ChannelDefault;
 
-                            
+
 
                             ret = cb.Result;
                         }
@@ -1363,9 +1384,9 @@ namespace ProUpgradeEditor.Common
                 }
 
                 cb.Data2 = cm.Command.GetData2();
-                
+
                 cb.Command = cm.Command;
-                
+
 
                 ret = cb.Result;
             }
@@ -1379,7 +1400,7 @@ namespace ProUpgradeEditor.Common
                         cb.Data1 = Utility.GetSoloData1_G5(targetDifficulty);
                         cb.MidiChannel = Utility.ChannelDefault;
                         cb.Command = cm.Command;
-                        
+
                         ret = cb.Result;
                     }
                     else if (cm.Data1.IsPowerup())
@@ -1388,7 +1409,7 @@ namespace ProUpgradeEditor.Common
                         cb.Data1 = Utility.PowerupData1;
                         cb.MidiChannel = Utility.ChannelDefault;
                         cb.Command = cm.Command;
-                        
+
                         ret = cb.Result;
                     }
                 }
@@ -1689,14 +1710,14 @@ namespace ProUpgradeEditor.Common
         }
         public static TickPair GetTickPairSmallest<T>(this IEnumerable<T> list) where T : GuitarMessage
         {
-            if(list == null || !list.Any())
+            if (list == null || !list.Any())
             {
-                return TickPair.NullValue ;
+                return TickPair.NullValue;
             }
             else
             {
-                var downTicks = list.Select(x => x.DownTick).Where(x=> x.IsNull()==false);
-                var upTicks = list.Select(x => x.UpTick).Where(x=> x.IsNull()==false);
+                var downTicks = list.Select(x => x.DownTick).Where(x => x.IsNull() == false);
+                var upTicks = list.Select(x => x.UpTick).Where(x => x.IsNull() == false);
 
                 return new TickPair(downTicks.Any() ? downTicks.Max() : Int32.MinValue, upTicks.Any() ? upTicks.Min() : Int32.MinValue);
             }
@@ -1764,89 +1785,104 @@ namespace ProUpgradeEditor.Common
         [CompilerGenerated()]
         public static void ForEach<T>(this IEnumerable<T> tlist, Action<T> func)
         {
-            foreach (var l in tlist) { func(l); }
+            if (tlist != null)
+            {
+                foreach (var l in tlist) { func(l); }
+            }
         }
         [CompilerGenerated()]
         public static void ForEach<T>(this IEnumerable<T> tlist, Action<T, int> func)
         {
-            var arr = tlist.ToArray();
-            for (int x = 0; x < arr.Length; x++)
+            if (tlist != null)
             {
-                func(arr[x], x);
+                var arr = tlist.ToArray();
+                for (int x = 0; x < arr.Length; x++)
+                {
+                    func(arr[x], x);
+                }
             }
         }
         [CompilerGenerated()]
         public static void For<T>(this IEnumerable<T> tlist, Action<T, int> func)
         {
-            for (int x = 0; x < tlist.Count(); x++)
+            if (tlist != null)
             {
-                func(tlist.ElementAt(x), x);
+                for (int x = 0; x < tlist.Count(); x++)
+                {
+                    func(tlist.ElementAt(x), x);
+                }
             }
         }
 
         public static IEnumerable<T> GetMessages<T>(this IEnumerable<T> list, GuitarMessageType type) where T : GuitarMessage
         {
-            return list.Where(x => x.MessageType == type).ToList();
+            if (list != null)
+            {
+                return list.Where(x => x.MessageType == type);
+            }
+            return null;
         }
 
 
 
         public static IEnumerable<GuitarMessage> GetEventsByData1(this IEnumerable<GuitarMessage> list, int data1)
         {
-            return list.Where(x => x.Data1 == data1).ToList();
+            if (list != null)
+            {
+                return list.Where(x => x.Data1 == data1).ToList();
+            }
+            return null;
         }
 
         public static IEnumerable<MidiEvent> GetEventsByData1(this IEnumerable<MidiEvent> list, int data1)
         {
-            return list.Where(x => x.Data1 == data1).ToList();
+            if (list != null)
+            {
+                return list.Where(x => x.Data1 == data1).ToList();
+            }
+            return null;
         }
 
-        public static IEnumerable<Data1ChannelPair> GetDistinctData1ChannelPairs(this IEnumerable<MidiEvent> list)
-        {
-            var ret = new List<Data1ChannelPair>();
-
-            ret.AddRange(list.Distinct(new MidiEventData1ChannelPairEqualityComparer()).ToList().Select(x => new Data1ChannelPair(x.Data1, x.Channel)).ToList());
-
-            return ret;
-        }
 
         public static IEnumerable<IGrouping<Data1ChannelPair, MidiEvent>> GroupByData1Channel(
-            this IEnumerable<MidiEvent> list,  IEnumerable<int> data1)
+            this IEnumerable<MidiEvent> list, IEnumerable<int> data1)
         {
-            if(data1 != null)
+            if (data1 != null && list != null)
             {
                 list = list.Where(d => data1.Contains(d.Data1));
+
+                return list.ToList().GroupBy(x => x.GetData1ChannelPair()).ToList();
             }
-            return list.ToList().GroupBy(x => x.GetData1ChannelPair()).ToList();
+            return null;
         }
 
 
         public static IEnumerable<IEnumerable<MidiEventPair>> GroupMidiEventPairByCloseTick(this IEnumerable<MidiEventPair> list, int closeValue)
         {
-            return list.GroupBy(x => x.DownTick, x => x, new TickCloseComparer(closeValue)).ToList();
+            return list == null ? null : list.GroupBy(x => x.DownTick, x => x, new TickCloseComparer(closeValue)).ToList();
         }
         public static IEnumerable<IEnumerable<T>> GroupByCloseTick<T>(this IEnumerable<T> list, int closeValue) where T : MidiEvent
         {
-            return list.GroupBy(x => x.AbsoluteTicks, x => x, new TickCloseComparer(closeValue)).ToList();
+            return list == null ? null : list.GroupBy(x => x.AbsoluteTicks, x => x, new TickCloseComparer(closeValue)).ToList();
         }
         public static IEnumerable<IEnumerable<T>> GroupByCloseTick<T>(this IEnumerable<T> list) where T : GuitarMessage
         {
-            return list.GroupBy(x => x.AbsoluteTicks, x => x, new TickCloseComparer(Utility.TickCloseWidth)).ToList();
+            return list == null ? null : list.GroupBy(x => x.AbsoluteTicks, x => x, new TickCloseComparer(Utility.TickCloseWidth)).ToList();
         }
 
         public static IEnumerable<MidiEventPair> GetEventPairs(this IEnumerable<Data1ChannelEventList> list, IEnumerable<int> data1)
         {
-            var ret = list.Where(x => data1.Contains(x.Data1)).SelectMany(x=> x.Events.ToList()).ToList();
+            var ret = list.Where(x => data1.Contains(x.Data1)).SelectMany(x => x.Events.ToList()).ToList();
             ret.Sort(new Data1ChannelEventInterlacingSorter());
             return ret;
         }
 
-        public static IEnumerable<Data1ChannelEventList> GetCleanMessageList(this Track track, IEnumerable<int> data1List=null, GuitarMessageList owner=null)
+        public static IEnumerable<Data1ChannelEventList> GetCleanMessageList(this Track track, IEnumerable<int> data1List = null, GuitarMessageList owner = null)
         {
             var ret = new List<Data1ChannelEventList>();
 
             var data1ChannelGroup = track.ChanMessages.GroupByData1Channel(data1List).ToList();
-            
+
 
             foreach (var data1chan in data1ChannelGroup)
             {

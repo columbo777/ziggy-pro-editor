@@ -283,6 +283,8 @@ namespace ProUpgradeEditor.Common
 
         public void SetHScrollMaximum(int max)
         {
+            if (max < 0)
+                max = 0;
             if (max < HScroll.Value)
             {
                 HScroll.Value = max;
@@ -589,6 +591,10 @@ namespace ProUpgradeEditor.Common
         public Track GetGuitar5BassMidiTrack()
         {
             return GetTrack(GuitarTrack.BassTrackName5);
+        }
+        public Track GetGuitar5BassElseGuitar()
+        {
+            return GetTrack(GuitarTrack.BassTrackName5).GetIfNull(()=> GetGuitar5MidiTrack());
         }
         public Track GetGuitar6MidiTrack()
         {

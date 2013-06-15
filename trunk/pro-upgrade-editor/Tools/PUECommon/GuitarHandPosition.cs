@@ -15,7 +15,7 @@ namespace ProUpgradeEditor.Common
         {
             this.Data1 = Utility.HandPositionData1;
             NoteFretDown = noteFret;
-            
+            Channel = 0;
             this.SetTicks(pair);
         }
 
@@ -23,6 +23,7 @@ namespace ProUpgradeEditor.Common
             : base(pair, GuitarMessageType.GuitarHandPosition)
         {
             this.Data1 = pair.Data1;
+            Channel = 0;
             NoteFretDown = pair.Data2 - 100;
         }
 

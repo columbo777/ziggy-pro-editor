@@ -682,15 +682,17 @@ namespace ProUpgradeEditor.UI
             return ret;
         }
 
-        private SongCacheItem ImportIntoExistingSong(SongCacheItem song, IEnumerable<KeyValueObject<string, byte[]>> midiFilesPro, IEnumerable<DTAFile> dtaFiles)
+        private SongCacheItem ImportIntoExistingSong(SongCacheItem song, 
+            IEnumerable<KeyValueObject<string, byte[]>> midiFilesPro, 
+            IEnumerable<DTAFile> dtaFiles)
         {
             SongCacheItem ret = null;
-            var songIDs = dtaFiles.SelectMany(x => x.GetSongIDs().Select(y => y.Value));
-            var songNames = dtaFiles.SelectMany(x => x.Select(y => y.Name));
+            var songIDs = dtaFiles.SelectMany(x => x.GetSongIDs().Select(y => y.Value)).Where(x => x != null).ToList();
+            var songNames = dtaFiles.SelectMany(x => x.Select(y => y.Name)).Where(x=> x != null).ToList();
 
             if (song != null)
             {
-                midiFilesPro.ForEach(midiPro =>
+                midiFilesPro.Where(x => x != null).ToList().ForEach(midiPro =>
                 {
                     CloseSelectedSong();
 
@@ -1716,105 +1718,132 @@ namespace ProUpgradeEditor.UI
                     return;
 
                 var currTrackNameG5 = EditorG5.SelectedTrack.Name;
+                var currentDifficulty5 = EditorG5.CurrentDifficulty;
 
                 bool fullRebuild = false;
 
                 if (EditorPro.IsLoaded == false)
                 {
                     fullRebuild = true;
-                    var p = GuitarTrackG5.GetTrack().Sequence.ConvertToPro();
+
+                    var p = EditorG5.Sequence.ConvertToPro();
                     EditorPro.SetTrack6(p, p.GetPrimaryTrack());
                 }
                 else
                 {
-                    var currTrackNamePro = EditorPro.SelectedTrack.Name;
-
-
-                    var proNames = EditorPro.Sequence.GetGuitarBassTracks().Select(x => x.Name).ToList();
-                    proNames.ToList().ForEach(ep =>
+                    var currTrackNamePro = string.Empty;
+                    if (EditorPro.SelectedTrack != null)
                     {
+                        currTrackNamePro = EditorPro.SelectedTrack.Name;
+                    }
+                    var currentDifficulty6 = EditorPro.CurrentDifficulty;
 
-                        if (checkBoxInitSelectedTrackOnly.Checked && EditorPro.IsLoaded && ep != ProGuitarTrack.Name)
-                            return;
+                    var tracks = EditorPro.Sequence.GetGuitarBassTracks().ToList();
+                    if (checkBoxInitSelectedTrackOnly.Checked)
+                    {
+                        tracks = EditorPro.GuitarTrack.GetTrack().MakeEnumerable().ToList();
+                    }
 
-                        EditorPro.SetTrack6(EditorPro.GetTrack(ep), EditorPro.CurrentDifficulty);
+                    var difficulties = Utility.GetDifficultyIter();
 
-                        if (ep.IsGuitarTrackName())
+                    if (checkBoxInitSelectedDifficultyOnly.Checked)
+                    {
+                        difficulties = difficulties.Where(x => x == EditorPro.CurrentDifficulty);
+                    }
+
+                    tracks.ForEach(proTrack =>
+                    {
+                        foreach (var diffiter in difficulties)
                         {
-                            EditorG5.SetTrack5(EditorG5.GetGuitar5MidiTrack(), EditorG5.CurrentDifficulty);
-                        }
-                        else if (ep.IsBassTrackName())
-                        {
-                            EditorG5.SetTrack5(EditorG5.GetGuitar5BassMidiTrack(), EditorG5.CurrentDifficulty);
-                        }
+                            var diff = diffiter;
+                            var ok = true;
+                            ok = EditorPro.SetTrack6(proTrack, diff);
+                            if (!ok)
+                                return;
 
+                            if (proTrack.Name.IsGuitarTrackName())
+                            {
+                                ok = EditorG5.SetTrack5(EditorG5.GetGuitar5MidiTrack(), diff);
+                            }
+                            else// if (proTrack.Name.IsBassTrackName())
+                            {
+                                ok = EditorG5.SetTrack5(EditorG5.GetGuitar5BassElseGuitar(), diff);
+                            }
+                            if (!ok)
+                                return;
 
-                        if (checkBoxInitSelectedDifficultyOnly.Checked)
-                        {
-                            var diff = EditorPro.CurrentDifficulty;
 
                             if (diff == GuitarDifficulty.Expert)
                                 diff |= GuitarDifficulty.All;
 
-                            EditorPro.Messages.GetByDifficulty(diff).ToList().ForEach(x => x.DeleteAll());
+                            var tempo = EditorPro.Sequence.GetTempoTrack();
+                            EditorPro.Sequence.Remove(tempo);
+                            EditorPro.Sequence.AddTempo(EditorG5.Sequence.GetTempoTrack().Clone(FileType.Pro));
 
-                            var msgs = EditorG5.Messages.GetByDifficulty(diff).ToList();
-
-                            foreach (var msg in msgs.Where(x => x.IsChannelEvent()).ToList())
+                            EditorPro.Messages.Chords.ToList().ForEach(x => x.DeleteAll());
+                            EditorG5.Messages.Chords.ForEach(x =>
                             {
-                                var down = msg.DownEvent.ConvertToPro(diff);
-                                if (down != null)
+                                var ev = x.CloneToMemory(EditorPro.Messages, EditorPro.CurrentDifficulty);
+                                ev.IsNew = true;
+                                ev.CreateEvents();
+                            });
+
+                            if (diff.IsAll())
+                            {
+                                EditorPro.Messages.Solos.ToList().ForEach(x => x.DeleteAll());
+                                EditorG5.Messages.Solos.ForEach(x =>
                                 {
-                                    EditorPro.Messages.Insert(down.Data1, down.Data2, down.MidiChannel, msg.TickPair);
-                                }
+                                    var ev = new GuitarSolo(EditorPro.Messages, x.TickPair);
+                                    ev.IsNew = true;
+                                    ev.CreateEvents();
+                                });
+
+                                EditorPro.Messages.Powerups.ToList().ForEach(x => x.DeleteAll());
+                                EditorG5.Messages.Powerups.ForEach(x =>
+                                {
+                                    var ev = new GuitarPowerup(EditorPro.Messages, x.TickPair);
+                                    ev.IsNew = true;
+                                    ev.CreateEvents();
+                                });
+
+                                EditorPro.Messages.BigRockEndings.ToList().ForEach(x => x.DeleteAll());
+                                EditorG5.Messages.BigRockEndings.ForEach(x =>
+                                {
+                                    var ev = new GuitarBigRockEnding(EditorPro.Messages, x.TickPair);
+                                    ev.IsNew = true;
+                                    ev.CreateEvents();
+                                });
                             }
-                            ReloadTracks();
-                        }
-                        else
-                        {
-                            var cur = ProGuitarTrack.GetTrack();
-                            var name = cur.Name;
-
-                            ProGuitarTrack.RemoveTrack(cur);
-
-                            if (GuitarTrackG5.GetTrack().IsTempo())
-                            {
-                                ProGuitarTrack.AddTempoTrack(GuitarTrackG5.GetTrack());
-                            }
-                            else
-                            {
-                                var newTrack = GuitarTrackG5.GetTrack().ConvertToPro();
-                                newTrack.Name = name;
-                                EditorPro.AddTrack(newTrack);
-
-                                EditorPro.SetTrack6(EditorPro.Sequence, newTrack);
-                            }
-
-                            ProGuitarTrack.RebuildEvents();
                         }
                     });
 
-                    EditorPro.SetTrack(currTrackNamePro);
+                    EditorPro.SetTrack(currTrackNamePro, currentDifficulty6);
                 }
+
+                EditorG5.SetTrack(currTrackNameG5, currentDifficulty5);
 
                 if (SelectedSong == null)
                 {
                     AddNewSongToLibrary(false);
                 }
 
-                EditorG5.SetTrack(currTrackNameG5);
-
                 ReloadTracks();
 
-                if (EditorG5.IsLoaded && EditorPro.IsLoaded && fullRebuild)
+                if (EditorG5.IsLoaded && EditorPro.IsLoaded && SelectedSong != null)
                 {
-                    CopySolosFromG5(true);
-                    CopyPowerupsFromG5(true);
-                    CopyBigRockEnding();
-                    if (SelectedSong != null)
+
+                    if (fullRebuild)
                     {
-                        GenerateDifficulties(false, new GenDiffConfig(SelectedSong, true, false, false, false, true));
+                        var config = new GenDiffConfig(SelectedSong, 
+                            true, 
+                            false, 
+                            checkBoxInitSelectedDifficultyOnly.Checked, 
+                            checkBoxInitSelectedTrackOnly.Checked, 
+                            true);
+
+                        GenerateDifficulties(false, config);
                     }
+
                     ReloadTracks();
                 }
             }
@@ -9822,7 +9851,7 @@ namespace ProUpgradeEditor.UI
                                         int noteString = 5 - beat.Notes.IndexOf(note);
                                         if (!note.Fret.IsEmpty())
                                         {
-                                            
+
                                             seqTrack.Insert(position, new ChannelMessage(ChannelCommand.NoteOn, Utility.ExpertData1LowE + noteString,
                                                 100 + note.Fret.ToInt()));
 

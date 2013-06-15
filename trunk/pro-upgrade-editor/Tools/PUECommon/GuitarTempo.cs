@@ -144,7 +144,10 @@ namespace ProUpgradeEditor.Common
         {
             get { return SecondsPerEigthNote / 2.0; }
         }
-
+        public double SecondsPerThirtySecondNote
+        {
+            get { return SecondsPerSixteenthNote / 2.0; }
+        }
         public double SecondsPerQuarterNote
         {
             get { return 1.0 / QuarterNotesPerSecond; }

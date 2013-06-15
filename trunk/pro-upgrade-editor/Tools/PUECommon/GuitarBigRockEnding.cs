@@ -15,16 +15,15 @@ namespace ProUpgradeEditor.Common
         public GuitarBigRockEnding(GuitarMessageList owner, TickPair ticks, IEnumerable<MidiEventPair> events) :
             this(owner, ticks)
         {
-            
+            Channel = 0;
             events.ToList().ForEach(ev => AddSubMessage(new GuitarBigRockEndingSubMessage(this, ev)));
-
             SetTicks(ticks);
         }
 
         public GuitarBigRockEnding(GuitarMessageList owner, TickPair ticks) : 
             base(owner,ticks,GuitarModifierType.BigRockEnding, GuitarMessageType.GuitarBigRockEnding)
         {
-            
+            Channel = 0;
             foreach (var data1 in Utility.GetBigRockEndingData1(IsPro))
             {
                 childEvents.Add(new GuitarBigRockEndingSubMessage(this, ticks, data1));

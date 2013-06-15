@@ -84,6 +84,10 @@ namespace ProUpgradeEditor.Common
                         ret.Modifiers.AddRange(owner.Slides.Where(x => x.Chord == null).GetBetweenTick(ret.TickPair).ToList());
                         ret.Modifiers.AddRange(owner.ChordStrums.Where(x=> x.Chord == null).GetBetweenTick(ret.TickPair).ToList());
 
+                        if (ret.HasSlide)
+                        {
+                        }
+
                         var mods = ret.Modifiers.Where(x=> x.TickPair != ret.TickPair).ToList();
                         foreach (var mod in mods)
                         {
@@ -448,12 +452,17 @@ namespace ProUpgradeEditor.Common
                 if (ret != null)
                 {
                     if (HasSlide)
+                    {
                         ret.AddSlide(HasSlideReversed, false);
+                    }
                     if (HasStrum)
+                    {
                         ret.AddStrum(StrumMode, false);
+                    }
                     if (HasHammeron)
+                    {
                         ret.AddHammeron(false);
-                    
+                    }
                 }
             }
             return ret;

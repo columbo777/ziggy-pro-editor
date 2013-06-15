@@ -104,6 +104,7 @@
     <Compile Include="ChordStrumList.cs" />
     <Compile Include="CodeCompiler.cs" />
     <Compile Include="CopyChordList.cs" />
+    <Compile Include="Data1ChannelEventList.cs" />
     <Compile Include="Data1ChannelPair.cs" />
     <Compile Include="Data1ChannelPairEqualityComparer.cs" />
     <Compile Include="Data1ChannelPairEventList.cs" />

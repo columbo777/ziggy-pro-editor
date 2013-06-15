@@ -25,6 +25,7 @@ namespace ProUpgradeEditor.Common
         public MidiEventPair(MidiEventPair pair) : this(pair.owner, pair.down, pair.up) { }
         public MidiEventPair(GuitarMessageList owner) : this(owner, null, null) { }
         public MidiEventPair(GuitarMessageList owner, MidiEvent down) : this(owner, down, null) { }
+        public MidiEventPair(MidiEvent down, MidiEvent up) : this(null, down, up) { }
         public MidiEventPair(GuitarMessageList owner, MidiEvent down, MidiEvent up)
         {
             this.owner = owner;
@@ -42,7 +43,12 @@ namespace ProUpgradeEditor.Common
             }
         }
 
-        public GuitarMessageList Owner { get { return owner; } }
+        public override string ToString()
+        {
+            return "Down: " + (this.Down == null ? "(null)" : this.Down.ToString()) + " Up: " + (this.Up == null ? "(null)" : this.Up.ToString());
+        }
+
+        public GuitarMessageList Owner { get { return owner; } internal set { owner = value; } }
 
         public int Data1 { get { return Down != null ? Down.Data1 : Int32.MinValue; } }
         public int Data2 { get { return Down != null ? Down.Data2 : Int32.MinValue; } }

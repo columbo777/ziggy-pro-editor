@@ -440,7 +440,7 @@ namespace ProUpgradeEditor.UI
             radioNoteEditDifficultyHard.Checked = false;
             radioNoteEditDifficultyMedium.Checked = false;
             radioNoteEditDifficultyEasy.Checked = false;
-
+            
             if (diff == GuitarDifficulty.Easy)
             {
                 radioDifficultyEasy.Checked = true;
@@ -462,15 +462,10 @@ namespace ProUpgradeEditor.UI
                 radioNoteEditDifficultyExpert.Checked = true;
             }
 
-
-            if (EditorPro.CurrentDifficulty != diff)
-            {
-                EditorPro.CurrentDifficulty = diff;
-            }
-            if (EditorG5.CurrentDifficulty != diff)
-            {
-                EditorG5.CurrentDifficulty = diff;
-            }
+            EditorPro.CurrentDifficulty = diff;
+            
+            EditorG5.CurrentDifficulty = diff;
+            
 
             RefreshTracks();
         }
@@ -1210,8 +1205,6 @@ namespace ProUpgradeEditor.UI
 
             if (gc != null && (keepSel == false || ignoreKeepSelection))
             {
-
-
                 var hb = GetHoldBoxes();
                 hb.ForEach(x => x.Text = "");
                 NoteChannelBoxes.ForEach(x => x.Text = "");
@@ -1222,14 +1215,12 @@ namespace ProUpgradeEditor.UI
                 }
 
 
-
                 var sb = GetChordStartBox();
                 var eb = GetChordEndBox();
 
 
                 sb.Text = gc.DownTick.ToStringEx();
                 eb.Text = gc.UpTick.ToStringEx();
-
 
                 checkIsSlide.Checked = gc.HasSlide;
                 checkIsSlideReversed.Checked = gc.HasSlideReversed;
@@ -1556,9 +1547,9 @@ namespace ProUpgradeEditor.UI
 
 
         bool placingNote = false;
-        public bool PlaceNote(SelectNextEnum selectNextEnum)
+        public IEnumerable<GuitarChord> PlaceNote(SelectNextEnum selectNextEnum)
         {
-            bool ret = false;
+            var ret = new List<GuitarChord>();
 
             if (placingNote)
             {
@@ -1575,7 +1566,11 @@ namespace ProUpgradeEditor.UI
                     var gc = GetChordFromScreen();
                     if (gc != null)
                     {
-                        gc.CloneAtTime(EditorPro.Messages, sc.TickPair);
+                        var chord = gc.CloneAtTime(EditorPro.Messages, sc.TickPair);
+                        if (chord != null)
+                        {
+                            ret.Add(chord);
+                        }
                     }
                     else
                     {
@@ -1585,7 +1580,6 @@ namespace ProUpgradeEditor.UI
 
                 HandleSelectNext(selectNextEnum);
 
-                ret = true;
             }
             catch (Exception ex)
             {
@@ -1720,12 +1714,15 @@ namespace ProUpgradeEditor.UI
                     if (EditorPro.SetTrack(t, GuitarDifficulty.Expert))
                     {
                         EditorPro.GuitarTrack.CreateHandPositionEvents();
+                        if (Utility.ClearChordNames)
+                        {
+                            EditorPro.GuitarTrack.ClearChordNames();
+                        }
                     }
                 }
                 ret = true;
             }
             catch { ret = false; }
-
 
             return ret;
         }
@@ -2501,14 +2498,14 @@ namespace ProUpgradeEditor.UI
                 {
                     if (!c.HasSlide)
                     {
-                        c.AddSlide(false);
+                        c.AddSlide(false, true);
                     }
 
                     EditorPro.GetNextChord(c).IfObjectNotNull(nc =>
                     {
                         if (!nc.HasHammeron)
                         {
-                            nc.AddHammeron();
+                            nc.AddHammeron(true);
                         }
                     });
                 });
@@ -2576,7 +2573,7 @@ namespace ProUpgradeEditor.UI
                 EditorPro.SelectedChords.ForEach(c =>
                 {
                     if (!c.HasSlide)
-                        c.AddSlide(false);
+                        c.AddSlide(false, true);
                 });
 
                 EditorPro.Invalidate();
@@ -2591,7 +2588,7 @@ namespace ProUpgradeEditor.UI
                 EditorPro.SelectedChords.ForEach(x =>
                 {
                     if (!x.HasHammeron)
-                        x.AddHammeron();
+                        x.AddHammeron(true);
                 });
 
                 EditorPro.Invalidate();
@@ -4697,6 +4694,8 @@ namespace ProUpgradeEditor.UI
                     listBoxSongLibrary.SelectedItem = item;
 
                     SongList.SelectedSong = listBoxSongLibrary.SelectedItem as SongCacheItem;
+
+
                 }
             }
             catch { }
@@ -4820,7 +4819,7 @@ namespace ProUpgradeEditor.UI
                 return false;
             }
 
-            foreach (SongCacheItem sc in SongList)
+            foreach (var sc in SongList)
             {
                 if (sc.SongName.EqualsEx(songName) || sc.DTASongShortName.EqualsEx(songName) ||
                     (sc.G5FileName.IsNotEmpty() && sc.G5FileName.GetFileName().EqualsEx(FileNameG5.GetFileName())) ||

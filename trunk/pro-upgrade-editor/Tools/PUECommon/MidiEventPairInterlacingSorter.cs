@@ -22,6 +22,29 @@ namespace ProUpgradeEditor.Common
                 return -1;
             if (a.DownTick > b.DownTick)
                 return 1;
+            
+            return 0;
+        }
+    }
+
+    public class Data1ChannelEventInterlacingSorter : IComparer<MidiEventPair>
+    {
+        public int Compare(MidiEventPair a, MidiEventPair b)
+        {
+            if (a.DownTick < b.DownTick)
+                return -1;
+            if (a.DownTick > b.DownTick)
+                return 1;
+
+            if (a.Channel < b.Channel)
+                return -1;
+            if (a.Channel > b.Channel)
+                return 1;
+
+            if (a.Data1 < b.Data1)
+                return -1;
+            if (a.Data1 > b.Data1)
+                return 1;
 
             return 0;
         }

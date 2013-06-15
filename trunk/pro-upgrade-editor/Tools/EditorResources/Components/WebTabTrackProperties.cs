@@ -9,21 +9,14 @@ using System.Windows.Forms;
 
 using ProUpgradeEditor.Common;
 using Sanford.Multimedia.Midi;
+using ProUpgradeEditor;
 
 namespace EditorResources.Components
 {
 
-    public class AbsoluteMidiEvent
-    {
-        public int Tick;
-        public IMidiMessage Message;
-
-        public AbsoluteMidiEvent Clone() { return new AbsoluteMidiEvent() { Tick = this.Tick, Message = Message }; }
-    }
-
     public class WebTabTrackProperties
     {
-        public WebTabTrackProperties(Track track)
+        public WebTabTrackProperties(Track track, TrackEditor editorPro)
         {
             this.Track = track;
 
@@ -31,13 +24,15 @@ namespace EditorResources.Components
             this.Offset = 3.0;
             this.Import = true;
 
-            Events = new List<AbsoluteMidiEvent>();
-            Events.AddRange(track.ChanMessages.Select(x => new AbsoluteMidiEvent() { Message = x.Clone(), Tick = x.AbsoluteTicks }));
+            Events = new CopyChordList(editorPro);
+            editorPro.SetTrack(track, GuitarDifficulty.Expert);
+            
+            Events.AddRange(editorPro.Messages.Chords.ToList());
 
         }
         public Track Track;
 
-        public List<AbsoluteMidiEvent> Events;
+        public CopyChordList Events;
 
         public double Scale;
         public bool Import;

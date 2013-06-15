@@ -17,6 +17,8 @@ namespace Sanford.Multimedia.Midi
     {
         Pro,
         Guitar5,
+        DTA,
+        CON,
         Unknown,
     }
 

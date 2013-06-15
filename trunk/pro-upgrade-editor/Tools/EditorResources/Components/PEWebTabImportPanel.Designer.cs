@@ -1,4 +1,5 @@
-﻿namespace EditorResources.Components
+﻿using ProUpgradeEditor.Common;
+namespace EditorResources.Components
 {
     partial class PEWebTabImportPanel
     {
@@ -70,7 +71,7 @@
             this.trackEditorPro.Location = new System.Drawing.Point(285, 31);
             this.trackEditorPro.Margin = new System.Windows.Forms.Padding(0);
             this.trackEditorPro.Name = "trackEditorPro";
-            this.trackEditorPro.SelectedDifficulty = ProUpgradeEditor.GuitarDifficulty.Expert;
+            this.trackEditorPro.SelectedDifficulty = GuitarDifficulty.Expert;
             this.trackEditorPro.Size = new System.Drawing.Size(239, 268);
             this.trackEditorPro.TabIndex = 1;
             this.trackEditorPro.TrackRemoved += new EditorResources.Components.TrackEditPanelEventHandler(this.trackEditorPro_TrackRemoved);
@@ -86,7 +87,7 @@
             this.trackEditorWebTab.Location = new System.Drawing.Point(13, 31);
             this.trackEditorWebTab.Margin = new System.Windows.Forms.Padding(0);
             this.trackEditorWebTab.Name = "trackEditorWebTab";
-            this.trackEditorWebTab.SelectedDifficulty = ProUpgradeEditor.GuitarDifficulty.Expert;
+            this.trackEditorWebTab.SelectedDifficulty = GuitarDifficulty.Expert;
             this.trackEditorWebTab.Size = new System.Drawing.Size(239, 409);
             this.trackEditorWebTab.TabIndex = 0;
             // 

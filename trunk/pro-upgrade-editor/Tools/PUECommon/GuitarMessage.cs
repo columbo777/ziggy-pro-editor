@@ -97,7 +97,6 @@ namespace ProUpgradeEditor.Common
                     case GuitarMessageType.GuitarTempo:
                     case GuitarMessageType.GuitarTimeSignature:
                     case GuitarMessageType.GuitarBigRockEnding:
-                    case GuitarMessageType.GuitarBigRockEndingSubMessage:
                     case GuitarMessageType.GuitarTextEvent:
                     case GuitarMessageType.GuitarTrainer:
                     case GuitarMessageType.GuitarChord:

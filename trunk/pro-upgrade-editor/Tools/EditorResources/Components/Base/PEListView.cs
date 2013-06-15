@@ -15,6 +15,7 @@ using System.Runtime.InteropServices;
 using Sanford.Multimedia.Midi;
 using ProUpgradeEditor;
 using System.Collections;
+using ProUpgradeEditor.Common;
 
 
 namespace EditorResources.Components

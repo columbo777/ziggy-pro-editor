@@ -31,12 +31,12 @@ namespace PhoneGuitarTab.Core
             {
                 //TODO: init track header
                 Track track = new Track
-                                  {
-                                      Index = i,
-                                      Name = gpFile.Body.Tracks[i].Name,
-                                      IsDrum = gpFile.Body.Tracks[i].IsDrumsTrack,
-                                      StringNumber = gpFile.Body.Tracks[i].StringNumber
-                                  };
+                {
+                    Index = i,
+                    Name = gpFile.Body.Tracks[i].Name,
+                    IsDrum = gpFile.Body.Tracks[i].IsDrumsTrack,
+                    StringNumber = gpFile.Body.Tracks[i].StringNumber
+                };
                 for (int j = 0; j < measureCount; j++)
                 {
                     // if ((j + i) % tracksCount != 0)
@@ -60,27 +60,24 @@ namespace PhoneGuitarTab.Core
                             beat.Notes.Add(new Note() { Fret = "" });
 
                         int noteIndex = 0;
-                        for (int stringIndex = stringCount - 1; stringIndex >= 0; stringIndex--)
+                        for (int stringIndex = 0; stringIndex < stringCount; stringIndex++)
                         {
-                            if (!gpBeat.Strings[stringIndex])
+                            var gpIdx = stringCount-1-stringIndex;
+                            if (!gpBeat.Strings[gpIdx])
                                 continue;
 
                             var effects = gpBeat.Notes[noteIndex].Effects ?? new EffectsOnNote();
-                            beat.Notes[stringCount - stringIndex - 1] = new Note()
-                                                                            {
-                                                                                Fret =
-                                                                                    gpBeat.Notes[noteIndex].FretNumber.
-                                                                                    ToString(),
-                                                                                IsLegato = effects.HammerOnPullOff,
-                                                                                Bend = effects.Bend == null ? null : new Bend(),
-                                                                                Slide = effects.Slide ==
-                                                                                PhoneGuitarTab.Tablature.GuitarPro.Slide.NoSlide ? null : new Slide()
-                                                                            };
+                            beat.Notes[stringIndex] = new Note()
+                            {
+                                Fret = gpBeat.Notes[noteIndex].FretNumber.ToString(),
+                                IsLegato = effects.HammerOnPullOff,
+                                Bend = effects.Bend == null ? null : new Bend(),
+                                Slide = effects.Slide ==
+                                PhoneGuitarTab.Tablature.GuitarPro.Slide.NoSlide ? null : new Slide()
+                            };
                             noteIndex++;
                         }
-                        //TODO: Remove feature
-                        if (stringCount > 6)
-                            beat.Notes.RemoveAt(6);
+                        
                         measure.Beats.Add(beat);
                     }
                     track.Measures.Add(measure);

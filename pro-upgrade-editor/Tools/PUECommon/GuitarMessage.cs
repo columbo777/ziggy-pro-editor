@@ -167,8 +167,12 @@ namespace ProUpgradeEditor.Common
                     ("invalid data").OutputDebug();
                     return;
                 }
-
-                props.SetUpdatedEventPair(Owner.Insert(props.Data1, props.Data2, props.Channel, props.TickPair));
+                if (Channel.IsNull())
+                {
+                    ("invalid channel").OutputDebug();
+                    Channel = 0;
+                }
+                props.SetUpdatedEventPair(Owner.Insert(Data1, Data2, Channel, TickPair));
             }
             if (IsNew)
             {

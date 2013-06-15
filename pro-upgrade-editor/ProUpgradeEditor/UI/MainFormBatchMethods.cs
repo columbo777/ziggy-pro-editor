@@ -472,42 +472,31 @@ namespace ProUpgradeEditor.UI
                                 }
                             }
 
-                            if (genBass)
+                            if (config.CopyGuitarToBass)
+                            {
+                                if (EditorPro.GetTrackGuitar17() != null)
+                                {
+                                    CopyTrack(GuitarTrack.GuitarTrackName17, GuitarTrack.BassTrackName17);
+                                }
+                                if (EditorPro.GetTrackGuitar22() != null)
+                                {
+                                    CopyTrack(GuitarTrack.GuitarTrackName22, GuitarTrack.BassTrackName22);
+                                }
+                            }
+                            else if (genBass)
                             {
                                 var gt5 = EditorG5.GetGuitar5BassMidiTrack();
+
                                 var gt6 = EditorPro.GetTrackBass17();
-
-
-                                if (config.CopyGuitarToBass)
+                                if (gt5 != null && gt6 != null)
                                 {
-                                    if (EditorPro.GetTrackGuitar17() != null)
-                                    {
-                                        CopyTrack(GuitarTrack.GuitarTrackName17, GuitarTrack.BassTrackName17);
-                                    }
+                                    GenerateDifficultiesForTrack(gt5, gt6, bassDifficulties, config);
                                 }
-                                else
+                                
+                                gt6 = EditorPro.GetTrackBass22();
+                                if (gt5 != null && gt6 != null)
                                 {
-                                    if (gt5 != null && gt6 != null)
-                                    {
-                                        GenerateDifficultiesForTrack(gt5, gt6, bassDifficulties, config);
-                                    }
-                                }
-
-
-                                if (config.CopyGuitarToBass)
-                                {
-                                    if (EditorPro.GetTrackGuitar22() != null)
-                                    {
-                                        CopyTrack(GuitarTrack.GuitarTrackName22, GuitarTrack.BassTrackName22);
-                                    }
-                                }
-                                else
-                                {
-                                    gt6 = EditorPro.GetTrackBass22();
-                                    if (gt5 != null && gt6 != null)
-                                    {
-                                        GenerateDifficultiesForTrack(gt5, gt6, bassDifficulties, config);
-                                    }
+                                    GenerateDifficultiesForTrack(gt5, gt6, bassDifficulties, config);
                                 }
                             }
                         }

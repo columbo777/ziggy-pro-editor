@@ -2102,8 +2102,8 @@ namespace ProUpgradeEditor.UI
                         track5.TickToTime(nc.UpTick);
 
                     var diff = Math.Abs(timeTillNext52 - timeTillNext5);
-                    double spb = ProGuitarTrack.GetTempo(oc.DownTick).SecondsPerQuarterNote;
-                    if (diff > spb / 128.0)
+                    double spb = ProGuitarTrack.GetTempo(oc.DownTick).SecondsPerThirtySecondNote;
+                    if (diff > spb)
                     {
                         return false;
                     }

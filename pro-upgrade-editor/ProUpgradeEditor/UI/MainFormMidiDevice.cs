@@ -327,7 +327,7 @@ namespace ProUpgradeEditor.UI
 
         int midiPlaybackDeviceVolume = 100;
 
-        Sequence midiPlaybackSequence = new Sequence(FileType.Pro);
+        Sequence midiPlaybackSequence = null;
         Sequencer midiPlaybackSequencer = new Sequencer();
         OutputDevice midiPlaybackDevice = null;
         public bool MidiPlaybackInProgress
@@ -509,6 +509,10 @@ namespace ProUpgradeEditor.UI
                     MidiPlaybackInProgress = false;
                 }
 
+                if (midiPlaybackSequence != null)
+                {
+                    midiPlaybackSequence.Dispose();
+                }
                 midiPlaybackSequence = new Sequence(FileType.Pro, EditorPro.Sequence.Division);
                 midiPlaybackSequence.Format = EditorPro.Sequence.Format;
 
@@ -517,14 +521,14 @@ namespace ProUpgradeEditor.UI
                 int pos = 0;
                 if (SelectedChord != null)
                 {
-                    pos = SelectedChord.DownTick;
+                    pos = SelectedChord.DownTick - Utility.ScollToSelectionOffset;
                 }
 
                 var mainTrack = EditorPro.GuitarTrack.GetTrack();
                 if (mainTrack != null)
                 {
 
-                    midiPlaybackSequence.AddTempo(EditorPro.GuitarTrack.GetTempoTrack());
+                    midiPlaybackSequence.AddTempo(EditorPro.GuitarTrack.GetTempoTrack().Clone());
                     Track t = new Track(FileType.Pro, mainTrack.Name);
 
                     foreach (var gc in EditorPro.GuitarTrack.Messages.Chords.Where(x => x.IsPureArpeggioHelper == false).ToList())
@@ -541,7 +545,7 @@ namespace ProUpgradeEditor.UI
                 if (SelectedSong != null)
                 {
                     if (SelectedSong.EnableSongMP3Playback &&
-                        File.Exists(SelectedSong.SongMP3Location))
+                        SelectedSong.SongMP3Location.FileExists())
                     {
                         LoadSongMP3Playback();
                     }

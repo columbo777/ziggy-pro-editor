@@ -84,6 +84,10 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
+        /// <summary>
+        /// LowE = 0
+        /// HighE = 5
+        /// </summary>
         public virtual int NoteString
         {
             get
@@ -100,7 +104,15 @@ namespace ProUpgradeEditor.Common
 
         public GuitarNote CloneToMemory(GuitarMessageList owner)
         {
-            return GetNote(owner, Difficulty, this.TickPair, NoteString, NoteFretDown, IsTapNote, IsArpeggioNote, IsXNote);
+            var ret = GetNote(owner, Difficulty, this.TickPair, NoteString, NoteFretDown, IsTapNote, IsArpeggioNote, IsXNote);
+            if (ret != null && owner != null)
+            {
+                if (IsPro == false && owner.IsPro)
+                {
+                    ret.Data2 = 100;
+                }
+            }
+            return ret;
         }
 
 

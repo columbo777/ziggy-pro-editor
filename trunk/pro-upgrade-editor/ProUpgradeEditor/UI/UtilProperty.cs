@@ -78,7 +78,7 @@ namespace ProUpgradeEditor.UI
         {
             return new UtilProperty[]
                 {
-                    new UtilProperty("Tick Close Distance", (int)4, (p)=>{
+                    new UtilProperty("Tick Close Distance", (int)20, (p)=>{
                         Utility.TickCloseWidth = ((int)p.Data);
                         return Utility.TickCloseWidth.IsNull() == false;
                     }),
@@ -96,6 +96,8 @@ namespace ProUpgradeEditor.UI
                         return ret;
                     }),
                     //new UtilProperty("Enable Render MP3 Wave", false),
+                    new UtilProperty( "Save plus.mid with con", false),
+                    new UtilProperty( "Save pro backup on save", false),
                     new UtilProperty( "Clear Chord Names", Utility.ClearChordNames),
                     new UtilProperty( "108 Generation Enabled", Utility.HandPositionGenerationEnabled),
                     new UtilProperty( "108 Marker Start Offset", Utility.HandPositionMarkerStartOffset),

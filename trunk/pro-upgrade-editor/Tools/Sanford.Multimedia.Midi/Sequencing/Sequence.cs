@@ -51,21 +51,6 @@ namespace Sanford.Multimedia.Midi
 
 
 
-        public MemoryStream Save()
-        {
-            var ms = new MemoryStream();
-
-            properties.Write(ms);
-
-            var writer = new TrackWriter();
-            foreach (Track trk in tracks)
-            {
-                writer.Track = trk;
-                writer.Write(ms);
-            }
-            ms.Seek(0, SeekOrigin.Begin);
-            return ms;
-        }
 
         public static Sequence FromStream(MemoryStream ms)
         {
@@ -198,31 +183,22 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
-        /// <summary>
-        /// Saves the Sequence as a MIDI file.
-        /// </summary>
-        /// <param name="fileName">
-        /// The name to use for saving the MIDI file.
-        /// </param>
-        public void Save(string fileName)
+        
+
+        public MemoryStream Save()
         {
-            var stream = new FileStream(fileName, FileMode.Create,
-                FileAccess.Write, FileShare.None);
+            var ms = new MemoryStream();
+            properties.Write(ms);
 
-            using (stream)
+            var writer = new TrackWriter();
+            foreach (Track trk in tracks)
             {
-                properties.Write(stream);
-
-                var writer = new TrackWriter();
-
-                foreach (Track trk in tracks)
-                {
-                    writer.Track = trk;
-                    writer.Write(stream);
-                }
+                writer.Track = trk;
+                writer.Write(ms);
             }
+            ms.Seek(0, SeekOrigin.Begin);
+            return ms;
         }
-
         /// <summary>
         /// Gets the length in ticks of the Sequence.
         /// </summary>

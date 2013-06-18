@@ -20,6 +20,7 @@ namespace ProUpgradeEditor.Common
         public bool SnapG6;
         public bool SnapGrid;
 
+
         public SnapConfig(bool snapG5, bool snapG6, bool snapGrid)
         {
             this.SnapG5 = snapG5;

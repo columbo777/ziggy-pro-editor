@@ -202,37 +202,33 @@ namespace ProUpgradeEditor.Common
 
         public void AddScrollHandler()
         {
-
             HScroll.ValueChanged += delegate(object o, EventArgs e)
             {
-                BeginInvoke(new MethodInvoker(delegate()
-                {
-                    try
-                    {
-                        var value = HScrollValue;
-                        if (this == Editor5)
-                        {
-                            if (EditorPro.HScrollValue != value)
-                            {
-                                EditorPro.HScrollValue = value;
-                            }
-                        }
-                        else if (this == EditorPro)
-                        {
-                            if (Editor5.HScrollValue != value)
-                            {
-                                Editor5.HScrollValue = value;
-                            }
-                        }
 
-                        UpdateSelectorVisibility();
-                        Editor5.Invalidate();
-                        EditorPro.Invalidate();
+                try
+                {
+                    var value = HScrollValue;
+                    if (this == Editor5)
+                    {
+                        if (EditorPro.HScrollValue != value)
+                        {
+                            EditorPro.HScrollValue = value;
+                        }
                     }
-                    catch { }
-                }));
+                    else if (this == EditorPro)
+                    {
+                        if (Editor5.HScrollValue != value)
+                        {
+                            Editor5.HScrollValue = value;
+                        }
+                    }
+
+                    UpdateSelectorVisibility();
+                    Invalidate();
+                }
+                catch { }
             };
-            Application.DoEvents();
+
         }
 
         protected override void OnVisibleChanged(EventArgs e)
@@ -484,42 +480,6 @@ namespace ProUpgradeEditor.Common
 
         public int NumBackups { get { return backupSequences.Count; } }
 
-        public int NumRedoBackups { get { return redoSequences.Count; } }
-
-        public void CreateRedoBackup()
-        {
-            try
-            {
-                if (NumBackups > 0)
-                {
-                    var ms = new MemoryStream(backupSequences[backupSequences.Count - 1].GetBuffer());
-                    ms.Seek(0, SeekOrigin.Begin);
-                    redoSequences.Add(ms);
-                }
-            }
-            catch { }
-        }
-
-        public bool RedoBackup()
-        {
-            try
-            {
-                if (NumRedoBackups > 0)
-                {
-                    var ms = redoSequences[redoSequences.Count - 1];
-                    backupSequences.Add(ms);
-                    redoSequences.RemoveAt(redoSequences.Count - 1);
-
-                    RestoreBackup();
-                }
-                return true;
-            }
-            catch
-            {
-                RestoreBackup();
-            }
-            return false;
-        }
 
         bool show108Events = false;
         public bool Show108Events
@@ -594,7 +554,7 @@ namespace ProUpgradeEditor.Common
         }
         public Track GetGuitar5BassElseGuitar()
         {
-            return GetTrack(GuitarTrack.BassTrackName5).GetIfNull(()=> GetGuitar5MidiTrack());
+            return GetTrack(GuitarTrack.BassTrackName5).GetIfNull(() => GetGuitar5MidiTrack());
         }
         public Track GetGuitar6MidiTrack()
         {
@@ -632,12 +592,11 @@ namespace ProUpgradeEditor.Common
         }
 
         List<MemoryStream> backupSequences = new List<MemoryStream>();
-        List<MemoryStream> redoSequences = new List<MemoryStream>();
 
         public void ClearBackups()
         {
             backupSequences.Clear();
-            redoSequences.Clear();
+
         }
 
         public void BackupSequence()
@@ -654,10 +613,6 @@ namespace ProUpgradeEditor.Common
                         backupSequences.RemoveAt(0);
                     }
 
-                    while (redoSequences.Count > Utility.MaxBackups)
-                    {
-                        redoSequences.RemoveAt(0);
-                    }
                 }
                 catch { }
             }
@@ -847,19 +802,18 @@ namespace ProUpgradeEditor.Common
             return t;
         }
 
-        public bool RestoreBackup(int recursion = 0)
+        public bool RestoreBackup()
         {
 
             bool ret = true;
             try
             {
-                if (backupSequences.Count > 0 && recursion < 2)
+                if (backupSequences.Any())
                 {
                     try
                     {
-                        var mso = backupSequences[backupSequences.Count - 1];
+                        var mso = backupSequences.Last();
                         mso.Seek(0, SeekOrigin.Begin);
-
                         ret = LoadMidi17("", mso.ToArray(), true);
                     }
                     catch
@@ -868,7 +822,7 @@ namespace ProUpgradeEditor.Common
                     }
                     finally
                     {
-                        backupSequences.RemoveAt(backupSequences.Count - 1);
+                        backupSequences.Remove(backupSequences.Last());
                     }
                     Invalidate();
                 }
@@ -878,27 +832,94 @@ namespace ProUpgradeEditor.Common
                 ret = false;
             }
 
-            if (ret == false)
-            {
-                ret = RestoreBackup(recursion + 1);
-            }
-
 
             return ret;
         }
 
-
-
-        public void SaveTrack(string fileName)
+        public bool SaveTrackAs(string fileName)
         {
-
-            if (Sequence != null)
+            var ret = false;
+            try
             {
-                Sequence.Save(fileName);
+                if (Sequence != null)
+                {
+                    var bytes = Sequence.Save().GetBytes(true);
+                    if (bytes.Any())
+                    {
+                        if (fileName.WriteFileBytes(bytes))
+                        {
+                            ret = fileName.FileExists();
+                        }
+                    }
+                }
             }
-
+            catch { }
+            return ret;
         }
 
+        public bool SaveTrack(string fileName, bool createBackup)
+        {
+            var ret = false;
+            try
+            {
+                if (Sequence != null)
+                {
+                    var bytes = Sequence.Save().GetBytes(true);
+                    var diff = false;
+
+                    if (fileName.FileExists())
+                    {
+                        var existing = fileName.ReadFileBytes();
+                        if (existing.Length != bytes.Length)
+                        {
+                            diff = true;
+                        }
+                        else
+                        {
+                            for (int x = 0; x < existing.Length; x++)
+                            {
+                                var ex = existing[x];
+                                var nx = bytes[x];
+                                if (ex != nx)
+                                {
+                                    diff = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (diff || !fileName.FileExists())
+                    {
+                        if (diff)
+                        {
+                            DoCreateBackup(fileName);
+                        }
+
+                        fileName.WriteFileBytes(bytes);
+                    }
+
+                    LoadedFileName = fileName;
+                    ret = fileName.FileExists();
+                }
+            }
+            catch { }
+            return ret;
+        }
+
+        void DoCreateBackup(string existingFileName)
+        {
+
+            try
+            {
+                var backupName = LoadedFileName.GetFolderName() +
+                    existingFileName.GetFileName() + ".bak";
+
+                File.WriteAllBytes(backupName, LoadedFileName.ReadFileBytes());
+            }
+            catch { }
+
+        }
         public bool SetTrack5(Track t, GuitarDifficulty difficulty = GuitarDifficulty.Unknown)
         {
             return SetTrack5(this.Sequence == null ? t != null ? t.Sequence : null : this.Sequence, t, difficulty);
@@ -1005,26 +1026,26 @@ namespace ProUpgradeEditor.Common
         {
             try
             {
-                BeginInvoke(new Action<TrackEditor>(delegate(TrackEditor editor)
+
+                if (!IsLoaded)
                 {
-                    try
-                    {
-                        if (!IsLoaded)
-                            return;
-                        var v = editor.HScroll.Value;
-                        editor.SetHScrollMaximum((int)Math.Round(Utility.ScaleUp(editor.GuitarTrack.TotalSongTime)));
-                        if (v < HScrollMaximum)
-                        {
-                            editor.HScrollValue = v;
-                        }
-                        else
-                        {
-                            editor.HScrollValue = editor.HScrollMaximum;
-                        }
-                        Invalidate();
-                    }
-                    catch { }
-                }), this);
+                    HScrollValue = 0;
+                    SetHScrollMaximum(0);
+                    return;
+                }
+                var v = HScroll.Value;
+                SetHScrollMaximum((int)Math.Round(Utility.ScaleUp(GuitarTrack.TotalSongTime)));
+                if (v < HScrollMaximum)
+                {
+                    HScrollValue = v;
+                }
+                else
+                {
+                    HScrollValue = HScrollMaximum;
+                }
+                Invalidate();
+
+
             }
             catch { }
         }
@@ -1047,6 +1068,7 @@ namespace ProUpgradeEditor.Common
                 {
                     return;
                 }
+
 
                 var g = e.Graphics;
                 var clipRect = e.ClipRectangle;
@@ -1312,8 +1334,6 @@ namespace ProUpgradeEditor.Common
 
             foreach (var point in gridPoints)
             {
-
-
                 var next = gridPoints.ElementAtOrDefault(gridPoints.IndexOf(point) + 1);
 
                 var p = point.ScreenPoint;
@@ -1354,19 +1374,38 @@ namespace ProUpgradeEditor.Common
 
             if (Utility.ShowTempos)
             {
-                foreach (var tempo in visTempo)
+
+                int lastTempo = 0;
+                foreach (var tempo in visTempo.ToList())
                 {
-                    DrawTextAtTime(e.Graphics, 80, 180, true, false,
-                        tempo.TickPair, "BPM: " + (tempo.QuarterNotesPerSecond * 60.0).Round(3).Round(), Utility.TextEventBrush, false);
+                    var curTempo = (tempo.QuarterNotesPerSecond * 60.0).Round(3).Round();
+                    var diff = (lastTempo - curTempo).Abs();
+                    if (diff > 5)
+                    {
+                        lastTempo = curTempo;
+                        DrawTextAtTime(e.Graphics, 80, 180, true, false,
+                            tempo.TickPair,
+                            "BPM: " + curTempo, Utility.TextEventBrush, false);
+                    }
                 }
             }
 
             if (Utility.ShowTimeSignatures)
             {
-                foreach (var ts in visTimeSig)
+                double lastNumerator = double.MinValue;
+                double lastDenominator = double.MinValue;
+
+                foreach (var ts in visTimeSig.ToList())
                 {
-                    DrawTextAtTime(e.Graphics, 80, 180, true, false,
-                        ts.TickPair, "" + ts.Numerator + "/" + ts.Denominator, Utility.TextEventBrush, false);
+                    if (ts.Numerator != lastNumerator ||
+                        ts.Denominator != lastDenominator)
+                    {
+                        lastNumerator = ts.Numerator;
+                        lastDenominator = ts.Denominator;
+
+                        DrawTextAtTime(e.Graphics, 80, 180, true, false,
+                            ts.TickPair, "" + ts.Numerator + "/" + ts.Denominator, Utility.TextEventBrush, false);
+                    }
                 }
             }
         }
@@ -2443,15 +2482,24 @@ namespace ProUpgradeEditor.Common
         {
             ret = new TickPair(ticks);
             bool snapped = false;
+
             int t1;
-            int t2;
             if (!SnapToNotes(ticks.Down, out t1))
             {
                 t1 = ticks.Down;
             }
+            else
+            {
+                snapped = true;
+            }
+            int t2;
             if (!SnapToNotes(ticks.Up, out t2))
             {
                 t2 = ticks.Up;
+            }
+            else
+            {
+                snapped = true;
             }
             ret = new TickPair(t1, t2);
             return snapped;
@@ -2471,11 +2519,22 @@ namespace ProUpgradeEditor.Common
             return snapped;
         }
 
-        public bool SnapTick(int tick, out int ret)
+        public bool SnapTick(int tick, out int closeTick)
         {
-            ret = tick;
-            bool snapped = false;
-            int closestDist = int.MaxValue;
+            closeTick = tick;
+            IEnumerable<int> close;
+            var ret = SnapTick(tick, out close);
+            if (ret && close.Any())
+            {
+                closeTick = close.Select(x => new { Dist = (x - tick).Abs(), Val = x }).OrderBy(x => x.Dist).FirstOrDefault().Val;
+            }
+            return ret;
+        }
+        public bool SnapTick(int tick, out IEnumerable<int> closeTicks)
+        {
+            closeTicks = null;
+
+            var ret = new List<int>();
 
             if (IsLoaded && GridSnap)
             {
@@ -2483,12 +2542,9 @@ namespace ProUpgradeEditor.Common
                 if (NoteSnapG5 && (EditorType == EEditorType.ProGuitar && Editor5.IsLoaded))
                 {
                     int point;
-                    if (Editor5.SnapToNotes(ret, out point))
+                    if (Editor5.SnapToNotes(tick, out point))
                     {
-                        AddSnapPointToRender(GetClientPointFromTick(point));
-                        snapped = true;
-                        ret = point;
-                        closestDist = Math.Abs(point - tick);
+                        ret.Add(point);
                     }
                 }
 
@@ -2496,16 +2552,9 @@ namespace ProUpgradeEditor.Common
                     (NoteSnapG6 && EditorType == EEditorType.ProGuitar)))
                 {
                     int point;
-                    if (SnapToNotes(ret, out point))
+                    if (SnapToNotes(tick, out point))
                     {
-                        var dist = Math.Abs(point - tick);
-                        if (dist < closestDist)
-                        {
-                            AddSnapPointToRender(GetClientPointFromTick(point));
-                            snapped = true;
-                            ret = point;
-                            closestDist = dist;
-                        }
+                        ret.Add(point);
                     }
                 }
                 if (((NoteSnapG5 && EditorType == EEditorType.Guitar5) ||
@@ -2514,20 +2563,17 @@ namespace ProUpgradeEditor.Common
                     var closeUnit = guitarTrack.GetCloseGridPointToScreenPoint(GetScreenPointFromTick(tick));
                     if (closeUnit != null)
                     {
-                        var dist = Math.Abs(tick - closeUnit.Tick);
-                        if (dist < closestDist)
-                        {
-                            AddSnapPointToRender(closeUnit.ScreenPoint - HScrollValue);
-                            snapped = true;
-                            ret = closeUnit.Tick;
-                            closestDist = dist;
-                        }
+                        ret.Add(closeUnit.Tick);
                     }
                 }
             }
-            return snapped;
-        }
 
+            closeTicks = ret.Distinct();
+
+            closeTicks.ForEach(x => AddSnapPointToRender(GetClientPointFromTick(x)));
+
+            return closeTicks.Any();
+        }
         public bool SnapClientPointToChords(int clientPoint, out int ret)
         {
             ret = clientPoint;
@@ -2957,254 +3003,375 @@ namespace ProUpgradeEditor.Common
             var closeToRight6 = closeChords6.Where(x => x.ScreenPointPair.Down.IsCloseScreenPoint(screenPoint.Up)).ToList();
             var closeToRight5 = closeChords5.Where(x => x.ScreenPointPair.Down.IsCloseScreenPoint(screenPoint.Up)).ToList();
 
-            screenPoint = snapLeftScreenPoint(screenPoint, gridPointDown, closeToLeft6, closeToLeft5);
-            screenPoint = snapRightScreenPoint(screenPoint, gridPointUp, closeToRight6, closeToRight5);
+            var origPair = screenPoint;
+            var screenPointLeft = snapLeftScreenPoint(origPair, gridPointDown, closeToLeft6, closeToLeft5);
+            var screenPointRight = snapRightScreenPoint(origPair, gridPointUp, closeToRight6, closeToRight5);
 
-            return GetClientPointFromScreenPoint(screenPoint);
+
+            return GetClientPointFromScreenPoint(new TickPair(screenPointLeft.Down, screenPointRight.Up));
         }
 
 
         public TickPair SnapLeftRightTicks(TickPair tickPair, SnapConfig config)
         {
 
-            var gridPointDown = guitarTrack.GetCloseGridPointToTick(tickPair.Down);
-            var gridPointUp = guitarTrack.GetCloseGridPointToTick(tickPair.Up);
+            GridPoint gridPointDown = null;
+            GridPoint gridPointUp = null;
 
-            var closeChords6 = Messages.Chords.GetBetweenTick(tickPair.Expand(10)).ToList();
-            var closeChords5 = new List<GuitarChord>();
-            if (IsPro && Editor5.IsLoaded && NoteSnapG5)
+            if (config.SnapGrid)
             {
-                closeChords5.AddRange(Editor5.Messages.Chords.GetBetweenTick(tickPair.Expand(10)).ToList());
+                gridPointDown = guitarTrack.GetCloseGridPointToTick(tickPair.Down);
+                gridPointUp = guitarTrack.GetCloseGridPointToTick(tickPair.Up);
             }
 
-            var closeToLeft6 = closeChords6.Where(x => x.UpTick.IsCloseTick(tickPair.Down)).ToList();
-            var closeToLeft5 = closeChords5.Where(x => x.TickPair.IsClose(tickPair.Down)).ToList();
+            IEnumerable<TickPair> closeLeft6 = null;
+            IEnumerable<TickPair> closeRight6 = null;
 
-            var closeToRight6 = closeChords6.Where(x => x.DownTick.IsCloseTick(tickPair.Up)).ToList();
-            var closeToRight5 = closeChords5.Where(x => x.TickPair.IsClose(tickPair.Up)).ToList();
+            IEnumerable<TickPair> closeLeft5 = null;
+            IEnumerable<TickPair> closeRight5 = null;
+
+            if (config.SnapG6 && EditorPro.IsLoaded)
+            {
+                var closeChords6 = Messages.Chords.GetBetweenTick(tickPair.Expand(Utility.TickCloseWidth)).ToList();
+                closeLeft6 = closeChords6.Where(x => x.TickPair.IsClose(tickPair.Down)).Select(x => x.TickPair);
+                closeRight6 = closeChords6.Where(x => x.TickPair.IsClose(tickPair.Up)).Select(x => x.TickPair);
+
+                var closePowerups = Messages.Powerups.GetBetweenTick(tickPair.Expand(Utility.TickCloseWidth)).ToList();
+                if (closePowerups.Any())
+                {
+                    closeLeft6 = closeLeft6.Concat(closePowerups.Where(x => x.TickPair.IsClose(tickPair.Down)).Select(x => x.TickPair));
+                    closeRight6 = closeRight6.Concat(closePowerups.Where(x => x.TickPair.IsClose(tickPair.Up)).Select(x => x.TickPair));
+                }
+
+                var closeSolo = Messages.Solos.GetBetweenTick(tickPair.Expand(Utility.TickCloseWidth)).ToList();
+                if (closeSolo.Any())
+                {
+                    closeLeft6 = closeLeft6.Concat(closeSolo.Where(x => x.TickPair.IsClose(tickPair.Down)).Select(x => x.TickPair));
+                    closeRight6 = closeRight6.Concat(closeSolo.Where(x => x.TickPair.IsClose(tickPair.Up)).Select(x => x.TickPair));
+                }
+            }
+            if (IsPro && config.SnapG5 && Editor5.IsLoaded)
+            {
+                var closeChords5 = Editor5.Messages.Chords.GetBetweenTick(tickPair.Expand(Utility.TickCloseWidth)).ToList();
+                closeLeft5 = closeChords5.Where(x => x.TickPair.IsClose(tickPair.Down)).Select(x => x.TickPair);
+                closeRight5 = closeChords5.Where(x => x.TickPair.IsClose(tickPair.Up)).Select(x => x.TickPair);
+
+                var closePowerups = Editor5.Messages.Powerups.GetBetweenTick(tickPair.Expand(Utility.TickCloseWidth)).ToList();
+                if (closePowerups.Any())
+                {
+                    closeLeft5 = closeLeft5.Concat(closePowerups.Where(x => x.TickPair.IsClose(tickPair.Down)).Select(x => x.TickPair));
+                    closeRight5 = closeRight5.Concat(closePowerups.Where(x => x.TickPair.IsClose(tickPair.Up)).Select(x => x.TickPair));
+                }
+
+                var closeSolo = Editor5.Messages.Solos.GetBetweenTick(tickPair.Expand(Utility.TickCloseWidth)).ToList();
+                if (closeSolo.Any())
+                {
+                    closeLeft5 = closeLeft5.Concat(closeSolo.Where(x => x.TickPair.IsClose(tickPair.Down)).Select(x => x.TickPair));
+                    closeRight5 = closeRight5.Concat(closeSolo.Where(x => x.TickPair.IsClose(tickPair.Up)).Select(x => x.TickPair));
+                }
+            }
 
             var oldPair = tickPair;
-            tickPair = snapLeftTick(tickPair, gridPointDown, closeToLeft6, closeToLeft5, config);
-            tickPair = snapRightTick(tickPair, gridPointUp, closeToRight6, closeToRight5, config);
 
-            return tickPair;
+            var tickPairDown = snapLeftTick(oldPair, gridPointDown, closeLeft6, closeLeft5, config);
+            var tickPairUp = snapRightTick(oldPair, gridPointUp, closeRight6, closeRight5, config);
+
+            if (tickPairDown.Down != tickPair.Down)
+            {
+                AddSnapPointToRender(GetClientPointFromTick(tickPairDown.Down));
+            }
+            if (tickPairUp.Up != tickPair.Up)
+            {
+                AddSnapPointToRender(GetClientPointFromTick(tickPairUp.Up));
+            }
+            return new TickPair(tickPairDown.Down, tickPairUp.Up);
         }
 
-        private TickPair snapLeftTick(TickPair tickPair, GridPoint gridPointDown, List<GuitarChord> closeToLeft, List<GuitarChord> closeToLeft5, SnapConfig config)
+        private TickPair snapLeftTick(TickPair tickPair, GridPoint gridPoint,
+            IEnumerable<TickPair> closeToLeft,
+            IEnumerable<TickPair> closeToLeft5,
+            SnapConfig config)
         {
             var gridTick = Int32.MinValue;
-            if (gridPointDown != null && config.SnapGrid)
-            {
-                if (tickPair.Down.IsCloseTick(gridPointDown.Tick))
-                    gridTick = gridPointDown.Tick;
-            }
+            var tickPairDown = tickPair.Down;
 
-            if (closeToLeft5.Any() && config.SnapG5)
+            var tickPair5 = Int32.MinValue;
+            var tickPair6 = Int32.MinValue;
+
+            if (gridPoint != null && config.SnapGrid)
             {
-                var closeDown = closeToLeft5.Where(x => x.DownTick.IsCloseTick(tickPair.Down));
-                var closeUp = closeToLeft5.Where(x => x.UpTick.IsCloseTick(tickPair.Down));
+                if (tickPairDown.IsCloseTick(gridPoint.Tick))
+                    gridTick = gridPoint.Tick;
+            }
+            if (config.SnapG5 && closeToLeft5 != null && closeToLeft5.Any())
+            {
+                var closeDown = closeToLeft5.Where(x => x.Down.IsCloseTick(tickPairDown)).ToList();
+                var closeUp = closeToLeft5.Where(x => x.Up.IsCloseTick(tickPairDown)).ToList();
 
                 if (closeDown.Any())
                 {
-                    var maxLeft = closeDown.Max(v => v.DownTick);
-                    if (maxLeft > tickPair.Down)
+                    var maxDown = closeDown.Select(x => new { Dist = (tickPair.Down - x.Down).Abs(), Val = x.Down }).OrderBy(x => x.Dist).FirstOrDefault().Val;
+
+                    if (tickPairDown.IsCloseTick(maxDown))
                     {
-                        if (tickPair.Down.IsCloseTick(maxLeft))
-                            tickPair.Down = maxLeft;
+                        tickPair5 = maxDown;
                     }
-                    else if (gridPointDown != null && config.SnapGrid)
+                    else if (gridPoint != null && config.SnapGrid && gridTick.IsNotNull())
                     {
-                        var gd = gridTick.DistSq(tickPair.Down);
-                        if (gd < maxLeft.DistSq(tickPair.Down))
+                        var gd = gridTick.DistSq(tickPairDown);
+                        if (gd < maxDown.DistSq(tickPairDown))
                         {
-                            if (tickPair.Down.IsCloseTick(gridTick))
-                                tickPair.Down = gridTick;
+                            if (tickPairDown.IsCloseTick(gridTick))
+                                tickPair5 = gridTick;
                         }
                         else
                         {
-                            if (tickPair.Down.IsCloseTick(maxLeft))
-                                tickPair.Down = maxLeft;
+                            if (tickPairDown.IsCloseTick(maxDown))
+                                tickPair5 = maxDown;
                         }
                     }
-                    else
-                    {
-                        if (tickPair.Down.IsCloseTick(maxLeft))
-                            tickPair.Down = maxLeft;
-                    }
-                }
-                else if (closeUp.Any())
-                {
-                    var maxLeft = closeUp.Min(v => v.UpTick);
-                    tickPair.Down = maxLeft;
 
-                    if (gridPointDown != null && config.SnapGrid)
+                }
+
+                if (closeUp.Any())
+                {
+                    var maxUp = closeUp.Select(x => new { Dist = (tickPair.Down - x.Up).Abs(), Val = x.Up }).OrderBy(x => x.Dist).FirstOrDefault().Val;
+
+                    if (maxUp > tickPairDown)
                     {
-                        var gd = gridTick.DistSq(tickPair.Down);
-                        if (gd < maxLeft.DistSq(tickPair.Down))
+                        if (tickPairDown.IsCloseTick(maxUp))
+                            tickPair5 = maxUp;
+                    }
+                    else if (gridPoint != null && config.SnapGrid && gridTick.IsNotNull())
+                    {
+                        var gd = gridTick.DistSq(tickPairDown);
+                        if (gd < maxUp.DistSq(tickPairDown))
                         {
-                            if (tickPair.Down.IsCloseTick(gridTick))
-                                tickPair.Down = gridTick;
+                            if (tickPairDown.IsCloseTick(gridTick))
+                                tickPair5 = gridTick;
                         }
                         else
                         {
-                            if (tickPair.Down.IsCloseTick(maxLeft))
-                                tickPair.Down = maxLeft;
+                            if (tickPairDown.IsCloseTick(maxUp))
+                                tickPair5 = maxUp;
                         }
                     }
-                    if (tickPair.Up <= tickPair.Down)
-                    {
-                        tickPair.Down = tickPair.Up - 1;
-                    }
+
                 }
 
             }
-            if (closeToLeft.Any() && config.SnapG6)
+            if (config.SnapG6 && closeToLeft != null && closeToLeft.Any())
             {
-                var maxLeft = closeToLeft.Max(x => x.UpTick);
+                var closeDown = closeToLeft.Where(x => x.Down.IsCloseTick(tickPair.Down)).ToList();
+                var closeUp = closeToLeft.Where(x => x.Up.IsCloseTick(tickPair.Down)).ToList();
 
-                if (maxLeft > tickPair.Down)
+                if (closeDown.Any())
                 {
-                    if (tickPair.Down.IsCloseTick(maxLeft))
-                        tickPair.Down = maxLeft;
-                }
-                else if (gridPointDown != null && config.SnapGrid)
-                {
-                    var gd = gridTick.DistSq(tickPair.Down);
-                    if (gd < maxLeft.DistSq(tickPair.Down))
+                    var minDown = closeDown.Select(x => new { Dist = (tickPair.Down - x.Down).Abs(), Val = x.Down }).OrderBy(x => x.Dist).FirstOrDefault().Val;
+
+                    if (tickPairDown.IsCloseTick(minDown))
                     {
-                        if (tickPair.Down.IsCloseTick(gridTick))
-                            tickPair.Down = gridTick;
+                        tickPair6 = minDown;
                     }
-                    else
+                    else if (gridPoint != null && config.SnapGrid && gridTick.IsNotNull())
                     {
-                        if (tickPair.Down.IsCloseTick(maxLeft))
-                            tickPair.Down = maxLeft;
+                        var gd = gridTick.DistSq(tickPairDown);
+                        if (gd < minDown.DistSq(tickPairDown))
+                        {
+                            if (tickPairDown.IsCloseTick(gridTick))
+                                tickPair6 = gridTick;
+                        }
+                        else
+                        {
+                            if (tickPairDown.IsCloseTick(minDown))
+                                tickPair6 = minDown;
+                        }
                     }
                 }
-                else
+
+                if (closeUp.Any())
                 {
-                    if (tickPair.Down.IsCloseTick(maxLeft))
-                        tickPair.Down = maxLeft;
+                    var maxUp = closeUp.Select(x => new { Dist = (tickPair.Down - x.Up).Abs(), Val = x.Up }).OrderBy(x => x.Dist).FirstOrDefault().Val;
+
+                    if (tickPairDown.IsCloseTick(maxUp))
+                    {
+                        tickPair6 = maxUp;
+                    }
+                    else if (gridPoint != null && config.SnapGrid && gridTick.IsNotNull())
+                    {
+                        var gd = gridTick.DistSq(tickPairDown);
+                        if (gd < maxUp.DistSq(tickPairDown))
+                        {
+                            if (tickPairDown.IsCloseTick(gridTick))
+                                tickPair6 = gridTick;
+                        }
+                        else
+                        {
+                            if (tickPairDown.IsCloseTick(maxUp))
+                                tickPair6 = maxUp;
+                        }
+                    }
+
                 }
+
             }
-            else if (gridPointDown != null && config.SnapGrid)
+            else if (gridPoint != null && config.SnapGrid && gridTick.IsNotNull())
             {
-                if (tickPair.Down.IsCloseTick(gridTick))
-                    tickPair.Down = gridTick;
-
+                if (tickPairDown.IsCloseTick(gridTick))
+                    tickPairDown = gridTick;
             }
-            return tickPair;
+
+            var ret = new[] { tickPair6, tickPair5, gridTick }.Where(x => x.IsNotNull());
+            if (ret.Any())
+            {
+                tickPairDown = ret.Select(x => new { Dist = (x - tickPairDown).Abs(), Val = x }).OrderBy(x => x.Dist).FirstOrDefault().Val;
+            }
+
+            if (tickPairDown.IsNull() == false &&
+                tickPairDown > tickPair.Up)
+            {
+                tickPairDown = tickPair.Up;
+            }
+            return new TickPair(tickPairDown, tickPair.Up);
         }
-
-
-        private TickPair snapRightTick(TickPair tickPair, GridPoint gridPoint, List<GuitarChord> closeToRight, List<GuitarChord> closeToRight5, SnapConfig config)
+        private TickPair snapRightTick(TickPair tickPair, GridPoint gridPoint,
+            IEnumerable<TickPair> closeToRight,
+            IEnumerable<TickPair> closeToRight5, SnapConfig config)
         {
             var gridTick = Int32.MinValue;
+            var tickPair5 = Int32.MinValue;
+            var tickPair6 = Int32.MinValue;
+
             if (gridPoint != null && config.SnapGrid)
             {
                 if (tickPair.Up.IsCloseTick(gridPoint.Tick))
                     gridTick = gridPoint.Tick;
             }
-            if (closeToRight5.Any() && config.SnapG5)
+            if (config.SnapG5 && closeToRight5 != null && closeToRight5.Any())
             {
-                var closeDown = closeToRight5.Where(x => x.DownTick.IsCloseTick(tickPair.Up));
-                var closeUp = closeToRight5.Where(x => x.UpTick.IsCloseTick(tickPair.Up));
+                var closeDown = closeToRight5.Where(x => x.Down.IsCloseTick(tickPair.Up)).ToList();
+                var closeUp = closeToRight5.Where(x => x.Up.IsCloseTick(tickPair.Up)).ToList();
 
                 if (closeDown.Any())
                 {
-                    var minDown = closeDown.Min(v => v.DownTick);
-                    if (minDown < tickPair.Up)
+                    var minDown = closeDown.Select(x => new { Dist = (tickPair.Up - x.Down).Abs(), Val = x.Down }).OrderBy(x => x.Dist).FirstOrDefault().Val;
+
+
+                    if (tickPair.Up.IsCloseTick(minDown))
                     {
-                        if (tickPair.Up.IsCloseTick(minDown))
-                            tickPair.Up = minDown;
+                        tickPair5 = minDown;
                     }
-                    else if (gridPoint != null && config.SnapGrid)
+                    else if (gridPoint != null && config.SnapGrid && gridTick.IsNotNull())
                     {
                         var gd = gridTick.DistSq(tickPair.Up);
                         if (gd < minDown.DistSq(tickPair.Up))
                         {
                             if (tickPair.Up.IsCloseTick(gridTick))
-                                tickPair.Up = gridTick;
+                                tickPair5 = gridTick;
                         }
                         else
                         {
                             if (tickPair.Up.IsCloseTick(minDown))
-                                tickPair.Up = minDown;
+                                tickPair5 = minDown;
                         }
                     }
-                    else
-                    {
-                        if (tickPair.Up.IsCloseTick(minDown))
-                            tickPair.Up = minDown;
-                    }
+
                 }
-                else if (closeUp.Any())
+                if (closeUp.Any())
                 {
-                    var maxUp = closeUp.Max(v => v.UpTick);
-                    if (maxUp < tickPair.Up)
+                    var maxUp = closeUp.Select(x => new { Dist = (tickPair.Up - x.Up).Abs(), Val = x.Up }).OrderBy(x => x.Dist).FirstOrDefault().Val;
+
+                    if (tickPair.Up.IsCloseTick(maxUp))
                     {
-                        if (tickPair.Up.IsCloseTick(maxUp))
-                            tickPair.Up = maxUp;
+                        tickPair5 = maxUp;
                     }
-                    else if (gridPoint != null && config.SnapGrid)
+                    else if (gridPoint != null && config.SnapGrid && gridTick.IsNotNull())
                     {
                         var gd = gridTick.DistSq(tickPair.Up);
                         if (gd < maxUp.DistSq(tickPair.Up))
                         {
                             if (tickPair.Up.IsCloseTick(gridTick))
-                                tickPair.Up = gridTick;
+                                tickPair5 = gridTick;
                         }
                         else
                         {
                             if (tickPair.Up.IsCloseTick(maxUp))
-                                tickPair.Up = maxUp;
+                                tickPair5 = maxUp;
                         }
                     }
-                    else
-                    {
-                        if (tickPair.Up.IsCloseTick(maxUp))
-                            tickPair.Up = maxUp;
-                    }
-                }
-                if (tickPair.Up.IsNull() == false &&
-                    tickPair.Up <= tickPair.Down)
-                {
-                    tickPair.Up = tickPair.Down + 1;
-                }
-            }
-            if (closeToRight.Any() && config.SnapG6)
-            {
-                var minDown = closeToRight.Min(x => x.DownTick);
 
-                if (minDown < tickPair.Up)
-                {
-                    if (tickPair.Up.IsCloseTick(minDown))
-                        tickPair.Up = minDown;
                 }
-                else if (gridPoint != null && config.SnapGrid)
+
+            }
+            if (config.SnapG6 && closeToRight != null && closeToRight.Any())
+            {
+                var closeDown = closeToRight.Where(x => x.Down.IsCloseTick(tickPair.Up)).ToList();
+                var closeUp = closeToRight.Where(x => x.Up.IsCloseTick(tickPair.Up)).ToList();
+
+                if (closeDown.Any())
                 {
-                    var gd = gridTick.DistSq(tickPair.Up);
-                    if (gd < minDown.DistSq(tickPair.Up))
-                    {
-                        if (tickPair.Up.IsCloseTick(gridTick))
-                            tickPair.Up = gridTick;
-                    }
-                    else
-                    {
-                        if (tickPair.Up.IsCloseTick(minDown))
-                            tickPair.Up = minDown;
-                    }
-                }
-                else
-                {
+                    var minDown = closeDown.Select(x => new { Dist = (tickPair.Up - x.Down).Abs(), Val = x.Down }).OrderBy(x => x.Dist).FirstOrDefault().Val;
+
                     if (tickPair.Up.IsCloseTick(minDown))
-                        tickPair.Up = minDown;
+                    {
+                        tickPair6 = minDown;
+                    }
+                    else if (gridPoint != null && config.SnapGrid && gridTick.IsNotNull())
+                    {
+                        var gd = gridTick.DistSq(tickPair.Up);
+                        if (gd < minDown.DistSq(tickPair.Up))
+                        {
+                            if (tickPair.Up.IsCloseTick(gridTick))
+                                tickPair6 = gridTick;
+                        }
+                        else
+                        {
+                            if (tickPair.Up.IsCloseTick(minDown))
+                                tickPair6 = minDown;
+                        }
+                    }
+
+                }
+                if (closeUp.Any())
+                {
+                    var maxUp = closeUp.Select(x => new { Dist = (tickPair.Up - x.Up).Abs(), Val = x.Up }).OrderBy(x => x.Dist).FirstOrDefault().Val;
+
+
+                    if (tickPair.Up.IsCloseTick(maxUp))
+                    {
+                        tickPair6 = maxUp;
+                    }
+                    else if (gridPoint != null && config.SnapGrid && gridTick.IsNotNull())
+                    {
+                        var gd = gridTick.DistSq(tickPair.Up);
+                        if (gd < maxUp.DistSq(tickPair.Up))
+                        {
+                            if (tickPair.Up.IsCloseTick(gridTick))
+                                tickPair6 = gridTick;
+                        }
+                        else
+                        {
+                            if (tickPair.Up.IsCloseTick(maxUp))
+                                tickPair6 = maxUp;
+                        }
+                    }
+
                 }
             }
-            else if (gridPoint != null && config.SnapGrid)
+            else if (gridPoint != null && config.SnapGrid && gridTick.IsNotNull())
             {
                 if (tickPair.Up.IsCloseTick(gridTick))
                     tickPair.Up = gridTick;
+            }
+            var ret = new[] { tickPair6, tickPair5, gridTick }.Where(x => x.IsNotNull());
+            if (ret.Any())
+            {
+                tickPair.Up = ret.Select(x => new { Dist = (x - tickPair.Up).Abs(), Val = x }).OrderBy(x => x.Dist).FirstOrDefault().Val;
+            }
+            if (tickPair.Up.IsNull() == false &&
+                tickPair.Up < tickPair.Down)
+            {
+                tickPair.Up = tickPair.Down;
             }
             return tickPair;
         }
@@ -3463,16 +3630,32 @@ namespace ProUpgradeEditor.Common
         {
             var sel = CurrentSelector;
 
-            if (sel == null)
+            if (sel == null || sel.Chord == null)
                 return;
 
             if (GridSnap)
             {
-                int mc;
-                if (!GetGridSnapPointFromClientPoint(mouseClient, out mc))
+                var tickPair = sel.Chord.TickPair;
+
+                if (sel.IsRight)
                 {
-                    mc = mouseClient.X;
+                    tickPair.Up = GetTickFromClientPoint(mouseClient.X);
                 }
+                else
+                {
+                    tickPair.Down = GetTickFromClientPoint(mouseClient.X);
+                }
+
+                tickPair = SnapLeftRightTicks(tickPair, new SnapConfig(true, true, true));
+
+                var cli = GetClientPointFromTick(tickPair);
+                int mc = cli.Down;
+                if (sel.IsRight)
+                {
+                    mc = cli.Up;
+                }
+
+
                 mouseClient = new Point(mc, SnapToString(mouseClient.Y));
             }
 
@@ -3559,7 +3742,7 @@ namespace ProUpgradeEditor.Common
             {
                 if (EditorPro.IsLoaded && Editor5.IsLoaded)
                 {
-                    BackupSequence();
+                    EditorPro.BackupSequence();
 
                     var newChords = new List<GuitarChord>();
                     Editor5.SelectedChords.ToList().ForEach(chord5 =>
@@ -3576,7 +3759,7 @@ namespace ProUpgradeEditor.Common
                         }
                     });
 
-                    SetSelected(newChords);
+                    EditorPro.SetSelected(newChords);
 
                     EditorPro.Invalidate();
                 }

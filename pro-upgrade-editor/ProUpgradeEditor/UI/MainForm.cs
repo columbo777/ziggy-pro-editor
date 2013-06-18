@@ -364,16 +364,20 @@ namespace ProUpgradeEditor.UI
                     var tt = EditorPro.GuitarTrack.GetTempoTrack();
                     if (tt != null)
                     {
-                        var seq = new Sequence(FileType.Guitar5, EditorPro.GuitarTrack.SequenceDivision.ToInt());
-                        seq.AddTempo(tt);
-
-                        foreach (var track in EditorPro.Tracks.Where(x => x.Name.IsProTrackName17()))
+                        using (var seq = new Sequence(FileType.Guitar5, EditorPro.GuitarTrack.SequenceDivision.ToInt()))
                         {
-                            var g5 = track.ConvertToG5();
-                            g5.Name = track.Name.IsGuitarTrackName() ? GuitarTrack.GuitarTrackName5 : GuitarTrack.BassTrackName5;
-                            seq.Add(g5);
+                            seq.AddTempo(tt);
+
+                            foreach (var track in EditorPro.Tracks.Where(x => x.Name.IsProTrackName17()))
+                            {
+                                var g5 = track.ConvertToG5();
+                                g5.Name = track.Name.IsGuitarTrackName() ? GuitarTrack.GuitarTrackName5 : GuitarTrack.BassTrackName5;
+                                seq.Add(g5);
+                            }
+
+                            TryWriteFile(item.G5FileName, seq.Save().GetBytes(true));
                         }
-                        seq.Save(item.G5FileName);
+
                     }
 
                     ret = OpenSongCacheItem(item);
@@ -682,13 +686,13 @@ namespace ProUpgradeEditor.UI
             return ret;
         }
 
-        private SongCacheItem ImportIntoExistingSong(SongCacheItem song, 
-            IEnumerable<KeyValueObject<string, byte[]>> midiFilesPro, 
+        private SongCacheItem ImportIntoExistingSong(SongCacheItem song,
+            IEnumerable<KeyValueObject<string, byte[]>> midiFilesPro,
             IEnumerable<DTAFile> dtaFiles)
         {
             SongCacheItem ret = null;
             var songIDs = dtaFiles.SelectMany(x => x.GetSongIDs().Select(y => y.Value)).Where(x => x != null).ToList();
-            var songNames = dtaFiles.SelectMany(x => x.Select(y => y.Name)).Where(x=> x != null).ToList();
+            var songNames = dtaFiles.SelectMany(x => x.Select(y => y.Name)).Where(x => x != null).ToList();
 
             if (song != null)
             {
@@ -709,6 +713,7 @@ namespace ProUpgradeEditor.UI
                             else
                             {
                                 song.G6FileName = newFileName;
+                                textBoxSongLibProMidiFileName.Text = song.G6FileName;
                                 ret = song;
                             }
                         }
@@ -719,6 +724,7 @@ namespace ProUpgradeEditor.UI
                         {
                             if (OpenSongCacheItem(song))
                             {
+
                                 if (!TryWriteFile(song.G6FileName, midiPro.Value))
                                 {
                                     MessageBox.Show("Unable to write file: " + song.G6FileName);
@@ -817,6 +823,7 @@ namespace ProUpgradeEditor.UI
                     GetDTAFiles(f).ForEach(dta =>
                     {
                         var newFile = Path.Combine(outputDir, dta.Name);
+
                         if (!File.Exists(newFile))
                         {
                             File.WriteAllBytes(newFile, dta.Data);
@@ -1066,6 +1073,7 @@ namespace ProUpgradeEditor.UI
 
             RefreshTracks6();
             RefreshLists();
+
         }
 
         void trackEditorG5_OnClose(TrackEditor editor)
@@ -1665,12 +1673,13 @@ namespace ProUpgradeEditor.UI
                 }
                 else
                 {
-                    FileNameG5.IfNotEmpty(x => EditorG5.SaveTrack(FileNameG5));
+                    FileNameG5.IfNotEmpty(x => EditorG5.SaveTrack(FileNameG5, CreateBackup));
                 }
             }
             catch { }
         }
 
+        public bool CreateBackup { get { return settings.GetValueBool("Save pro backup on save", false); } }
 
         private void openPro17ToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1698,8 +1707,14 @@ namespace ProUpgradeEditor.UI
 
         private void saveProToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SaveSelectedSong();
-            SaveProFile(FileNamePro, false);
+            if (SelectedSong != null)
+            {
+                SaveSelectedSong();
+            }
+            else
+            {
+                SaveProFile(FileNamePro, false);
+            }
         }
 
 
@@ -1834,11 +1849,11 @@ namespace ProUpgradeEditor.UI
 
                     if (fullRebuild)
                     {
-                        var config = new GenDiffConfig(SelectedSong, 
-                            true, 
-                            false, 
-                            checkBoxInitSelectedDifficultyOnly.Checked, 
-                            checkBoxInitSelectedTrackOnly.Checked, 
+                        var config = new GenDiffConfig(SelectedSong,
+                            true,
+                            false,
+                            checkBoxInitSelectedDifficultyOnly.Checked,
+                            checkBoxInitSelectedTrackOnly.Checked,
                             true);
 
                         GenerateDifficulties(false, config);
@@ -2659,8 +2674,13 @@ namespace ProUpgradeEditor.UI
         {
             SelectedSong.IfObjectNotNull(song =>
             {
-                song.G6FileName.IfNotEmpty(fn => EditorPro.SaveTrack(fn));
-
+                if (EditorPro.IsLoaded)
+                {
+                    if (SaveProFile(song.G6FileName, false))
+                    {
+                        textBoxSongLibProMidiFileName.Text = song.G6FileName;
+                    }
+                }
                 UpdateSongCacheItem(song);
             });
         }
@@ -3222,7 +3242,7 @@ namespace ProUpgradeEditor.UI
         {
             try
             {
-                if (FileNamePro.IsEmpty())
+                if (FileNamePro.IsNotEmpty())
                 {
                     SaveProFile(FileNamePro, true);
                     EditorPro.ClearBackups();
@@ -8207,22 +8227,7 @@ namespace ProUpgradeEditor.UI
 
                 if (!wasLoaded)
                 {
-                    var folder = DefaultMidiFileLocationPro.AppendSlashIfMissing();
-                    if (SelectedSong != null)
-                        folder = SelectedSong.G5FileName.GetIfEmpty(SelectedSong.G6FileName).GetFolderName();
-
-                    ShowSaveFileDlg("Save Rock Band 3 Pro Midi File", folder, "").IfNotEmpty(fileName =>
-                    {
-                        FileNamePro = fileName;
-                        EditorPro.SaveTrack(fileName);
-
-                        if (SelectedSong != null)
-                        {
-                            SelectedSong.G6FileName = FileNamePro;
-                            textBoxSongLibProMidiFileName.Text = SelectedSong.G6FileName;
-                            UpdateSongCacheItem(SelectedSong);
-                        }
-                    });
+                    SaveProFile(EditorPro.LoadedFileName, false);
                 }
             }
         }
@@ -8255,14 +8260,16 @@ namespace ProUpgradeEditor.UI
             ShowSaveFileDlg("Save Midi 5", folder,
                 "").IfNotEmpty(fileName =>
                 {
-                    FileNameG5 = fileName;
-                    EditorG5.SaveTrack(fileName);
 
-                    if (SelectedSong != null)
+                    if (EditorG5.SaveTrackAs(fileName))
                     {
-                        SelectedSong.G5FileName = FileNameG5;
-                        textBoxSongLibG5MidiFileName.Text = SelectedSong.G5FileName;
-                        UpdateSongCacheItem(SelectedSong);
+                        FileNameG5 = fileName;
+                        if (SelectedSong != null)
+                        {
+                            SelectedSong.G5FileName = FileNameG5;
+                            textBoxSongLibG5MidiFileName.Text = SelectedSong.G5FileName;
+                            UpdateSongCacheItem(SelectedSong);
+                        }
                     }
                 });
         }
@@ -9534,11 +9541,15 @@ namespace ProUpgradeEditor.UI
                         var saveFileName = ShowSaveFileDlg("Save File", DefaultMidiFileLocationPro, "");
                         if (!saveFileName.IsEmpty())
                         {
-                            seq.Save(saveFileName);
+                            TryWriteFile(saveFileName, seq.Save().GetBytes(true));
 
                             if (EditorPro.LoadMidi17(saveFileName, ReadFileBytes(saveFileName), false))
                             {
-
+                                if (SelectedSong != null && SelectedSong.G6FileName.IsEmpty())
+                                {
+                                    SelectedSong.G6FileName = saveFileName;
+                                    textBoxSongLibProMidiFileName.Text = saveFileName;
+                                }
                             }
                         }
                     }

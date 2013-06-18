@@ -165,6 +165,37 @@ namespace ProUpgradeEditor.Common
             catch { }
             return ret;
         }
+
+
+        public static byte[] GetBytes(this MemoryStream data, bool closeStream)
+        {
+            byte[] ret = null;
+            try
+            {
+                if (data.CanSeek)
+                {
+                    data.Seek(0, SeekOrigin.Begin);
+                }
+                if (data.CanRead)
+                {
+                    ret = new byte[data.Length];
+                    data.Read(ret, 0, (int)data.Length);
+                }
+                if (closeStream)
+                {
+                    try
+                    {
+                        data.Close();
+                    }
+                    finally
+                    {
+                        data.Dispose();
+                    }
+                }
+            }
+            catch { }
+            return ret == null ? new byte[0] : ret;
+        }
         public static Sequence LoadSequence(this byte[] data)
         {
             Sequence ret = null;
@@ -404,7 +435,9 @@ namespace ProUpgradeEditor.Common
                 }
                 else
                 {
-                    return str.GetFileInfo().GetIfNotNull((fi) => fi.Exists && fi.Attributes.HasFlag(FileAttributes.Directory) ? str.AppendSlashIfMissing() : Path.GetDirectoryName(str).AppendSlashIfMissing());
+                    return str.GetFileInfo().GetIfNotNull((fi) => 
+                        fi.Exists && fi.Attributes.HasFlag(FileAttributes.Directory) ? 
+                        str.AppendSlashIfMissing() : Path.GetDirectoryName(str).AppendSlashIfMissing());
                 }
             });
         }
@@ -764,6 +797,11 @@ namespace ProUpgradeEditor.Common
             return (int)Math.Abs(i - x);
         }
 
+        public static int Abs(this int i)
+        {
+            return (int)Math.Abs(i);
+        }
+
         public static bool IsBetween(this int i, int lowValue, int highValue, bool includingValue = true)
         {
             if (lowValue > highValue)
@@ -1102,19 +1140,35 @@ namespace ProUpgradeEditor.Common
 
             if (t.IsFileTypePro() && type == FileType.Guitar5)
             {
-                tmess.ForEach(x => ret.Insert(x.AbsoluteTicks, x.ConvertToG5(destDifficulty)));
+                tmess.Select(x => new
+                {
+                    AbsoluteTicks = x.AbsoluteTicks,
+                    Event = x.ConvertToG5(destDifficulty)
+                }).Where(x => x.Event != null).ForEach(x => ret.Insert(x.AbsoluteTicks, x.Event));
             }
             else if (t.IsFileTypePro() == false && type == FileType.Pro)
             {
-                tmess.ForEach(x => ret.Insert(x.AbsoluteTicks, x.ConvertToPro(destDifficulty)));
+                tmess.Select(x => new
+                {
+                    AbsoluteTicks = x.AbsoluteTicks,
+                    Event = x.ConvertToPro(destDifficulty)
+                }).Where(x => x.Event != null).ForEach(x => ret.Insert(x.AbsoluteTicks, x.Event));
             }
             else if (t.IsFileTypePro())
             {
-                tmess.ForEach(x => ret.Insert(x.AbsoluteTicks, x.ConvertDifficultyPro(destDifficulty)));
+                tmess.Select(x => new
+                {
+                    AbsoluteTicks = x.AbsoluteTicks,
+                    Event = x.ConvertDifficultyPro(destDifficulty)
+                }).Where(x => x.Event != null).ForEach(x => ret.Insert(x.AbsoluteTicks, x.Event));
             }
             else
             {
-                tmess.ForEach(x => ret.Insert(x.AbsoluteTicks, x.ConvertDifficultyG5(destDifficulty)));
+                tmess.Select(x => new
+                {
+                    AbsoluteTicks = x.AbsoluteTicks,
+                    Event = x.ConvertDifficultyG5(destDifficulty)
+                }).Where(x => x.Event != null).ForEach(x => ret.Insert(x.AbsoluteTicks, x.Event));
             }
 
             return ret;

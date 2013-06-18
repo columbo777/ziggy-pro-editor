@@ -520,19 +520,16 @@ namespace ProUpgradeEditor.UI
             GuitarDifficulty guitarDifficulties,
             GenDiffConfig config)
         {
-            if (guitarDifficulties.IsExpert())
-            {
-                guitarDifficulties ^= GuitarDifficulty.Expert;
-            }
-
+           
             if (guitarDifficulties.IsUnknownOrNone())
                 return;
 
             var diffs = guitarDifficulties.GetDifficulties().Where(x => x.IsEasyMediumHard());
 
-            EditorPro.SetTrack(trackG6);
-            EditorG5.SetTrack(trackG5);
+            EditorPro.SetTrack(trackG6, GuitarDifficulty.Expert);
+            EditorG5.SetTrack(trackG5, GuitarDifficulty.Expert);
 
+            var expertChords = EditorPro.Messages.Chords.ToList();
 
             foreach (var diff in diffs)
             {
@@ -554,21 +551,20 @@ namespace ProUpgradeEditor.UI
                 EditorPro.Messages.Arpeggios.Where(x => x.Difficulty == diff).ToList().ForEach(x => x.DeleteAll());
 
 
-                GenDiffNotes(sourceChords, sourceArpeggio, diff, config);
+                GenDiffNotes(expertChords, sourceChords, sourceArpeggio, diff, config);
 
             }
 
         }
 
         private void GenDiffNotes(
+            IEnumerable<GuitarChord> expertChords,
             IEnumerable<GuitarChord> sourceChords,
             IEnumerable<GuitarArpeggio> sourceArpeggio,
             GuitarDifficulty targetDifficulty, GenDiffConfig config)
         {
-
-
             var chords = sourceChords.Where(x => x.IsPureArpeggioHelper == false).ToList();
-            CreateChords(targetDifficulty, chords);
+            CreateChords(expertChords, targetDifficulty, chords);
 
             if (targetDifficulty == GuitarDifficulty.Hard)
             {
@@ -581,7 +577,9 @@ namespace ProUpgradeEditor.UI
         }
 
         private void CreateChords(
-            GuitarDifficulty targetDifficulty, IEnumerable<GuitarChord> sourceChords)
+            IEnumerable<GuitarChord> expertChords,
+            GuitarDifficulty targetDifficulty, 
+            IEnumerable<GuitarChord> sourceChords)
         {
 
             GuitarChord lastChord = null;
@@ -591,7 +589,7 @@ namespace ProUpgradeEditor.UI
                 if (lastChord != null && sc.StartTime < lastChord.EndTime)
                     continue;
 
-                var c = CreateChordAtDifficulty(sourceChords, targetDifficulty, sc);
+                var c = CreateChordAtDifficulty(expertChords, sourceChords, targetDifficulty, sc);
                 if (c != null)
                 {
                     lastChord = c;
@@ -600,7 +598,9 @@ namespace ProUpgradeEditor.UI
             }
         }
 
-        private GuitarChord CreateChordAtDifficulty(IEnumerable<GuitarChord> sourceChords,
+        private GuitarChord CreateChordAtDifficulty(
+            IEnumerable<GuitarChord> expertChords, 
+            IEnumerable<GuitarChord> sourceChords,
             GuitarDifficulty targetDifficulty, GuitarChord sc)
         {
             GuitarChord ret = null;
@@ -623,6 +623,12 @@ namespace ProUpgradeEditor.UI
                         }
                     }
                 }
+                
+            }
+
+            if (g6c == null)
+            {
+                g6c = expertChords.SingleBetweenTick(sc.TickPair);
             }
 
             if (g6c != null)
@@ -696,7 +702,11 @@ namespace ProUpgradeEditor.UI
                         EditorPro.Messages,
                         targetDifficulty,
                         sc.TickPair,
-                        new GuitarChordConfig(frets, channels, g6c.HasSlide, g6c.HasSlideReversed, g6c.HasHammeron, g6c.StrumMode));
+                        new GuitarChordConfig(frets, channels, 
+                            g6c.HasSlide, 
+                            g6c.HasSlideReversed, 
+                            g6c.HasHammeron, 
+                            g6c.StrumMode));
 
                 }
             }
@@ -1328,6 +1338,11 @@ namespace ProUpgradeEditor.UI
                                 }
                             }
 
+                            if (chords.First().DownTick < 10)
+                            {
+                                fileErrors.Add("first chord is too soon in track: " + (currentTrackName) + " " + diff);
+                            }
+
                             var tempotrack = EditorPro.GuitarTrack.GetTempoTrack();
                             if (tempotrack == null)
                             {
@@ -1345,6 +1360,24 @@ namespace ProUpgradeEditor.UI
                                 fileErrors.Add(currentTrackName + " Tempo missing from tempo track.");
                             }
                         }
+
+                        if (songCacheItem != null)
+                        {
+                            if (songCacheItem.CopyGuitarToBass == false)
+                            {
+                                if (currentTrackName.IsBassTrackName())
+                                {
+                                    
+                                    var notesOver4 = chords.Where(c => c.Notes.Any(x=> x.NoteString > 3)).ToList();
+                                    if (notesOver4.Any())
+                                    {
+                                        fileErrors.Add(currentTrackName + " " + notesOver4.Count + " Chords using more than 4 strings on bass: " + diff);
+                                        fileErrors.AddRange(notesOver4.Select(m => m.ToString()));
+                                    }
+                                }
+                            }
+                        }
+
                         var noteAligns = chords.Where(x => x.Notes.NotesAligned == false).ToList();
                         if (noteAligns.Any())
                         {
@@ -1400,6 +1433,17 @@ namespace ProUpgradeEditor.UI
                             if (modWithNoNotes.Any())
                             {
                                 fileErrors.Add(currentTrackName + " " + modWithNoNotes.Count + " Multi string tremelo with no notes: " + diff);
+                                fileErrors.AddRange(modWithNoNotes.Select(m => m.ToString()));
+                            }
+                        }
+
+                        {
+                            var powerups = EditorPro.Messages.Powerups.ToList();
+                            var modWithNoNotes = powerups.Where(x => chords.AnyBetweenTick(x.TickPair) == false).ToList();
+
+                            if (modWithNoNotes.Any())
+                            {
+                                fileErrors.Add(currentTrackName + " " + modWithNoNotes.Count + " Powerup with no notes: " + diff);
                                 fileErrors.AddRange(modWithNoNotes.Select(m => m.ToString()));
                             }
                         }

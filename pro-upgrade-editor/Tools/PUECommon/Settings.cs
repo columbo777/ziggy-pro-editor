@@ -226,6 +226,7 @@ namespace ProUpgradeEditor.Common
         public void SetValue(string name, string value)
         {
             var valuePath = getValuePath(name);
+
             if (XMLUtil.NodeExists(root, valuePath))
             {
                 XMLUtil.SetNodeValue(root, valuePath, value);
@@ -262,6 +263,14 @@ namespace ProUpgradeEditor.Common
         public string GetValue(string name)
         {
             var valuePath = getValuePath(name);
+            if (XMLUtil.NodeExists(root, valuePath) == false)
+            {
+                valuePath = getValuePath("Util_" + name);
+                if (XMLUtil.NodeExists(root, valuePath) == false)
+                {
+                    return string.Empty;
+                }
+            }
             return XMLUtil.GetNodeValue(root, valuePath);
         }
         public string GetDefaultSettingValue(string name)
@@ -271,8 +280,18 @@ namespace ProUpgradeEditor.Common
         }
         public int GetValueInt(string name, int defaultValue)
         {
+            var i = defaultValue;
+
             var valuePath = getValuePath(name);
-            int i;
+            if (XMLUtil.NodeExists(root, valuePath) == false)
+            {
+                valuePath = getValuePath("Util_" + name);
+                if (XMLUtil.NodeExists(root, valuePath) == false)
+                {
+                    return defaultValue;
+                }
+            }
+            
             var r = XMLUtil.GetNodeValue(root, valuePath);
             if (string.IsNullOrEmpty(r) || int.TryParse(r, out i) == false)
             {
@@ -322,9 +341,14 @@ namespace ProUpgradeEditor.Common
         public bool GetValueBool(string name, bool defaultValue)
         {
             var valuePath = getValuePath(name);
+            
             if (XMLUtil.NodeExists(root, valuePath) == false)
             {
-                return defaultValue;
+                valuePath = getValuePath("Util_" + name);
+                if (XMLUtil.NodeExists(root, valuePath) == false)
+                {
+                    return defaultValue;
+                }
             }
             var v = XMLUtil.GetNodeValue(root, valuePath);
             bool bret;

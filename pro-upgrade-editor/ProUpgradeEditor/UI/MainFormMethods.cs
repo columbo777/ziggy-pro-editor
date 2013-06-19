@@ -514,7 +514,7 @@ namespace ProUpgradeEditor.UI
                         if (SelectedSong != null && SelectedSong.G5FileName.IsNotEmpty() &&
                             SelectedSong.G5FileName.FileExists())
                         {
-                            fileName = SelectedSong.G5FileName.GetFolderName() + 
+                            fileName = SelectedSong.G5FileName.GetFolderName() +
                                 SelectedSong.G5FileName.GetFileNameWithoutExtension() +
                                 Utility.DefaultPROFileExtension;
                         }
@@ -526,7 +526,7 @@ namespace ProUpgradeEditor.UI
                     }
                     catch { }
                 }
-                
+
                 if (fileName.IsNotEmpty())
                 {
                     if (EditorPro.SaveTrack(fileName, CreateBackup))
@@ -789,8 +789,9 @@ namespace ProUpgradeEditor.UI
                                 ProGuitarTrack.CurrentDifficulty,
                                 EditorPro.SnapTickPairPro(ticks),
                                 new GuitarChordConfig(ScreenFrets, ScreenChannels,
-                                checkIsSlide.Checked, checkIsSlideReversed.Checked,
-                                checkIsHammeron.Checked, GetChordStrumFromScreen()));
+                                    checkIsSlide.Checked, checkIsSlideReversed.Checked,
+                                    checkIsHammeron.Checked, GetChordStrumFromScreen(),
+                                    GetChordRootNoteConfigFromScreen()));
                         }
                         else
                         {
@@ -807,7 +808,8 @@ namespace ProUpgradeEditor.UI
                                     ProGuitarTrack.CurrentDifficulty,
                                     EditorPro.SnapTickPairPro(ticks),
                                     new GuitarChordConfig(ScreenFrets, ScreenChannels,
-                                    false, false, false, ChordStrum.Normal));
+                                        false, false, false, ChordStrum.Normal,
+                                        GetChordRootNoteConfigFromScreen()));
                             }
                         }
                     }
@@ -1212,6 +1214,153 @@ namespace ProUpgradeEditor.UI
             }
         }
 
+        public IEnumerable<CheckBox> ChordScaleBoxes
+        {
+            get
+            {
+                var ret = new List<CheckBox>();
+                ret.AddRange(new[]
+                {
+                    checkChordNameE,
+                    checkChordNameF,
+                    checkChordNameGb,
+                    checkChordNameG,
+                    checkChordNameAb,
+                    checkChordNameA,
+                    checkChordNameBb,
+                    checkChordNameB,
+                    checkChordNameC,
+                    checkChordNameDb,
+                    checkChordNameD,
+                    checkChordNameEb
+                });
+                return ret;
+            }
+        }
+        public IEnumerable<ToneNameData1> ChordScaleBoxData1
+        {
+            get
+            {
+                var ret = new List<ToneNameData1>();
+                ret.AddRange(new[]
+                {
+                    ToneNameData1.E,
+                    ToneNameData1.F,
+                    ToneNameData1.Gb,
+                    ToneNameData1.G,
+                    ToneNameData1.Ab,
+                    ToneNameData1.A,
+                    ToneNameData1.Bb,
+                    ToneNameData1.B,
+                    ToneNameData1.C,
+                    ToneNameData1.Db,
+                    ToneNameData1.D,
+                    ToneNameData1.Eb,
+                });
+                return ret;
+            }
+        }
+        public CheckBox GetChordScaleBox(ToneNameData1 d1)
+        {
+            var val = (int)d1;
+            return ChordScaleBoxes.ElementAtOrDefault(val - ((int)ToneNameData1.BaseValue));
+        }
+
+        public int[] CurrentTuning
+        {
+            get
+            {
+                var ret = new int[] { 0, 0, 0, 0, 0, 0 };
+                if (EditorPro.IsLoaded)
+                {
+                    ret = EditorPro.IsEditingBass ? BassTuning : GuitarTuning;
+                }
+                return ret;
+            }
+        }
+
+        public void SetChordScaleBoxes(GuitarChord chord)
+        {
+            comboBoxNoteEditorChordName.BeginUpdate();
+            comboBoxNoteEditorChordName.Items.Clear();
+            comboBoxNoteEditorChordName.SelectedIndex = -1;
+
+            ChordScaleBoxes.ForEach(x => x.Checked = false);
+
+            if (chord != null)
+            {
+                if(EditorPro.IsLoaded && EditorPro.SelectedTrack.IsNotNull())
+                {
+                    var tuning = EditorPro.IsEditingBass ? BassTuning : GuitarTuning;
+
+                    var names = chord.GetTunedChordNames(CurrentTuning);
+                    if (names.IsNotEmpty())
+                    {
+                        GetChordScaleBox(names.First().ToneName.ToToneNameData1()).IfNotNull(x => x.Checked = true);
+                    }
+
+                    comboBoxNoteEditorChordName.Items.AddRange(names.ToArray());
+
+                    if (comboBoxNoteEditorChordName.Items.Count > 0)
+                    {
+                        comboBoxNoteEditorChordName.SelectedIndex = 0;
+                    }
+
+                    if (chord.RootNoteConfig.IsNotNull())
+                    {
+                        var rc = chord.RootNoteConfig;
+
+                        GetChordScaleBox((ToneNameData1)rc.RootNoteData1).IfNotNull(x => x.Checked = true);
+
+                        if (rc.UseUserChordName)
+                        {
+                            var match = names.Where(n => n.ToString().EqualsEx(rc.UserChordName));
+                            if (match.Any())
+                            {
+                                comboBoxNoteEditorChordName.SelectedItem = null;
+                                comboBoxNoteEditorChordName.SelectedText = match.First().ToStringEx();
+                            }
+                            else
+                            {
+                                comboBoxNoteEditorChordName.SelectedItem = null;
+                                comboBoxNoteEditorChordName.Text = rc.UserChordName ?? "";
+                            }
+                        }
+                        checkChordNameHide.Checked = rc.HideNoteName;
+                    }
+
+
+                }
+            }
+
+            comboBoxNoteEditorChordName.EndUpdate();
+        }
+
+        public int[] BassTuning
+        {
+            get
+            {
+                var tunings = new[] { 0, 0, 0, 0, 0, 0 };
+                SelectedSong.IfNotNull(s =>
+                {
+                    tunings = s.BassTuning.Select(gt => gt.ToInt(0)).ToArray();
+                });
+                return tunings;
+            }
+        }
+
+        public int[] GuitarTuning
+        {
+            get
+            {
+                var tunings = new[] { 0, 0, 0, 0, 0, 0 };
+                SelectedSong.IfNotNull(s =>
+                {
+                    tunings = s.GuitarTuning.Select(gt => gt.ToInt(0)).ToArray();
+                });
+                return tunings;
+            }
+        }
         public void SetChordToScreen(GuitarChord gc, bool allowKeepSelection = true, bool ignoreKeepSelection = false)
         {
             var keepSel = (allowKeepSelection && checkKeepSelection.Checked);
@@ -1247,6 +1396,7 @@ namespace ProUpgradeEditor.UI
                 checkStrumHigh.Checked = gc.HasStrumMode(ChordStrum.High);
                 checkStrumMid.Checked = gc.HasStrumMode(ChordStrum.Mid);
                 checkStrumLow.Checked = gc.HasStrumMode(ChordStrum.Low);
+
             }
             else if (gc != null)
             {
@@ -1256,6 +1406,8 @@ namespace ProUpgradeEditor.UI
                 sb.Text = gc.DownTick.ToStringEx();
                 eb.Text = gc.UpTick.ToStringEx();
             }
+
+            SetChordScaleBoxes(gc);
 
             int iStart = GetChordStartBox().Text.ToInt();
             int iEnd = GetChordEndBox().Text.ToInt();
@@ -1287,15 +1439,36 @@ namespace ProUpgradeEditor.UI
 
         public GuitarChord GetChordFromScreen()
         {
-            return GuitarChord.GetChord(EditorPro.Messages, ProGuitarTrack.CurrentDifficulty,
+            var ret = GuitarChord.GetChord(EditorPro.Messages, ProGuitarTrack.CurrentDifficulty,
                 GetChordTicksFromScreen(),
                 new GuitarChordConfig(ScreenFrets,
-                ScreenChannels,
-                checkIsSlide.Checked,
-                checkIsSlideReversed.Checked, checkIsHammeron.Checked,
-                GetChordStrumFromScreen()));
+                    ScreenChannels,
+                    checkIsSlide.Checked,
+                    checkIsSlideReversed.Checked, checkIsHammeron.Checked,
+                    GetChordStrumFromScreen(),
+                    GetChordRootNoteConfigFromScreen()));
+
+            return ret;
         }
 
+        public GuitarChordRootNoteConfig GetChordRootNoteConfigFromScreen()
+        {
+            var ret = new GuitarChordRootNoteConfig();
+            
+            comboBoxNoteEditorChordName.SelectedItem.IfNotNull(x => ret.ChordNameMeta = x as ChordNameMeta);
+            
+            ret.UserChordName = comboBoxNoteEditorChordName.Text;
+
+            ret.UseUserChordName = ret.UserChordName.IsNotEmpty();
+            var check = ChordScaleBoxes.FirstOrDefault(x=> x.Checked);
+            if(check != null)
+            {
+                ret.RootNoteData1 = ChordScaleBoxData1.ElementAt(ChordScaleBoxes.IndexOf(check)).ToInt();
+            }
+            ret.HideNoteName = checkChordNameHide.Checked;
+            
+            return ret;
+        }
         public void ScrollToSelection()
         {
             BeginInvoke(new MethodInvoker(delegate()
@@ -1694,6 +1867,10 @@ namespace ProUpgradeEditor.UI
                 {
                     EditorPro.GuitarTrack.ClearChordNames();
                 }
+                else
+                {
+                    EditorPro.GuitarTrack.CreateChordNames(GuitarTuning, BassTuning);
+                }
             });
         }
 
@@ -1730,6 +1907,10 @@ namespace ProUpgradeEditor.UI
                         if (Utility.ClearChordNames)
                         {
                             EditorPro.GuitarTrack.ClearChordNames();
+                        }
+                        else
+                        {
+                            EditorPro.GuitarTrack.CreateChordNames(GuitarTuning, BassTuning);
                         }
                     }
                 }
@@ -2984,7 +3165,7 @@ namespace ProUpgradeEditor.UI
                     return true;
                 }
             }
-            else if ((tabContainerMain.SelectedTab != null && 
+            else if ((tabContainerMain.SelectedTab != null &&
                 tabContainerMain.SelectedTab == tabNoteEditor &&
                 EditorPro.IsLoaded) ||
                 (EditorPro.Focused && EditorPro.IsLoaded))
@@ -3365,7 +3546,7 @@ namespace ProUpgradeEditor.UI
 
                     return true;
                 }
-                
+
                 if (e.KeyCode == Keys.D1 ||
                     e.KeyCode == Keys.D2 ||
                     e.KeyCode == Keys.D3 ||
@@ -3563,12 +3744,12 @@ namespace ProUpgradeEditor.UI
         {
             try
             {
-                
+
                 EditorPro.RestoreBackup();
             }
             catch
             {
-                
+
             }
         }
 
@@ -5369,10 +5550,10 @@ namespace ProUpgradeEditor.UI
                         }
                         else
                         {
-                            var config = new GenDiffConfig(item, 
-                                true, 
+                            var config = new GenDiffConfig(item,
+                                true,
                                 checkBoxSongLibCopyGuitar.Checked,
-                                false, 
+                                false,
                                 false,
                                 Utility.HandPositionGenerationEnabled);
 

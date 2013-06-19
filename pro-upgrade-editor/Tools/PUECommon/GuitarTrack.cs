@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using Sanford.Multimedia.Midi;
 using System.Diagnostics;
+using ProUpgradeEditor;
 
 namespace ProUpgradeEditor.Common
 {
-
 
 
 
@@ -184,6 +184,7 @@ namespace ProUpgradeEditor.Common
             }
             return ret;
         }
+
 
         public IEnumerable<GuitarTimeSignature> GetTimeSigMessages(GuitarMessageList owner, Track tempoTrack)
         {
@@ -570,11 +571,14 @@ namespace ProUpgradeEditor.Common
                     events.GetEventPairs(Utility.AllHammeronData1).Select(x => new GuitarHammeron(x)).ToList().ForEach(x => x.AddToList());
                     events.GetEventPairs(Utility.AllStrumData1).Select(x => new GuitarChordStrum(x)).ToList().ForEach(x => x.AddToList());
 
+                    events.GetEventPairs(Utility.ChordNameEvents).ToList().
+                        Select(x => new GuitarChordName(x)).ToList().ForEach(x => x.AddToList());
+
                     var notes = events.GetEventPairs(Utility.GetStringsForDifficulty6(difficulty)).Select(x => new GuitarNote(x)).ToList();
                     notes.ForEach(x => x.AddToList());
                     if (notes.Any())
                     {
-                        var closeNotes = notes.GroupBy(x=> x.DownTick).ToList();
+                        var closeNotes = notes.GroupBy(x => x.DownTick).ToList();
                         var chordNotes = closeNotes.Select(n => GuitarChord.GetChord(ret, difficulty, n, true)).ToList().Where(x => x != null).ToList();
                         chordNotes.ForEach(x => x.AddToList());
                     }
@@ -585,6 +589,7 @@ namespace ProUpgradeEditor.Common
                     LoadTrainers(ret, ret.TextEvents).ToList().ForEach(x => x.AddToList());
 
                     events.GetEventPairs(Utility.HandPositionData1.MakeEnumerable()).ToList().Select(x => new GuitarHandPosition(x)).ToList().ForEach(x => x.AddToList());
+
                 }
                 else
                 {
@@ -893,6 +898,81 @@ namespace ProUpgradeEditor.Common
                 ownerTrack.Insert(item.Ticks.Up, new ChannelMessage(ChannelCommand.NoteOff, 17, 0));
             }
         }
+        public void CreateChordNames(int[] GuitarTuning, int[] BassTuning)
+        {
+            var ownerTrack = Messages.Owner.MidiTrack;
+
+            ownerTrack.Remove(ownerTrack.ChanMessages.Where(x => x.IsRootNoteEvent() ).ToList());
+            ownerTrack.Remove(ownerTrack.Meta.Where(x => x.IsChordNameTextEvent()).ToList());
+
+            Utility.GetDifficultyIter().Where(x=> x.IsEasyMediumHardExpert()).ToList().ForEach(difficulty=>
+            {
+                CurrentDifficulty = difficulty;
+
+                CreateChordNameEvents(difficulty, GuitarTuning, BassTuning, ownerTrack);
+            });
+
+            RebuildEvents();
+        }
+
+        public void CreateChordNameEvents(GuitarDifficulty difficulty,
+            int[] GuitarTuning, int[] BassTuning, Track ownerTrack)
+        {
+
+            var x108 = Generate108().Where(x => x.Chord != null).ToList();
+
+            foreach (var item in x108)
+            {
+                if (item.Chord.Notes.Count() > 1)
+                {
+                    ChordNameMeta name = null;
+                    if (ownerTrack.Name.IsBassTrackName())
+                    {
+                        name = item.Chord.GetTunedChordName(BassTuning);
+                    }
+                    else
+                    {
+                        name = item.Chord.GetTunedChordName(GuitarTuning);
+                    }
+
+                    int data1 = -1;
+                    var useUserChordName = false;
+                    var chordName = string.Empty;
+                    var hideChordName = false;
+
+                    item.Chord.RootNoteConfig.IfNotNull(x => useUserChordName = x.UseUserChordName);
+                    item.Chord.RootNoteConfig.IfNotNull(x => chordName = x.UserChordName);
+                    item.Chord.RootNoteConfig.IfNotNull(x => data1 = x.RootNoteData1);
+                    item.Chord.RootNoteConfig.IfNotNull(x => hideChordName = x.HideNoteName);
+
+                    if (difficulty == GuitarDifficulty.Expert)
+                    {
+                        if (hideChordName || (data1 == -1 && (name == null || (name != null && name.ToneName.ToToneNameData1() == ToneNameData1.NotSet))))
+                        {
+                            ownerTrack.Insert(item.Ticks.Down, new ChannelMessage(ChannelCommand.NoteOn, Utility.ChordNameHiddenData1, 100 + item.Fret));
+                            ownerTrack.Insert(item.Ticks.Up, new ChannelMessage(ChannelCommand.NoteOff, Utility.ChordNameHiddenData1, 0));
+                        }
+                        else
+                        {
+                            if (data1 == -1)
+                            {
+                                data1 = name.ToneName.ToToneNameData1().ToInt();
+                            }
+                            ownerTrack.Insert(item.Ticks.Down, new ChannelMessage(ChannelCommand.NoteOn, data1, 100 + item.Fret));
+                            ownerTrack.Insert(item.Ticks.Up, new ChannelMessage(ChannelCommand.NoteOff, data1, 0));
+                        }
+                    }
+
+
+                    var chordNameText = Utility.CreateChordNameText(item.Chord.Difficulty, useUserChordName ? chordName : name.ToStringEx());
+
+                    if (chordNameText.IsNotEmpty())
+                    {
+                        ownerTrack.Insert(item.Chord.AbsoluteTicks, new MetaMessage(MetaType.Text, chordNameText));
+                    }
+                }
+            }
+        }
 
         public bool CreateHandPositionEvents()
         {
@@ -929,6 +1009,7 @@ namespace ProUpgradeEditor.Common
 
             ret.Add(new GuitarHandPositionMeta()
             {
+                Chord = null,
                 Fret = 0,
                 Ticks = new TickPair(Utility.HandPositionMarkerFirstBeginOffset, Utility.HandPositionMarkerFirstEndOffset),
                 IsChord = false,
@@ -943,6 +1024,7 @@ namespace ProUpgradeEditor.Common
 
                     ret.Add(new GuitarHandPositionMeta()
                     {
+                        Chord = chord,
                         Ticks = chord.TickPair,
                         Fret = lowestNonZero,
                         IsChord = chord.NoteFrets.Count() > 1

@@ -83,7 +83,50 @@ namespace ProUpgradeEditor.Common
             
             return ret;
         }
+        public static GuitarNote GetNotePro(GuitarMessageList owner, GuitarDifficulty diff,
+            TickPair ticks, int noteString, int noteFret, bool isTap, bool isArpeggio, bool isX)
+        {
+            var ret = new GuitarNote(owner, ticks);
+            ret.Data1 = Utility.GetNoteData1(noteString, diff, true);
+            ret.NoteFretDown = noteFret;
 
+            if (isX)
+            {
+                ret.Channel = Utility.ChannelX;
+            }
+            else if (isArpeggio)
+            {
+                ret.Channel = Utility.ChannelArpeggio;
+            }
+            else if (isTap)
+            {
+                ret.Channel = Utility.ChannelTap;
+            }
+
+            return ret;
+        }
+        public static GuitarNote GetNote5(GuitarMessageList owner, GuitarDifficulty diff,
+            TickPair ticks, int noteString, int noteFret, bool isTap, bool isArpeggio, bool isX)
+        {
+            var ret = new GuitarNote(owner, ticks);
+            ret.Data1 = Utility.GetNoteData1(noteString, diff, false);
+            ret.NoteFretDown = noteFret;
+
+            if (isX)
+            {
+                ret.Channel = Utility.ChannelX;
+            }
+            else if (isArpeggio)
+            {
+                ret.Channel = Utility.ChannelArpeggio;
+            }
+            else if (isTap)
+            {
+                ret.Channel = Utility.ChannelTap;
+            }
+
+            return ret;
+        }
         /// <summary>
         /// LowE = 0
         /// HighE = 5
@@ -102,14 +145,37 @@ namespace ProUpgradeEditor.Common
             }
         }
 
+        public ToneNameEnum NoteScale { get { return Utility.GetNoteScale(NoteString, NoteFretDown); } }
+
+        public ToneNameEnum GetTunedNoteScale (int[] tuning)
+        {
+            return Utility.GetNoteScale(NoteString, NoteFretDown, tuning);
+        } 
+    
+
         public GuitarNote CloneToMemory(GuitarMessageList owner)
         {
-            var ret = GetNote(owner, Difficulty, this.TickPair, NoteString, NoteFretDown, IsTapNote, IsArpeggioNote, IsXNote);
-            if (ret != null && owner != null)
+            GuitarNote ret= null;
+            if (owner != null)
             {
-                if (IsPro == false && owner.IsPro)
+                ret = GetNote(owner, Difficulty, this.TickPair, NoteString, NoteFretDown, IsTapNote, IsArpeggioNote, IsXNote);
+            }
+            else if (IsPro)
+            {
+                ret = GetNotePro(owner, Difficulty, this.TickPair, NoteString, NoteFretDown, IsTapNote, IsArpeggioNote, IsXNote);
+            }
+            else
+            {
+                ret = GetNote5(owner, Difficulty, this.TickPair, NoteString, NoteFretDown, IsTapNote, IsArpeggioNote, IsXNote);
+            }
+            if (ret != null)
+            {
+                if (owner != null)
                 {
-                    ret.Data2 = 100;
+                    if (IsPro == false && owner.IsPro)
+                    {
+                        ret.Data2 = 100;
+                    }
                 }
             }
             return ret;

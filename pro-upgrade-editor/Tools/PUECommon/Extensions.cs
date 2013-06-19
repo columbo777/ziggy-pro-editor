@@ -17,6 +17,10 @@ namespace ProUpgradeEditor.Common
 
     public static class PUEExtensions
     {
+        public static int ToInt(this object val)
+        {
+            return val.CastObject<int>();
+        }
 
         public static double ToDouble(this int i) { return (double)i; }
         public static double Round(this double d, int decimals) { return Math.Round(d, decimals); }
@@ -435,8 +439,8 @@ namespace ProUpgradeEditor.Common
                 }
                 else
                 {
-                    return str.GetFileInfo().GetIfNotNull((fi) => 
-                        fi.Exists && fi.Attributes.HasFlag(FileAttributes.Directory) ? 
+                    return str.GetFileInfo().GetIfNotNull((fi) =>
+                        fi.Exists && fi.Attributes.HasFlag(FileAttributes.Directory) ?
                         str.AppendSlashIfMissing() : Path.GetDirectoryName(str).AppendSlashIfMissing());
                 }
             });
@@ -643,7 +647,29 @@ namespace ProUpgradeEditor.Common
         {
             return ev != null && ev.MessageType == MessageType.Meta;
         }
+        
 
+        public static string ToStringEx(this ChordNameMeta chord)
+        {
+            var ret = string.Empty;
+            if (chord != null)
+            {
+                ret = chord.ToString();
+            }
+            return ret ?? "";
+        }
+        public static bool IsChordNameTextEvent(this MidiEvent ev)
+        {
+            return ev.IsMetaEvent() && ev.Text.StartsWithEx("[chrd");
+        }
+        public static bool IsChordNameTextEvent(this string ev)
+        {
+            return ev.StartsWithEx("[chrd");
+        }
+        public static bool IsRootNoteEvent(this MidiEvent ev)
+        {
+            return ev.IsChannelEvent() && Utility.ChordNameEvents.Contains(ev.Data1);
+        }
         public static void SetSelectedItem<T>(this ListBox list, T item) where T : class
         {
             if (item != null && list.Items.ToEnumerable<T>().Any(x => x == item))
@@ -1446,7 +1472,7 @@ namespace ProUpgradeEditor.Common
             }
             else
             {
-                if (targetDifficulty != GuitarDifficulty.Unknown)
+                if (targetDifficulty.IsExpertAll())
                 {
                     if (cm.Data1.IsSoloExpert(true))
                     {
@@ -1707,6 +1733,12 @@ namespace ProUpgradeEditor.Common
         public static bool IsHandPositionMessage(this GuitarMessage mess)
         {
             return mess.Data1 == Utility.HandPositionData1;
+        }
+
+
+        public static TickPair ExpandTicks(this int i, int width)
+        {
+            return new TickPair(i - width, i + width);
         }
 
 
@@ -2396,6 +2428,16 @@ namespace ProUpgradeEditor.Common
         {
             return o == null;
         }
+        public static bool IsNotEmpty<T>(this IEnumerable<T> iter)
+        {
+            return iter != null && iter.Any();
+        }
+        
+        public static bool IsEmpty<T>(this IEnumerable<T> iter)
+        {
+            return iter == null || !iter.Any();
+        }
+
         public static bool IsNotNull(this object o)
         {
             return o != null;

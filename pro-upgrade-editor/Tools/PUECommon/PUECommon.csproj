@@ -100,6 +100,8 @@
     <Compile Include="AudioDSP.cs" />
     <Compile Include="ChordModifier.cs" />
     <Compile Include="ChordModifierType.cs" />
+    <Compile Include="ChordNameFinder.cs" />
+    <Compile Include="ChordNameMeta.cs" />
     <Compile Include="ChordStrum.cs" />
     <Compile Include="ChordStrumList.cs" />
     <Compile Include="CodeCompiler.cs" />
@@ -117,6 +119,8 @@
     <Compile Include="GuitarBigRockEndingSubMessage.cs" />
     <Compile Include="GuitarChordConfig.cs" />
     <Compile Include="GuitarChordList.cs" />
+    <Compile Include="GuitarChordName.cs" />
+    <Compile Include="GuitarChordNameList.cs" />
     <Compile Include="GuitarChordNoteList.cs" />
     <Compile Include="GuitarChordNoteListSorter.cs" />
     <Compile Include="GuitarGrid.cs" />
@@ -220,6 +224,8 @@
     <Compile Include="TickPair.cs" />
     <Compile Include="TimePair.cs" />
     <Compile Include="TimeUnit.cs" />
+    <Compile Include="ToneNameData1.cs" />
+    <Compile Include="ToneNameEnum.cs" />
     <Compile Include="TrackDifficulty.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="GuitarArpeggio.cs" />

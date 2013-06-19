@@ -13,6 +13,7 @@ namespace ProUpgradeEditor.Common
     {
         Unknown,
         GuitarHandPosition,
+        GuitarChordName,
         GuitarTextEvent,
         GuitarTrainer,
         GuitarChord,

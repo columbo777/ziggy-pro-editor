@@ -452,8 +452,6 @@ namespace ProUpgradeEditor.UI
             {
                 panel6.Location = new Point(panel6.Location.X, pTop - vScrollBar1.Value);
             });
-
-
         }
 
 

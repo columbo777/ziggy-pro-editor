@@ -9,7 +9,7 @@ using System.Diagnostics;
 
 namespace ProUpgradeEditor.Common
 {
-    
+
 
     public class GuitarMessage : DeletableEntity
     {
@@ -46,7 +46,7 @@ namespace ProUpgradeEditor.Common
             this.props = new MidiEventProps(pair, type);
             SetTicks(pair.TickPair);
         }
-        
+
         public GuitarMessage(GuitarMessageList owner, TickPair pair, GuitarMessageType type)
         {
             this.messageType = type;
@@ -55,7 +55,13 @@ namespace ProUpgradeEditor.Common
             this.SetTicks(pair);
         }
 
-        public virtual bool IsPro { get { return Owner.IsPro; } }
+        public virtual bool IsPro
+        {
+            get
+            {
+                return props.IsPro;
+            }
+        }
 
         public virtual void UpdateEvents()
         {
@@ -114,12 +120,14 @@ namespace ProUpgradeEditor.Common
             {
                 Debug.WriteLine("adding deleted");
             }
-            
-            
-            Owner.Add(this);
+
+            if (Owner != null)
+            {
+                Owner.Add(this);
+            }
             IsNew = false;
             IsDeleted = false;
-            
+
         }
 
         public virtual void RemoveFromList()
@@ -162,17 +170,21 @@ namespace ProUpgradeEditor.Common
                     return;
                 }
 
-                if (TickPair.IsValid == false || Owner == null)
+                if (TickPair.IsValid == false)
                 {
-                    ("invalid data").OutputDebug();
+                    ("invalid TickPair").OutputDebug();
                     return;
                 }
+
                 if (Channel.IsNull())
                 {
                     ("invalid channel").OutputDebug();
                     Channel = 0;
                 }
-                props.SetUpdatedEventPair(Owner.Insert(Data1, Data2, Channel, TickPair));
+                if (Owner.IsNotNull())
+                {
+                    props.SetUpdatedEventPair(Owner.Insert(Data1, Data2, Channel, TickPair));
+                }
             }
             if (IsNew)
             {
@@ -471,6 +483,8 @@ namespace ProUpgradeEditor.Common
             {
                 if (this is GuitarHandPosition)
                     ret = GuitarMessageType.GuitarHandPosition;
+                if (this is GuitarChordName)
+                    ret = GuitarMessageType.GuitarChordName;
                 else if (this is GuitarTextEvent)
                     ret = GuitarMessageType.GuitarTextEvent;
                 else if (this is GuitarTrainer)

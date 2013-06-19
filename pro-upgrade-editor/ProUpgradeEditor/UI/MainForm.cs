@@ -888,6 +888,21 @@ namespace ProUpgradeEditor.UI
                 listBoxUSBSongs.Columns[0].Width = listBoxUSBSongs.Width - 2;
 
                 CheckLoadLastFile();
+
+                ChordScaleBoxes.ToList().ForEach(scaleBox =>
+                {
+                    scaleBox.CheckedChanged += (o, ev) =>
+                    {
+                        if (o.IsNotNull())
+                        {
+                            var ocheck = ((CheckBox)o);
+                            if (ocheck.Checked)
+                            {
+                                ChordScaleBoxes.Where(x => x != ocheck).ToList().ForEach(x => x.Checked = false);
+                            }
+                        }
+                    };
+                });
             }
         }
 
@@ -1369,7 +1384,7 @@ namespace ProUpgradeEditor.UI
         private void buttonPackageEditorOpenPackage_Click(object sender, EventArgs e)
         {
             string selCon = string.Empty;
-            if (SelectedSong != null && !string.IsNullOrEmpty(SelectedSong.G6ConFile))
+            if (SelectedSong != null && SelectedSong.G6ConFile.IsNotEmpty())
             {
                 selCon = SelectedSong.G6ConFile;
             }
@@ -1471,7 +1486,7 @@ namespace ProUpgradeEditor.UI
         {
             try
             {
-                if (SelectedSong != null && File.Exists(SelectedSong.G6ConFile))
+                if (SelectedSong != null && SelectedSong.G6ConFile.FileExists())
                 {
                     var p = Package.Load(SelectedSong.G6ConFile);
                     if (p != null)
@@ -3833,15 +3848,7 @@ namespace ProUpgradeEditor.UI
 
                 foreach (var ch in EditorPro.SelectedChords.ToList())
                 {
-                    foreach (var n in ch.Notes.ToList())
-                    {
-                        if (n.NoteFretDown >= 12)
-                        {
-                            n.NoteFretDown -= 12;
-                            n.UpdateEvents();
-                        }
-                    }
-
+                    ch.DownTwelveFrets();
                 }
                 EditorPro.Invalidate();
             }
@@ -3889,43 +3896,7 @@ namespace ProUpgradeEditor.UI
 
                 foreach (var ch in EditorPro.SelectedChords.ToList())
                 {
-                    ch.Notes.ToList().ForEach(n =>
-                    {
-                        var noteString = n.NoteString;
-                        var noteFret = n.NoteFretDown;
-                        if (noteString != 5)
-                        {
-                            noteString++;
-
-                            if (noteString == 4)
-                            {
-                                noteFret -= 4;
-                            }
-                            else if (noteString == 5)
-                            {
-                                noteFret -= 5;
-                            }
-                            else
-                            {
-                                noteFret -= 5;
-                            }
-                            if (noteFret < 0)
-                                noteFret = 0;
-
-                            n.NoteFretDown = noteFret;
-                            n.NoteString = noteString;
-                            n.UpdateEvents();
-                        }
-                        else
-                        {
-                            ch.RemoveNote(n);
-                        }
-                    });
-
-                    if (!ch.Notes.Any())
-                    {
-                        ch.DeleteAll();
-                    }
+                    ch.UpString();
                 }
 
             }
@@ -7077,34 +7048,7 @@ namespace ProUpgradeEditor.UI
 
                 foreach (var ch in EditorPro.SelectedChords.ToList())
                 {
-                    foreach (var n in ch.Notes.ToList())
-                    {
-                        if (n.NoteString == 0)
-                        {
-                            ch.RemoveNote(n);
-                        }
-                        else
-                        {
-                            n.NoteString--;
-
-                            if (n.NoteString == 3)
-                            {
-                                n.NoteFretDown += 4;
-                            }
-                            else
-                            {
-                                n.NoteFretDown += 5;
-                            }
-                            if (n.NoteFretDown > 23)
-                                n.NoteFretDown = 23;
-
-                            n.UpdateEvents();
-                        }
-                    }
-                    if (!ch.Notes.Any())
-                    {
-                        ch.DeleteAll();
-                    }
+                    ch.DownString();
                 }
                 EditorPro.Refresh();
             }
@@ -7127,16 +7071,10 @@ namespace ProUpgradeEditor.UI
                 if (!EditorPro.IsLoaded)
                     return;
 
-                foreach (var ch in EditorPro.SelectedChords.ToList())
+                foreach (var ch in EditorPro.SelectedChords.ToList().
+                    Where(x=> x.Notes.Any(n=> n.NoteFretDown <= 10)).ToList())
                 {
-                    foreach (var note in ch.Notes.ToList())
-                    {
-                        if (note.NoteFretDown <= 10)
-                        {
-                            note.NoteFretDown += 12;
-                            note.UpdateEvents();
-                        }
-                    }
+                    ch.UpTwelveFrets();
                 }
 
                 EditorPro.Invalidate();
@@ -8350,40 +8288,9 @@ namespace ProUpgradeEditor.UI
 
                 foreach (var ch in EditorPro.SelectedChords.ToList())
                 {
-
-                    foreach (var n in ch.Notes.ToList())
-                    {
-                        int noteString = n.NoteString - 2;
-                        int noteFret = n.NoteFretDown;
-                        if (noteString == 3 || noteString == 2)
-                        {
-                            noteFret -= 3;
-                        }
-                        else
-                        {
-                            noteFret -= 2;
-                        }
-                        if (noteFret < 0)
-                            noteFret = 0;
-
-                        if (noteString < 0)
-                        {
-                            ch.RemoveNote(n);
-                        }
-                        else
-                        {
-                            n.NoteFretDown = noteFret;
-                            n.NoteString = noteString;
-                            n.UpdateEvents();
-                        }
-                    }
-                    if (!ch.Notes.Any())
-                    {
-                        ch.DeleteAll();
-                    }
-
+                    ch.DownOctave();
                 }
-                EditorPro.Refresh();
+                EditorPro.Invalidate();
             }
             catch
             {
@@ -8401,41 +8308,10 @@ namespace ProUpgradeEditor.UI
 
                 foreach (var ch in EditorPro.SelectedChords.ToList())
                 {
-
-                    foreach (var n in ch.Notes.ToList())
-                    {
-                        int noteString = n.NoteString;
-                        int noteFretDown = n.NoteFretDown;
-                        if (noteString < 4)
-                        {
-                            noteString += 2;
-
-                            if (noteString >= 4)
-                            {
-                                noteFretDown += 3;
-                            }
-                            else
-                            {
-                                noteFretDown += 2;
-                            }
-                            if (noteFretDown > 22)
-                                noteFretDown = 22;
-
-                            n.NoteFretDown = noteFretDown;
-                            n.NoteString = noteString;
-                            n.UpdateEvents();
-                        }
-                        else
-                        {
-                            ch.RemoveNote(n);
-                        }
-                    }
-                    if (!ch.Notes.Any())
-                    {
-                        ch.DeleteAll();
-                    }
+                    ch.UpOctave();
                 }
-                EditorPro.Refresh();
+
+                EditorPro.Invalidate();
             }
             catch
             {
@@ -8463,7 +8339,6 @@ namespace ProUpgradeEditor.UI
                         sel = chord;
                         break;
                     }
-
                 }
                 if (sel != null)
                 {
@@ -8525,11 +8400,14 @@ namespace ProUpgradeEditor.UI
             try
             {
                 int numSnapped = 0;
-                var chords = ProGuitarTrack.Messages.Chords.Where(x => !x.IsDeleted && x.TickLength < Utility.NoteCloseWidth).ToList();
-                foreach (var c in chords)
+                if (EditorPro.IsLoaded && EditorG5.IsLoaded)
                 {
-                    if (SetChordToG5Length(c))
-                        numSnapped++;
+                    var chords = ProGuitarTrack.Messages.Chords.Where(x => !x.IsDeleted && x.TickLength < Utility.NoteCloseWidth).ToList();
+                    foreach (var c in chords)
+                    {
+                        if (SetChordToG5Length(c))
+                            numSnapped++;
+                    }
                 }
 
             }
@@ -10424,6 +10302,7 @@ namespace ProUpgradeEditor.UI
                                 {
                                     EditorPro.Messages.Chords.ToList().ForEach(chord =>
                                     {
+                                        
                                         var newTicks = EditorPro.SnapLeftRightTicks(chord.TickPair, new SnapConfig(true, false, false));
 
                                         if (chord.TickPair != newTicks)

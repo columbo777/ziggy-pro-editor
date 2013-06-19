@@ -706,7 +706,8 @@ namespace ProUpgradeEditor.UI
                             g6c.HasSlide, 
                             g6c.HasSlideReversed, 
                             g6c.HasHammeron, 
-                            g6c.StrumMode));
+                            g6c.StrumMode,
+                            null));
 
                 }
             }

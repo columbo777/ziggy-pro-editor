@@ -55,6 +55,7 @@ namespace ProUpgradeEditor.Common
             return new GuitarMessageType[]
             {
                 GuitarMessageType.GuitarHandPosition,
+                GuitarMessageType.GuitarChordName,
                 GuitarMessageType.GuitarTextEvent,
                 GuitarMessageType.GuitarTrainer,
                 GuitarMessageType.GuitarChord,
@@ -85,7 +86,9 @@ namespace ProUpgradeEditor.Common
                     case GuitarMessageType.GuitarHandPosition:
                         ret.AddRange(HandPositions.Where(x=> diff.HasFlag(x.Difficulty)));
                         break;
-
+                    case GuitarMessageType.GuitarChordName:
+                        ret.AddRange(ChordNames.Where(x => diff.HasFlag(x.Difficulty)));
+                        break;
                     case GuitarMessageType.GuitarTextEvent:
                         ret.AddRange(TextEvents.Where(x=> diff.HasFlag(x.Difficulty)));
                         break;
@@ -154,6 +157,7 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
+        public GuitarChordNameList ChordNames;
         public GuitarHandPositionList HandPositions;
         public GuitarTextEventList TextEvents;
         public GuitarTrainerList Trainers;
@@ -181,6 +185,7 @@ namespace ProUpgradeEditor.Common
         public GuitarMessageList(TrackEditor owner)
         {
             this.owner = owner;
+            ChordNames = new GuitarChordNameList(owner);
             HandPositions = new GuitarHandPositionList(owner);
             TextEvents = new GuitarTextEventList(owner);
             Trainers = new GuitarTrainerList(owner);
@@ -456,7 +461,9 @@ namespace ProUpgradeEditor.Common
                     case GuitarMessageType.GuitarHandPosition:
                         HandPositions.Add(mess);
                         break;
-
+                    case GuitarMessageType.GuitarChordName:
+                        ChordNames.Add(mess);
+                        break;
                     case GuitarMessageType.GuitarTextEvent:
                         TextEvents.Add(mess);
                         break;
@@ -568,7 +575,9 @@ namespace ProUpgradeEditor.Common
                     case GuitarMessageType.GuitarHandPosition:
                         HandPositions.Remove(mess);
                         break;
-
+                    case GuitarMessageType.GuitarChordName:
+                        ChordNames.Remove(mess);
+                        break;
                     case GuitarMessageType.GuitarTextEvent:
                         TextEvents.Remove(mess);
                         break;
@@ -649,7 +658,15 @@ namespace ProUpgradeEditor.Common
                             }
                         }
                         break;
-
+                    case GuitarMessageType.GuitarChordName:
+                        {
+                            var enumer = ChordNames.GetEnumerator();
+                            while (enumer.MoveNext())
+                            {
+                                yield return enumer.Current as T;
+                            }
+                        }
+                        break;
                     case GuitarMessageType.GuitarTextEvent:
                         {
                             var enumer = TextEvents.GetEnumerator();

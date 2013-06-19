@@ -49,4 +49,7 @@ namespace ProUpgradeEditor.Common
             return base.ToString() + " Fret: " + NoteFretDown.ToStringEx();
         }
     }
+
+
+    
 }

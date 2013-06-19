@@ -9,9 +9,9 @@ using System.Diagnostics;
 
 namespace ProUpgradeEditor.Common
 {
-    public class GuitarHandPositionList : SpecializedMessageList<GuitarHandPosition>
+    public class GuitarChordNameList : SpecializedMessageList<GuitarChordName>
     {
-        public GuitarHandPositionList(TrackEditor owner)
+        public GuitarChordNameList(TrackEditor owner)
             : base(owner)
         {
 
@@ -19,8 +19,7 @@ namespace ProUpgradeEditor.Common
 
         public override GuitarMessageType MessageType
         {
-            get { return GuitarMessageType.GuitarHandPosition; }
+            get { return GuitarMessageType.GuitarChordName; }
         }
     }
-    
 }

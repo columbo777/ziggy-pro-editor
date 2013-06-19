@@ -12,6 +12,36 @@ using System.IO;
 
 namespace ProUpgradeEditor.Common
 {
+    [Serializable()]
+    public class GuitarChordRootNoteConfig
+    {
+        public virtual bool UseUserChordName { get; set; }
+        public virtual string UserChordName { get; set; }
+        public virtual int RootNoteData1 { get; set; }
+        public virtual bool HideNoteName { get; set; }
+        public virtual ChordNameMeta ChordNameMeta { get; set; }
+
+        public GuitarChordRootNoteConfig()
+        {
+            UseUserChordName = false;
+            UserChordName = string.Empty;
+            RootNoteData1 = Int32.MinValue;
+            HideNoteName = false;
+            ChordNameMeta = null;
+        }
+
+        public GuitarChordRootNoteConfig Clone()
+        {
+            return new GuitarChordRootNoteConfig()
+            {
+                UseUserChordName = this.UseUserChordName,
+                UserChordName = this.UserChordName,
+                ChordNameMeta = this.ChordNameMeta.GetIfNotNull(x=> x.Clone()),
+                HideNoteName = this.HideNoteName,
+                RootNoteData1 = this.RootNoteData1,
+            };
+        }
+    }
     public class GuitarChordConfig
     {
         public int[] Frets { get; internal set; }
@@ -20,7 +50,21 @@ namespace ProUpgradeEditor.Common
         public bool IsSlideReverse { get; internal set; }
         public bool IsHammeron { get; internal set; }
         public ChordStrum StrumMode { get; internal set; }
+        public GuitarChordRootNoteConfig RootNoteConfig { get; internal set; }
 
+        public GuitarChordConfig Clone()
+        {
+            return new GuitarChordConfig()
+            {
+                Frets = this.Frets.ToArray(),
+                Channels = this.Channels.ToArray(),
+                IsSlide= this.IsSlide,
+                IsSlideReverse = this.IsSlideReverse ,
+                IsHammeron = this.IsHammeron,
+                StrumMode = this.StrumMode,
+                RootNoteConfig = this.RootNoteConfig.GetIfNotNull(x=> x.Clone()),
+            };
+        }
         public GuitarChordConfig()
         {
             Frets = Utility.Null6.ToArray();
@@ -29,11 +73,17 @@ namespace ProUpgradeEditor.Common
             IsSlideReverse = false;
             IsHammeron = false;
             StrumMode = ChordStrum.Normal;
+            RootNoteConfig = null;
         }
 
-        public GuitarChordConfig(int[] frets = null, int[] channels = null, bool isSlide = false, bool isSlideReverse = false, bool isHammeron = false, ChordStrum strumMode = ChordStrum.Normal)
+        public GuitarChordConfig(int[] frets, int[] channels,
+            bool isSlide, bool isSlideReverse,
+            bool isHammeron,
+            ChordStrum strumMode,
+            GuitarChordRootNoteConfig rootNoteConfig)
             : this()
         {
+            this.RootNoteConfig = rootNoteConfig;
             if (frets != null)
             {
                 Frets = frets.ToArray();

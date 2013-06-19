@@ -49,11 +49,14 @@ namespace ProUpgradeEditor.Common
 
         public List<SerializedChordNote> Notes { get; set; }
         public List<SerializedChordModifier> Modifiers { get; set; }
+        
+        public GuitarChordRootNoteConfig RootNoteConfig { get; set;}
 
         public SerializedChord()
         {
             Notes = new List<SerializedChordNote>();
             Modifiers = new List<SerializedChordModifier>();
+            RootNoteConfig = new GuitarChordRootNoteConfig();
         }
 
         public GuitarChord Deserialize(GuitarMessageList owner, GuitarDifficulty diff, TickPair ticks)
@@ -64,19 +67,29 @@ namespace ProUpgradeEditor.Common
             bool isSlide;
             bool isSlideReverse;
             bool isHammeron;
-            GetProperties(out frets, out channels, out chordStrum, out isSlide, out isSlideReverse, out isHammeron);
+            GuitarChordRootNoteConfig rootConfig;
+            GetProperties(out frets, out channels, out chordStrum, out isSlide, out isSlideReverse, out isHammeron, out rootConfig);
 
-            var ret = GuitarChord.CreateChord(owner, diff, ticks, new GuitarChordConfig(frets, channels,
-                isSlide,
-                isSlideReverse,
-                isHammeron,
-                chordStrum));
+            var ret = GuitarChord.CreateChord(owner, diff, ticks, 
+                new GuitarChordConfig(frets, channels,
+                    isSlide,
+                    isSlideReverse,
+                    isHammeron,
+                    chordStrum,
+                        rootConfig));
 
             return ret;
         }
 
-        public void GetProperties(out int[] frets, out int[] channels, out ChordStrum chordStrum, out bool isSlide, out bool isSlideReverse, out bool isHammeron)
+        public void GetProperties(out int[] frets, out int[] channels, 
+            out ChordStrum chordStrum, 
+            out bool isSlide, 
+            out bool isSlideReverse, 
+            out bool isHammeron,
+            out GuitarChordRootNoteConfig rootNoteConfig)
         {
+            rootNoteConfig = this.RootNoteConfig.Clone();
+
             frets = Utility.Null6.ToArray();
             channels = Utility.Null6.ToArray();
             foreach (var n in Notes)

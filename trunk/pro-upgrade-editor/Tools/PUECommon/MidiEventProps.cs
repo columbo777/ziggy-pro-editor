@@ -27,6 +27,8 @@ namespace ProUpgradeEditor.Common
 
         public TimePair TimePair { get; set; }
 
+        public bool IsPro { get; set; }
+
         MidiEventPair _eventPair;
         public MidiEventPair EventPair
         {
@@ -65,6 +67,7 @@ namespace ProUpgradeEditor.Common
         private void resetProps(GuitarMessageList owner)
         {
             Owner = owner;
+            IsPro = (owner == null ? true : owner.IsPro);
             Data1 = Int32.MinValue;
             Data2 = Int32.MinValue;
             Channel = Int32.MinValue;
@@ -72,6 +75,7 @@ namespace ProUpgradeEditor.Common
             Text = string.Empty;
             TickPair = TickPair.NullValue;
             TimePair = TimePair.NullValue;
+
             _eventPair = new MidiEventPair(owner);
         }
 

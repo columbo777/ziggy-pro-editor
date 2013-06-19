@@ -1157,7 +1157,7 @@ namespace ProUpgradeEditor.Common
 
                 var visChords = guitarTrack.Messages.Chords.GetBetweenTick(visTicks).ToList();
                 var visTrainer = guitarTrack.Messages.Trainers.GetBetweenTick(visTicks).ToList();
-                var visText = guitarTrack.Messages.TextEvents.GetBetweenTick(visTicks).ToList();
+                var visText = guitarTrack.Messages.TextEvents.GetBetweenTick(visTicks).ToList().Where(x => x.Text.IsChordNameTextEvent() == false).ToList();
                 var visTempo = guitarTrack.Messages.Tempos.GetBetweenTick(visTicks).ToList();
                 var visTimeSig = guitarTrack.Messages.TimeSignatures.GetBetweenTick(visTicks).ToList();
                 var visMod = guitarTrack.Messages.GetModifiersBetweenTick(visTicks).ToList();
@@ -1294,7 +1294,7 @@ namespace ProUpgradeEditor.Common
                 {
                     try
                     {
-                        ret = GetTrack().Name.IsGuitarTrackName();
+                        GetTrack().IfNotNull(x => ret = x.Name.IsGuitarTrackName());
                     }
                     catch { }
                 }
@@ -1311,7 +1311,7 @@ namespace ProUpgradeEditor.Common
                 {
                     try
                     {
-                        ret = GetTrack().Name.IsBassTrackName();
+                        GetTrack().IfNotNull(x => ret = x.Name.IsBassTrackName());
                     }
                     catch { }
                 }
@@ -1898,7 +1898,7 @@ namespace ProUpgradeEditor.Common
 
             var visChords = guitarTrack.Messages.Chords.GetBetweenTick(screenTicks).ToList();
             var visTrainer = guitarTrack.Messages.Trainers.GetBetweenTick(screenTicks).ToList();
-            var visText = guitarTrack.Messages.TextEvents.GetBetweenTick(screenTicks).ToList();
+            var visText = guitarTrack.Messages.TextEvents.GetBetweenTick(screenTicks).ToList().Where(x => x.Text.IsChordNameTextEvent() == false).ToList();
             var visTempo = guitarTrack.Messages.Tempos.GetBetweenTick(screenTicks).ToList();
             var visTimeSig = guitarTrack.Messages.TimeSignatures.GetBetweenTick(screenTicks).ToList();
             var visMod = guitarTrack.Messages.GetModifiersBetweenTick(screenTicks).ToList();
@@ -3751,7 +3751,8 @@ namespace ProUpgradeEditor.Common
                             SnapTickPairPro(chord5.TickPair),
                             new GuitarChordConfig(chord5.Notes.FretArrayZero,
                             chord5.Notes.ChannelArrayZero,
-                            false, false, false, ChordStrum.Normal));
+                            false, false, false, ChordStrum.Normal,
+                                null));
 
                         if (newChord != null)
                         {

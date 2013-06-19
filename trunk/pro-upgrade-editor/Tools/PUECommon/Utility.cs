@@ -111,6 +111,7 @@ namespace ProUpgradeEditor.Common
         public const int EasyData1LowE = 24;
 
         public const int ChordNameHiddenData1 = 17;
+        public const int ChordNameSlashChordData1 = 16;
         public const int ChordNameEbData1 = 15;
         public const int ChordNameDData1 = 14;
         public const int ChordNameDbData1 = 13;
@@ -136,6 +137,38 @@ namespace ProUpgradeEditor.Common
             ExpertArpeggioData1, HardArpeggioData1,
             ExpertHammeronData1, HardHammeronData1, MediumHammeronData1, EasyHammeronData1,
         };
+
+        public static string GetChordNameTextPrefix(GuitarDifficulty difficulty)
+        {
+            int iDiff;
+            if (difficulty.IsExpertAll())
+            {
+                iDiff = 3;
+            }
+            else if (difficulty.IsHard())
+            {
+                iDiff = 2;
+            }
+            else if (difficulty.IsMedium())
+            {
+                iDiff = 1;
+            }
+            else
+            {
+                iDiff = 0;
+            }
+            return "chrd" + iDiff + " ";
+        }
+
+        public static string CreateChordNameText(GuitarDifficulty difficulty, ChordNameMeta chordName)
+        {
+            return "[" + GetChordNameTextPrefix(difficulty) + " " + chordName.ToStringEx().GetIfEmpty(" ") + "]";
+        }
+
+        public static string CreateChordNameText(GuitarDifficulty difficulty, string chordName)
+        {
+            return "[" + GetChordNameTextPrefix(difficulty) + " " + chordName.GetIfEmpty(" ") + "]";
+        }
 
         public static GuitarDifficulty[] EasyMediumHardExpert = { GuitarDifficulty.Easy, GuitarDifficulty.Medium, GuitarDifficulty.Hard, GuitarDifficulty.Expert };
 
@@ -372,6 +405,7 @@ namespace ProUpgradeEditor.Common
         public static int[] ChordNameEvents = new int[] 
                 { 
                     ChordNameHiddenData1,
+                    ChordNameSlashChordData1,
                     ChordNameEbData1,
                     ChordNameDData1,
                     ChordNameDbData1,
@@ -955,6 +989,53 @@ namespace ProUpgradeEditor.Common
         public static bool ShowTempos = false;
         public static bool ShowTimeSignatures = false;
         public static bool ModifyWebTabScale = false;
+
+
+
+        public static ToneNameData1 GetNoteScaleData1(int noteString, int noteFretDown)
+        {
+            return (ToneNameData1)(((int)ToneNameData1.E) + GetNoteScale(noteString, noteFretDown));
+        }
+
+        public static ToneNameEnum GetNoteScale(int noteString, int noteFretDown, int[] tuning = null)
+        {
+            if (noteFretDown.IsNull() || noteString.IsNull())
+            {
+                return ToneNameEnum.NotSet;
+            }
+
+            if (tuning != null)
+            {
+                noteFretDown += tuning[noteString];
+            }
+
+            int chordScaleRange = ToneNameEnum.NumTones.ToInt();
+
+            while (noteString > 0)
+            {
+                noteString--;
+                if (noteString == 3)
+                {
+                    noteFretDown += 4;
+                }
+                else
+                {
+                    noteFretDown += 5;
+                }
+
+                if (tuning != null)
+                {
+                    noteFretDown += tuning[noteString];
+                }
+            }
+
+            while (noteFretDown < 0)
+            {
+                noteFretDown += 12;
+            }
+
+            return (ToneNameEnum)(noteFretDown % (int)ToneNameEnum.NumTones);
+        }
     }
 
 

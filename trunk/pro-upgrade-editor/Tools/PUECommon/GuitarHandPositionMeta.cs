@@ -9,6 +9,7 @@ namespace ProUpgradeEditor.Common
 {
     public class GuitarHandPositionMeta
     {
+        public GuitarChord Chord;
         public TickPair Ticks;
         public int Fret;
         public bool IsChord;

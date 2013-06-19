@@ -18,14 +18,29 @@ namespace ProUpgradeEditor.Common
         public GuitarChordNoteList Notes { get; internal set; }
         public List<ChordModifier> Modifiers { get; internal set; }
 
+        public List<GuitarChordName> ChordNameEvents { get; internal set; }
+
         public GuitarChord(GuitarMessageList owner, TickPair pair, GuitarDifficulty difficulty, IEnumerable<GuitarNote> notes)
             : base(owner, pair, GuitarMessageType.GuitarChord)
         {
             Notes = new GuitarChordNoteList(this);
             Modifiers = new List<ChordModifier>();
+            ChordNameEvents = new List<GuitarChordName>();
 
             Notes.SetNotes(notes);
             SetTicks(pair);
+
+            chordConfig = new GuitarChordConfig()
+            {
+                Frets = this.NoteFrets.ToArray(),
+                Channels = this.NoteChannels.ToArray(),
+                IsHammeron = this.HasHammeron,
+                IsSlide = this.HasSlide,
+                IsSlideReverse = this.HasSlideReversed,
+                StrumMode = this.StrumMode,
+                
+            };
+
         }
 
         public GuitarChord(MidiEventPair pair)
@@ -33,11 +48,450 @@ namespace ProUpgradeEditor.Common
         {
             Notes = new GuitarChordNoteList(this);
             Modifiers = new List<ChordModifier>();
+            ChordNameEvents = new List<GuitarChordName>();
+
+            chordConfig = new GuitarChordConfig()
+            {
+                Frets = this.NoteFrets.ToArray(),
+                Channels = this.NoteChannels.ToArray(),
+                IsHammeron = this.HasHammeron,
+                IsSlide = this.HasSlide,
+                IsSlideReverse = this.HasSlideReversed,
+                StrumMode = this.StrumMode,
+
+            };
         }
+
+        public bool UpTwelveFrets()
+        {
+            var ret = false;
+            if (HighestFret <= 10)
+            {
+                ret = true;
+                foreach (var note in Notes.ToList())
+                {
+                    note.NoteFretDown += 12;
+                }
+            }
+            UpdateEvents();
+            return ret;
+        }
+
+        public IEnumerable<ChordNameMeta> GetTunedChordNames(int[] tuning, bool allMatches = true)
+        {
+            var ret = new List<ChordNameMeta>();
+
+            var tunedNotes = GetTunedNoteScale(tuning).ToList().Where(x=> x != ToneNameEnum.NotSet).ToList();
+
+            if (tunedNotes.Any())
+            {
+                if (tunedNotes.Count() == 1)
+                {
+                    var item = new ChordNameMeta();
+                    item.ToneName = tunedNotes.Single();
+                    ret.Add(item);
+                }
+                else
+                {
+                    if (tunedNotes.Count() == 2)
+                    {
+                        tunedNotes.Add(tunedNotes.First());
+                    }
+                    if (allMatches)
+                    {
+                        var items = ChordNameFinder.GetChordNames(tunedNotes);
+                        if (items == null)
+                        {
+                            var item = new ChordNameMeta();
+                            item.ToneName = tunedNotes.Single();
+                            ret.Add(item);
+                        }
+                        else
+                        {
+                            ret.AddRange(items);
+                        }
+                    }
+                    else
+                    {
+                        var item = ChordNameFinder.GetChordName(tunedNotes);
+                        if (item != null)
+                        {
+                            ret.Add(item);
+                        }
+                        else
+                        {
+                            item = new ChordNameMeta();
+                            item.ToneName = tunedNotes.Single();
+                            ret.Add(item);
+                        }
+                    }
+                }
+            }
+            return ret;
+        }
+
+        public ChordNameMeta GetTunedChordName(int[] tuning)
+        {
+            return GetTunedChordNames(tuning, false).FirstOrDefault();
+        }
+
+        
+
+        public ToneNameEnum GetRootNoteTone(int[] tuning)
+        {
+            var ret = ToneNameEnum.NotSet;
+            GetTunedChordName(tuning).IfNotNull(x=> ret = x.ToneName);
+            return ret;
+        }
+
+        public void DownString()
+        {
+            foreach (var n in Notes.ToList())
+            {
+                if (n.NoteString == 0)
+                {
+                    RemoveNote(n);
+                }
+                else
+                {
+                    n.NoteString--;
+
+                    if (n.NoteString == 3)
+                    {
+                        n.NoteFretDown += 4;
+                    }
+                    else
+                    {
+                        n.NoteFretDown += 5;
+                    }
+                    if (n.NoteFretDown > 23)
+                        n.NoteFretDown = 23;
+                }
+            }
+            if (!Notes.Any())
+            {
+                DeleteAll();
+            }
+            else
+            {
+                UpdateEvents();
+            }
+        }
+
+        public bool CanMoveDownString
+        {
+            get
+            {
+                var ret = true;
+                if (Notes.Any(x => x.NoteString == 0))
+                {
+                    ret = false;
+                }
+                else
+                {
+
+                    foreach (var n in Notes.ToList())
+                    {
+                        if (n.NoteString != 0)
+                        {
+                            var noteString = n.NoteString - 1;
+                            var noteFretDown = n.NoteFretDown;
+
+                            if (noteString == 3)
+                            {
+                                noteFretDown += 4;
+                            }
+                            else
+                            {
+                                noteFretDown += 5;
+                            }
+                            if (noteFretDown > 23)
+                            {
+                                ret = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                return ret;
+            }
+        }
+        public bool CanMoveUpString
+        {
+            get
+            {
+                var ret = true;
+                if (Notes.Any(x => x.NoteString == 5))
+                {
+                    ret = false;
+                }
+                else
+                {
+
+                    foreach (var n in Notes.ToList())
+                    {
+                        var noteString = n.NoteString;
+                        var noteFret = n.NoteFretDown;
+
+                        if (noteString != 5)
+                        {
+                            noteString++;
+
+                            if (noteString == 4)
+                            {
+                                noteFret -= 4;
+                            }
+                            else if (noteString == 5)
+                            {
+                                noteFret -= 5;
+                            }
+                            else
+                            {
+                                noteFret -= 5;
+                            }
+                            if (noteFret < 0)
+                            {
+                                ret = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                return ret;
+            }
+        }
+
+        public void UpString()
+        {
+            foreach (var n in Notes.ToList())
+            {
+                var noteString = n.NoteString;
+                var noteFret = n.NoteFretDown;
+
+                if (noteString != 5)
+                {
+                    noteString++;
+
+                    if (noteString == 4)
+                    {
+                        noteFret -= 4;
+                    }
+                    else if (noteString == 5)
+                    {
+                        noteFret -= 5;
+                    }
+                    else
+                    {
+                        noteFret -= 5;
+                    }
+                    if (noteFret < 0)
+                        noteFret = 0;
+
+                    n.NoteFretDown = noteFret;
+                    n.NoteString = noteString;
+
+                }
+                else
+                {
+                    RemoveNote(n);
+                }
+            }
+
+            if (!Notes.Any())
+            {
+                DeleteAll();
+            }
+            else
+            {
+                UpdateEvents();
+            }
+        }
+        public bool CanMoveDownTwelveFrets
+        {
+            get
+            {
+                return LowestNonZeroFret >= 12;
+            }
+        }
+        public bool CanMoveUpTwelveFrets
+        {
+            get
+            {
+                return HighestFret <= 10;
+            }
+        }
+        public bool DownTwelveFrets()
+        {
+            var ret = false;
+            if (LowestNonZeroFret >= 12)
+            {
+                ret = true;
+                foreach (var n in Notes.ToList())
+                {
+                    if (n.NoteFretDown >= 12)
+                    {
+                        n.NoteFretDown -= 12;
+                    }
+                }
+            }
+            UpdateEvents();
+            return ret;
+        }
+
+        public bool CanMoveDownOctave
+        {
+            get
+            {
+                var ret = true;
+                
+                foreach (var n in Notes.ToList())
+                {
+                    int noteString = n.NoteString - 2;
+                    int noteFret = n.NoteFretDown;
+
+                    if (noteString == 3 || noteString == 2)
+                    {
+                        noteFret -= 3;
+                    }
+                    else
+                    {
+                        noteFret -= 2;
+                    }
+                    if (noteFret < 0 || noteString < 0)
+                    {
+                        ret = false;
+                        break;
+                    }
+                }
+                
+                return ret;
+            }
+        }
+
+        public void DownOctave()
+        {
+            foreach (var n in Notes.ToList())
+            {
+                int noteString = n.NoteString - 2;
+                int noteFret = n.NoteFretDown;
+                if (noteString == 3 || noteString == 2)
+                {
+                    noteFret -= 3;
+                }
+                else
+                {
+                    noteFret -= 2;
+                }
+                if (noteFret < 0)
+                {
+                    noteFret = 0;
+                }
+
+                if (noteString < 0)
+                {
+                    RemoveNote(n);
+                }
+                else
+                {
+                    n.NoteFretDown = noteFret;
+                    n.NoteString = noteString;
+                }
+            }
+            if (!Notes.Any())
+            {
+                DeleteAll();
+            }
+            else
+            {
+                UpdateEvents();
+            }
+        }
+
+        public bool CanMoveUpOctave
+        {
+            get
+            {
+                var ret = true;
+
+                foreach (var n in Notes.ToList())
+                {
+                    int noteString = n.NoteString;
+                    int noteFretDown = n.NoteFretDown;
+
+                    if (noteString < 4)
+                    {
+                        noteString += 2;
+
+                        if (noteString >= 4)
+                        {
+                            noteFretDown += 3;
+                        }
+                        else
+                        {
+                            noteFretDown += 2;
+                        }
+                        if (noteFretDown > 22)
+                        {
+                            ret = false;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        ret = false;
+                        break;
+                    }
+                }
+                return ret;
+            }
+        }
+
+        public void UpOctave()
+        {
+            foreach (var n in Notes.ToList())
+            {
+                int noteString = n.NoteString;
+                int noteFretDown = n.NoteFretDown;
+                if (noteString < 4)
+                {
+                    noteString += 2;
+
+                    if (noteString >= 4)
+                    {
+                        noteFretDown += 3;
+                    }
+                    else
+                    {
+                        noteFretDown += 2;
+                    }
+                    if (noteFretDown > 22)
+                        noteFretDown = 22;
+
+                    n.NoteFretDown = noteFretDown;
+                    n.NoteString = noteString;
+
+                }
+                else
+                {
+                    RemoveNote(n);
+                }
+            }
+            if (!Notes.Any())
+            {
+                DeleteAll();
+            }
+            else
+            {
+                UpdateEvents();
+            }
+        }
+
+        GuitarChordConfig chordConfig;
 
         public static GuitarChord CreateChord(GuitarMessageList owner, GuitarDifficulty difficulty, TickPair ticks,
            GuitarChordConfig config)
         {
+            
             GuitarChord ret = null;
 
             ret = GetChord(owner, difficulty, ticks, config);
@@ -50,7 +504,8 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
-        public static GuitarChord GetChord(GuitarMessageList owner, GuitarDifficulty difficulty, IEnumerable<GuitarNote> notes, bool findModifiers = true)
+        public static GuitarChord GetChord(GuitarMessageList owner, 
+            GuitarDifficulty difficulty, IEnumerable<GuitarNote> notes, bool findModifiers = true)
         {
             GuitarChord ret = null;
             try
@@ -63,13 +518,13 @@ namespace ProUpgradeEditor.Common
                     }
 
                     var tickPair = notes.GetTickPairSmallest();
-                    
+
                     if (!tickPair.IsValid)
                     {
                         Debug.WriteLine("short chord");
                         return ret;
                     }
-                    
+
                     var unfit = notes.Where(x => x.TickPair != tickPair);
                     if (unfit.Any())
                     {
@@ -77,18 +532,16 @@ namespace ProUpgradeEditor.Common
                     }
 
                     ret = new GuitarChord(owner, tickPair, difficulty, notes.ToList());
-                    
+
                     if (findModifiers)
                     {
                         ret.Modifiers.AddRange(owner.Hammerons.Where(x => x.Chord == null).GetBetweenTick(ret.TickPair).ToList());
                         ret.Modifiers.AddRange(owner.Slides.Where(x => x.Chord == null).GetBetweenTick(ret.TickPair).ToList());
-                        ret.Modifiers.AddRange(owner.ChordStrums.Where(x=> x.Chord == null).GetBetweenTick(ret.TickPair).ToList());
+                        ret.Modifiers.AddRange(owner.ChordStrums.Where(x => x.Chord == null).GetBetweenTick(ret.TickPair).ToList());
 
-                        if (ret.HasSlide)
-                        {
-                        }
+                        ret.ChordNameEvents.AddRange(owner.ChordNames.GetBetweenTick(ret.TickPair).ToList());
 
-                        var mods = ret.Modifiers.Where(x=> x.TickPair != ret.TickPair).ToList();
+                        var mods = ret.Modifiers.Where(x => x.TickPair != ret.TickPair).ToList();
                         foreach (var mod in mods)
                         {
                             mod.SetTicks(ret.TickPair);
@@ -101,13 +554,15 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
+
+
         public static GuitarChord GetChord(GuitarMessageList owner,
             GuitarDifficulty difficulty,
             TickPair ticks,
             GuitarChordConfig config)
         {
             GuitarChord ret = null;
-
+            
             var lowE = Utility.GetStringLowE(difficulty);
 
             var notes = new List<GuitarNote>();
@@ -138,7 +593,8 @@ namespace ProUpgradeEditor.Common
             if (notes.Any())
             {
                 ret = new GuitarChord(owner, ticks, difficulty, notes);
-                
+                ret.chordConfig = config.Clone();
+
                 if (ret != null)
                 {
                     if (config.IsSlide || config.IsSlideReverse)
@@ -150,7 +606,7 @@ namespace ProUpgradeEditor.Common
                         ret.AddHammeron(false);
 
                     ret.AddStrum(config.StrumMode, false);
-                    
+
                 }
             }
 
@@ -158,7 +614,7 @@ namespace ProUpgradeEditor.Common
         }
 
 
-        
+
 
         public GuitarChord NextChord
         {
@@ -199,6 +655,26 @@ namespace ProUpgradeEditor.Common
             }
         }
 
+        public ToneNameEnum[] NoteScale
+        {
+            get
+            {
+                var ret = new[] { ToneNameEnum.NotSet, ToneNameEnum.NotSet, ToneNameEnum.NotSet, ToneNameEnum.NotSet, ToneNameEnum.NotSet, ToneNameEnum.NotSet };
+
+                Notes.ForEach(x => ret[x.NoteString] = x.NoteScale);
+
+                return ret;
+            }
+        }
+        public ToneNameEnum[] GetTunedNoteScale(int[] tuning)
+        {
+            var ret = new[] { ToneNameEnum.NotSet, ToneNameEnum.NotSet, ToneNameEnum.NotSet, ToneNameEnum.NotSet, ToneNameEnum.NotSet, ToneNameEnum.NotSet };
+
+            Notes.ForEach(x => ret[x.NoteString] = x.GetTunedNoteScale(tuning));
+
+            return ret;
+            
+        }
         public int[] NoteFrets
         {
             get
@@ -302,6 +778,19 @@ namespace ProUpgradeEditor.Common
             }
         }
 
+        public int LowestString
+        {
+            get
+            {
+                var ret = Int32.MinValue;
+                if (Notes.Any())
+                {
+                    ret = Notes.Min(n => n.NoteString);
+                }
+                return ret;
+            }
+        }
+
         public int LowestNonZeroFret
         {
             get
@@ -336,8 +825,17 @@ namespace ProUpgradeEditor.Common
             return GuitarChord.CreateChord(owner, owner.Owner.CurrentDifficulty,
                 owner.Owner.SnapLeftRightTicks(ticks, new SnapConfig(true, true, true)),
                 new GuitarChordConfig(Notes.GetFretsAtStringOffset(stringOffset.GetIfNull(0)),
-                Notes.GetChannelsAtStringOffset(stringOffset.GetIfNull(0)),
-                HasSlide, HasSlideReversed, HasHammeron, StrumMode));
+                    Notes.GetChannelsAtStringOffset(stringOffset.GetIfNull(0)),
+                    HasSlide, HasSlideReversed, HasHammeron, StrumMode,
+                        RootNoteConfig.Clone()));
+        }
+
+        public GuitarChordRootNoteConfig RootNoteConfig
+        {
+            get
+            {
+                return chordConfig.GetIfNotNull(x=> x.RootNoteConfig);
+            }
         }
 
         public override void DeleteAll()
@@ -368,8 +866,11 @@ namespace ProUpgradeEditor.Common
         }
         public override void CreateEvents()
         {
-            var between = Owner.Chords.GetBetweenTick(TickPair).ToList();
-            between.ForEach(x => x.DeleteAll());
+            if (Owner != null)
+            {
+                var between = Owner.Chords.GetBetweenTick(TickPair).ToList();
+                between.ForEach(x => x.DeleteAll());
+            }
 
             if (!IsNew)
             {
@@ -387,6 +888,9 @@ namespace ProUpgradeEditor.Common
             {
                 x.CreateEvents();
             });
+
+            
+
             if (IsNew)
             {
                 AddToList();
@@ -535,7 +1039,7 @@ namespace ProUpgradeEditor.Common
             var ret = false;
             if (strum.HasFlag(ChordStrum.High))
             {
-                ret = Modifiers.Any(x=> x.ModifierType == ChordModifierType.ChordStrumHigh);
+                ret = Modifiers.Any(x => x.ModifierType == ChordModifierType.ChordStrumHigh);
             }
             else if (strum.HasFlag(ChordStrum.Mid))
             {
@@ -555,21 +1059,21 @@ namespace ProUpgradeEditor.Common
                 if (strum.HasFlag(ChordStrum.High))
                 {
                     var gs = new GuitarChordStrum(this, ChordModifierType.ChordStrumHigh);
-                    
+
                     gs.IsNew = true;
-                    
+
                     Modifiers.Add(gs);
 
                     if (createEvents)
                     {
                         gs.CreateEvents();
                     }
-                    
+
                 }
                 if (strum.HasFlag(ChordStrum.Mid))
                 {
                     var gs = new GuitarChordStrum(this, ChordModifierType.ChordStrumMed);
-                    
+
                     gs.IsNew = true;
 
                     Modifiers.Add(gs);
@@ -582,7 +1086,7 @@ namespace ProUpgradeEditor.Common
                 if (strum.HasFlag(ChordStrum.Low))
                 {
                     var gs = new GuitarChordStrum(this, ChordModifierType.ChordStrumLow);
-                    
+
                     gs.IsNew = true;
 
                     Modifiers.Add(gs);
@@ -647,7 +1151,7 @@ namespace ProUpgradeEditor.Common
                 Modifiers.Add(ho);
 
                 ho.IsNew = true;
-                
+
                 if (createEvents)
                 {
                     ho.CreateEvents();
@@ -664,13 +1168,13 @@ namespace ProUpgradeEditor.Common
         public void RemoveNote(GuitarNote note)
         {
             note.DeleteAll();
-            
+
             Notes.Remove(note);
         }
 
         public override string ToString()
         {
-            var ret = base.ToString()+" ";
+            var ret = base.ToString() + " ";
 
             if (HasSlide)
             {

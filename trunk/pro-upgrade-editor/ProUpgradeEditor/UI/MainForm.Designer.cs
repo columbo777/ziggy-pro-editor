@@ -707,6 +707,8 @@ namespace ProUpgradeEditor.UI
             this.xBoxUSBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.comboBoxNoteEditorChordName = new System.Windows.Forms.ComboBox();
+            this.label61 = new System.Windows.Forms.Label();
             groupBox24 = new System.Windows.Forms.GroupBox();
             groupBox15 = new System.Windows.Forms.GroupBox();
             groupBox3 = new System.Windows.Forms.GroupBox();
@@ -3616,10 +3618,10 @@ namespace ProUpgradeEditor.UI
             this.tabNoteEditor.Controls.Add(this.groupBoxStrumMarkers);
             this.tabNoteEditor.ForeColor = System.Drawing.SystemColors.ControlText;
             this.tabNoteEditor.ImageIndex = 13;
-            this.tabNoteEditor.Location = new System.Drawing.Point(4, 23);
+            this.tabNoteEditor.Location = new System.Drawing.Point(4, 24);
             this.tabNoteEditor.Name = "tabNoteEditor";
             this.tabNoteEditor.Padding = new System.Windows.Forms.Padding(3);
-            this.tabNoteEditor.Size = new System.Drawing.Size(1095, 523);
+            this.tabNoteEditor.Size = new System.Drawing.Size(1095, 522);
             this.tabNoteEditor.TabIndex = 2;
             this.tabNoteEditor.Text = "Note Editor";
             this.tabNoteEditor.Click += new System.EventHandler(this.tabPage2_Click);
@@ -3627,6 +3629,8 @@ namespace ProUpgradeEditor.UI
             // groupBox44
             // 
             this.groupBox44.BackColor = System.Drawing.Color.Transparent;
+            this.groupBox44.Controls.Add(this.comboBoxNoteEditorChordName);
+            this.groupBox44.Controls.Add(this.label61);
             this.groupBox44.Controls.Add(this.checkChordNameEb);
             this.groupBox44.Controls.Add(this.checkChordNameD);
             this.groupBox44.Controls.Add(this.checkChordNameDb);
@@ -3644,16 +3648,15 @@ namespace ProUpgradeEditor.UI
             this.groupBox44.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.groupBox44.Location = new System.Drawing.Point(8, 347);
             this.groupBox44.Name = "groupBox44";
-            this.groupBox44.Size = new System.Drawing.Size(197, 137);
+            this.groupBox44.Size = new System.Drawing.Size(197, 169);
             this.groupBox44.TabIndex = 19;
             this.groupBox44.TabStop = false;
             this.groupBox44.Text = "Chord Naming";
-            this.groupBox44.Visible = false;
             // 
             // checkChordNameEb
             // 
             this.checkChordNameEb.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameEb.Location = new System.Drawing.Point(91, 107);
+            this.checkChordNameEb.Location = new System.Drawing.Point(134, 91);
             this.checkChordNameEb.Name = "checkChordNameEb";
             this.checkChordNameEb.Size = new System.Drawing.Size(42, 17);
             this.checkChordNameEb.TabIndex = 14;
@@ -3663,7 +3666,7 @@ namespace ProUpgradeEditor.UI
             // checkChordNameD
             // 
             this.checkChordNameD.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameD.Location = new System.Drawing.Point(91, 90);
+            this.checkChordNameD.Location = new System.Drawing.Point(134, 74);
             this.checkChordNameD.Name = "checkChordNameD";
             this.checkChordNameD.Size = new System.Drawing.Size(37, 17);
             this.checkChordNameD.TabIndex = 13;
@@ -3673,7 +3676,7 @@ namespace ProUpgradeEditor.UI
             // checkChordNameDb
             // 
             this.checkChordNameDb.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameDb.Location = new System.Drawing.Point(91, 73);
+            this.checkChordNameDb.Location = new System.Drawing.Point(134, 56);
             this.checkChordNameDb.Name = "checkChordNameDb";
             this.checkChordNameDb.Size = new System.Drawing.Size(43, 17);
             this.checkChordNameDb.TabIndex = 12;
@@ -3683,7 +3686,7 @@ namespace ProUpgradeEditor.UI
             // checkChordNameC
             // 
             this.checkChordNameC.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameC.Location = new System.Drawing.Point(91, 56);
+            this.checkChordNameC.Location = new System.Drawing.Point(93, 91);
             this.checkChordNameC.Name = "checkChordNameC";
             this.checkChordNameC.Size = new System.Drawing.Size(36, 17);
             this.checkChordNameC.TabIndex = 11;
@@ -3693,7 +3696,7 @@ namespace ProUpgradeEditor.UI
             // checkChordNameG
             // 
             this.checkChordNameG.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameG.Location = new System.Drawing.Point(5, 107);
+            this.checkChordNameG.Location = new System.Drawing.Point(50, 56);
             this.checkChordNameG.Name = "checkChordNameG";
             this.checkChordNameG.Size = new System.Drawing.Size(37, 17);
             this.checkChordNameG.TabIndex = 10;
@@ -3703,7 +3706,7 @@ namespace ProUpgradeEditor.UI
             // checkChordNameGb
             // 
             this.checkChordNameGb.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameGb.Location = new System.Drawing.Point(5, 90);
+            this.checkChordNameGb.Location = new System.Drawing.Point(5, 91);
             this.checkChordNameGb.Name = "checkChordNameGb";
             this.checkChordNameGb.Size = new System.Drawing.Size(43, 17);
             this.checkChordNameGb.TabIndex = 9;
@@ -3713,7 +3716,7 @@ namespace ProUpgradeEditor.UI
             // checkChordNameB
             // 
             this.checkChordNameB.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameB.Location = new System.Drawing.Point(49, 107);
+            this.checkChordNameB.Location = new System.Drawing.Point(93, 74);
             this.checkChordNameB.Name = "checkChordNameB";
             this.checkChordNameB.Size = new System.Drawing.Size(35, 17);
             this.checkChordNameB.TabIndex = 8;
@@ -3723,7 +3726,7 @@ namespace ProUpgradeEditor.UI
             // checkChordNameBb
             // 
             this.checkChordNameBb.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameBb.Location = new System.Drawing.Point(49, 90);
+            this.checkChordNameBb.Location = new System.Drawing.Point(93, 56);
             this.checkChordNameBb.Name = "checkChordNameBb";
             this.checkChordNameBb.Size = new System.Drawing.Size(41, 17);
             this.checkChordNameBb.TabIndex = 7;
@@ -3733,7 +3736,7 @@ namespace ProUpgradeEditor.UI
             // checkChordNameA
             // 
             this.checkChordNameA.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameA.Location = new System.Drawing.Point(49, 73);
+            this.checkChordNameA.Location = new System.Drawing.Point(50, 91);
             this.checkChordNameA.Name = "checkChordNameA";
             this.checkChordNameA.Size = new System.Drawing.Size(35, 17);
             this.checkChordNameA.TabIndex = 6;
@@ -3743,7 +3746,7 @@ namespace ProUpgradeEditor.UI
             // checkChordNameAb
             // 
             this.checkChordNameAb.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameAb.Location = new System.Drawing.Point(49, 56);
+            this.checkChordNameAb.Location = new System.Drawing.Point(50, 74);
             this.checkChordNameAb.Name = "checkChordNameAb";
             this.checkChordNameAb.Size = new System.Drawing.Size(41, 17);
             this.checkChordNameAb.TabIndex = 5;
@@ -3753,7 +3756,7 @@ namespace ProUpgradeEditor.UI
             // checkChordNameF
             // 
             this.checkChordNameF.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.checkChordNameF.Location = new System.Drawing.Point(5, 73);
+            this.checkChordNameF.Location = new System.Drawing.Point(5, 74);
             this.checkChordNameF.Name = "checkChordNameF";
             this.checkChordNameF.Size = new System.Drawing.Size(35, 17);
             this.checkChordNameF.TabIndex = 4;
@@ -9778,6 +9781,25 @@ namespace ProUpgradeEditor.UI
             this.aboutToolStripMenuItem.Text = "&About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
+            // comboBoxNoteEditorChordName
+            // 
+            this.comboBoxNoteEditorChordName.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.comboBoxNoteEditorChordName.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.comboBoxNoteEditorChordName.FormattingEnabled = true;
+            this.comboBoxNoteEditorChordName.Location = new System.Drawing.Point(9, 129);
+            this.comboBoxNoteEditorChordName.Name = "comboBoxNoteEditorChordName";
+            this.comboBoxNoteEditorChordName.Size = new System.Drawing.Size(176, 23);
+            this.comboBoxNoteEditorChordName.TabIndex = 16;
+            // 
+            // label61
+            // 
+            this.label61.AutoSize = true;
+            this.label61.Location = new System.Drawing.Point(6, 111);
+            this.label61.Name = "label61";
+            this.label61.Size = new System.Drawing.Size(78, 15);
+            this.label61.TabIndex = 15;
+            this.label61.Text = "Chord Name:";
+            // 
             // MainForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -9846,6 +9868,7 @@ namespace ProUpgradeEditor.UI
             this.groupBox41.PerformLayout();
             this.tabNoteEditor.ResumeLayout(false);
             this.groupBox44.ResumeLayout(false);
+            this.groupBox44.PerformLayout();
             this.groupBox42.ResumeLayout(false);
             this.groupBox40.ResumeLayout(false);
             this.groupBox37.ResumeLayout(false);
@@ -10611,6 +10634,8 @@ namespace ProUpgradeEditor.UI
         private System.Windows.Forms.Button buttonSongUtilFindFolder;
         private System.Windows.Forms.TextBox textBoxSongUtilFindFolder;
         private System.Windows.Forms.CheckBox checkBoxSongUtilFindInProOnly;
+        private System.Windows.Forms.ComboBox comboBoxNoteEditorChordName;
+        private System.Windows.Forms.Label label61;
 
 
     }

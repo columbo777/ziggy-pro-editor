@@ -97,11 +97,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdjustOption.cs" />
+    <Compile Include="AdjustResult.cs" />
     <Compile Include="AudioDSP.cs" />
     <Compile Include="ChordModifier.cs" />
     <Compile Include="ChordModifierType.cs" />
     <Compile Include="ChordNameFinder.cs" />
     <Compile Include="ChordNameMeta.cs" />
+    <Compile Include="ChordQueryOption.cs" />
     <Compile Include="ChordStrum.cs" />
     <Compile Include="ChordStrumList.cs" />
     <Compile Include="CodeCompiler.cs" />

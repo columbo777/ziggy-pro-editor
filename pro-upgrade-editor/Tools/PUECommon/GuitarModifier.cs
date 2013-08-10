@@ -28,17 +28,5 @@ namespace ProUpgradeEditor.Common
             this.ModifierType = type;
         }
 
-
-        public override void RemoveEvents()
-        {
-            if (UpEvent != null && Owner != null)
-            {
-                Owner.Remove(UpEvent);
-            }
-            if (DownEvent != null && Owner != null)
-            {
-                Owner.Remove(DownEvent);
-            }
-        }
     }
 }

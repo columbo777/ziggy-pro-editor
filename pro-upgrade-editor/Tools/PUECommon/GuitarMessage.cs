@@ -78,17 +78,9 @@ namespace ProUpgradeEditor.Common
 
         public virtual void RemoveEvents()
         {
-            if (UpEvent != null && Owner != null)
+            if (Owner != null)
             {
-                Owner.Remove(UpEvent);
-
-                SetUpEvent(null);
-            }
-            if (DownEvent != null && Owner != null)
-            {
-                Owner.Remove(DownEvent);
-
-                SetDownEvent(null);
+                Owner.Remove(EventPair);
             }
         }
 

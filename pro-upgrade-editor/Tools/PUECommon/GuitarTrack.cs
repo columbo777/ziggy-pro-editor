@@ -85,28 +85,6 @@ namespace ProUpgradeEditor.Common
             }
         }
 
-        public void Remove(MidiEvent ev)
-        {
-            midiTrack.Remove(ev);
-        }
-
-        public void Remove(IEnumerable<MidiEvent> ev)
-        {
-            foreach (var e in ev)
-            {
-                Remove(e);
-            }
-        }
-        public void Remove(IEnumerable<MidiEventPair> ev)
-        {
-            foreach (var e in ev)
-            {
-                if (e.HasDown)
-                    Remove(e.Down);
-                if (e.HasUp)
-                    Remove(e.Up);
-            }
-        }
 
         public MidiEvent Insert(int absoluteTicks, IMidiMessage ev)
         {

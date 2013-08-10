@@ -18,14 +18,14 @@ namespace ProUpgradeEditor.Common
         public GuitarChordNoteList Notes { get; internal set; }
         public List<ChordModifier> Modifiers { get; internal set; }
 
-        public List<GuitarChordName> ChordNameEvents { get; internal set; }
+        public GuitarChordNameList ChordNameEvents { get; internal set; }
 
         public GuitarChord(GuitarMessageList owner, TickPair pair, GuitarDifficulty difficulty, IEnumerable<GuitarNote> notes)
             : base(owner, pair, GuitarMessageType.GuitarChord)
         {
             Notes = new GuitarChordNoteList(this);
             Modifiers = new List<ChordModifier>();
-            ChordNameEvents = new List<GuitarChordName>();
+            ChordNameEvents = new GuitarChordNameList(this);
 
             Notes.SetNotes(notes);
             SetTicks(pair);
@@ -48,7 +48,7 @@ namespace ProUpgradeEditor.Common
         {
             Notes = new GuitarChordNoteList(this);
             Modifiers = new List<ChordModifier>();
-            ChordNameEvents = new List<GuitarChordName>();
+            ChordNameEvents = new GuitarChordNameList(this);
 
             chordConfig = new GuitarChordConfig()
             {
@@ -505,7 +505,9 @@ namespace ProUpgradeEditor.Common
         }
 
         public static GuitarChord GetChord(GuitarMessageList owner, 
-            GuitarDifficulty difficulty, IEnumerable<GuitarNote> notes, bool findModifiers = true)
+            GuitarDifficulty difficulty, 
+            IEnumerable<GuitarNote> notes, 
+            bool findModifiers = true)
         {
             GuitarChord ret = null;
             try
@@ -539,7 +541,7 @@ namespace ProUpgradeEditor.Common
                         ret.Modifiers.AddRange(owner.Slides.Where(x => x.Chord == null).GetBetweenTick(ret.TickPair).ToList());
                         ret.Modifiers.AddRange(owner.ChordStrums.Where(x => x.Chord == null).GetBetweenTick(ret.TickPair).ToList());
 
-                        ret.ChordNameEvents.AddRange(owner.ChordNames.GetBetweenTick(ret.TickPair).ToList());
+                        ret.ChordNameEvents.SetNames(owner.ChordNames.GetAtTick(ret.AbsoluteTicks).ToList());
 
                         var mods = ret.Modifiers.Where(x => x.TickPair != ret.TickPair).ToList();
                         foreach (var mod in mods)
@@ -827,7 +829,7 @@ namespace ProUpgradeEditor.Common
                 new GuitarChordConfig(Notes.GetFretsAtStringOffset(stringOffset.GetIfNull(0)),
                     Notes.GetChannelsAtStringOffset(stringOffset.GetIfNull(0)),
                     HasSlide, HasSlideReversed, HasHammeron, StrumMode,
-                        RootNoteConfig.Clone()));
+                        RootNoteConfig.GetIfNotNull(x=> x.Clone())));
         }
 
         public GuitarChordRootNoteConfig RootNoteConfig
@@ -1279,7 +1281,9 @@ namespace ProUpgradeEditor.Common
 
             ret.Notes.AddRange(Notes.Select(x => new SerializedChordNote() { Fret = x.NoteFretDown, String = x.NoteString, Channel = x.Channel }));
             ret.Modifiers.AddRange(Modifiers.Select(x => new SerializedChordModifier() { Type = (int)x.ModifierType }));
-
+            ret.RootNoteConfig = RootNoteConfig.GetIfNotNull(x => x.Clone());
+            GetTunedChordNames(null).ForEach(x =>
+                ret.Names.Add(x));
             return ret;
         }
     }

@@ -19,4 +19,5 @@ namespace ProUpgradeEditor.Common
         public int Fret { get; set; }
         public int Channel { get; set; }
     }
+
 }

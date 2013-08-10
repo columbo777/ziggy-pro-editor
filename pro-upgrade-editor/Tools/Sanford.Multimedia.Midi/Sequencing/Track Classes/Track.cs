@@ -144,6 +144,48 @@ namespace Sanford.Multimedia.Midi
             }
         }
 
+        public class MessageSort : IComparer<MidiEvent>
+        {
+            //gt101 = mod
+            //leq101 = note
+            //mod on, note on, note off, mod off
+
+            public int Compare(MidiEvent x, MidiEvent y)
+            {
+                var xIsMod = x.Data1 >= 101;
+                var xIsOn = x.Command == ChannelCommand.NoteOn;
+                var yIsMod = y.Data1 >= 101;
+                var yIsOn = y.Command == ChannelCommand.NoteOn;
+
+                if (xIsOn == yIsOn && xIsMod == yIsMod)
+                    return 0;
+
+                if (xIsOn != yIsOn)
+                {
+                    if (xIsOn)
+                        return -1;
+                    else
+                        return 1;
+                }
+                else
+                {
+                    if (!xIsOn)
+                    {
+                        if (xIsMod)
+                            return 1;
+                        else
+                            return -1;
+                    }
+                    else
+                    {
+                        if (xIsMod)
+                            return -1;
+                        else
+                            return 1;
+                    }
+                }
+            }
+        }
         public MidiEvent Insert(int position, IMidiMessage message)
         {
 
@@ -179,20 +221,23 @@ namespace Sanford.Multimedia.Midi
                     {
                         if (message.MessageType == MessageType.Channel)
                         {
-                            var eqChan = eq.Where(x => x.MessageType == MessageType.Channel);
+                            var chanMess = (ChannelMessage)message;
+
+                            var eqChan = eq.Where(x => x.MessageType == MessageType.Channel).ToList().Select(x => new ChannelMessage(x.MessageData)).ToList();
+
                             if (!eqChan.Any())
                             {
                                 InsertAt(eventList.IndexOf(eq.First()), newMidiEvent);
                             }
                             else
                             {
-                                if (newMidiEvent.Command == ChannelCommand.NoteOn)
+                                if (chanMess.Command == ChannelCommand.NoteOff)
                                 {
-                                    InsertAt(eventList.IndexOf(eqChan.Last()) + 1, newMidiEvent);
+                                    InsertAt(eventList.IndexOf(eq.First()), newMidiEvent);
                                 }
                                 else
                                 {
-                                    InsertAt(eventList.IndexOf(eqChan.First()), newMidiEvent);
+                                    InsertAt(eventList.IndexOf(eq.Last()) + 1, newMidiEvent);
                                 }
                             }
                         }

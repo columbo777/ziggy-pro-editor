@@ -318,7 +318,7 @@ namespace ProUpgradeEditor.UI
             this.button38 = new System.Windows.Forms.Button();
             this.groupBox12 = new System.Windows.Forms.GroupBox();
             this.buttonDeleteSelectedNotes = new System.Windows.Forms.Button();
-            this.button96 = new System.Windows.Forms.Button();
+            this.buttonPlayHoldBoxMidi = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
             this.button7 = new System.Windows.Forms.Button();
@@ -4353,7 +4353,7 @@ namespace ProUpgradeEditor.UI
             this.groupBox12.BackColor = System.Drawing.Color.Transparent;
             this.groupBox12.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.groupBox12.Controls.Add(this.buttonDeleteSelectedNotes);
-            this.groupBox12.Controls.Add(this.button96);
+            this.groupBox12.Controls.Add(this.buttonPlayHoldBoxMidi);
             this.groupBox12.Controls.Add(this.button4);
             this.groupBox12.Controls.Add(this.button6);
             this.groupBox12.Controls.Add(this.button7);
@@ -4381,17 +4381,19 @@ namespace ProUpgradeEditor.UI
             // 
             // button96
             // 
-            this.button96.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.button96.ImageIndex = 77;
-            this.button96.ImageList = this.imageList1;
-            this.button96.Location = new System.Drawing.Point(11, 120);
-            this.button96.Name = "button96";
-            this.button96.Size = new System.Drawing.Size(24, 24);
-            this.button96.TabIndex = 4;
-            this.toolTip1.SetToolTip(this.button96, "Play");
-            this.button96.UseVisualStyleBackColor = true;
-            this.button96.MouseDown += new System.Windows.Forms.MouseEventHandler(this.button96_MouseDown);
-            this.button96.MouseUp += new System.Windows.Forms.MouseEventHandler(this.button96_MouseUp);
+            this.buttonPlayHoldBoxMidi.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.buttonPlayHoldBoxMidi.ImageIndex = 77;
+            this.buttonPlayHoldBoxMidi.ImageList = this.imageList1;
+            this.buttonPlayHoldBoxMidi.Location = new System.Drawing.Point(11, 120);
+            this.buttonPlayHoldBoxMidi.Name = "button96";
+            this.buttonPlayHoldBoxMidi.Size = new System.Drawing.Size(24, 24);
+            this.buttonPlayHoldBoxMidi.TabIndex = 4;
+            this.toolTip1.SetToolTip(this.buttonPlayHoldBoxMidi, "Play");
+            this.buttonPlayHoldBoxMidi.UseVisualStyleBackColor = true;
+            this.buttonPlayHoldBoxMidi.MouseDown += new System.Windows.Forms.MouseEventHandler(this.button96_MouseDown);
+            this.buttonPlayHoldBoxMidi.MouseUp += new System.Windows.Forms.MouseEventHandler(this.button96_MouseUp);
+            this.buttonPlayHoldBoxMidi.KeyDown += new System.Windows.Forms.KeyEventHandler(buttonPlayHoldBoxMidi_KeyDown);
+            this.buttonPlayHoldBoxMidi.KeyUp += new System.Windows.Forms.KeyEventHandler(buttonPlayHoldBoxMidi_KeyUp);
             // 
             // button4
             // 
@@ -5003,6 +5005,7 @@ namespace ProUpgradeEditor.UI
             this.button11.TabIndex = 3;
             this.toolTip1.SetToolTip(this.button11, "Update");
             this.button11.UseVisualStyleBackColor = true;
+            this.button11.Click += new System.EventHandler(button11_Click);
             // 
             // label9
             // 
@@ -9956,8 +9959,6 @@ namespace ProUpgradeEditor.UI
 
         }
 
-
-
         #endregion
 
 
@@ -10273,7 +10274,7 @@ namespace ProUpgradeEditor.UI
         private System.Windows.Forms.GroupBox groupBox29;
         private System.Windows.Forms.Button button97;
         private System.Windows.Forms.Button button98;
-        private System.Windows.Forms.Button button96;
+        private System.Windows.Forms.Button buttonPlayHoldBoxMidi;
         private System.Windows.Forms.Button button57;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label30;

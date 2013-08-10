@@ -718,7 +718,9 @@ namespace ProUpgradeEditor.UI
             checkBoxBatchCopyUSB.Checked = settings.GetValueBool("checkBoxBatchCopyUSB", false);
             checkBatchCopyTextEvents.Checked = settings.GetValueBool("checkBatchCopyTextEvents", true);
             checkBatchGenerateTrainersIfNone.Checked = settings.GetValueBool("checkBatchGenerateTrainersIfNone", true);
+            
             textBoxUSBFolder.Text = settings.GetValue("textBoxUSBFolder");
+
             DefaultConFileLocation = settings.GetValue("textBoxDefaultCONFileLocation");
             DefaultMidiFileLocationG5 = settings.GetValue("textBoxDefaultMidi5FileLocation");
             DefaultMidiFileLocationPro = settings.GetValue("textBoxDefaultMidiProFileLocation");

@@ -8,7 +8,7 @@ using System.Diagnostics;
 namespace ProUpgradeEditor.Common
 {
 
-    
+
 
     public static class ChordNameFinder
     {
@@ -63,7 +63,7 @@ namespace ProUpgradeEditor.Common
         static ChordNameMeta EC_ShowChord(string chord)
         {
             ChordNameMeta ret = null;
-           
+
             if (chord.IsNotEmpty())
             {
                 ret = new ChordNameMeta();
@@ -112,14 +112,28 @@ namespace ProUpgradeEditor.Common
         static IEnumerable<ChordNameMeta> EC_CalculateChordSymbols(ECToneNameEnum[] tones, bool firstOnly)
         {
             var ret = new List<ChordNameMeta>();
+            if (tones.IsEmpty())
+            {
+                return ret;
+            }
+            var distinctTones = tones.Distinct().OrderBy(x => x.ToInt()).ToList();
+            if (distinctTones.Count() == 1)
+            {
+                ret.Add(new ChordNameMeta() { ToneName = ChordNameFinder.GetToneName(distinctTones.First()) });
+                return ret;
+            }
+            else if (distinctTones.Count() == 2)
+            {
+                distinctTones.Add(distinctTones.First());
+            }
 
-            var n = tones.Count();
+            var n = distinctTones.Count();
             if (n < 3 || n > 5)
             {
                 return ret;
             }
 
-            var ecNotes = tones.Select(x => EC_NotesDir[((int)x)]).ToArray();
+            var ecNotes = distinctTones.Select(x => EC_NotesDir[((int)x)]).ToArray();
 
             for (var i = 0; i < EC_Chords.Length; i++)
             {
@@ -191,7 +205,8 @@ namespace ProUpgradeEditor.Common
 
         static string[] EC_NotesDir { get { return EC_NotesUp; } }
 
-        static readonly ChordNameListMeta[] EC_Chords = new[]
+        static readonly ChordNameListMeta[] EC_Chords =
+            new[]
         {
             new ChordNameListMeta(new[]{1,5,8}, ""),
             new ChordNameListMeta(new[]{1,4,8}, "m"),

@@ -58,7 +58,12 @@ namespace ProUpgradeEditor.Common
 
         public static ToneNameEnum NextSemiNote(this ToneNameEnum tone)
         {
-            return (ToneNameEnum)((tone.ToInt() + 1) % ToneNameEnum.NumTones.ToInt());
+            var next = tone.ToInt() + 1;
+            if (next > ToneNameEnum.Eb.ToInt())
+            {
+                next = ToneNameEnum.E.ToInt();
+            }
+            return (ToneNameEnum)next;
         }
 
         public static ToneNameEnum NextWholeNote(this ToneNameEnum tone)
@@ -73,7 +78,10 @@ namespace ProUpgradeEditor.Common
 
         public static ToneNameEnum PreviousSemiNote(this ToneNameEnum tone)
         {
-            return (ToneNameEnum)((tone.ToInt() - 1) % ToneNameEnum.NumTones.ToInt());
+            var prev = tone.ToInt() - 1;
+            if (prev < 0)
+                prev = ToneNameEnum.Eb.ToInt();
+            return (ToneNameEnum)prev;
         }
 
         public static ToneNameEnum PreviousWholeNote(this ToneNameEnum tone)

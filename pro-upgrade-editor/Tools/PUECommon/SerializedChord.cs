@@ -49,6 +49,7 @@ namespace ProUpgradeEditor.Common
 
         public List<SerializedChordNote> Notes { get; set; }
         public List<SerializedChordModifier> Modifiers { get; set; }
+        public List<ChordNameMeta> Names { get; set; }
         
         public GuitarChordRootNoteConfig RootNoteConfig { get; set;}
 
@@ -57,6 +58,7 @@ namespace ProUpgradeEditor.Common
             Notes = new List<SerializedChordNote>();
             Modifiers = new List<SerializedChordModifier>();
             RootNoteConfig = new GuitarChordRootNoteConfig();
+            Names = new List<ChordNameMeta>();
         }
 
         public GuitarChord Deserialize(GuitarMessageList owner, GuitarDifficulty diff, TickPair ticks)

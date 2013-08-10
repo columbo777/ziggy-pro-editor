@@ -43,13 +43,13 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
-        public MetaMessage BuildMessage()
+        public static MetaMessage BuildMessage(int numerator = 4, int denominator = 4, int clocksPerMetronomeClick = 24, int thirtySecondNotesPerQuarterNote = 8)
         {
             var sb = new TimeSignatureBuilder();
-            sb.Numerator = (byte)Numerator;
-            sb.Denominator = (byte)Denominator;
-            sb.ClocksPerMetronomeClick = (byte)ClocksPerMetronomeClick;
-            sb.ThirtySecondNotesPerQuarterNote = (byte)ThirtySecondNotesPerQuarterNote;
+            sb.Numerator = (byte)numerator;
+            sb.Denominator = (byte)denominator;
+            sb.ClocksPerMetronomeClick = (byte)clocksPerMetronomeClick;
+            sb.ThirtySecondNotesPerQuarterNote = (byte)thirtySecondNotesPerQuarterNote;
             sb.Build();
             return sb.Result;
         }

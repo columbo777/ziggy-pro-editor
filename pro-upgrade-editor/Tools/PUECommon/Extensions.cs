@@ -14,7 +14,28 @@ using System.Diagnostics;
 
 namespace ProUpgradeEditor.Common
 {
+    public static class FormsExtensions
+    {
+        public static IEnumerable<TreeNode> GetChildByText(this TreeNodeCollection nodes, string text, bool recursive = false)
+        {
+            var ret = new List<TreeNode>();
+            if (nodes.IsNotNull())
+            {
+                text = text ?? "";
+                var list = nodes.ToEnumerable<TreeNode>();
+                if (list.IsNotEmpty())
+                {
+                    ret.AddRange(list.Where(x => x.Text.EqualsEx(text)));
+                }
 
+                if (recursive)
+                {
+                    list.ForEach(x => ret.AddRange(x.Nodes.GetChildByText(text, recursive)));
+                }
+            }
+            return ret;
+        }
+    }
     public static class PUEExtensions
     {
         public static int ToInt(this object val)
@@ -1772,7 +1793,10 @@ namespace ProUpgradeEditor.Common
         {
             return list.Where(x => x.DownTick < ticks.Up && x.UpTick > ticks.Down);
         }
-
+        public static IEnumerable<T> GetAtTick<T>(this IEnumerable<T> list, int tick) where T : GuitarMessage
+        {
+            return list.Where(x => x.AbsoluteTicks == tick);
+        }
         public static IEnumerable<T> GetBetweenTime<T>(this IEnumerable<T> list, TimePair time) where T : GuitarMessage
         {
             return list.Where(x => x.StartTime < time.Up && x.EndTime > time.Down);

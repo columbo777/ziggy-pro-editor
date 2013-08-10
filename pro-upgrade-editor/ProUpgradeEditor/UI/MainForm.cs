@@ -1228,9 +1228,35 @@ namespace ProUpgradeEditor.UI
         private void button96_MouseDown(object sender, MouseEventArgs e)
         {
             PlayHoldBoxMidi();
-
         }
 
+        DateTime lastPlayHoldBoxKeyDown = DateTime.MinValue;
+        void buttonPlayHoldBoxMidi_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Space)
+            {
+                if (lastPlayHoldBoxKeyDown.IsNull())
+                {
+                    lastPlayHoldBoxKeyDown = DateTime.Now;
+                    PlayHoldBoxMidi();
+                }
+                else
+                {
+                    if ((lastPlayHoldBoxKeyDown - DateTime.Now).TotalSeconds > 2)
+                    {
+                        lastPlayHoldBoxKeyDown = DateTime.MinValue;
+                    }
+                }
+            }
+        }
+        void buttonPlayHoldBoxMidi_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Space)
+            {
+                StopHoldBoxMidi();
+                lastPlayHoldBoxKeyDown = DateTime.MinValue;
+            }
+        }
         private void buttonRebuildPackage_Click(object sender, EventArgs e)
         {
             RebuildSongPackage();
@@ -1357,7 +1383,6 @@ namespace ProUpgradeEditor.UI
                             MessageBox.Show("Rebuild OK");
                         }
                     }
-
                 }
             });
         }
@@ -4041,7 +4066,8 @@ namespace ProUpgradeEditor.UI
 
 
             treeUSBContents.BeginUpdate();
-            var sel = treeUSBContents.SelectedNode;
+            var oldPath = treeUSBContents.SelectedNode.GetIfNotNull(x=> x.FullPath);
+            
             treeUSBContents.SelectedNode = null;
             if (!refreshing)
             {
@@ -4103,39 +4129,16 @@ namespace ProUpgradeEditor.UI
 
             if (refreshing)
             {
-                if (sel != null)
+                if (oldPath.IsNotEmpty())
                 {
-                    if (!string.IsNullOrEmpty(sel.Text))
-                    {
-                        var nodes = treeUSBContents.Nodes.Find(sel.Name, true);
-                        if (nodes != null && nodes.Length > 0)
-                        {
-                            foreach (var n in nodes)
-                            {
-                                if (string.Compare(n.Text, sel.Text, true) == 0)
-                                {
-                                    treeUSBContents.SelectedNode = n;
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                    SelectUSBFolder(oldPath);
                 }
-
             }
             else
             {
                 if (treeUSBContents.SelectedNode == null)
                 {
-                    var defFolder = settings.GetValue("textBoxUSBFolder");
-                    if (!string.IsNullOrEmpty(defFolder))
-                    {
-                        var nodes = treeUSBContents.Nodes.Find(defFolder, true);
-                        if (nodes != null && nodes.Length > 0)
-                        {
-                            treeUSBContents.SelectedNode = nodes[nodes.Length - 1];
-                        }
-                    }
+                    SelectDefaultUSBFolder();
                 }
             }
 
@@ -4166,6 +4169,40 @@ namespace ProUpgradeEditor.UI
             RefreshUSBFilesList();
 
             return ret;
+        }
+
+        private void SelectDefaultUSBFolder()
+        {
+            var defFolder = settings.GetValue("SelectedUSBFolderPath");
+            SelectUSBFolder(defFolder);
+        }
+
+        public void SelectUSBFolder(string folder)
+        {
+            if (folder.IsNotEmpty())
+            {
+                var elems = folder.Split(new[] { treeUSBContents.PathSeparator }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                var nodes = treeUSBContents.Nodes;
+                TreeNode node = null;
+                while (elems.Any())
+                {
+                    var foundNodes = nodes.GetChildByText(elems.First());
+                    if (foundNodes.IsNotEmpty())
+                    {
+                        elems.RemoveAt(0);
+                        node = foundNodes.First();
+                        nodes = node.Nodes;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                if (node != null)
+                {
+                    treeUSBContents.SelectedNode = node;
+                }
+            }
         }
 
         private void buttonUSBRefresh_Click(object sender, EventArgs e)
@@ -5424,8 +5461,8 @@ namespace ProUpgradeEditor.UI
 
                 if (SelectedUSBFolderEntry == null)
                 {
-                    var def = settings.GetValue("textBoxUSBFolder");
-                    if (string.IsNullOrEmpty(def))
+                    var def = settings.GetValue("SelectedUSBFolderPath");
+                    if (def.IsEmpty())
                     {
                         MessageBox.Show("Must set default usb folder");
                         return;
@@ -5460,7 +5497,8 @@ namespace ProUpgradeEditor.UI
 
         void buttonUSBSetDefaultFolder_Click(object sender, EventArgs e)
         {
-            settings.SetValue("textBoxUSBFolder", textBoxUSBFolder.Text);
+            treeUSBContents.SelectedNode.IfNotNull(x=>
+                settings.SetValue("SelectedUSBFolderPath", x.FullPath));
         }
 
         void buttonUSBRestoreImage_Click(object sender, EventArgs e)
@@ -6988,18 +7026,22 @@ namespace ProUpgradeEditor.UI
                     EditorPro.BackupSequence();
 
                     var tempoTrack = editor.GuitarTrack.GetTempoTrack();
-                    tempoTrack.TimeSig.ToList().ForEach(x =>
-                        editor.GuitarTrack.Remove(x));
+                    if (tempoTrack == null)
+                    {
+                        tempoTrack = new Track(editor.Sequence.FileType, "tempo");
+                        editor.Sequence.AddTempo(tempoTrack);
+                    }
+                    else
+                    {
+                        tempoTrack.TimeSig.ToList().ForEach(x =>
+                            tempoTrack.Remove(x));
+                    }
 
-                    GuitarTimeSignature.CreateTimeSignature(
-                        editor.Messages,
-                        0,
+                    tempoTrack.Insert(0, GuitarTimeSignature.BuildMessage(
                         textBoxTempoNumerator.Text.ToInt(4),
-                        textBoxTempoDenominator.Text.ToInt(4));
-
+                        textBoxTempoDenominator.Text.ToInt(4)));
 
                     ReloadTracks();
-
                 }
             }
             catch { MessageBox.Show("Cannot create time signature"); }
@@ -7072,7 +7114,7 @@ namespace ProUpgradeEditor.UI
                     return;
 
                 foreach (var ch in EditorPro.SelectedChords.ToList().
-                    Where(x=> x.Notes.Any(n=> n.NoteFretDown <= 10)).ToList())
+                    Where(x => x.Notes.Any(n => n.NoteFretDown <= 10)).ToList())
                 {
                     ch.UpTwelveFrets();
                 }
@@ -9574,64 +9616,6 @@ namespace ProUpgradeEditor.UI
             }
         }
 
-        private void buttonFindNoteInMP3_Click(object sender, EventArgs e)
-        {
-            if (EditorPro.IsLoaded)
-            {
-                try
-                {
-                    if (EditorPro.WaveViewer != null && EditorPro.WaveViewer.WaveStream != null)
-                    {
-                        List<GuitarChord> chords = new List<GuitarChord>();
-                        if (EditorPro.SelectedChords.Any())
-                        {
-                            chords.AddRange(EditorPro.SelectedChords.ToList());
-                        }
-                        else
-                        {
-                            chords.AddRange(EditorPro.Messages.Chords.ToList());
-                        }
-
-                        foreach (var chord in chords)
-                        {
-                            SetSelectedChord(chord, false);
-                            ScrollToSelection();
-
-                            EditorPro.Invalidate();
-                            Application.DoEvents();
-
-                            if (EditorPro.WaveViewer != null)
-                            {
-                                var chordPitchRecords = EditorPro.WaveViewer.GetPitchRecords(chord);
-
-                                if (chordPitchRecords.Any())
-                                {
-                                    foreach (var midiNote in chordPitchRecords.Distinct())
-                                    {
-
-                                        ScrollToSelection();
-                                        EditorPro.Invalidate();
-                                        Application.DoEvents();
-
-
-                                        PlayMidiNote(midiNote.MidiNote);
-
-                                        EditorPro.Invalidate();
-                                        Application.DoEvents();
-
-                                    }
-                                }
-                            }
-                        }
-
-
-                        EditorPro.Invalidate();
-                    }
-                }
-                catch { }
-            }
-        }
-
         private void mergeProMidiToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
@@ -9648,6 +9632,39 @@ namespace ProUpgradeEditor.UI
                 });
             }
             catch { }
+        }
+
+        void button11_Click(object sender, System.EventArgs e)
+        {
+            if (!EditorPro.IsLoaded)
+                return;
+
+            var down = textBoxNoteEditorSelectedChordDownTick.Text.ToInt();
+            var up = textBoxNoteEditorSelectedChordUpTick.Text.ToInt();
+            var len = textBoxNoteEditorSelectedChordTickLength.Text.ToInt();
+
+            if (EditorPro.NumSelectedChords == 1)
+            {
+                if (down.IsNotNull() && up.IsNotNull())
+                {
+                    var chord = EditorPro.SelectedChord;
+
+                    chord.SetTicks(new TickPair(down, up));
+                    chord.UpdateEvents();
+                }
+            }
+            else if (EditorPro.NumSelectedChords > 1)
+            {
+                if (len.IsNotNull())
+                {
+                    EditorPro.SelectedChords.ToList().ForEach(x =>
+                    {
+                        x.SetTicks(new TickPair(x.DownTick, x.DownTick + len));
+                        x.UpdateEvents();
+                    });
+                }
+            }
+
         }
 
         private void tabPackageViewer_FileDrop(object sender, DragEventArgs e)
@@ -10302,7 +10319,7 @@ namespace ProUpgradeEditor.UI
                                 {
                                     EditorPro.Messages.Chords.ToList().ForEach(chord =>
                                     {
-                                        
+
                                         var newTicks = EditorPro.SnapLeftRightTicks(chord.TickPair, new SnapConfig(true, false, false));
 
                                         if (chord.TickPair != newTicks)

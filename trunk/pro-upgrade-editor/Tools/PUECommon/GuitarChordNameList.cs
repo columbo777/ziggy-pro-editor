@@ -9,17 +9,52 @@ using System.Diagnostics;
 
 namespace ProUpgradeEditor.Common
 {
-    public class GuitarChordNameList : SpecializedMessageList<GuitarChordName>
+    public class GuitarChordNameList : IEnumerable<GuitarChordName>
     {
-        public GuitarChordNameList(TrackEditor owner)
-            : base(owner)
-        {
+        List<GuitarChordName> names;
+        GuitarChord owner;
 
+        public GuitarChordNameList(GuitarChord owner)
+        {
+            this.owner = owner;
+            names = new List<GuitarChordName>();
         }
 
-        public override GuitarMessageType MessageType
+        public void Remove(GuitarChordName name)
         {
-            get { return GuitarMessageType.GuitarChordName; }
+            names.Remove(name);
+        }
+
+        public void SetNames(IEnumerable<GuitarChordName> names)
+        {
+            Clear();
+            if (names != null)
+            {
+                names.ForEach(x => internalAddName(x));
+            }
+        }
+        public void Clear()
+        {
+            names.ToList().ForEach(n => Remove(n));
+            names.Clear();
+        }
+
+        void internalAddName(GuitarChordName n)
+        {
+            n.OwnerList = this;
+            n.OwnerChord = this.owner;
+            names.Add(n);
+        }
+
+
+        public IEnumerator<GuitarChordName> GetEnumerator()
+        {
+            return names.GetEnumerator();
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
         }
     }
 }

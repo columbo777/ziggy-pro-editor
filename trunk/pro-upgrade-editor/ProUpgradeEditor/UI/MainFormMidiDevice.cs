@@ -729,6 +729,7 @@ namespace ProUpgradeEditor.UI
                         data2 = midiPlaybackDeviceVolume;
                     }
                     midiPlaybackDevice.Send(new ChannelMessage(e.Message.Command, GetTunedNote(e.Message.Data1, e.Message.Data2), data2));
+                    
                     if (e.Message.Command == ChannelCommand.NoteOff ||
                         e.Message.Data2 == 0)
                     {
@@ -742,20 +743,6 @@ namespace ProUpgradeEditor.UI
             catch { }
         }
 
-        public void PlayMidiNote(int midiNote, int waitMS = 500)
-        {
-            try
-            {
-                if (CreateMidiPlaybackDeviceIfNull())
-                {
-                    midiPlaybackDevice.Send(new ChannelMessage(ChannelCommand.NoteOn, midiNote, 100));
-                    Thread.Sleep(waitMS);
-                    midiPlaybackDevice.Send(new ChannelMessage(ChannelCommand.NoteOff, midiNote, 0));
-                }
-            }
-            catch { }
-
-        }
         public int GetTunedNote(int data1, int data2)
         {
 

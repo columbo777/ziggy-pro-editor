@@ -8,47 +8,9 @@ using System.Diagnostics;
 
 namespace ProUpgradeEditor.Common
 {
-    [Flags()]
-    public enum ChordQueryOption
-    {
-        Default = (0),
-        IncludeEndingOnMin = (1 << 0),
-        IncludeStartingOnMax = (1 << 1),
-    }
-
-    [Flags()]
-    public enum AdjustResult
-    {
-        NoResult = 0,
-        Success = (1 << 0),
-
-        AdjustedDownTickLeft = (1 << 1),
-        AdjustedDownTickRight = (1 << 2),
-
-        AdjustedUpTickLeft = (1 << 3),
-        AdjustedUpTickRight = (1 << 4),
-
-        ShortResult = (1 << 5),
-
-        Error = (1 << 6),
-
-        AdjustedDownTick = (AdjustedDownTickLeft | AdjustedDownTickRight),
-        AdjustedUpTick = (AdjustedUpTickLeft | AdjustedUpTickRight),
-    }
-
-    [Flags()]
-    public enum AdjustOption
-    {
-        NoAdjust = (0),
-        AllowGrow = (1 << 0),
-        AllowShrink = (1 << 1),
-        AllowShift = (1 << 2),
-        AllowAny = (AllowGrow | AllowShrink | AllowShift),
-    }
-
+    
     public class GuitarMessageList : IEnumerable<GuitarMessage>
     {
-
 
         protected IEnumerable<GuitarMessageType> GetAllMessageTypes()
         {
@@ -157,7 +119,7 @@ namespace ProUpgradeEditor.Common
             return ret;
         }
 
-        public GuitarChordNameList ChordNames;
+        public ChordNameList ChordNames;
         public GuitarHandPositionList HandPositions;
         public GuitarTextEventList TextEvents;
         public GuitarTrainerList Trainers;
@@ -185,7 +147,7 @@ namespace ProUpgradeEditor.Common
         public GuitarMessageList(TrackEditor owner)
         {
             this.owner = owner;
-            ChordNames = new GuitarChordNameList(owner);
+            ChordNames = new ChordNameList(owner);
             HandPositions = new GuitarHandPositionList(owner);
             TextEvents = new GuitarTextEventList(owner);
             Trainers = new GuitarTrainerList(owner);
@@ -548,22 +510,10 @@ namespace ProUpgradeEditor.Common
         {
             owner.GuitarTrack.Remove(pair);
         }
-        public void Remove(MidiEvent mess)
-        {
-            owner.GuitarTrack.Remove(mess);
-        }
         public void Remove(IEnumerable<GuitarMessage> mess)
         {
             foreach (var m in mess.ToList())
                 internalRemove(m);
-        }
-        public void Remove(IEnumerable<MidiEvent> mess)
-        {
-            owner.GuitarTrack.Remove(mess);
-        }
-        public void Remove(IEnumerable<MidiEventPair> mess)
-        {
-            owner.GuitarTrack.Remove(mess);
         }
         internal void internalRemove<T>(T mess) where T : GuitarMessage
         {

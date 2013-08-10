@@ -41,18 +41,6 @@ namespace ProUpgradeEditor.Common
             base.DeleteAll();
         }
 
-        public override void RemoveEvents()
-        {
-            if (UpEvent != null && Owner != null)
-            {
-                Owner.Remove(UpEvent);
-            }
-            if (DownEvent != null && Owner != null)
-            {
-                Owner.Remove(DownEvent);
-            }
-        }
-
         public GuitarNote(MidiEventPair pair)
             : base(pair, GuitarMessageType.GuitarNote)
         {

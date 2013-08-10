@@ -3191,6 +3191,16 @@ namespace ProUpgradeEditor.UI
                     }
                 }
 
+                if (e.KeyCode == Keys.Space)
+                {
+                    if (lastPlayHoldBoxKeyDown.IsNull())
+                    {
+                        buttonPlayHoldBoxMidi.Focus();
+                        lastPlayHoldBoxKeyDown = DateTime.Now;
+                        PlayHoldBoxMidi();
+                    }
+                    return true;
+                }
                 if (e.KeyCode == Keys.Delete)
                 {
                     if (EditorPro.IsLoaded && EditorPro.SelectedChords.Any())
@@ -3203,12 +3213,12 @@ namespace ProUpgradeEditor.UI
 
                     return true;
                 }
-                else if (e.KeyValue == 189)//minus
+                else if (e.KeyCode == Keys.OemMinus)
                 {
                     ZoomOut();
                     return true;
                 }
-                else if (e.KeyValue == 187)//plus
+                else if (e.KeyCode == Keys.Oemplus)
                 {
                     ZoomIn();
                     return true;

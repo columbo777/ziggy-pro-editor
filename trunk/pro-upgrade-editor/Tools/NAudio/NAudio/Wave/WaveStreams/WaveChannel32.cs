@@ -42,6 +42,7 @@ namespace NAudio.Wave
                 new Stereo24SampleChunkConverter(),
                 new MonoFloatSampleChunkConverter(),
                 new StereoFloatSampleChunkConverter(),
+                new FourChannel8SampleChunkConverter(),
             };
             foreach (var provider in providers)
             {

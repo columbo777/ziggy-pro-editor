@@ -69,7 +69,14 @@ namespace ProUpgradeEditor.UI
             WaveStream ret = null;
             try
             {
-                ret = new Mp3FileReader(fileName);
+                if (fileName.EndsWithEx("ogg"))
+                {
+                    ret = new OggFileReader(fileName);
+                }
+                else
+                {
+                    ret = new Mp3FileReader(fileName);
+                }
             }
             catch { }
             return ret;
@@ -92,7 +99,15 @@ namespace ProUpgradeEditor.UI
                     waveOutDevice = new WaveOut(handle);
                 }
 
-                mainOutputStream = new Mp3FileReader(fileName);
+                if (fileName.EndsWithEx("ogg"))
+                {
+                    mainOutputStream = new OggFileReader(fileName);
+                }
+                else
+                {
+                    mainOutputStream = new Mp3FileReader(fileName);
+                }
+
                 volumeStream = new WaveChannel32(mainOutputStream);
                 mainOutputStream = volumeStream;
 

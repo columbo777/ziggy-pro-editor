@@ -205,7 +205,7 @@ namespace ProUpgradeEditor.UI
                         {
                             var midiFiles = outputFolder.GetFilesInFolder(true, "*.mid|*.midi").ToList();
                             var dtaFiles = outputFolder.GetFilesInFolder(true, "*.dta").ToList();
-                            var mp3Files = outputFolder.GetFilesInFolder(true, "*.mp3").ToList();
+                            var mp3Files = outputFolder.GetFilesInFolder(true, "*.mp3|*.mogg").ToList();
 
                             importDroppedMidi(dtaFiles.Select(x => new KeyValueObject<string, byte[]>(x, x.ReadFileBytes())),
                                 midiFiles.Select(x => new KeyValueObject<string, byte[]>(x, x.ReadFileBytes())),
@@ -225,7 +225,7 @@ namespace ProUpgradeEditor.UI
                                 });
                         }
                     }
-                    else if (fileName.EndsWithEx(".mp3"))
+                    else if (fileName.EndsWithEx(".mp3") || fileName.EndsWithEx("ogg"))
                     {
                         var dtaFiles = GetDroppedDTAFiles(fileName, allFiles);
                         if (dtaFiles.Any())
@@ -308,11 +308,12 @@ namespace ProUpgradeEditor.UI
                                 {
                                     var extractedDTAFiles = ExtractDTAFiles(package, outputFolder);
                                     var extractedMIDIFiles = ExtractMidiFiles(package, outputFolder);
+                                    var extractedAudioFiles = ExtractAudioFiles(package, outputFolder);
 
                                     importDroppedMidi(extractedDTAFiles.
                                         Select(x => new KeyValueObject<string, byte[]>(x, x.ReadFileBytes())),
                                         extractedMIDIFiles.Select(x => new KeyValueObject<string, byte[]>(x, x.ReadFileBytes())),
-                                        new List<KeyValueObject<string, byte[]>>()).ToList().ForEach(x =>
+                                        extractedAudioFiles.Select(x => new KeyValueObject<string, byte[]>(x, x.ReadFileBytes()))).ToList().ForEach(x =>
                                         {
                                             if (x != null)
                                             {
@@ -789,6 +790,32 @@ namespace ProUpgradeEditor.UI
         }
 
 
+        public List<string> ExtractAudioFiles(Package f, string outputDir)
+        {
+            var ret = new List<string>();
+            try
+            {
+
+                foreach (var file in GetAudioFiles(f))
+                {
+                    try
+                    {
+                        var newFile = outputDir.PathCombine(file.Name);
+                        if (!newFile.FileExists())
+                        {
+                            File.WriteAllBytes(newFile, file.Data);
+                        }
+                        ret.Add(newFile);
+                    }
+                    catch { }
+                }
+
+            }
+            catch { }
+            return ret;
+        }
+
+
         public static IEnumerable<PackageFile> GetMidiFiles(Package f)
         {
             var ret = new List<PackageFile>();
@@ -801,6 +828,18 @@ namespace ProUpgradeEditor.UI
 
         }
 
+
+        public static IEnumerable<PackageFile> GetAudioFiles(Package f)
+        {
+            var ret = new List<PackageFile>();
+            try
+            {
+                ret.AddRange(f.GetFilesByExtension(".mp3|.mogg"));
+            }
+            catch { }
+            return ret;
+
+        }
         public static IEnumerable<PackageFile> GetDTAFiles(Package f)
         {
             var ret = new List<PackageFile>();
@@ -1483,7 +1522,7 @@ namespace ProUpgradeEditor.UI
             ExecuteBatchDifficulty();
         }
 
-        private void button104_Click(object sender, EventArgs e)
+        private void buttonExecuteBatchGuitarBassCopy_Click(object sender, EventArgs e)
         {
             ClearBatchResults();
             ExecuteBatchGuitarBassCopy();
@@ -5885,7 +5924,7 @@ namespace ProUpgradeEditor.UI
             return ret;
         }
 
-        private void button127_Click(object sender, EventArgs e)
+        private void buttonExecuteBatchCopyUSB_Click(object sender, EventArgs e)
         {
             ClearBatchResults();
             ExecuteBatchCopyUSB();

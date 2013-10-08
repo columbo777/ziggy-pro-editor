@@ -101,8 +101,8 @@ Global
 		{501A0458-E01C-404D-A55D-11627CC4B48F}.Editor|x86.ActiveCfg = Editor|Any CPU
 		{501A0458-E01C-404D-A55D-11627CC4B48F}.Form Test|Any CPU.ActiveCfg = Form Test|Any CPU
 		{501A0458-E01C-404D-A55D-11627CC4B48F}.Form Test|Any CPU.Build.0 = Form Test|Any CPU
-		{501A0458-E01C-404D-A55D-11627CC4B48F}.Form Test|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{501A0458-E01C-404D-A55D-11627CC4B48F}.Form Test|Mixed Platforms.Build.0 = Debug|Any CPU
+		{501A0458-E01C-404D-A55D-11627CC4B48F}.Form Test|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{501A0458-E01C-404D-A55D-11627CC4B48F}.Form Test|Mixed Platforms.Build.0 = Release|Any CPU
 		{501A0458-E01C-404D-A55D-11627CC4B48F}.Form Test|x86.ActiveCfg = Form Test|Any CPU
 		{501A0458-E01C-404D-A55D-11627CC4B48F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{501A0458-E01C-404D-A55D-11627CC4B48F}.Release|Any CPU.Build.0 = Release|Any CPU
@@ -217,8 +217,8 @@ Global
 		{7767D3DD-6E1C-419E-9092-F3F3DDDF3D87}.Editor|x86.ActiveCfg = Release|x86
 		{7767D3DD-6E1C-419E-9092-F3F3DDDF3D87}.Editor|x86.Build.0 = Release|x86
 		{7767D3DD-6E1C-419E-9092-F3F3DDDF3D87}.Form Test|Any CPU.ActiveCfg = Release|x86
-		{7767D3DD-6E1C-419E-9092-F3F3DDDF3D87}.Form Test|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{7767D3DD-6E1C-419E-9092-F3F3DDDF3D87}.Form Test|Mixed Platforms.Build.0 = Debug|Any CPU
+		{7767D3DD-6E1C-419E-9092-F3F3DDDF3D87}.Form Test|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{7767D3DD-6E1C-419E-9092-F3F3DDDF3D87}.Form Test|Mixed Platforms.Build.0 = Release|Any CPU
 		{7767D3DD-6E1C-419E-9092-F3F3DDDF3D87}.Form Test|x86.ActiveCfg = Release|x86
 		{7767D3DD-6E1C-419E-9092-F3F3DDDF3D87}.Form Test|x86.Build.0 = Release|x86
 		{7767D3DD-6E1C-419E-9092-F3F3DDDF3D87}.Release|Any CPU.ActiveCfg = Release|x86

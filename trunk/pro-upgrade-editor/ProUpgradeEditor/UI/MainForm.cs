@@ -205,7 +205,7 @@ namespace ProUpgradeEditor.UI
                         {
                             var midiFiles = outputFolder.GetFilesInFolder(true, "*.mid|*.midi").ToList();
                             var dtaFiles = outputFolder.GetFilesInFolder(true, "*.dta").ToList();
-                            var mp3Files = outputFolder.GetFilesInFolder(true, "*.mp3|*.mogg").ToList();
+                            var mp3Files = outputFolder.GetFilesInFolder(true, "*.mp3|*.mogg|*.ogg").ToList();
 
                             importDroppedMidi(dtaFiles.Select(x => new KeyValueObject<string, byte[]>(x, x.ReadFileBytes())),
                                 midiFiles.Select(x => new KeyValueObject<string, byte[]>(x, x.ReadFileBytes())),
@@ -803,7 +803,7 @@ namespace ProUpgradeEditor.UI
                         var newFile = outputDir.PathCombine(file.Name);
                         if (!newFile.FileExists())
                         {
-                            File.WriteAllBytes(newFile, file.Data);
+                            newFile.WriteFileBytes(file.Data);
                         }
                         ret.Add(newFile);
                     }
@@ -834,7 +834,7 @@ namespace ProUpgradeEditor.UI
             var ret = new List<PackageFile>();
             try
             {
-                ret.AddRange(f.GetFilesByExtension(".mp3|.mogg"));
+                ret.AddRange(f.GetFilesByExtension(".mp3|.mogg|.ogg"));
             }
             catch { }
             return ret;

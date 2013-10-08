@@ -59,6 +59,10 @@ namespace NAudio.Wave
             {
                 readerStream = new Mp3FileReader(fileName);
             }
+            else if (fileName.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase) || fileName.EndsWith(".mogg", StringComparison.OrdinalIgnoreCase))
+            {
+                readerStream = new OggFileReader(fileName);
+            }
             else if (fileName.EndsWith(".aiff"))
             {
                 readerStream = new AiffFileReader(fileName);

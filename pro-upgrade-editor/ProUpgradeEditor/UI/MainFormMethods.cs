@@ -4919,13 +4919,10 @@ namespace ProUpgradeEditor.UI
                 var sc = SelectedSong;
                 if (sc != null && sc.SongMP3Location.FileExists())
                 {
-                    EditorPro.MP3PlaybackStream = naudioPlayer.LoadMP3(sc.SongMP3Location);
+                    
                     EditorPro.MP3PlaybackOffset = sc.SongMP3PlaybackOffset;
                 }
-                else
-                {
-                    EditorPro.MP3PlaybackStream = null;
-                }
+                
             }
             catch { }
 

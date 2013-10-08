@@ -40,71 +40,6 @@ namespace ProUpgradeEditor.Common
         }
         public int MP3PlaybackOffset { get; set; }
 
-        public WaveStream MP3PlaybackStream
-        {
-            get
-            {
-                if (WaveViewer != null)
-                {
-                    return WaveViewer.WaveStream;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            set
-            {
-                try
-                {
-                    if (WaveViewer != null)
-                    {
-                        try
-                        {
-                            WaveViewer.Dispose();
-                        }
-                        finally
-                        {
-                            WaveViewer = null;
-                        }
-                    }
-                    if (value != null)
-                    {
-                        WaveViewer = new PEWaveViewerControl();
-                        WaveViewer.WaveStream = value;
-                    }
-
-                }
-                catch { try { WaveViewer.Dispose(); } finally { WaveViewer = null; } }
-            }
-        }
-
-        public PEWaveViewerControl WaveViewer
-        {
-            get;
-            set;
-        }
-
-        void RenderWaveViewer(Graphics g)
-        {
-            try
-            {
-                if (WaveViewer != null)
-                {
-                    WaveViewer.Owner = this;
-                    WaveViewer.DrawBounds = this.ClientRectangle;
-
-                    var mp3Offset = GetScreenPointFromTime(-(MP3PlaybackOffset.ToDouble() / 1000.0));
-
-                    WaveViewer.DrawClientSize = new Size(HScroll.Maximum + ClientRectangle.Width, ClientRectangle.Height);
-
-
-                    g.DrawImage(WaveViewer.DrawToMemory(), ClientRectangle);
-                }
-
-            }
-            catch { }
-        }
 
         public void AddTrack(Track t)
         {
@@ -461,13 +396,6 @@ namespace ProUpgradeEditor.Common
                 SetTrack5(null);
             }
             ClearBackups();
-
-            if (WaveViewer != null)
-            {
-                WaveViewer.UnloadMemory();
-                WaveViewer.Dispose();
-                WaveViewer = null;
-            }
 
             if (OnClose != null)
             {

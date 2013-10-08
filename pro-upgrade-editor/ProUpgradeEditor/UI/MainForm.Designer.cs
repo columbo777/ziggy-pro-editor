@@ -35,9 +35,9 @@ namespace ProUpgradeEditor.UI
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             System.Windows.Forms.GroupBox groupBox3;
             System.Windows.Forms.GroupBox groupBox14;
-            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("File Name", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Size", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Date", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("File Name", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("Size", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("Date", System.Windows.Forms.HorizontalAlignment.Left);
             this.panel8 = new System.Windows.Forms.Panel();
             this.midiTrackEditorG5 = new EditorResources.Components.PEMidiTrackEditPanel();
             this.buttonSongToolSnapNotes = new System.Windows.Forms.Button();
@@ -182,11 +182,11 @@ namespace ProUpgradeEditor.UI
             this.buttonBatchBuildTextEvents = new System.Windows.Forms.Button();
             this.checkBatchGenerateTrainersIfNone = new System.Windows.Forms.CheckBox();
             this.checkBatchCopyTextEvents = new System.Windows.Forms.CheckBox();
-            this.button127 = new System.Windows.Forms.Button();
+            this.buttonExecuteBatchCopyUSB = new System.Windows.Forms.Button();
             this.checkBoxBatchCopyUSB = new System.Windows.Forms.CheckBox();
             this.button106 = new System.Windows.Forms.Button();
             this.button105 = new System.Windows.Forms.Button();
-            this.button104 = new System.Windows.Forms.Button();
+            this.buttonExecuteBatchGuitarBassCopy = new System.Windows.Forms.Button();
             this.button103 = new System.Windows.Forms.Button();
             this.checkBoxBatchCheckCON = new System.Windows.Forms.CheckBox();
             this.checkBoxBatchGenerateDifficulties = new System.Windows.Forms.CheckBox();
@@ -256,6 +256,8 @@ namespace ProUpgradeEditor.UI
             this.button130 = new System.Windows.Forms.Button();
             this.tabNoteEditor = new System.Windows.Forms.TabPage();
             this.groupBox44 = new System.Windows.Forms.GroupBox();
+            this.comboBoxNoteEditorChordName = new System.Windows.Forms.ComboBox();
+            this.label61 = new System.Windows.Forms.Label();
             this.checkChordNameEb = new System.Windows.Forms.CheckBox();
             this.checkChordNameD = new System.Windows.Forms.CheckBox();
             this.checkChordNameDb = new System.Windows.Forms.CheckBox();
@@ -707,8 +709,6 @@ namespace ProUpgradeEditor.UI
             this.xBoxUSBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.comboBoxNoteEditorChordName = new System.Windows.Forms.ComboBox();
-            this.label61 = new System.Windows.Forms.Label();
             groupBox24 = new System.Windows.Forms.GroupBox();
             groupBox15 = new System.Windows.Forms.GroupBox();
             groupBox3 = new System.Windows.Forms.GroupBox();
@@ -1503,8 +1503,8 @@ namespace ProUpgradeEditor.UI
             // 
             // groupBox39
             // 
-            this.groupBox39.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox39.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.groupBox39.Controls.Add(this.groupBox48);
             this.groupBox39.Controls.Add(this.buttonSongLibListFilterReset);
             this.groupBox39.Controls.Add(this.label55);
@@ -1618,8 +1618,8 @@ namespace ProUpgradeEditor.UI
             // 
             // listBoxSongLibrary
             // 
-            this.listBoxSongLibrary.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)));
+            this.listBoxSongLibrary.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.listBoxSongLibrary.ForeColor = System.Drawing.SystemColors.ControlText;
             this.listBoxSongLibrary.FormattingEnabled = true;
             this.listBoxSongLibrary.ItemHeight = 15;
@@ -1674,9 +1674,9 @@ namespace ProUpgradeEditor.UI
             // 
             // tabControl2
             // 
-            this.tabControl2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabControl2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl2.Controls.Add(this.tabSongLibSongProperties);
             this.tabControl2.Controls.Add(this.tabSongLibUtility);
             this.tabControl2.Controls.Add(this.tabSongLibSongUtility);
@@ -1927,7 +1927,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxSongPropertiesMP3StartOffset.Text = "0";
             this.textBoxSongPropertiesMP3StartOffset.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.toolTip1.SetToolTip(this.textBoxSongPropertiesMP3StartOffset, "Time in Milliseconds to adjust playback. Negative to start playback late. Positiv" +
-                    "e to start playback early.");
+        "e to start playback early.");
             this.textBoxSongPropertiesMP3StartOffset.TextChanged += new System.EventHandler(this.textBoxSongPropertiesMP3StartOffset_TextChanged);
             this.textBoxSongPropertiesMP3StartOffset.Leave += new System.EventHandler(this.textBoxSongPropertiesMP3StartOffset_Leave);
             // 
@@ -2622,8 +2622,8 @@ namespace ProUpgradeEditor.UI
             // 
             // textBoxBatchUtilExtractXML
             // 
-            this.textBoxBatchUtilExtractXML.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxBatchUtilExtractXML.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxBatchUtilExtractXML.Location = new System.Drawing.Point(134, 372);
             this.textBoxBatchUtilExtractXML.Name = "textBoxBatchUtilExtractXML";
             this.textBoxBatchUtilExtractXML.Size = new System.Drawing.Size(365, 23);
@@ -2711,11 +2711,11 @@ namespace ProUpgradeEditor.UI
             this.groupBox22.Controls.Add(this.buttonBatchBuildTextEvents);
             this.groupBox22.Controls.Add(this.checkBatchGenerateTrainersIfNone);
             this.groupBox22.Controls.Add(this.checkBatchCopyTextEvents);
-            this.groupBox22.Controls.Add(this.button127);
+            this.groupBox22.Controls.Add(this.buttonExecuteBatchCopyUSB);
             this.groupBox22.Controls.Add(this.checkBoxBatchCopyUSB);
             this.groupBox22.Controls.Add(this.button106);
             this.groupBox22.Controls.Add(this.button105);
-            this.groupBox22.Controls.Add(this.button104);
+            this.groupBox22.Controls.Add(this.buttonExecuteBatchGuitarBassCopy);
             this.groupBox22.Controls.Add(this.button103);
             this.groupBox22.Controls.Add(this.checkBoxBatchCheckCON);
             this.groupBox22.Controls.Add(this.checkBoxBatchGenerateDifficulties);
@@ -2765,16 +2765,16 @@ namespace ProUpgradeEditor.UI
             this.checkBatchCopyTextEvents.Text = "Copy Text Events if None";
             this.checkBatchCopyTextEvents.UseVisualStyleBackColor = true;
             // 
-            // button127
+            // buttonExecuteBatchCopyUSB
             // 
-            this.button127.ImageIndex = 21;
-            this.button127.ImageList = this.imageList1;
-            this.button127.Location = new System.Drawing.Point(6, 175);
-            this.button127.Name = "button127";
-            this.button127.Size = new System.Drawing.Size(24, 24);
-            this.button127.TabIndex = 12;
-            this.button127.UseVisualStyleBackColor = true;
-            this.button127.Click += new System.EventHandler(this.button127_Click);
+            this.buttonExecuteBatchCopyUSB.ImageIndex = 21;
+            this.buttonExecuteBatchCopyUSB.ImageList = this.imageList1;
+            this.buttonExecuteBatchCopyUSB.Location = new System.Drawing.Point(6, 175);
+            this.buttonExecuteBatchCopyUSB.Name = "buttonExecuteBatchCopyUSB";
+            this.buttonExecuteBatchCopyUSB.Size = new System.Drawing.Size(24, 24);
+            this.buttonExecuteBatchCopyUSB.TabIndex = 12;
+            this.buttonExecuteBatchCopyUSB.UseVisualStyleBackColor = true;
+            this.buttonExecuteBatchCopyUSB.Click += new System.EventHandler(this.buttonExecuteBatchCopyUSB_Click);
             // 
             // checkBoxBatchCopyUSB
             // 
@@ -2808,16 +2808,16 @@ namespace ProUpgradeEditor.UI
             this.button105.UseVisualStyleBackColor = true;
             this.button105.Click += new System.EventHandler(this.button105_Click);
             // 
-            // button104
+            // buttonExecuteBatchGuitarBassCopy
             // 
-            this.button104.ImageIndex = 14;
-            this.button104.ImageList = this.imageList1;
-            this.button104.Location = new System.Drawing.Point(6, 90);
-            this.button104.Name = "button104";
-            this.button104.Size = new System.Drawing.Size(24, 24);
-            this.button104.TabIndex = 3;
-            this.button104.UseVisualStyleBackColor = true;
-            this.button104.Click += new System.EventHandler(this.button104_Click);
+            this.buttonExecuteBatchGuitarBassCopy.ImageIndex = 14;
+            this.buttonExecuteBatchGuitarBassCopy.ImageList = this.imageList1;
+            this.buttonExecuteBatchGuitarBassCopy.Location = new System.Drawing.Point(6, 90);
+            this.buttonExecuteBatchGuitarBassCopy.Name = "buttonExecuteBatchGuitarBassCopy";
+            this.buttonExecuteBatchGuitarBassCopy.Size = new System.Drawing.Size(24, 24);
+            this.buttonExecuteBatchGuitarBassCopy.TabIndex = 3;
+            this.buttonExecuteBatchGuitarBassCopy.UseVisualStyleBackColor = true;
+            this.buttonExecuteBatchGuitarBassCopy.Click += new System.EventHandler(this.buttonExecuteBatchGuitarBassCopy_Click);
             // 
             // button103
             // 
@@ -2992,8 +2992,8 @@ namespace ProUpgradeEditor.UI
             // 
             // progressBarGenCompletedDifficulty
             // 
-            this.progressBarGenCompletedDifficulty.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBarGenCompletedDifficulty.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.progressBarGenCompletedDifficulty.Location = new System.Drawing.Point(6, 406);
             this.progressBarGenCompletedDifficulty.Name = "progressBarGenCompletedDifficulty";
             this.progressBarGenCompletedDifficulty.Size = new System.Drawing.Size(798, 12);
@@ -3043,8 +3043,8 @@ namespace ProUpgradeEditor.UI
             // 
             // textBoxCopyAllG5MidiFolder
             // 
-            this.textBoxCopyAllG5MidiFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxCopyAllG5MidiFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxCopyAllG5MidiFolder.Location = new System.Drawing.Point(134, 268);
             this.textBoxCopyAllG5MidiFolder.Name = "textBoxCopyAllG5MidiFolder";
             this.textBoxCopyAllG5MidiFolder.Size = new System.Drawing.Size(365, 23);
@@ -3052,8 +3052,8 @@ namespace ProUpgradeEditor.UI
             // 
             // textBoxCopyAllProFolder
             // 
-            this.textBoxCopyAllProFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxCopyAllProFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxCopyAllProFolder.Location = new System.Drawing.Point(134, 293);
             this.textBoxCopyAllProFolder.Name = "textBoxCopyAllProFolder";
             this.textBoxCopyAllProFolder.Size = new System.Drawing.Size(365, 23);
@@ -3061,8 +3061,8 @@ namespace ProUpgradeEditor.UI
             // 
             // textBoxCompressAllZipFile
             // 
-            this.textBoxCompressAllZipFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxCompressAllZipFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxCompressAllZipFile.Location = new System.Drawing.Point(134, 344);
             this.textBoxCompressAllZipFile.Name = "textBoxCompressAllZipFile";
             this.textBoxCompressAllZipFile.Size = new System.Drawing.Size(365, 23);
@@ -3070,8 +3070,8 @@ namespace ProUpgradeEditor.UI
             // 
             // textBoxCopyAllCONFolder
             // 
-            this.textBoxCopyAllCONFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxCopyAllCONFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxCopyAllCONFolder.Location = new System.Drawing.Point(134, 318);
             this.textBoxCopyAllCONFolder.Name = "textBoxCopyAllCONFolder";
             this.textBoxCopyAllCONFolder.Size = new System.Drawing.Size(365, 23);
@@ -3185,9 +3185,9 @@ namespace ProUpgradeEditor.UI
             // 
             // groupBox49
             // 
-            this.groupBox49.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox49.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox49.Controls.Add(this.buttonSongUtilFindInFileResultsOpenWindow);
             this.groupBox49.Controls.Add(this.checkBoxSongUtilFindInFileResultsOpenCompleted);
             this.groupBox49.Controls.Add(this.textBoxSongUtilFindInFileResults);
@@ -3227,9 +3227,9 @@ namespace ProUpgradeEditor.UI
             // 
             this.textBoxSongUtilFindInFileResults.AcceptsReturn = true;
             this.textBoxSongUtilFindInFileResults.AcceptsTab = true;
-            this.textBoxSongUtilFindInFileResults.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxSongUtilFindInFileResults.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxSongUtilFindInFileResults.BackColor = System.Drawing.SystemColors.Window;
             this.textBoxSongUtilFindInFileResults.Font = new System.Drawing.Font("Courier New", 10F);
             this.textBoxSongUtilFindInFileResults.ForeColor = System.Drawing.SystemColors.ControlText;
@@ -3618,10 +3618,10 @@ namespace ProUpgradeEditor.UI
             this.tabNoteEditor.Controls.Add(this.groupBoxStrumMarkers);
             this.tabNoteEditor.ForeColor = System.Drawing.SystemColors.ControlText;
             this.tabNoteEditor.ImageIndex = 13;
-            this.tabNoteEditor.Location = new System.Drawing.Point(4, 24);
+            this.tabNoteEditor.Location = new System.Drawing.Point(4, 23);
             this.tabNoteEditor.Name = "tabNoteEditor";
             this.tabNoteEditor.Padding = new System.Windows.Forms.Padding(3);
-            this.tabNoteEditor.Size = new System.Drawing.Size(1095, 522);
+            this.tabNoteEditor.Size = new System.Drawing.Size(1095, 523);
             this.tabNoteEditor.TabIndex = 2;
             this.tabNoteEditor.Text = "Note Editor";
             this.tabNoteEditor.Click += new System.EventHandler(this.tabPage2_Click);
@@ -3652,6 +3652,25 @@ namespace ProUpgradeEditor.UI
             this.groupBox44.TabIndex = 19;
             this.groupBox44.TabStop = false;
             this.groupBox44.Text = "Chord Naming";
+            // 
+            // comboBoxNoteEditorChordName
+            // 
+            this.comboBoxNoteEditorChordName.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.comboBoxNoteEditorChordName.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.comboBoxNoteEditorChordName.FormattingEnabled = true;
+            this.comboBoxNoteEditorChordName.Location = new System.Drawing.Point(9, 129);
+            this.comboBoxNoteEditorChordName.Name = "comboBoxNoteEditorChordName";
+            this.comboBoxNoteEditorChordName.Size = new System.Drawing.Size(176, 23);
+            this.comboBoxNoteEditorChordName.TabIndex = 16;
+            // 
+            // label61
+            // 
+            this.label61.AutoSize = true;
+            this.label61.Location = new System.Drawing.Point(6, 111);
+            this.label61.Name = "label61";
+            this.label61.Size = new System.Drawing.Size(78, 15);
+            this.label61.TabIndex = 15;
+            this.label61.Text = "Chord Name:";
             // 
             // checkChordNameEb
             // 
@@ -4379,21 +4398,21 @@ namespace ProUpgradeEditor.UI
             this.buttonDeleteSelectedNotes.UseVisualStyleBackColor = true;
             this.buttonDeleteSelectedNotes.Click += new System.EventHandler(this.buttonDeleteSelectedNotes_Click);
             // 
-            // button96
+            // buttonPlayHoldBoxMidi
             // 
             this.buttonPlayHoldBoxMidi.ForeColor = System.Drawing.SystemColors.ControlText;
             this.buttonPlayHoldBoxMidi.ImageIndex = 77;
             this.buttonPlayHoldBoxMidi.ImageList = this.imageList1;
             this.buttonPlayHoldBoxMidi.Location = new System.Drawing.Point(11, 120);
-            this.buttonPlayHoldBoxMidi.Name = "button96";
+            this.buttonPlayHoldBoxMidi.Name = "buttonPlayHoldBoxMidi";
             this.buttonPlayHoldBoxMidi.Size = new System.Drawing.Size(24, 24);
             this.buttonPlayHoldBoxMidi.TabIndex = 4;
             this.toolTip1.SetToolTip(this.buttonPlayHoldBoxMidi, "Play");
             this.buttonPlayHoldBoxMidi.UseVisualStyleBackColor = true;
+            this.buttonPlayHoldBoxMidi.KeyDown += new System.Windows.Forms.KeyEventHandler(this.buttonPlayHoldBoxMidi_KeyDown);
+            this.buttonPlayHoldBoxMidi.KeyUp += new System.Windows.Forms.KeyEventHandler(this.buttonPlayHoldBoxMidi_KeyUp);
             this.buttonPlayHoldBoxMidi.MouseDown += new System.Windows.Forms.MouseEventHandler(this.button96_MouseDown);
             this.buttonPlayHoldBoxMidi.MouseUp += new System.Windows.Forms.MouseEventHandler(this.button96_MouseUp);
-            this.buttonPlayHoldBoxMidi.KeyDown += new System.Windows.Forms.KeyEventHandler(buttonPlayHoldBoxMidi_KeyDown);
-            this.buttonPlayHoldBoxMidi.KeyUp += new System.Windows.Forms.KeyEventHandler(buttonPlayHoldBoxMidi_KeyUp);
             // 
             // button4
             // 
@@ -4909,7 +4928,7 @@ namespace ProUpgradeEditor.UI
             this.button32.TabIndex = 3;
             this.button32.Text = "Combine";
             this.toolTip1.SetToolTip(this.button32, "Combine the currently selected note with the next note, extending the end of the " +
-                    "selected note to the end of the next note.");
+        "selected note to the end of the next note.");
             this.button32.UseVisualStyleBackColor = true;
             this.button32.Click += new System.EventHandler(this.button32_Click);
             // 
@@ -5005,7 +5024,7 @@ namespace ProUpgradeEditor.UI
             this.button11.TabIndex = 3;
             this.toolTip1.SetToolTip(this.button11, "Update");
             this.button11.UseVisualStyleBackColor = true;
-            this.button11.Click += new System.EventHandler(button11_Click);
+            this.button11.Click += new System.EventHandler(this.button11_Click);
             // 
             // label9
             // 
@@ -7708,9 +7727,9 @@ namespace ProUpgradeEditor.UI
             // 
             this.textBoxPackageDTAText.AcceptsReturn = true;
             this.textBoxPackageDTAText.AcceptsTab = true;
-            this.textBoxPackageDTAText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxPackageDTAText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxPackageDTAText.BackColor = System.Drawing.SystemColors.Window;
             this.textBoxPackageDTAText.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxPackageDTAText.Font = new System.Drawing.Font("Courier New", 10F);
@@ -8013,8 +8032,8 @@ namespace ProUpgradeEditor.UI
             // 
             // listBoxUSBSongs
             // 
-            this.listBoxUSBSongs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.listBoxUSBSongs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.listBoxUSBSongs.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1});
             this.listBoxUSBSongs.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
@@ -8032,16 +8051,16 @@ namespace ProUpgradeEditor.UI
             this.listUSBFileView.AllowColumnReorder = true;
             this.listUSBFileView.AllowDrop = true;
             this.listUSBFileView.GridLines = true;
-            listViewGroup1.Header = "File Name";
-            listViewGroup1.Name = "FileName";
-            listViewGroup2.Header = "Size";
-            listViewGroup2.Name = "Size";
-            listViewGroup3.Header = "Date";
-            listViewGroup3.Name = "Date";
+            listViewGroup4.Header = "File Name";
+            listViewGroup4.Name = "FileName";
+            listViewGroup5.Header = "Size";
+            listViewGroup5.Name = "Size";
+            listViewGroup6.Header = "Date";
+            listViewGroup6.Name = "Date";
             this.listUSBFileView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1,
-            listViewGroup2,
-            listViewGroup3});
+            listViewGroup4,
+            listViewGroup5,
+            listViewGroup6});
             this.listUSBFileView.HideSelection = false;
             this.listUSBFileView.LabelEdit = true;
             this.listUSBFileView.LabelWrap = false;
@@ -8097,8 +8116,8 @@ namespace ProUpgradeEditor.UI
             // 
             // progressUSBSongs
             // 
-            this.progressUSBSongs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressUSBSongs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.progressUSBSongs.Location = new System.Drawing.Point(760, 280);
             this.progressUSBSongs.Name = "progressUSBSongs";
             this.progressUSBSongs.Size = new System.Drawing.Size(329, 11);
@@ -9291,7 +9310,7 @@ namespace ProUpgradeEditor.UI
             this.trackEditorG5.Margin = new System.Windows.Forms.Padding(0);
             this.trackEditorG5.MidiPlaybackPosition = 0;
             this.trackEditorG5.MP3PlaybackOffset = 0;
-            this.trackEditorG5.MP3PlaybackStream = null;
+            
             this.trackEditorG5.Name = "trackEditorG5";
             this.trackEditorG5.NoteSnapG5 = true;
             this.trackEditorG5.NoteSnapG6 = true;
@@ -9304,7 +9323,7 @@ namespace ProUpgradeEditor.UI
             this.trackEditorG5.Size = new System.Drawing.Size(1101, 117);
             this.trackEditorG5.TabIndex = 8;
             this.trackEditorG5.ViewLyrics = false;
-            this.trackEditorG5.WaveViewer = null;
+            
             this.trackEditorG5.DragDrop += new System.Windows.Forms.DragEventHandler(this.trackEditorG5_DragDrop);
             this.trackEditorG5.DragEnter += new System.Windows.Forms.DragEventHandler(this.trackEditorG5_DragEnter);
             this.trackEditorG5.Enter += new System.EventHandler(this.trackEditorG5_Enter);
@@ -9421,7 +9440,7 @@ namespace ProUpgradeEditor.UI
             this.trackEditorG6.Margin = new System.Windows.Forms.Padding(0);
             this.trackEditorG6.MidiPlaybackPosition = 0;
             this.trackEditorG6.MP3PlaybackOffset = 0;
-            this.trackEditorG6.MP3PlaybackStream = null;
+            
             this.trackEditorG6.Name = "trackEditorG6";
             this.trackEditorG6.NoteSnapG5 = true;
             this.trackEditorG6.NoteSnapG6 = true;
@@ -9434,7 +9453,7 @@ namespace ProUpgradeEditor.UI
             this.trackEditorG6.Size = new System.Drawing.Size(1101, 117);
             this.trackEditorG6.TabIndex = 9;
             this.trackEditorG6.ViewLyrics = false;
-            this.trackEditorG6.WaveViewer = null;
+            
             this.trackEditorG6.Load += new System.EventHandler(this.trackEditorG6_Load);
             this.trackEditorG6.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDropEditorPro);
             this.trackEditorG6.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnterEditorPro);
@@ -9783,25 +9802,6 @@ namespace ProUpgradeEditor.UI
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.aboutToolStripMenuItem.Text = "&About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
-            // 
-            // comboBoxNoteEditorChordName
-            // 
-            this.comboBoxNoteEditorChordName.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.comboBoxNoteEditorChordName.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this.comboBoxNoteEditorChordName.FormattingEnabled = true;
-            this.comboBoxNoteEditorChordName.Location = new System.Drawing.Point(9, 129);
-            this.comboBoxNoteEditorChordName.Name = "comboBoxNoteEditorChordName";
-            this.comboBoxNoteEditorChordName.Size = new System.Drawing.Size(176, 23);
-            this.comboBoxNoteEditorChordName.TabIndex = 16;
-            // 
-            // label61
-            // 
-            this.label61.AutoSize = true;
-            this.label61.Location = new System.Drawing.Point(6, 111);
-            this.label61.Name = "label61";
-            this.label61.Size = new System.Drawing.Size(78, 15);
-            this.label61.TabIndex = 15;
-            this.label61.Text = "Chord Name:";
             // 
             // MainForm
             // 
@@ -10310,7 +10310,7 @@ namespace ProUpgradeEditor.UI
         private System.Windows.Forms.Button buttonCreateSongFromOpenMidi;
         private System.Windows.Forms.Button button106;
         private System.Windows.Forms.Button button105;
-        private System.Windows.Forms.Button button104;
+        private System.Windows.Forms.Button buttonExecuteBatchGuitarBassCopy;
         private System.Windows.Forms.Button button103;
         private System.Windows.Forms.Button buttonSongLibViewPackageContents;
         private System.Windows.Forms.GroupBox groupBox34;
@@ -10409,7 +10409,7 @@ namespace ProUpgradeEditor.UI
         private System.Windows.Forms.ProgressBar progressUSBSongs;
         private System.Windows.Forms.Button buttonUSBAddFolder;
         private System.Windows.Forms.Button button126;
-        private System.Windows.Forms.Button button127;
+        private System.Windows.Forms.Button buttonExecuteBatchCopyUSB;
         private System.Windows.Forms.CheckBox checkBoxBatchCopyUSB;
         private System.Windows.Forms.Button buttonUSBViewPackage;
         private System.Windows.Forms.Button buttonUSBRenameFile;

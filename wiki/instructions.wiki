@@ -69,7 +69,12 @@ First off, the editor was built for speed.  To be efficient, you will have to me
 Here are the most commonly used features:
 
 1.	Copy, find and replace.  The holy grail of the editor since so many sequences of notes will repeat.  This will save your hours of single note plotting.
-a.	Let’s start with a simple Replacing of a string of repeating notes.  
+a.      PROPAGATING a note or string of notes.  
+i. Highlight the note or sting of notes you want to be the same everywhere in the song.
+ii.  Under COPY PATTERN, hit the magnifying glass.  It's that simple.
+iii.  The options underneath the copy box allow for less or more control over the pattern matching.  For your own sanity, LEAVE Forward Only Checked at all costs.
+
+REPLACING (much more difficult to get the hand of, and I stopped using it)
 i.	Select the note pattern (mouse grab).  Use Control Key if you need to scroll and continue adding notes.
 ii.	In the left note box, change the note to the new desired notes and hit +
 b.	Next, let’s use Find/Replace a Chord function.
@@ -84,17 +89,14 @@ iii.	You can now use the copy pattern < and > buttons to look through the song a
 iv.	Click the Replace Notes button under the Copy Pattern Box.
 ctrl-Z to undo whatever you might have just done!
 
-2.	Creating lesser difficulties :
+2.	Creating the lesser difficulties : Done via Auto creation using the GEN DIFFICULTIES button which utilizes finger reduction to simplify the gameplay.  On the TRACK EDITOR tab, you generate lesser difficulties AFTER completing the Expert track.
 
-a.	is Auto creation using the GEN DIFFICULTIES button which utilizes finger reduction to simplify the gameplay.  On the TRACK EDITOR tab, you generate lesser difficulties AFTER completing the Expert track.  MAKE SURE you have the appropriate PRO track selected (guitar vs. bass); See Bass track creation below.
-
-To shrink or increase the notes viewer:
+To shrink or increase the notes viewer in either of the scrolling screens:
 From the NOTE screen, use – or + (not on the number pad) to increase or decrease the note fonts
 
 APPENDIX A
 Certain note type construction using the Modifiers tab
 
-when creating arpeggios (aka broken chord) use the 'add ghost notes' check box to automatically add helper arpeggio (inversions work the same way) notes: 
+when creating arpeggios (aka broken chord) use the 'add ghost notes' check box to automatically add helper arpeggio (inversions work the same way).  NOTE that due to a bug, there is no way to undo these, so if you want arpeggios, do them LAST.
 
-Power-ups and Solos are also defined here by defining selecting a new (+) one and then selecting the start and end with the mouse clicks as prompted.
-TYPICALLY, you wont create these but use the COPY SOLOS button.
+You WANT to accurately chart the solo and let the reduction process take care of the rest.

@@ -9,12 +9,12 @@ Building a PRO custom track for a custom CON song for RB3 (again, thanks!)
 You want to add PRO guitar to RB or CUSTOM tracks? Here is the process to do this, based on build 71 (final?) of the tool.  NOTE: I am looking for a programmer to pick up the project.
 
 Prep Work
-Copy the track (CON File) to a USB stick via the XBOX.  *NOTE: If you dont have the CON file, you need to EXTRACT the track you want from your XBOX.  There are a number of tools to do this.  I have the USB HD to PC cable, and I can extract using Horizon , Party Buffalo, or 360 Content Manager v3.  Copying the track to USB and using the tools works just as well.  Just get the CON to your PC.
+Copy the track (CON File) to a USB stick via the XBOX.  *NOTE: If you dont have the CON file, you need to EXTRACT the track you want from your XBOX.  There are a number of tools to do this.  I have the USB HD to PC cable, and I can extract using Horizon or 360 Content Manager v3.  Copying the track to USB and using the tools works just as well.  Just get the CON to your PC.
 
-Optional but very useful
-On a PC, open the stick using Modio or Horizon, or tool of your choice and extract out the individual files.  (You will need the .mid file, the .dta file and the .mogg file)  NOTE: IF the .mogg is encrypted, we'll use a work around.  YouTUBE)
+Optional but very useful!
+On a PC, open the stick using Modio or Horizon, or tool of your choice and extract out the individual files.  (You will need the .mid file, the .dta file and the .mogg file)  NOTE: IF the .mogg is encrypted, we'll use a work around.  i.e. YouTUBE)
 
-Using Audacity, convert the mogg file to mp3 (dont worry about a mono mix).  NOTICE: If you DONT have an unencrypted mod, see if you can find someone playing the song in RB on Youtube OR the song itself.  I prefer the YouTube version of the game because it eliminates tiny timing differences that can occur between the game and the studio recording.  There is an "MP3 Start Offset" field that allows you to insert a value in milliseconds to adjust your MP3 to the first note of the song.  
+Using Audacity, convert the mogg file to mp3 (dont worry about a mono mix).  NOTICE: If you DONT have an unencrypted mogg, see if you can find someone playing the song in RB on YouTube OR the MP3 song itself.  I prefer the YouTube version of the game because it eliminates tiny timing differences that can occur between the game and the studio recording.  There is an "MP3 Start Offset" field that allows you to insert a value in milliseconds to adjust your MP3 to the first note of the song so it syncs up like the mogg file would.  
 
 Start the actual creation process:
 1.	Open up the Ziggy editor.
@@ -23,7 +23,7 @@ Start the actual creation process:
  b.	it is useful to also extract the songs.dta file
 
 3a. NOW, From the TOP menu, select File -> Open -> Open Guitar 5 midi
-3b. Now press the CREATE From Open Midi button
+3b. Now press the "CREATE From Open Midi" button
 
 4.	Next we Create the “empty” Pro track that will contain your pro guitar upgrade.
  a.	Go to the Track Editor Tab

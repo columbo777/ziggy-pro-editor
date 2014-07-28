@@ -14,25 +14,26 @@ Copy the track (CON File) to a USB stick via the XBOX.  *NOTE: If you don't have
 Optional but very useful!
 On a PC, open the stick using Modio or Horizon (better), or tool of your choice and extract out the individual files.  You will need the .mid file, the songs.dta file.  Since the .mogg is encrypted, we'll use a work around.  i.e. YouTUBE.  
 
-Using Audacity, convert the mogg file to mp3 (dont worry about a mono mix).  NOTICE: If you DONT have an unencrypted mogg, see if you can find someone playing the song in RB on YouTube OR the MP3 song itself.  I prefer the YouTube version of the song in-game because it eliminates tiny timing differences that can occur between the game and the studio recording.  There is an "MP3 Start Offset" field that allows you to insert a value in milliseconds (-4000 is a good guess) to adjust your MP3 to the first note of the song so it syncs up like the mogg file would.  
+An audio track is incredibly useful.  I prefer the YouTube version of the song in-game because it eliminates tiny timing differences that can occur between the game and the studio recording.  Use a YOUTUBE to MP3 webssite to capture yourself a file...  In the editor, There is an "MP3 Start Offset" field that allows you to insert a value in milliseconds (-4000 is a good guess) to adjust your MP3 to the first note of the song so it syncs up like the mogg file would.  Once you get that squared away, it will be time to get to work!
 
 Start the actual creation process:
 1.	Open up the Ziggy editor (v71).
-2.	If you did not extract necessary files from the CON file above, Load the CON original track into the editor.  NOTE: This is a 2-step process.
+2.	If you did not extract necessary files from the CON file above, Load the CON original track into the editor.  NOTE: This is a 2-step process.  Otherwise, skip to step 3.
  a.	Click the Package Editor tab and OPEN the CON* file.  Extract the song.dta and the <title>.mid file
  b.	it is useful to also extract the songs.dta file
 
 3a. NOW, From the TOP menu, select File -> Open -> Open Guitar 5 midi
-3b. Now press the "CREATE From Open Midi" button
+3b. Now press the "CREATE From Open Midi" button.  Various fields should populate in the editor.
 
 4.	Next we Create the “empty” Pro track that will contain your pro guitar upgrade.
- a.	Go to the Track Editor Tab
+ a.	Go to the Track Editor Tab.
  b.	Click the button, “Init from 5 button”.
         Various fields will populate based on this creation.  
-NOTE: The created file will be the _pro file for the track.  you need to SAVE this file as the PRO and then on the songs tab select this saved track as your pro.
- c.	If you extracted the songs.dta file, the songID box should be populated with ID and difficulties.  NOTE: Due to a BUG, non numeric songIDs do not auto-populate.  So, open songs.dta and copy/paste the SONGID from that file.  For short name, just remove any versioning or author initials so it sorts correctly in game.  Manually choose your difficulty of play (best to match what the original track difficulties were rated as)
+NOTE: The created file will be the _pro file for the track.  
+ c.     SAVE this file as the PRO and then on the songs tab select this saved track as your pro.
+ d.	If you extracted the songs.dta file, the songID box should be populated with ID and difficulties.  NOTE: Due to a BUG, non numeric songIDs do not auto-populate (until fixed).  So, open songs.dta and copy/paste the SONGID from that file.  For short name, just remove any versioning or author initials so it sorts correctly in game.  Manually choose your difficulty of play (best to match what the original track difficulties were rated as)
 d.	Supply the MP3 file (optional) to play as you review and play with offset values as necessary (a studio song is typically a -4000 entry here)
-e.      decide to follow along with MIDI to MP3 and select the appropriate checkboxes.  
+e.      decide to follow along with MIDI or MP3 (or even both) and select the appropriate checkboxes.  
 g.      Hit the SAVE button.
 
 click the tiny PLAY button on either the first tab or the note editor tab and watch the editor play along with you.  (Are you getting just midi notes?  Check the boxes at the bottom of the first tab and see if you are playing back mp3)
@@ -41,26 +42,29 @@ click the tiny PLAY button on either the first tab or the note editor tab and wa
 Note:	You are always going to chart the EXPERT guitar track.  (see radio button on right of TRACK TAB, set to EXPERT).
  
 6.	charting the songs: 
+There are 3 ways to chart the notes...
  a.	CHART (place each note just like with EOF) best method.
  b.	PLAY CAPTURE (MIDI instrument and MIDI to USB cable required).
  c.	Play capture can be note by note or real time.
 NOTE: Despite these multiple supported ways, we most always want 6a.
 
-7.	On the Note Editor tab you build your pro track.   You will place notes based on the location of the 5 button notes to start.  They are to be the same "duration" (or width) of the 5 button notes.  If you click on one of the dummy pro notes, it will make that the current note.  
+7.	On the Note Editor tab you now build your pro track.   You will place notes based on the location of the 5 button notes.  They are to be the same "duration" (or width) of the 5 button notes.  If you click on one of the dummy pro notes, it will make that the current note.  
 
 a.	Double-Click a PRO note (the first note is a good start)
 b.	In the columns in the far left, you can build the note or chord you want.  The notes will go from High E (Top) to Low E (bottom).  (Remove default zeros if you double clicked the note to start).  Note the CHAN column which later will allow you to set X notes...  That is for later...
 
 For example, if I want an OPEN A, I fill in top to bottom 0 2 2 2 0 and leave the Low E blank (blank is NOT open, it means skip.  0 is open)
 
-This is a good time to SET the ROOT NOTE marker (this tells the game what to display as the note on the screen).  Toggle the correct box and select the correct note from the pull down selection.  if its different from what the editor thought it might be, you want to resave that note with the new marker (click + again).  Try to get that right BEFORE using copy pattern to propagate notes or patterns.
+This is a good time to SET the ROOT NOTE marker (this tells the game what to display as the note on the screen).  Toggle the correct box and select the correct note from the pull down selection.  if its different from what the editor thought it might be, you want to resave that note with the new marker (click [+] again).  Try to get that right BEFORE using copy pattern to propagate notes or patterns.
 
 c.	 You need to careful as the note being edited is the one CLICKED (and in bold).  When you define the note/chord you will press (or click) the + key and the note will update on the upper portion of the screen.  NOTE: The cursor will jump to the NEXT note automatically.
 d.	I recommend creating the first verse and saving the work for testing at that point.
 e.      You probably have not noticed yet, but you are building a standard pro GUITAR track.  You can navigate to the second tab and switch to BASS and PRO_BASS to chart that track.  Please chart Bass also and avoid the "copy guitar over bass" track which was for vs. games that never materialized.  No Bass makes columbo cry.
 
-7.	When you think you have done enough, Save your PRO track (File, save, pro midi).  
-a. 	on the SONG TAB, find the "REBUILD" button (to the right of CON Package:) and build it.  The program runs auto checks to insure RB3 compatibility.  If there are warnings, you can click the "check" box next to it and get a readout of your mistakes.  If you fix mistakes, hit REBUILD before CHECK again or it will undo the changes! (bug?)
+At this point, press play and watch the editor run through your pro along with the 5 button.  Is it going well?  SAVE each time you are happy with your progress!  (File, save, pro midi)
+
+7.	When you think you have completed your PRO, its time to COMPILE.  
+a. 	on the SONG TAB, find the "REBUILD" button (to the right of CON Package:) and build it.  The program runs auto checks to insure RB3 compatibility.  If there are warnings, you can click the "check" button next to it and get a readout of your mistakes.  If you fix mistakes, hit REBUILD before CHECK again or it will undo the changes! (bug?)
 b.	Avoid additional trouble by checking your settings under the BATCH tab.  Make sure that copy guitar to bass in UNCHECKED if you built your own bass track or it will be destroyed.  also keep those auto-generate difficulties checked unless you want to do all those reductions by hand.  The algorithm for reductions is pretty solid.  
 
 8: Special notes: When you chart a note that is going to occur multiple times in a song, you should COPY it throughout the song.  This works best when the 5 button is particularly well done.  Highlight your note and then click the magnifying glass under "copy pattern".  WOOOSH.  NOTE: You can do this with MULTIPLE NOTES for even better results!!!  (See #1 below)

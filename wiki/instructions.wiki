@@ -4,15 +4,15 @@
 Aka, Building a PRO custom track for a custom CON song for RB3.  (and thanks for that!)
 
 = Details =
-Building a PRO custom track for a custom CON song for RB3 (again, thanks!)
+Building a PRO custom track for a custom CON song for RB3 (again, thanks for playing!)
 
-You want to add PRO guitar to RB or CUSTOM tracks? Here is the process to do this, based on build 71 (final?) of the tool.  NOTE: I am looking for a programmer to pick up the project.
+So, you want to add PRO guitar to RB or CUSTOM tracks? Here is the process to do this, based on build 70/11 (stable) of the tool.  NOTE: We are reopening maintenance on the tool in Q3.
 
 Prep Work
-Copy the track (CON File) to a USB stick via the XBOX.  *NOTE: If you dont have the CON file, you need to EXTRACT the track you want from your XBOX.  There are a number of tools to do this.  I have the USB HD to PC cable, and I can extract using Horizon or 360 Content Manager v3.  Copying the track to USB and using the tools works just as well.  Just get the CON to your PC.
+Copy the track (CON File) to a USB stick via the XBOX.  *NOTE: If you don't have the CON file, you need to EXTRACT the track you want from your XBOX.  There are a number of tools to do this.  I have the USB HD to PC cable, and I can extract using Horizon or 360 Content Manager v3.  Alternatively, you can copy the track or pack to the USB stick.  Just get the CON to your PC.
 
 Optional but very useful!
-On a PC, open the stick using Modio or Horizon, or tool of your choice and extract out the individual files.  (You will need the .mid file, the .dta file and the .mogg file)  NOTE: IF the .mogg is encrypted, we'll use a work around.  i.e. YouTUBE)
+On a PC, open the stick using Modio or Horizon (better), or tool of your choice and extract out the individual files.  You will need the .mid file, the songs.dta file.  Since the .mogg is encrypted, we'll use a work around.  i.e. YouTUBE.  
 
 Using Audacity, convert the mogg file to mp3 (dont worry about a mono mix).  NOTICE: If you DONT have an unencrypted mogg, see if you can find someone playing the song in RB on YouTube OR the MP3 song itself.  I prefer the YouTube version of the song in-game because it eliminates tiny timing differences that can occur between the game and the studio recording.  There is an "MP3 Start Offset" field that allows you to insert a value in milliseconds (-4000 is a good guess) to adjust your MP3 to the first note of the song so it syncs up like the mogg file would.  
 

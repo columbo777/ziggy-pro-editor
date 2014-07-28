@@ -65,12 +65,14 @@ At this point, press play and watch the editor run through your pro along with t
 
 7.	When you think you have completed your PRO, its time to COMPILE.  
 a. 	on the SONG TAB, find the "REBUILD" button (to the right of CON Package:) and build it.  The program runs auto checks to insure RB3 compatibility.  If there are warnings, you can click the "check" button next to it and get a readout of your mistakes.  If you fix mistakes, hit REBUILD before CHECK again or it will undo the changes! (bug?)
-b.	Avoid additional trouble by checking your settings under the BATCH tab.  Make sure that copy guitar to bass in UNCHECKED if you built your own bass track or it will be destroyed.  also keep those auto-generate difficulties checked unless you want to do all those reductions by hand.  The algorithm for reductions is pretty solid.  
+b.	Make sure that copy guitar to bass in UNCHECKED if you built your own bass track or it will be destroyed.  also keep those auto-generate difficulties checked unless you want to do all those reductions by hand.  The algorithm for reductions is pretty solid and game compliant.  
 
-8: Special notes: When you chart a note that is going to occur multiple times in a song, you should COPY it throughout the song.  This works best when the 5 button is particularly well done.  Highlight your note and then click the magnifying glass under "copy pattern".  WOOOSH.  NOTE: You can do this with MULTIPLE NOTES for even better results!!!  (See #1 below)
+8: COPY notes: When you chart a note or sequence of notes that is going to occur multiple times in a song, you should COPY it throughout the song.  This works best when the 5 button is well done.  Highlight your notes pattern (in the pro window) and then click the magnifying glass under "copy pattern".  WOOOSH.  
+
+
 
 Editor Functions
-First off, the editor was built for speed.  To be efficient, you will have to memorize the keyboard shortcuts (often denoted in the editor) and master search and replace (below).  
+The editor was built for speed.  To be efficient, you will have to memorize the keyboard shortcuts (often denoted in the editor) and master search and replace (below).  
 
 Here are the most commonly used features:
 
@@ -105,4 +107,7 @@ Certain note type construction using the Modifiers tab
 
 when creating arpeggios (aka broken chord) use the 'add ghost notes' check box to automatically add helper arpeggio (inversions work the same way).  NOTE that due to a bug, there is no way to undo these, so if you want arpeggios, do them LAST.
 
-You WANT to accurately chart the solo and let the reduction process take care of the rest.
+SOLO sections: You WANT to accurately chart the ENTIRE solo and let the reduction process take care of the rest.  Dont just phone in some silly dummy notes.
+
+FIN
+When you are all done and your message is "Rebuild OK" you can now add the PRO to your USB stick and test in the game.  If it does not show up in the game, you either forgot to delete your cache, or you fat-fingered the SONG ID.

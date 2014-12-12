@@ -106,10 +106,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="ZipLib, Version=0.86.0.518, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\ZipLib.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ProResources.Designer.cs">
@@ -386,7 +382,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tools\EditorResources\EditorResources.csproj">
-      <Project>{F0F523DA-3085-4BE5-AC09-5F680F0E392E}</Project>
+      <Project>{f0f523da-3085-4be5-ac09-5f680f0e392e}</Project>
       <Name>EditorResources</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tools\NAudio\NAudio.WindowsMediaFormat\NAudio.WindowsMediaFormat.csproj">
@@ -412,6 +408,10 @@
     <ProjectReference Include="..\Tools\XPackage\XPackage\XPackage.csproj">
       <Project>{EE644FE5-458F-496B-B9E3-0B37921F7D38}</Project>
       <Name>XPackage</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tools\ZipLib\ZipLib.csproj">
+      <Project>{dd8f2458-ba45-43a9-b433-943b293d069e}</Project>
+      <Name>ZipLib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

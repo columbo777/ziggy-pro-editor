@@ -91,12 +91,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="XPackage">
-      <HintPath>..\..\lib\XPackage.dll</HintPath>
-    </Reference>
-    <Reference Include="ZipLib">
-      <HintPath>..\..\lib\ZipLib.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MidiViewer.cs">
@@ -144,6 +138,14 @@
     <ProjectReference Include="..\Sanford.Multimedia.Midi\Sanford.Multimedia.Midi.csproj">
       <Project>{4269C72A-8D3A-4737-8F89-72EAA33EA9E1}</Project>
       <Name>Sanford.Multimedia.Midi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XPackage\XPackage\XPackage.csproj">
+      <Project>{ee644fe5-458f-496b-b9e3-0b37921f7d38}</Project>
+      <Name>XPackage</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ZipLib\ZipLib.csproj">
+      <Project>{dd8f2458-ba45-43a9-b433-943b293d069e}</Project>
+      <Name>ZipLib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

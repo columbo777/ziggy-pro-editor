@@ -35,9 +35,9 @@ namespace ProUpgradeEditor.UI
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             System.Windows.Forms.GroupBox groupBox3;
             System.Windows.Forms.GroupBox groupBox14;
-            System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("File Name", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("Size", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("Date", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("File Name", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Size", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Date", System.Windows.Forms.HorizontalAlignment.Left);
             this.panel8 = new System.Windows.Forms.Panel();
             this.midiTrackEditorG5 = new EditorResources.Components.PEMidiTrackEditPanel();
             this.buttonSongToolSnapNotes = new System.Windows.Forms.Button();
@@ -1481,7 +1481,7 @@ namespace ProUpgradeEditor.UI
             this.tabContainerMain.Location = new System.Drawing.Point(0, 302);
             this.tabContainerMain.Name = "tabContainerMain";
             this.tabContainerMain.SelectedIndex = 0;
-            this.tabContainerMain.Size = new System.Drawing.Size(1103, 550);
+            this.tabContainerMain.Size = new System.Drawing.Size(1028, 422);
             this.tabContainerMain.TabIndex = 0;
             // 
             // tabSongLibraryUtility
@@ -1497,14 +1497,14 @@ namespace ProUpgradeEditor.UI
             this.tabSongLibraryUtility.Location = new System.Drawing.Point(4, 24);
             this.tabSongLibraryUtility.Name = "tabSongLibraryUtility";
             this.tabSongLibraryUtility.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSongLibraryUtility.Size = new System.Drawing.Size(1095, 522);
+            this.tabSongLibraryUtility.Size = new System.Drawing.Size(1020, 394);
             this.tabSongLibraryUtility.TabIndex = 8;
             this.tabSongLibraryUtility.Text = "Song Library / Utility";
             // 
             // groupBox39
             // 
-            this.groupBox39.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox39.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)));
             this.groupBox39.Controls.Add(this.groupBox48);
             this.groupBox39.Controls.Add(this.buttonSongLibListFilterReset);
             this.groupBox39.Controls.Add(this.label55);
@@ -1603,7 +1603,7 @@ namespace ProUpgradeEditor.UI
             this.label55.ForeColor = System.Drawing.Color.Black;
             this.label55.Location = new System.Drawing.Point(42, 357);
             this.label55.Name = "label55";
-            this.label55.Size = new System.Drawing.Size(36, 15);
+            this.label55.Size = new System.Drawing.Size(37, 15);
             this.label55.TabIndex = 5;
             this.label55.Text = "Filter:";
             // 
@@ -1612,14 +1612,14 @@ namespace ProUpgradeEditor.UI
             this.textBoxSongLibListFilter.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.textBoxSongLibListFilter.Location = new System.Drawing.Point(84, 354);
             this.textBoxSongLibListFilter.Name = "textBoxSongLibListFilter";
-            this.textBoxSongLibListFilter.Size = new System.Drawing.Size(142, 23);
+            this.textBoxSongLibListFilter.Size = new System.Drawing.Size(142, 21);
             this.textBoxSongLibListFilter.TabIndex = 4;
             this.textBoxSongLibListFilter.TextChanged += new System.EventHandler(this.textBoxSongLibListFilter_TextChanged);
             // 
             // listBoxSongLibrary
             // 
-            this.listBoxSongLibrary.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+            this.listBoxSongLibrary.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)));
             this.listBoxSongLibrary.ForeColor = System.Drawing.SystemColors.ControlText;
             this.listBoxSongLibrary.FormattingEnabled = true;
             this.listBoxSongLibrary.ItemHeight = 15;
@@ -1674,9 +1674,9 @@ namespace ProUpgradeEditor.UI
             // 
             // tabControl2
             // 
-            this.tabControl2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabControl2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl2.Controls.Add(this.tabSongLibSongProperties);
             this.tabControl2.Controls.Add(this.tabSongLibUtility);
             this.tabControl2.Controls.Add(this.tabSongLibSongUtility);
@@ -1685,7 +1685,7 @@ namespace ProUpgradeEditor.UI
             this.tabControl2.MinimumSize = new System.Drawing.Size(736, 403);
             this.tabControl2.Name = "tabControl2";
             this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(818, 516);
+            this.tabControl2.Size = new System.Drawing.Size(739, 516);
             this.tabControl2.TabIndex = 16;
             // 
             // tabSongLibSongProperties
@@ -1696,7 +1696,7 @@ namespace ProUpgradeEditor.UI
             this.tabSongLibSongProperties.Location = new System.Drawing.Point(4, 24);
             this.tabSongLibSongProperties.Margin = new System.Windows.Forms.Padding(0);
             this.tabSongLibSongProperties.Name = "tabSongLibSongProperties";
-            this.tabSongLibSongProperties.Size = new System.Drawing.Size(810, 488);
+            this.tabSongLibSongProperties.Size = new System.Drawing.Size(731, 488);
             this.tabSongLibSongProperties.TabIndex = 0;
             this.tabSongLibSongProperties.Text = "Song Properties";
             // 
@@ -1746,7 +1746,7 @@ namespace ProUpgradeEditor.UI
             this.groupBox25.ForeColor = System.Drawing.SystemColors.ControlText;
             this.groupBox25.Location = new System.Drawing.Point(0, 0);
             this.groupBox25.Name = "groupBox25";
-            this.groupBox25.Size = new System.Drawing.Size(810, 488);
+            this.groupBox25.Size = new System.Drawing.Size(731, 488);
             this.groupBox25.TabIndex = 0;
             this.groupBox25.TabStop = false;
             this.groupBox25.UseCompatibleTextRendering = true;
@@ -1875,7 +1875,7 @@ namespace ProUpgradeEditor.UI
             this.checkBoxSongPropertiesEnableMP3Playback.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkBoxSongPropertiesEnableMP3Playback.Location = new System.Drawing.Point(267, 312);
             this.checkBoxSongPropertiesEnableMP3Playback.Name = "checkBoxSongPropertiesEnableMP3Playback";
-            this.checkBoxSongPropertiesEnableMP3Playback.Size = new System.Drawing.Size(138, 19);
+            this.checkBoxSongPropertiesEnableMP3Playback.Size = new System.Drawing.Size(146, 19);
             this.checkBoxSongPropertiesEnableMP3Playback.TabIndex = 32;
             this.checkBoxSongPropertiesEnableMP3Playback.Text = "Enable MP3 Playback";
             this.checkBoxSongPropertiesEnableMP3Playback.UseVisualStyleBackColor = true;
@@ -1899,7 +1899,7 @@ namespace ProUpgradeEditor.UI
             this.checkBoxEnableMidiPlayback.ForeColor = System.Drawing.SystemColors.ControlText;
             this.checkBoxEnableMidiPlayback.Location = new System.Drawing.Point(108, 312);
             this.checkBoxEnableMidiPlayback.Name = "checkBoxEnableMidiPlayback";
-            this.checkBoxEnableMidiPlayback.Size = new System.Drawing.Size(138, 19);
+            this.checkBoxEnableMidiPlayback.Size = new System.Drawing.Size(144, 19);
             this.checkBoxEnableMidiPlayback.TabIndex = 32;
             this.checkBoxEnableMidiPlayback.Text = "Enable Midi Playback";
             this.checkBoxEnableMidiPlayback.UseVisualStyleBackColor = true;
@@ -1922,12 +1922,12 @@ namespace ProUpgradeEditor.UI
             // 
             this.textBoxSongPropertiesMP3StartOffset.Location = new System.Drawing.Point(211, 166);
             this.textBoxSongPropertiesMP3StartOffset.Name = "textBoxSongPropertiesMP3StartOffset";
-            this.textBoxSongPropertiesMP3StartOffset.Size = new System.Drawing.Size(100, 23);
+            this.textBoxSongPropertiesMP3StartOffset.Size = new System.Drawing.Size(100, 21);
             this.textBoxSongPropertiesMP3StartOffset.TabIndex = 31;
             this.textBoxSongPropertiesMP3StartOffset.Text = "0";
             this.textBoxSongPropertiesMP3StartOffset.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.toolTip1.SetToolTip(this.textBoxSongPropertiesMP3StartOffset, "Time in Milliseconds to adjust playback. Negative to start playback late. Positiv" +
-        "e to start playback early.");
+                    "e to start playback early.");
             this.textBoxSongPropertiesMP3StartOffset.TextChanged += new System.EventHandler(this.textBoxSongPropertiesMP3StartOffset_TextChanged);
             this.textBoxSongPropertiesMP3StartOffset.Leave += new System.EventHandler(this.textBoxSongPropertiesMP3StartOffset_Leave);
             // 
@@ -1936,7 +1936,7 @@ namespace ProUpgradeEditor.UI
             this.label54.AutoSize = true;
             this.label54.Location = new System.Drawing.Point(112, 170);
             this.label54.Name = "label54";
-            this.label54.Size = new System.Drawing.Size(96, 15);
+            this.label54.Size = new System.Drawing.Size(98, 15);
             this.label54.TabIndex = 30;
             this.label54.Text = "MP3 Start Offset:";
             // 
@@ -1969,7 +1969,7 @@ namespace ProUpgradeEditor.UI
             this.label53.AutoSize = true;
             this.label53.Location = new System.Drawing.Point(24, 144);
             this.label53.Name = "label53";
-            this.label53.Size = new System.Drawing.Size(83, 15);
+            this.label53.Size = new System.Drawing.Size(86, 15);
             this.label53.TabIndex = 29;
             this.label53.Text = "MP3 Location:";
             // 
@@ -1977,7 +1977,7 @@ namespace ProUpgradeEditor.UI
             // 
             this.textBoxSongPropertiesMP3Location.Location = new System.Drawing.Point(113, 140);
             this.textBoxSongPropertiesMP3Location.Name = "textBoxSongPropertiesMP3Location";
-            this.textBoxSongPropertiesMP3Location.Size = new System.Drawing.Size(198, 23);
+            this.textBoxSongPropertiesMP3Location.Size = new System.Drawing.Size(198, 21);
             this.textBoxSongPropertiesMP3Location.TabIndex = 15;
             this.textBoxSongPropertiesMP3Location.TextChanged += new System.EventHandler(this.textBoxSongPropertiesMP3Location_TextChanged);
             // 
@@ -2147,7 +2147,7 @@ namespace ProUpgradeEditor.UI
             this.label36.AutoSize = true;
             this.label36.Location = new System.Drawing.Point(72, 19);
             this.label36.Name = "label36";
-            this.label36.Size = new System.Drawing.Size(37, 15);
+            this.label36.Size = new System.Drawing.Size(39, 15);
             this.label36.TabIndex = 0;
             this.label36.Text = "Song:";
             // 
@@ -2206,42 +2206,42 @@ namespace ProUpgradeEditor.UI
             // 
             this.textBox43.Location = new System.Drawing.Point(8, 19);
             this.textBox43.Name = "textBox43";
-            this.textBox43.Size = new System.Drawing.Size(30, 23);
+            this.textBox43.Size = new System.Drawing.Size(30, 21);
             this.textBox43.TabIndex = 1;
             // 
             // textBox44
             // 
             this.textBox44.Location = new System.Drawing.Point(44, 19);
             this.textBox44.Name = "textBox44";
-            this.textBox44.Size = new System.Drawing.Size(30, 23);
+            this.textBox44.Size = new System.Drawing.Size(30, 21);
             this.textBox44.TabIndex = 2;
             // 
             // textBox45
             // 
             this.textBox45.Location = new System.Drawing.Point(80, 19);
             this.textBox45.Name = "textBox45";
-            this.textBox45.Size = new System.Drawing.Size(30, 23);
+            this.textBox45.Size = new System.Drawing.Size(30, 21);
             this.textBox45.TabIndex = 3;
             // 
             // textBox46
             // 
             this.textBox46.Location = new System.Drawing.Point(116, 19);
             this.textBox46.Name = "textBox46";
-            this.textBox46.Size = new System.Drawing.Size(30, 23);
+            this.textBox46.Size = new System.Drawing.Size(30, 21);
             this.textBox46.TabIndex = 4;
             // 
             // textBox47
             // 
             this.textBox47.Location = new System.Drawing.Point(152, 19);
             this.textBox47.Name = "textBox47";
-            this.textBox47.Size = new System.Drawing.Size(30, 23);
+            this.textBox47.Size = new System.Drawing.Size(30, 21);
             this.textBox47.TabIndex = 5;
             // 
             // textBox48
             // 
             this.textBox48.Location = new System.Drawing.Point(188, 19);
             this.textBox48.Name = "textBox48";
-            this.textBox48.Size = new System.Drawing.Size(30, 23);
+            this.textBox48.Size = new System.Drawing.Size(30, 21);
             this.textBox48.TabIndex = 0;
             // 
             // label30
@@ -2250,7 +2250,7 @@ namespace ProUpgradeEditor.UI
             this.label30.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label30.Location = new System.Drawing.Point(51, 26);
             this.label30.Name = "label30";
-            this.label30.Size = new System.Drawing.Size(73, 15);
+            this.label30.Size = new System.Drawing.Size(76, 15);
             this.label30.TabIndex = 0;
             this.label30.Text = "Short Name:";
             // 
@@ -2274,49 +2274,49 @@ namespace ProUpgradeEditor.UI
             // 
             this.textBox42.Location = new System.Drawing.Point(188, 19);
             this.textBox42.Name = "textBox42";
-            this.textBox42.Size = new System.Drawing.Size(30, 23);
+            this.textBox42.Size = new System.Drawing.Size(30, 21);
             this.textBox42.TabIndex = 5;
             // 
             // textBox41
             // 
             this.textBox41.Location = new System.Drawing.Point(152, 19);
             this.textBox41.Name = "textBox41";
-            this.textBox41.Size = new System.Drawing.Size(30, 23);
+            this.textBox41.Size = new System.Drawing.Size(30, 21);
             this.textBox41.TabIndex = 4;
             // 
             // textBox40
             // 
             this.textBox40.Location = new System.Drawing.Point(116, 19);
             this.textBox40.Name = "textBox40";
-            this.textBox40.Size = new System.Drawing.Size(30, 23);
+            this.textBox40.Size = new System.Drawing.Size(30, 21);
             this.textBox40.TabIndex = 3;
             // 
             // textBox39
             // 
             this.textBox39.Location = new System.Drawing.Point(80, 19);
             this.textBox39.Name = "textBox39";
-            this.textBox39.Size = new System.Drawing.Size(30, 23);
+            this.textBox39.Size = new System.Drawing.Size(30, 21);
             this.textBox39.TabIndex = 2;
             // 
             // textBox38
             // 
             this.textBox38.Location = new System.Drawing.Point(44, 19);
             this.textBox38.Name = "textBox38";
-            this.textBox38.Size = new System.Drawing.Size(30, 23);
+            this.textBox38.Size = new System.Drawing.Size(30, 21);
             this.textBox38.TabIndex = 1;
             // 
             // textBox37
             // 
             this.textBox37.Location = new System.Drawing.Point(8, 19);
             this.textBox37.Name = "textBox37";
-            this.textBox37.Size = new System.Drawing.Size(30, 23);
+            this.textBox37.Size = new System.Drawing.Size(30, 21);
             this.textBox37.TabIndex = 0;
             // 
             // textBoxCONShortName
             // 
             this.textBoxCONShortName.Location = new System.Drawing.Point(130, 23);
             this.textBoxCONShortName.Name = "textBoxCONShortName";
-            this.textBoxCONShortName.Size = new System.Drawing.Size(130, 23);
+            this.textBoxCONShortName.Size = new System.Drawing.Size(130, 21);
             this.textBoxCONShortName.TabIndex = 1;
             // 
             // label28
@@ -2325,7 +2325,7 @@ namespace ProUpgradeEditor.UI
             this.label28.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label28.Location = new System.Drawing.Point(10, 79);
             this.label28.Name = "label28";
-            this.label28.Size = new System.Drawing.Size(114, 15);
+            this.label28.Size = new System.Drawing.Size(113, 15);
             this.label28.TabIndex = 5;
             this.label28.Text = "Pro Guitar Difficulty:";
             // 
@@ -2335,7 +2335,7 @@ namespace ProUpgradeEditor.UI
             this.label27.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label27.Location = new System.Drawing.Point(73, 52);
             this.label27.Name = "label27";
-            this.label27.Size = new System.Drawing.Size(51, 15);
+            this.label27.Size = new System.Drawing.Size(54, 15);
             this.label27.TabIndex = 2;
             this.label27.Text = "Song ID:";
             // 
@@ -2345,7 +2345,7 @@ namespace ProUpgradeEditor.UI
             this.label29.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label29.Location = new System.Drawing.Point(19, 105);
             this.label29.Name = "label29";
-            this.label29.Size = new System.Drawing.Size(105, 15);
+            this.label29.Size = new System.Drawing.Size(107, 15);
             this.label29.TabIndex = 7;
             this.label29.Text = "Pro Bass Difficulty:";
             // 
@@ -2353,7 +2353,7 @@ namespace ProUpgradeEditor.UI
             // 
             this.textBoxCONSongID.Location = new System.Drawing.Point(130, 49);
             this.textBoxCONSongID.Name = "textBoxCONSongID";
-            this.textBoxCONSongID.Size = new System.Drawing.Size(104, 23);
+            this.textBoxCONSongID.Size = new System.Drawing.Size(104, 21);
             this.textBoxCONSongID.TabIndex = 3;
             // 
             // comboProGDifficulty
@@ -2483,7 +2483,7 @@ namespace ProUpgradeEditor.UI
             this.label37.AutoSize = true;
             this.label37.Location = new System.Drawing.Point(110, 19);
             this.label37.Name = "label37";
-            this.label37.Size = new System.Drawing.Size(161, 15);
+            this.label37.Size = new System.Drawing.Size(183, 15);
             this.label37.TabIndex = 0;
             this.label37.Text = "XXXXXXXXXXXXXXXXXXXXXX";
             // 
@@ -2492,7 +2492,7 @@ namespace ProUpgradeEditor.UI
             this.label34.AutoSize = true;
             this.label34.Location = new System.Drawing.Point(10, 68);
             this.label34.Name = "label34";
-            this.label34.Size = new System.Drawing.Size(97, 15);
+            this.label34.Size = new System.Drawing.Size(100, 15);
             this.label34.TabIndex = 4;
             this.label34.Text = "Guitar5 Location:";
             // 
@@ -2500,7 +2500,7 @@ namespace ProUpgradeEditor.UI
             // 
             this.textBoxSongLibConFile.Location = new System.Drawing.Point(113, 114);
             this.textBoxSongLibConFile.Name = "textBoxSongLibConFile";
-            this.textBoxSongLibConFile.Size = new System.Drawing.Size(198, 23);
+            this.textBoxSongLibConFile.Size = new System.Drawing.Size(198, 21);
             this.textBoxSongLibConFile.TabIndex = 8;
             this.textBoxSongLibConFile.TextChanged += new System.EventHandler(this.textBox23_TextChanged);
             // 
@@ -2508,7 +2508,7 @@ namespace ProUpgradeEditor.UI
             // 
             this.textBoxSongLibProMidiFileName.Location = new System.Drawing.Point(113, 89);
             this.textBoxSongLibProMidiFileName.Name = "textBoxSongLibProMidiFileName";
-            this.textBoxSongLibProMidiFileName.Size = new System.Drawing.Size(198, 23);
+            this.textBoxSongLibProMidiFileName.Size = new System.Drawing.Size(198, 21);
             this.textBoxSongLibProMidiFileName.TabIndex = 5;
             this.textBoxSongLibProMidiFileName.TextChanged += new System.EventHandler(this.textBox22_TextChanged);
             // 
@@ -2517,7 +2517,7 @@ namespace ProUpgradeEditor.UI
             this.label35.AutoSize = true;
             this.label35.Location = new System.Drawing.Point(30, 94);
             this.label35.Name = "label35";
-            this.label35.Size = new System.Drawing.Size(77, 15);
+            this.label35.Size = new System.Drawing.Size(79, 15);
             this.label35.TabIndex = 8;
             this.label35.Text = "Pro Location:";
             // 
@@ -2526,7 +2526,7 @@ namespace ProUpgradeEditor.UI
             this.label38.AutoSize = true;
             this.label38.Location = new System.Drawing.Point(24, 119);
             this.label38.Name = "label38";
-            this.label38.Size = new System.Drawing.Size(83, 15);
+            this.label38.Size = new System.Drawing.Size(87, 15);
             this.label38.TabIndex = 13;
             this.label38.Text = "CON Package:";
             // 
@@ -2535,7 +2535,7 @@ namespace ProUpgradeEditor.UI
             this.label39.AutoSize = true;
             this.label39.Location = new System.Drawing.Point(37, 44);
             this.label39.Name = "label39";
-            this.label39.Size = new System.Drawing.Size(70, 15);
+            this.label39.Size = new System.Drawing.Size(72, 15);
             this.label39.TabIndex = 2;
             this.label39.Text = "Description:";
             // 
@@ -2543,7 +2543,7 @@ namespace ProUpgradeEditor.UI
             // 
             this.textBox24.Location = new System.Drawing.Point(113, 41);
             this.textBox24.Name = "textBox24";
-            this.textBox24.Size = new System.Drawing.Size(198, 23);
+            this.textBox24.Size = new System.Drawing.Size(198, 21);
             this.textBox24.TabIndex = 1;
             this.textBox24.TextChanged += new System.EventHandler(this.textBox24_TextChanged);
             // 
@@ -2551,7 +2551,7 @@ namespace ProUpgradeEditor.UI
             // 
             this.textBoxSongLibG5MidiFileName.Location = new System.Drawing.Point(113, 65);
             this.textBoxSongLibG5MidiFileName.Name = "textBoxSongLibG5MidiFileName";
-            this.textBoxSongLibG5MidiFileName.Size = new System.Drawing.Size(198, 23);
+            this.textBoxSongLibG5MidiFileName.Size = new System.Drawing.Size(198, 21);
             this.textBoxSongLibG5MidiFileName.TabIndex = 2;
             this.textBoxSongLibG5MidiFileName.TextChanged += new System.EventHandler(this.textBox21_TextChanged);
             // 
@@ -2622,11 +2622,11 @@ namespace ProUpgradeEditor.UI
             // 
             // textBoxBatchUtilExtractXML
             // 
-            this.textBoxBatchUtilExtractXML.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxBatchUtilExtractXML.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxBatchUtilExtractXML.Location = new System.Drawing.Point(134, 372);
             this.textBoxBatchUtilExtractXML.Name = "textBoxBatchUtilExtractXML";
-            this.textBoxBatchUtilExtractXML.Size = new System.Drawing.Size(365, 23);
+            this.textBoxBatchUtilExtractXML.Size = new System.Drawing.Size(365, 21);
             this.textBoxBatchUtilExtractXML.TabIndex = 18;
             // 
             // checkBoxCompressAllInDefaultCONFolder
@@ -2992,8 +2992,8 @@ namespace ProUpgradeEditor.UI
             // 
             // progressBarGenCompletedDifficulty
             // 
-            this.progressBarGenCompletedDifficulty.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBarGenCompletedDifficulty.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.progressBarGenCompletedDifficulty.Location = new System.Drawing.Point(6, 406);
             this.progressBarGenCompletedDifficulty.Name = "progressBarGenCompletedDifficulty";
             this.progressBarGenCompletedDifficulty.Size = new System.Drawing.Size(798, 12);
@@ -3043,38 +3043,38 @@ namespace ProUpgradeEditor.UI
             // 
             // textBoxCopyAllG5MidiFolder
             // 
-            this.textBoxCopyAllG5MidiFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxCopyAllG5MidiFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxCopyAllG5MidiFolder.Location = new System.Drawing.Point(134, 268);
             this.textBoxCopyAllG5MidiFolder.Name = "textBoxCopyAllG5MidiFolder";
-            this.textBoxCopyAllG5MidiFolder.Size = new System.Drawing.Size(365, 23);
+            this.textBoxCopyAllG5MidiFolder.Size = new System.Drawing.Size(365, 21);
             this.textBoxCopyAllG5MidiFolder.TabIndex = 1;
             // 
             // textBoxCopyAllProFolder
             // 
-            this.textBoxCopyAllProFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxCopyAllProFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxCopyAllProFolder.Location = new System.Drawing.Point(134, 293);
             this.textBoxCopyAllProFolder.Name = "textBoxCopyAllProFolder";
-            this.textBoxCopyAllProFolder.Size = new System.Drawing.Size(365, 23);
+            this.textBoxCopyAllProFolder.Size = new System.Drawing.Size(365, 21);
             this.textBoxCopyAllProFolder.TabIndex = 4;
             // 
             // textBoxCompressAllZipFile
             // 
-            this.textBoxCompressAllZipFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxCompressAllZipFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxCompressAllZipFile.Location = new System.Drawing.Point(134, 344);
             this.textBoxCompressAllZipFile.Name = "textBoxCompressAllZipFile";
-            this.textBoxCompressAllZipFile.Size = new System.Drawing.Size(365, 23);
+            this.textBoxCompressAllZipFile.Size = new System.Drawing.Size(365, 21);
             this.textBoxCompressAllZipFile.TabIndex = 7;
             // 
             // textBoxCopyAllCONFolder
             // 
-            this.textBoxCopyAllCONFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxCopyAllCONFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxCopyAllCONFolder.Location = new System.Drawing.Point(134, 318);
             this.textBoxCopyAllCONFolder.Name = "textBoxCopyAllCONFolder";
-            this.textBoxCopyAllCONFolder.Size = new System.Drawing.Size(365, 23);
+            this.textBoxCopyAllCONFolder.Size = new System.Drawing.Size(365, 21);
             this.textBoxCopyAllCONFolder.TabIndex = 7;
             // 
             // button95
@@ -3185,9 +3185,9 @@ namespace ProUpgradeEditor.UI
             // 
             // groupBox49
             // 
-            this.groupBox49.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox49.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox49.Controls.Add(this.buttonSongUtilFindInFileResultsOpenWindow);
             this.groupBox49.Controls.Add(this.checkBoxSongUtilFindInFileResultsOpenCompleted);
             this.groupBox49.Controls.Add(this.textBoxSongUtilFindInFileResults);
@@ -3227,9 +3227,9 @@ namespace ProUpgradeEditor.UI
             // 
             this.textBoxSongUtilFindInFileResults.AcceptsReturn = true;
             this.textBoxSongUtilFindInFileResults.AcceptsTab = true;
-            this.textBoxSongUtilFindInFileResults.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxSongUtilFindInFileResults.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxSongUtilFindInFileResults.BackColor = System.Drawing.SystemColors.Window;
             this.textBoxSongUtilFindInFileResults.Font = new System.Drawing.Font("Courier New", 10F);
             this.textBoxSongUtilFindInFileResults.ForeColor = System.Drawing.SystemColors.ControlText;
@@ -3275,7 +3275,7 @@ namespace ProUpgradeEditor.UI
             // 
             this.textBoxSongUtilFindFolder.Location = new System.Drawing.Point(317, 36);
             this.textBoxSongUtilFindFolder.Name = "textBoxSongUtilFindFolder";
-            this.textBoxSongUtilFindFolder.Size = new System.Drawing.Size(209, 23);
+            this.textBoxSongUtilFindFolder.Size = new System.Drawing.Size(209, 21);
             this.textBoxSongUtilFindFolder.TabIndex = 14;
             // 
             // checkBoxSongUtilFindInProOnly
@@ -3294,7 +3294,7 @@ namespace ProUpgradeEditor.UI
             this.label60.ForeColor = System.Drawing.Color.Black;
             this.label60.Location = new System.Drawing.Point(314, 19);
             this.label60.Name = "label60";
-            this.label60.Size = new System.Drawing.Size(81, 15);
+            this.label60.Size = new System.Drawing.Size(87, 15);
             this.label60.TabIndex = 16;
             this.label60.Text = "Search Folder:";
             // 
@@ -3370,28 +3370,28 @@ namespace ProUpgradeEditor.UI
             // 
             this.textBoxSongUtilFindInFileChan.Location = new System.Drawing.Point(95, 36);
             this.textBoxSongUtilFindInFileChan.Name = "textBoxSongUtilFindInFileChan";
-            this.textBoxSongUtilFindInFileChan.Size = new System.Drawing.Size(37, 23);
+            this.textBoxSongUtilFindInFileChan.Size = new System.Drawing.Size(37, 21);
             this.textBoxSongUtilFindInFileChan.TabIndex = 5;
             // 
             // textBoxSongUtilFindInFileText
             // 
             this.textBoxSongUtilFindInFileText.Location = new System.Drawing.Point(139, 36);
             this.textBoxSongUtilFindInFileText.Name = "textBoxSongUtilFindInFileText";
-            this.textBoxSongUtilFindInFileText.Size = new System.Drawing.Size(172, 23);
+            this.textBoxSongUtilFindInFileText.Size = new System.Drawing.Size(172, 21);
             this.textBoxSongUtilFindInFileText.TabIndex = 8;
             // 
             // textBoxSongUtilFindInFileData1
             // 
             this.textBoxSongUtilFindInFileData1.Location = new System.Drawing.Point(9, 37);
             this.textBoxSongUtilFindInFileData1.Name = "textBoxSongUtilFindInFileData1";
-            this.textBoxSongUtilFindInFileData1.Size = new System.Drawing.Size(37, 23);
+            this.textBoxSongUtilFindInFileData1.Size = new System.Drawing.Size(37, 21);
             this.textBoxSongUtilFindInFileData1.TabIndex = 1;
             // 
             // textBoxSongUtilFindInFileData2
             // 
             this.textBoxSongUtilFindInFileData2.Location = new System.Drawing.Point(52, 37);
             this.textBoxSongUtilFindInFileData2.Name = "textBoxSongUtilFindInFileData2";
-            this.textBoxSongUtilFindInFileData2.Size = new System.Drawing.Size(37, 23);
+            this.textBoxSongUtilFindInFileData2.Size = new System.Drawing.Size(37, 21);
             this.textBoxSongUtilFindInFileData2.TabIndex = 3;
             // 
             // label59
@@ -3400,7 +3400,7 @@ namespace ProUpgradeEditor.UI
             this.label59.ForeColor = System.Drawing.Color.Black;
             this.label59.Location = new System.Drawing.Point(92, 18);
             this.label59.Name = "label59";
-            this.label59.Size = new System.Drawing.Size(38, 15);
+            this.label59.Size = new System.Drawing.Size(39, 15);
             this.label59.TabIndex = 4;
             this.label59.Text = "Chan:";
             // 
@@ -3423,7 +3423,7 @@ namespace ProUpgradeEditor.UI
             this.label58.ForeColor = System.Drawing.Color.Black;
             this.label58.Location = new System.Drawing.Point(136, 18);
             this.label58.Name = "label58";
-            this.label58.Size = new System.Drawing.Size(32, 15);
+            this.label58.Size = new System.Drawing.Size(33, 15);
             this.label58.TabIndex = 7;
             this.label58.Text = "Text:";
             // 
@@ -3433,7 +3433,7 @@ namespace ProUpgradeEditor.UI
             this.label56.ForeColor = System.Drawing.Color.Black;
             this.label56.Location = new System.Drawing.Point(6, 19);
             this.label56.Name = "label56";
-            this.label56.Size = new System.Drawing.Size(40, 15);
+            this.label56.Size = new System.Drawing.Size(43, 15);
             this.label56.TabIndex = 0;
             this.label56.Text = "Data1:";
             // 
@@ -3443,7 +3443,7 @@ namespace ProUpgradeEditor.UI
             this.label57.ForeColor = System.Drawing.Color.Black;
             this.label57.Location = new System.Drawing.Point(49, 19);
             this.label57.Name = "label57";
-            this.label57.Size = new System.Drawing.Size(40, 15);
+            this.label57.Size = new System.Drawing.Size(43, 15);
             this.label57.TabIndex = 2;
             this.label57.Text = "Data2:";
             // 
@@ -3463,7 +3463,7 @@ namespace ProUpgradeEditor.UI
             // 
             this.textBoxSongUtilSearchFolder.Location = new System.Drawing.Point(6, 23);
             this.textBoxSongUtilSearchFolder.Name = "textBoxSongUtilSearchFolder";
-            this.textBoxSongUtilSearchFolder.Size = new System.Drawing.Size(209, 23);
+            this.textBoxSongUtilSearchFolder.Size = new System.Drawing.Size(209, 21);
             this.textBoxSongUtilSearchFolder.TabIndex = 12;
             // 
             // buttonSongUtilSearchForG5FromOpenPro
@@ -3545,7 +3545,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxTempoDenominator.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxTempoDenominator.Location = new System.Drawing.Point(86, 45);
             this.textBoxTempoDenominator.Name = "textBoxTempoDenominator";
-            this.textBoxTempoDenominator.Size = new System.Drawing.Size(98, 23);
+            this.textBoxTempoDenominator.Size = new System.Drawing.Size(98, 21);
             this.textBoxTempoDenominator.TabIndex = 16;
             // 
             // textBoxTempoNumerator
@@ -3553,7 +3553,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxTempoNumerator.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxTempoNumerator.Location = new System.Drawing.Point(86, 19);
             this.textBoxTempoNumerator.Name = "textBoxTempoNumerator";
-            this.textBoxTempoNumerator.Size = new System.Drawing.Size(98, 23);
+            this.textBoxTempoNumerator.Size = new System.Drawing.Size(98, 21);
             this.textBoxTempoNumerator.TabIndex = 15;
             // 
             // label3
@@ -3562,7 +3562,7 @@ namespace ProUpgradeEditor.UI
             this.label3.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label3.Location = new System.Drawing.Point(8, 48);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(80, 15);
+            this.label3.Size = new System.Drawing.Size(82, 15);
             this.label3.TabIndex = 14;
             this.label3.Text = "Denominator:";
             // 
@@ -3572,7 +3572,7 @@ namespace ProUpgradeEditor.UI
             this.label2.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label2.Location = new System.Drawing.Point(19, 22);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(68, 15);
+            this.label2.Size = new System.Drawing.Size(69, 15);
             this.label2.TabIndex = 13;
             this.label2.Text = "Numerator:";
             // 
@@ -3668,7 +3668,7 @@ namespace ProUpgradeEditor.UI
             this.label61.AutoSize = true;
             this.label61.Location = new System.Drawing.Point(6, 111);
             this.label61.Name = "label61";
-            this.label61.Size = new System.Drawing.Size(78, 15);
+            this.label61.Size = new System.Drawing.Size(80, 15);
             this.label61.TabIndex = 15;
             this.label61.Text = "Chord Name:";
             // 
@@ -4042,7 +4042,7 @@ namespace ProUpgradeEditor.UI
             this.textBox2.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox2.Location = new System.Drawing.Point(9, 18);
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(31, 23);
+            this.textBox2.Size = new System.Drawing.Size(31, 21);
             this.textBox2.TabIndex = 0;
             // 
             // textBox3
@@ -4051,7 +4051,7 @@ namespace ProUpgradeEditor.UI
             this.textBox3.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox3.Location = new System.Drawing.Point(9, 44);
             this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(31, 23);
+            this.textBox3.Size = new System.Drawing.Size(31, 21);
             this.textBox3.TabIndex = 1;
             // 
             // textBox7
@@ -4060,7 +4060,7 @@ namespace ProUpgradeEditor.UI
             this.textBox7.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox7.Location = new System.Drawing.Point(9, 148);
             this.textBox7.Name = "textBox7";
-            this.textBox7.Size = new System.Drawing.Size(31, 23);
+            this.textBox7.Size = new System.Drawing.Size(31, 21);
             this.textBox7.TabIndex = 5;
             // 
             // textBox4
@@ -4069,7 +4069,7 @@ namespace ProUpgradeEditor.UI
             this.textBox4.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox4.Location = new System.Drawing.Point(9, 70);
             this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(31, 23);
+            this.textBox4.Size = new System.Drawing.Size(31, 21);
             this.textBox4.TabIndex = 2;
             // 
             // textBox6
@@ -4078,7 +4078,7 @@ namespace ProUpgradeEditor.UI
             this.textBox6.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox6.Location = new System.Drawing.Point(9, 122);
             this.textBox6.Name = "textBox6";
-            this.textBox6.Size = new System.Drawing.Size(31, 23);
+            this.textBox6.Size = new System.Drawing.Size(31, 21);
             this.textBox6.TabIndex = 4;
             // 
             // textBox5
@@ -4087,7 +4087,7 @@ namespace ProUpgradeEditor.UI
             this.textBox5.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox5.Location = new System.Drawing.Point(9, 96);
             this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(31, 23);
+            this.textBox5.Size = new System.Drawing.Size(31, 21);
             this.textBox5.TabIndex = 3;
             // 
             // groupBox34
@@ -4138,7 +4138,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxPlaceNoteFret.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxPlaceNoteFret.Location = new System.Drawing.Point(88, 21);
             this.textBoxPlaceNoteFret.Name = "textBoxPlaceNoteFret";
-            this.textBoxPlaceNoteFret.Size = new System.Drawing.Size(27, 23);
+            this.textBoxPlaceNoteFret.Size = new System.Drawing.Size(27, 21);
             this.textBoxPlaceNoteFret.TabIndex = 5;
             this.textBoxPlaceNoteFret.Text = "0";
             // 
@@ -4148,7 +4148,7 @@ namespace ProUpgradeEditor.UI
             this.label21.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label21.Location = new System.Drawing.Point(60, 24);
             this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(30, 15);
+            this.label21.Size = new System.Drawing.Size(31, 15);
             this.label21.TabIndex = 4;
             this.label21.Text = "Fret:";
             // 
@@ -4158,7 +4158,7 @@ namespace ProUpgradeEditor.UI
             this.label17.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label17.Location = new System.Drawing.Point(6, 45);
             this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(26, 15);
+            this.label17.Size = new System.Drawing.Size(27, 15);
             this.label17.TabIndex = 0;
             this.label17.Text = "Idle";
             // 
@@ -4247,7 +4247,7 @@ namespace ProUpgradeEditor.UI
             this.labelMidiInputDeviceState.ForeColor = System.Drawing.SystemColors.ControlText;
             this.labelMidiInputDeviceState.Location = new System.Drawing.Point(6, 42);
             this.labelMidiInputDeviceState.Name = "labelMidiInputDeviceState";
-            this.labelMidiInputDeviceState.Size = new System.Drawing.Size(97, 15);
+            this.labelMidiInputDeviceState.Size = new System.Drawing.Size(99, 15);
             this.labelMidiInputDeviceState.TabIndex = 3;
             this.labelMidiInputDeviceState.Text = "None Connected";
             // 
@@ -4537,7 +4537,7 @@ namespace ProUpgradeEditor.UI
             this.label15.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label15.Location = new System.Drawing.Point(52, 372);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(47, 15);
+            this.label15.Size = new System.Drawing.Size(63, 15);
             this.label15.TabIndex = 6;
             this.label15.Text = "________";
             // 
@@ -4547,7 +4547,7 @@ namespace ProUpgradeEditor.UI
             this.label8.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label8.Location = new System.Drawing.Point(6, 372);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(42, 15);
+            this.label8.Size = new System.Drawing.Size(45, 15);
             this.label8.TabIndex = 5;
             this.label8.Text = "Result:";
             // 
@@ -4928,7 +4928,7 @@ namespace ProUpgradeEditor.UI
             this.button32.TabIndex = 3;
             this.button32.Text = "Combine";
             this.toolTip1.SetToolTip(this.button32, "Combine the currently selected note with the next note, extending the end of the " +
-        "selected note to the end of the next note.");
+                    "selected note to the end of the next note.");
             this.button32.UseVisualStyleBackColor = true;
             this.button32.Click += new System.EventHandler(this.button32_Click);
             // 
@@ -4992,7 +4992,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxNoteEditorSelectedChordDownTick.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxNoteEditorSelectedChordDownTick.Location = new System.Drawing.Point(7, 38);
             this.textBoxNoteEditorSelectedChordDownTick.Name = "textBoxNoteEditorSelectedChordDownTick";
-            this.textBoxNoteEditorSelectedChordDownTick.Size = new System.Drawing.Size(53, 23);
+            this.textBoxNoteEditorSelectedChordDownTick.Size = new System.Drawing.Size(53, 21);
             this.textBoxNoteEditorSelectedChordDownTick.TabIndex = 0;
             // 
             // textBoxNoteEditorSelectedChordUpTick
@@ -5000,7 +5000,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxNoteEditorSelectedChordUpTick.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxNoteEditorSelectedChordUpTick.Location = new System.Drawing.Point(68, 38);
             this.textBoxNoteEditorSelectedChordUpTick.Name = "textBoxNoteEditorSelectedChordUpTick";
-            this.textBoxNoteEditorSelectedChordUpTick.Size = new System.Drawing.Size(53, 23);
+            this.textBoxNoteEditorSelectedChordUpTick.Size = new System.Drawing.Size(53, 21);
             this.textBoxNoteEditorSelectedChordUpTick.TabIndex = 1;
             this.textBoxNoteEditorSelectedChordUpTick.TextChanged += new System.EventHandler(this.textBox20_TextChanged);
             // 
@@ -5009,7 +5009,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxNoteEditorSelectedChordTickLength.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxNoteEditorSelectedChordTickLength.Location = new System.Drawing.Point(126, 38);
             this.textBoxNoteEditorSelectedChordTickLength.Name = "textBoxNoteEditorSelectedChordTickLength";
-            this.textBoxNoteEditorSelectedChordTickLength.Size = new System.Drawing.Size(41, 23);
+            this.textBoxNoteEditorSelectedChordTickLength.Size = new System.Drawing.Size(41, 21);
             this.textBoxNoteEditorSelectedChordTickLength.TabIndex = 2;
             this.textBoxNoteEditorSelectedChordTickLength.TextChanged += new System.EventHandler(this.textBox19_TextChanged);
             // 
@@ -5032,7 +5032,7 @@ namespace ProUpgradeEditor.UI
             this.label9.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label9.Location = new System.Drawing.Point(5, 19);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(34, 15);
+            this.label9.Size = new System.Drawing.Size(35, 15);
             this.label9.TabIndex = 45;
             this.label9.Text = "Start:";
             // 
@@ -5042,7 +5042,7 @@ namespace ProUpgradeEditor.UI
             this.label40.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label40.Location = new System.Drawing.Point(66, 19);
             this.label40.Name = "label40";
-            this.label40.Size = new System.Drawing.Size(30, 15);
+            this.label40.Size = new System.Drawing.Size(32, 15);
             this.label40.TabIndex = 45;
             this.label40.Text = "End:";
             // 
@@ -5052,7 +5052,7 @@ namespace ProUpgradeEditor.UI
             this.label24.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label24.Location = new System.Drawing.Point(123, 19);
             this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(47, 15);
+            this.label24.Size = new System.Drawing.Size(48, 15);
             this.label24.TabIndex = 67;
             this.label24.Text = "Length:";
             // 
@@ -5232,7 +5232,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxNoteEditorSelectedChordChannelBox0.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxNoteEditorSelectedChordChannelBox0.Location = new System.Drawing.Point(8, 18);
             this.textBoxNoteEditorSelectedChordChannelBox0.Name = "textBoxNoteEditorSelectedChordChannelBox0";
-            this.textBoxNoteEditorSelectedChordChannelBox0.Size = new System.Drawing.Size(31, 23);
+            this.textBoxNoteEditorSelectedChordChannelBox0.Size = new System.Drawing.Size(31, 21);
             this.textBoxNoteEditorSelectedChordChannelBox0.TabIndex = 0;
             // 
             // contextMenuStripChannels
@@ -5284,7 +5284,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxNoteEditorSelectedChordChannelBox5.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxNoteEditorSelectedChordChannelBox5.Location = new System.Drawing.Point(8, 148);
             this.textBoxNoteEditorSelectedChordChannelBox5.Name = "textBoxNoteEditorSelectedChordChannelBox5";
-            this.textBoxNoteEditorSelectedChordChannelBox5.Size = new System.Drawing.Size(31, 23);
+            this.textBoxNoteEditorSelectedChordChannelBox5.Size = new System.Drawing.Size(31, 21);
             this.textBoxNoteEditorSelectedChordChannelBox5.TabIndex = 5;
             // 
             // textBoxNoteEditorSelectedChordChannelBox4
@@ -5293,7 +5293,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxNoteEditorSelectedChordChannelBox4.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxNoteEditorSelectedChordChannelBox4.Location = new System.Drawing.Point(8, 122);
             this.textBoxNoteEditorSelectedChordChannelBox4.Name = "textBoxNoteEditorSelectedChordChannelBox4";
-            this.textBoxNoteEditorSelectedChordChannelBox4.Size = new System.Drawing.Size(31, 23);
+            this.textBoxNoteEditorSelectedChordChannelBox4.Size = new System.Drawing.Size(31, 21);
             this.textBoxNoteEditorSelectedChordChannelBox4.TabIndex = 4;
             // 
             // textBoxNoteEditorSelectedChordChannelBox3
@@ -5302,7 +5302,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxNoteEditorSelectedChordChannelBox3.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxNoteEditorSelectedChordChannelBox3.Location = new System.Drawing.Point(8, 96);
             this.textBoxNoteEditorSelectedChordChannelBox3.Name = "textBoxNoteEditorSelectedChordChannelBox3";
-            this.textBoxNoteEditorSelectedChordChannelBox3.Size = new System.Drawing.Size(31, 23);
+            this.textBoxNoteEditorSelectedChordChannelBox3.Size = new System.Drawing.Size(31, 21);
             this.textBoxNoteEditorSelectedChordChannelBox3.TabIndex = 3;
             // 
             // textBoxNoteEditorSelectedChordChannelBox2
@@ -5311,7 +5311,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxNoteEditorSelectedChordChannelBox2.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxNoteEditorSelectedChordChannelBox2.Location = new System.Drawing.Point(8, 70);
             this.textBoxNoteEditorSelectedChordChannelBox2.Name = "textBoxNoteEditorSelectedChordChannelBox2";
-            this.textBoxNoteEditorSelectedChordChannelBox2.Size = new System.Drawing.Size(31, 23);
+            this.textBoxNoteEditorSelectedChordChannelBox2.Size = new System.Drawing.Size(31, 21);
             this.textBoxNoteEditorSelectedChordChannelBox2.TabIndex = 2;
             // 
             // textBoxNoteEditorSelectedChordChannelBox1
@@ -5320,7 +5320,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxNoteEditorSelectedChordChannelBox1.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxNoteEditorSelectedChordChannelBox1.Location = new System.Drawing.Point(8, 44);
             this.textBoxNoteEditorSelectedChordChannelBox1.Name = "textBoxNoteEditorSelectedChordChannelBox1";
-            this.textBoxNoteEditorSelectedChordChannelBox1.Size = new System.Drawing.Size(31, 23);
+            this.textBoxNoteEditorSelectedChordChannelBox1.Size = new System.Drawing.Size(31, 21);
             this.textBoxNoteEditorSelectedChordChannelBox1.TabIndex = 1;
             // 
             // groupBox5
@@ -5419,7 +5419,7 @@ namespace ProUpgradeEditor.UI
             this.label48.AutoSize = true;
             this.label48.Location = new System.Drawing.Point(6, 174);
             this.label48.Name = "label48";
-            this.label48.Size = new System.Drawing.Size(47, 15);
+            this.label48.Size = new System.Drawing.Size(51, 15);
             this.label48.TabIndex = 13;
             this.label48.Text = "Presets:";
             // 
@@ -5507,7 +5507,7 @@ namespace ProUpgradeEditor.UI
             this.label20.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label20.Location = new System.Drawing.Point(9, 46);
             this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(26, 15);
+            this.label20.Size = new System.Drawing.Size(27, 15);
             this.label20.TabIndex = 0;
             this.label20.Text = "Idle";
             // 
@@ -5613,7 +5613,7 @@ namespace ProUpgradeEditor.UI
             this.textBox8.Location = new System.Drawing.Point(9, 18);
             this.textBox8.MaxLength = 2;
             this.textBox8.Name = "textBox8";
-            this.textBox8.Size = new System.Drawing.Size(31, 23);
+            this.textBox8.Size = new System.Drawing.Size(31, 21);
             this.textBox8.TabIndex = 0;
             this.textBox8.TextChanged += new System.EventHandler(this.onChangeString6);
             // 
@@ -5622,7 +5622,7 @@ namespace ProUpgradeEditor.UI
             this.textBox9.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox9.Location = new System.Drawing.Point(9, 44);
             this.textBox9.Name = "textBox9";
-            this.textBox9.Size = new System.Drawing.Size(31, 23);
+            this.textBox9.Size = new System.Drawing.Size(31, 21);
             this.textBox9.TabIndex = 1;
             this.textBox9.TextChanged += new System.EventHandler(this.onChangeString5);
             // 
@@ -5631,7 +5631,7 @@ namespace ProUpgradeEditor.UI
             this.textBox10.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox10.Location = new System.Drawing.Point(9, 70);
             this.textBox10.Name = "textBox10";
-            this.textBox10.Size = new System.Drawing.Size(31, 23);
+            this.textBox10.Size = new System.Drawing.Size(31, 21);
             this.textBox10.TabIndex = 2;
             this.textBox10.TextChanged += new System.EventHandler(this.onChangeString4);
             // 
@@ -5640,7 +5640,7 @@ namespace ProUpgradeEditor.UI
             this.textBox11.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox11.Location = new System.Drawing.Point(9, 96);
             this.textBox11.Name = "textBox11";
-            this.textBox11.Size = new System.Drawing.Size(31, 23);
+            this.textBox11.Size = new System.Drawing.Size(31, 21);
             this.textBox11.TabIndex = 3;
             this.textBox11.TextChanged += new System.EventHandler(this.onChangeString3);
             // 
@@ -5649,7 +5649,7 @@ namespace ProUpgradeEditor.UI
             this.textBox12.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox12.Location = new System.Drawing.Point(9, 122);
             this.textBox12.Name = "textBox12";
-            this.textBox12.Size = new System.Drawing.Size(31, 23);
+            this.textBox12.Size = new System.Drawing.Size(31, 21);
             this.textBox12.TabIndex = 4;
             this.textBox12.TextChanged += new System.EventHandler(this.onChangeString2);
             // 
@@ -5658,7 +5658,7 @@ namespace ProUpgradeEditor.UI
             this.textBox13.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox13.Location = new System.Drawing.Point(9, 148);
             this.textBox13.Name = "textBox13";
-            this.textBox13.Size = new System.Drawing.Size(31, 23);
+            this.textBox13.Size = new System.Drawing.Size(31, 21);
             this.textBox13.TabIndex = 5;
             this.textBox13.TextChanged += new System.EventHandler(this.onChangeString1);
             // 
@@ -5818,7 +5818,7 @@ namespace ProUpgradeEditor.UI
             this.label18.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label18.Location = new System.Drawing.Point(6, 230);
             this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(26, 15);
+            this.label18.Size = new System.Drawing.Size(27, 15);
             this.label18.TabIndex = 72;
             this.label18.Text = "Idle";
             // 
@@ -5840,7 +5840,7 @@ namespace ProUpgradeEditor.UI
             this.textBox18.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox18.Location = new System.Drawing.Point(95, 196);
             this.textBox18.Name = "textBox18";
-            this.textBox18.Size = new System.Drawing.Size(85, 23);
+            this.textBox18.Size = new System.Drawing.Size(85, 21);
             this.textBox18.TabIndex = 4;
             // 
             // button46
@@ -5861,7 +5861,7 @@ namespace ProUpgradeEditor.UI
             this.textBox17.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox17.Location = new System.Drawing.Point(6, 196);
             this.textBox17.Name = "textBox17";
-            this.textBox17.Size = new System.Drawing.Size(85, 23);
+            this.textBox17.Size = new System.Drawing.Size(85, 21);
             this.textBox17.TabIndex = 3;
             // 
             // groupBoxMultiStringTremelo
@@ -5940,7 +5940,7 @@ namespace ProUpgradeEditor.UI
             this.label16.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label16.Location = new System.Drawing.Point(6, 230);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(26, 15);
+            this.label16.Size = new System.Drawing.Size(27, 15);
             this.label16.TabIndex = 62;
             this.label16.Text = "Idle";
             // 
@@ -5949,7 +5949,7 @@ namespace ProUpgradeEditor.UI
             this.textBox16.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox16.Location = new System.Drawing.Point(95, 196);
             this.textBox16.Name = "textBox16";
-            this.textBox16.Size = new System.Drawing.Size(85, 23);
+            this.textBox16.Size = new System.Drawing.Size(85, 21);
             this.textBox16.TabIndex = 4;
             this.textBox16.TextChanged += new System.EventHandler(this.textBox16_TextChanged);
             // 
@@ -5958,7 +5958,7 @@ namespace ProUpgradeEditor.UI
             this.textBox15.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox15.Location = new System.Drawing.Point(6, 196);
             this.textBox15.Name = "textBox15";
-            this.textBox15.Size = new System.Drawing.Size(85, 23);
+            this.textBox15.Size = new System.Drawing.Size(85, 21);
             this.textBox15.TabIndex = 3;
             this.textBox15.TextChanged += new System.EventHandler(this.textBox15_TextChanged);
             // 
@@ -6066,7 +6066,7 @@ namespace ProUpgradeEditor.UI
             this.label13.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label13.Location = new System.Drawing.Point(6, 230);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(26, 15);
+            this.label13.Size = new System.Drawing.Size(27, 15);
             this.label13.TabIndex = 51;
             this.label13.Text = "Idle";
             // 
@@ -6088,7 +6088,7 @@ namespace ProUpgradeEditor.UI
             this.textBox30.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox30.Location = new System.Drawing.Point(95, 196);
             this.textBox30.Name = "textBox30";
-            this.textBox30.Size = new System.Drawing.Size(85, 23);
+            this.textBox30.Size = new System.Drawing.Size(85, 21);
             this.textBox30.TabIndex = 4;
             this.textBox30.TextChanged += new System.EventHandler(this.textBox30_TextChanged);
             // 
@@ -6097,7 +6097,7 @@ namespace ProUpgradeEditor.UI
             this.textBox29.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox29.Location = new System.Drawing.Point(6, 196);
             this.textBox29.Name = "textBox29";
-            this.textBox29.Size = new System.Drawing.Size(85, 23);
+            this.textBox29.Size = new System.Drawing.Size(85, 21);
             this.textBox29.TabIndex = 3;
             this.textBox29.TextChanged += new System.EventHandler(this.textBox29_TextChanged);
             // 
@@ -6214,7 +6214,7 @@ namespace ProUpgradeEditor.UI
             this.label10.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label10.Location = new System.Drawing.Point(6, 230);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(26, 15);
+            this.label10.Size = new System.Drawing.Size(27, 15);
             this.label10.TabIndex = 41;
             this.label10.Text = "Idle";
             // 
@@ -6223,7 +6223,7 @@ namespace ProUpgradeEditor.UI
             this.textBox28.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox28.Location = new System.Drawing.Point(95, 196);
             this.textBox28.Name = "textBox28";
-            this.textBox28.Size = new System.Drawing.Size(85, 23);
+            this.textBox28.Size = new System.Drawing.Size(85, 21);
             this.textBox28.TabIndex = 4;
             this.textBox28.TextChanged += new System.EventHandler(this.textBox28_TextChanged);
             // 
@@ -6232,7 +6232,7 @@ namespace ProUpgradeEditor.UI
             this.textBox27.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox27.Location = new System.Drawing.Point(6, 196);
             this.textBox27.Name = "textBox27";
-            this.textBox27.Size = new System.Drawing.Size(85, 23);
+            this.textBox27.Size = new System.Drawing.Size(85, 21);
             this.textBox27.TabIndex = 3;
             this.textBox27.TextChanged += new System.EventHandler(this.textBox27_TextChanged);
             // 
@@ -6338,7 +6338,7 @@ namespace ProUpgradeEditor.UI
             this.label11.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label11.Location = new System.Drawing.Point(6, 230);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(26, 15);
+            this.label11.Size = new System.Drawing.Size(27, 15);
             this.label11.TabIndex = 31;
             this.label11.Text = "Idle";
             // 
@@ -6347,7 +6347,7 @@ namespace ProUpgradeEditor.UI
             this.textBox1.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox1.Location = new System.Drawing.Point(6, 196);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(85, 23);
+            this.textBox1.Size = new System.Drawing.Size(85, 21);
             this.textBox1.TabIndex = 3;
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
@@ -6356,7 +6356,7 @@ namespace ProUpgradeEditor.UI
             this.textBox26.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox26.Location = new System.Drawing.Point(95, 196);
             this.textBox26.Name = "textBox26";
-            this.textBox26.Size = new System.Drawing.Size(85, 23);
+            this.textBox26.Size = new System.Drawing.Size(85, 21);
             this.textBox26.TabIndex = 4;
             this.textBox26.TextChanged += new System.EventHandler(this.textBox26_TextChanged);
             // 
@@ -6535,7 +6535,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxEventTick.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxEventTick.Location = new System.Drawing.Point(43, 196);
             this.textBoxEventTick.Name = "textBoxEventTick";
-            this.textBoxEventTick.Size = new System.Drawing.Size(102, 23);
+            this.textBoxEventTick.Size = new System.Drawing.Size(102, 21);
             this.textBoxEventTick.TabIndex = 2;
             // 
             // textBoxEventText
@@ -7259,7 +7259,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxEventText.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxEventText.Location = new System.Drawing.Point(9, 243);
             this.textBoxEventText.Name = "textBoxEventText";
-            this.textBoxEventText.Size = new System.Drawing.Size(196, 23);
+            this.textBoxEventText.Size = new System.Drawing.Size(196, 21);
             this.textBoxEventText.TabIndex = 6;
             // 
             // buttonUpdateTextEvent
@@ -7291,7 +7291,7 @@ namespace ProUpgradeEditor.UI
             this.label7.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label7.Location = new System.Drawing.Point(8, 225);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(32, 15);
+            this.label7.Size = new System.Drawing.Size(33, 15);
             this.label7.TabIndex = 5;
             this.label7.Text = "Text:";
             // 
@@ -7384,7 +7384,7 @@ namespace ProUpgradeEditor.UI
             this.labelProBassTrainerStatus.ForeColor = System.Drawing.SystemColors.ControlText;
             this.labelProBassTrainerStatus.Location = new System.Drawing.Point(11, 294);
             this.labelProBassTrainerStatus.Name = "labelProBassTrainerStatus";
-            this.labelProBassTrainerStatus.Size = new System.Drawing.Size(26, 15);
+            this.labelProBassTrainerStatus.Size = new System.Drawing.Size(27, 15);
             this.labelProBassTrainerStatus.TabIndex = 11;
             this.labelProBassTrainerStatus.Text = "Idle";
             // 
@@ -7393,7 +7393,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxProBassTrainerBeginTick.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxProBassTrainerBeginTick.Location = new System.Drawing.Point(10, 243);
             this.textBoxProBassTrainerBeginTick.Name = "textBoxProBassTrainerBeginTick";
-            this.textBoxProBassTrainerBeginTick.Size = new System.Drawing.Size(80, 23);
+            this.textBoxProBassTrainerBeginTick.Size = new System.Drawing.Size(80, 21);
             this.textBoxProBassTrainerBeginTick.TabIndex = 6;
             // 
             // textBoxProBassTrainerEndTick
@@ -7401,7 +7401,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxProBassTrainerEndTick.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxProBassTrainerEndTick.Location = new System.Drawing.Point(96, 243);
             this.textBoxProBassTrainerEndTick.Name = "textBoxProBassTrainerEndTick";
-            this.textBoxProBassTrainerEndTick.Size = new System.Drawing.Size(85, 23);
+            this.textBoxProBassTrainerEndTick.Size = new System.Drawing.Size(85, 21);
             this.textBoxProBassTrainerEndTick.TabIndex = 8;
             // 
             // buttonUpdateProBassTrainer
@@ -7446,7 +7446,7 @@ namespace ProUpgradeEditor.UI
             this.label49.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label49.Location = new System.Drawing.Point(11, 225);
             this.label49.Name = "label49";
-            this.label49.Size = new System.Drawing.Size(38, 15);
+            this.label49.Size = new System.Drawing.Size(39, 15);
             this.label49.TabIndex = 5;
             this.label49.Text = "From:";
             // 
@@ -7539,7 +7539,7 @@ namespace ProUpgradeEditor.UI
             this.labelProGuitarTrainerStatus.ForeColor = System.Drawing.SystemColors.ControlText;
             this.labelProGuitarTrainerStatus.Location = new System.Drawing.Point(9, 294);
             this.labelProGuitarTrainerStatus.Name = "labelProGuitarTrainerStatus";
-            this.labelProGuitarTrainerStatus.Size = new System.Drawing.Size(26, 15);
+            this.labelProGuitarTrainerStatus.Size = new System.Drawing.Size(27, 15);
             this.labelProGuitarTrainerStatus.TabIndex = 11;
             this.labelProGuitarTrainerStatus.Text = "Idle";
             // 
@@ -7548,7 +7548,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxProGuitarTrainerBeginTick.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxProGuitarTrainerBeginTick.Location = new System.Drawing.Point(7, 243);
             this.textBoxProGuitarTrainerBeginTick.Name = "textBoxProGuitarTrainerBeginTick";
-            this.textBoxProGuitarTrainerBeginTick.Size = new System.Drawing.Size(83, 23);
+            this.textBoxProGuitarTrainerBeginTick.Size = new System.Drawing.Size(83, 21);
             this.textBoxProGuitarTrainerBeginTick.TabIndex = 6;
             // 
             // textBoxProGuitarTrainerEndTick
@@ -7556,7 +7556,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxProGuitarTrainerEndTick.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxProGuitarTrainerEndTick.Location = new System.Drawing.Point(96, 243);
             this.textBoxProGuitarTrainerEndTick.Name = "textBoxProGuitarTrainerEndTick";
-            this.textBoxProGuitarTrainerEndTick.Size = new System.Drawing.Size(85, 23);
+            this.textBoxProGuitarTrainerEndTick.Size = new System.Drawing.Size(85, 21);
             this.textBoxProGuitarTrainerEndTick.TabIndex = 8;
             // 
             // buttonUpdateProGuitarTrainer
@@ -7601,7 +7601,7 @@ namespace ProUpgradeEditor.UI
             this.label52.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label52.Location = new System.Drawing.Point(9, 225);
             this.label52.Name = "label52";
-            this.label52.Size = new System.Drawing.Size(38, 15);
+            this.label52.Size = new System.Drawing.Size(39, 15);
             this.label52.TabIndex = 5;
             this.label52.Text = "From:";
             // 
@@ -7727,9 +7727,9 @@ namespace ProUpgradeEditor.UI
             // 
             this.textBoxPackageDTAText.AcceptsReturn = true;
             this.textBoxPackageDTAText.AcceptsTab = true;
-            this.textBoxPackageDTAText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxPackageDTAText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxPackageDTAText.BackColor = System.Drawing.SystemColors.Window;
             this.textBoxPackageDTAText.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxPackageDTAText.Font = new System.Drawing.Font("Courier New", 10F);
@@ -7824,7 +7824,7 @@ namespace ProUpgradeEditor.UI
             this.label42.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.label42.Location = new System.Drawing.Point(445, 16);
             this.label42.Name = "label42";
-            this.label42.Size = new System.Drawing.Size(128, 15);
+            this.label42.Size = new System.Drawing.Size(137, 15);
             this.label42.TabIndex = 11;
             this.label42.Text = "Selected File Properties";
             // 
@@ -7894,7 +7894,7 @@ namespace ProUpgradeEditor.UI
             this.textBox49.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox49.Location = new System.Drawing.Point(51, 23);
             this.textBox49.Name = "textBox49";
-            this.textBox49.Size = new System.Drawing.Size(245, 23);
+            this.textBox49.Size = new System.Drawing.Size(245, 21);
             this.textBox49.TabIndex = 0;
             // 
             // label4
@@ -7903,7 +7903,7 @@ namespace ProUpgradeEditor.UI
             this.label4.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label4.Location = new System.Drawing.Point(13, 26);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(34, 15);
+            this.label4.Size = new System.Drawing.Size(35, 15);
             this.label4.TabIndex = 18;
             this.label4.Text = "Path:";
             // 
@@ -7961,7 +7961,7 @@ namespace ProUpgradeEditor.UI
             this.textBox25.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBox25.Location = new System.Drawing.Point(51, 23);
             this.textBox25.Name = "textBox25";
-            this.textBox25.Size = new System.Drawing.Size(247, 23);
+            this.textBox25.Size = new System.Drawing.Size(247, 21);
             this.textBox25.TabIndex = 0;
             // 
             // label1
@@ -7970,7 +7970,7 @@ namespace ProUpgradeEditor.UI
             this.label1.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label1.Location = new System.Drawing.Point(8, 26);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(43, 15);
+            this.label1.Size = new System.Drawing.Size(45, 15);
             this.label1.TabIndex = 18;
             this.label1.Text = "Folder:";
             // 
@@ -8032,8 +8032,8 @@ namespace ProUpgradeEditor.UI
             // 
             // listBoxUSBSongs
             // 
-            this.listBoxUSBSongs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listBoxUSBSongs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.listBoxUSBSongs.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1});
             this.listBoxUSBSongs.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
@@ -8051,16 +8051,16 @@ namespace ProUpgradeEditor.UI
             this.listUSBFileView.AllowColumnReorder = true;
             this.listUSBFileView.AllowDrop = true;
             this.listUSBFileView.GridLines = true;
-            listViewGroup4.Header = "File Name";
-            listViewGroup4.Name = "FileName";
-            listViewGroup5.Header = "Size";
-            listViewGroup5.Name = "Size";
-            listViewGroup6.Header = "Date";
-            listViewGroup6.Name = "Date";
+            listViewGroup1.Header = "File Name";
+            listViewGroup1.Name = "FileName";
+            listViewGroup2.Header = "Size";
+            listViewGroup2.Name = "Size";
+            listViewGroup3.Header = "Date";
+            listViewGroup3.Name = "Date";
             this.listUSBFileView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup4,
-            listViewGroup5,
-            listViewGroup6});
+            listViewGroup1,
+            listViewGroup2,
+            listViewGroup3});
             this.listUSBFileView.HideSelection = false;
             this.listUSBFileView.LabelEdit = true;
             this.listUSBFileView.LabelWrap = false;
@@ -8100,7 +8100,7 @@ namespace ProUpgradeEditor.UI
             // 
             this.textBoxUSBFileName.Location = new System.Drawing.Point(315, 296);
             this.textBoxUSBFileName.Name = "textBoxUSBFileName";
-            this.textBoxUSBFileName.Size = new System.Drawing.Size(215, 23);
+            this.textBoxUSBFileName.Size = new System.Drawing.Size(215, 21);
             this.textBoxUSBFileName.TabIndex = 36;
             // 
             // buttonUSBAddFolder
@@ -8116,8 +8116,8 @@ namespace ProUpgradeEditor.UI
             // 
             // progressUSBSongs
             // 
-            this.progressUSBSongs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressUSBSongs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.progressUSBSongs.Location = new System.Drawing.Point(760, 280);
             this.progressUSBSongs.Name = "progressUSBSongs";
             this.progressUSBSongs.Size = new System.Drawing.Size(329, 11);
@@ -8129,7 +8129,7 @@ namespace ProUpgradeEditor.UI
             this.label47.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.label47.Location = new System.Drawing.Point(312, 36);
             this.label47.Name = "label47";
-            this.label47.Size = new System.Drawing.Size(33, 15);
+            this.label47.Size = new System.Drawing.Size(36, 15);
             this.label47.TabIndex = 27;
             this.label47.Text = "Files:";
             // 
@@ -8157,7 +8157,7 @@ namespace ProUpgradeEditor.UI
             // 
             this.textBoxUSBFolder.Location = new System.Drawing.Point(66, 283);
             this.textBoxUSBFolder.Name = "textBoxUSBFolder";
-            this.textBoxUSBFolder.Size = new System.Drawing.Size(188, 23);
+            this.textBoxUSBFolder.Size = new System.Drawing.Size(188, 21);
             this.textBoxUSBFolder.TabIndex = 20;
             // 
             // label46
@@ -8166,7 +8166,7 @@ namespace ProUpgradeEditor.UI
             this.label46.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.label46.Location = new System.Drawing.Point(757, 36);
             this.label46.Name = "label46";
-            this.label46.Size = new System.Drawing.Size(39, 15);
+            this.label46.Size = new System.Drawing.Size(42, 15);
             this.label46.TabIndex = 16;
             this.label46.Text = "Songs";
             // 
@@ -8185,7 +8185,7 @@ namespace ProUpgradeEditor.UI
             this.label45.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(70)))), ((int)(((byte)(213)))));
             this.label45.Location = new System.Drawing.Point(8, 36);
             this.label45.Name = "label45";
-            this.label45.Size = new System.Drawing.Size(48, 15);
+            this.label45.Size = new System.Drawing.Size(51, 15);
             this.label45.TabIndex = 9;
             this.label45.Text = "Folders:";
             // 
@@ -8504,7 +8504,7 @@ namespace ProUpgradeEditor.UI
             this.label14.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label14.Location = new System.Drawing.Point(29, 22);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(45, 15);
+            this.label14.Size = new System.Drawing.Size(47, 15);
             this.label14.TabIndex = 3;
             this.label14.Text = "Device:";
             // 
@@ -8652,7 +8652,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxNoteCloseDist.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxNoteCloseDist.Location = new System.Drawing.Point(379, 123);
             this.textBoxNoteCloseDist.Name = "textBoxNoteCloseDist";
-            this.textBoxNoteCloseDist.Size = new System.Drawing.Size(52, 23);
+            this.textBoxNoteCloseDist.Size = new System.Drawing.Size(52, 21);
             this.textBoxNoteCloseDist.TabIndex = 48;
             this.textBoxNoteCloseDist.Text = "8";
             // 
@@ -8663,7 +8663,7 @@ namespace ProUpgradeEditor.UI
             this.label44.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label44.Location = new System.Drawing.Point(282, 126);
             this.label44.Name = "label44";
-            this.label44.Size = new System.Drawing.Size(91, 15);
+            this.label44.Size = new System.Drawing.Size(94, 15);
             this.label44.TabIndex = 49;
             this.label44.Text = "Note Close Dist:";
             // 
@@ -8673,7 +8673,7 @@ namespace ProUpgradeEditor.UI
             this.textClearHoldBox.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textClearHoldBox.Location = new System.Drawing.Point(379, 97);
             this.textClearHoldBox.Name = "textClearHoldBox";
-            this.textClearHoldBox.Size = new System.Drawing.Size(52, 23);
+            this.textClearHoldBox.Size = new System.Drawing.Size(52, 21);
             this.textClearHoldBox.TabIndex = 48;
             this.textClearHoldBox.Text = "1";
             // 
@@ -8684,7 +8684,7 @@ namespace ProUpgradeEditor.UI
             this.label25.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label25.Location = new System.Drawing.Point(259, 101);
             this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(114, 15);
+            this.label25.Size = new System.Drawing.Size(122, 15);
             this.label25.TabIndex = 49;
             this.label25.Text = "Clear Hold Box Secs:";
             // 
@@ -8694,7 +8694,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxMidiScrollFreq.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxMidiScrollFreq.Location = new System.Drawing.Point(379, 71);
             this.textBoxMidiScrollFreq.Name = "textBoxMidiScrollFreq";
-            this.textBoxMidiScrollFreq.Size = new System.Drawing.Size(52, 23);
+            this.textBoxMidiScrollFreq.Size = new System.Drawing.Size(52, 21);
             this.textBoxMidiScrollFreq.TabIndex = 4;
             this.textBoxMidiScrollFreq.Text = "5";
             // 
@@ -8705,7 +8705,7 @@ namespace ProUpgradeEditor.UI
             this.label22.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label22.Location = new System.Drawing.Point(246, 74);
             this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(127, 15);
+            this.label22.Size = new System.Drawing.Size(133, 15);
             this.label22.TabIndex = 47;
             this.label22.Text = "Midi Scroll Update MS:";
             // 
@@ -8754,7 +8754,7 @@ namespace ProUpgradeEditor.UI
             this.label5.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label5.Location = new System.Drawing.Point(246, 50);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(127, 15);
+            this.label5.Size = new System.Drawing.Size(126, 15);
             this.label5.TabIndex = 20;
             this.label5.Text = "Minimum Note Width:";
             // 
@@ -8764,7 +8764,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxMinimumNoteWidth.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxMinimumNoteWidth.Location = new System.Drawing.Point(379, 47);
             this.textBoxMinimumNoteWidth.Name = "textBoxMinimumNoteWidth";
-            this.textBoxMinimumNoteWidth.Size = new System.Drawing.Size(52, 23);
+            this.textBoxMinimumNoteWidth.Size = new System.Drawing.Size(52, 21);
             this.textBoxMinimumNoteWidth.TabIndex = 1;
             this.textBoxMinimumNoteWidth.Text = "0";
             // 
@@ -8775,7 +8775,7 @@ namespace ProUpgradeEditor.UI
             this.label23.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label23.Location = new System.Drawing.Point(231, 24);
             this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(142, 15);
+            this.label23.Size = new System.Drawing.Size(146, 15);
             this.label23.TabIndex = 14;
             this.label23.Text = "Scroll To Selection Offset:";
             // 
@@ -8785,7 +8785,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxScrollToSelectionOffset.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxScrollToSelectionOffset.Location = new System.Drawing.Point(379, 21);
             this.textBoxScrollToSelectionOffset.Name = "textBoxScrollToSelectionOffset";
-            this.textBoxScrollToSelectionOffset.Size = new System.Drawing.Size(52, 23);
+            this.textBoxScrollToSelectionOffset.Size = new System.Drawing.Size(52, 21);
             this.textBoxScrollToSelectionOffset.TabIndex = 0;
             this.textBoxScrollToSelectionOffset.Text = "300";
             // 
@@ -8828,7 +8828,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxDefaultCONFileLocation.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxDefaultCONFileLocation.Location = new System.Drawing.Point(166, 19);
             this.textBoxDefaultCONFileLocation.Name = "textBoxDefaultCONFileLocation";
-            this.textBoxDefaultCONFileLocation.Size = new System.Drawing.Size(242, 23);
+            this.textBoxDefaultCONFileLocation.Size = new System.Drawing.Size(242, 21);
             this.textBoxDefaultCONFileLocation.TabIndex = 0;
             // 
             // textBoxDefaultMidi5FileLocation
@@ -8836,7 +8836,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxDefaultMidi5FileLocation.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxDefaultMidi5FileLocation.Location = new System.Drawing.Point(166, 45);
             this.textBoxDefaultMidi5FileLocation.Name = "textBoxDefaultMidi5FileLocation";
-            this.textBoxDefaultMidi5FileLocation.Size = new System.Drawing.Size(242, 23);
+            this.textBoxDefaultMidi5FileLocation.Size = new System.Drawing.Size(242, 21);
             this.textBoxDefaultMidi5FileLocation.TabIndex = 2;
             // 
             // textBoxDefaultMidiProFileLocation
@@ -8844,7 +8844,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxDefaultMidiProFileLocation.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxDefaultMidiProFileLocation.Location = new System.Drawing.Point(166, 71);
             this.textBoxDefaultMidiProFileLocation.Name = "textBoxDefaultMidiProFileLocation";
-            this.textBoxDefaultMidiProFileLocation.Size = new System.Drawing.Size(242, 23);
+            this.textBoxDefaultMidiProFileLocation.Size = new System.Drawing.Size(242, 21);
             this.textBoxDefaultMidiProFileLocation.TabIndex = 4;
             // 
             // label31
@@ -8853,7 +8853,7 @@ namespace ProUpgradeEditor.UI
             this.label31.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label31.Location = new System.Drawing.Point(25, 22);
             this.label31.Name = "label31";
-            this.label31.Size = new System.Drawing.Size(138, 15);
+            this.label31.Size = new System.Drawing.Size(142, 15);
             this.label31.TabIndex = 3;
             this.label31.Text = "Open CON File Location:";
             this.label31.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -8887,7 +8887,7 @@ namespace ProUpgradeEditor.UI
             this.label32.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label32.Location = new System.Drawing.Point(18, 48);
             this.label32.Name = "label32";
-            this.label32.Size = new System.Drawing.Size(145, 15);
+            this.label32.Size = new System.Drawing.Size(150, 15);
             this.label32.TabIndex = 6;
             this.label32.Text = "Open Midi 5 File Location:";
             this.label32.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -8922,7 +8922,7 @@ namespace ProUpgradeEditor.UI
             this.label33.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label33.Location = new System.Drawing.Point(6, 74);
             this.label33.Name = "label33";
-            this.label33.Size = new System.Drawing.Size(157, 15);
+            this.label33.Size = new System.Drawing.Size(162, 15);
             this.label33.TabIndex = 6;
             this.label33.Text = "Open Midi Pro File Location:";
             this.label33.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -8957,7 +8957,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxZoom.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxZoom.Location = new System.Drawing.Point(53, 21);
             this.textBoxZoom.Name = "textBoxZoom";
-            this.textBoxZoom.Size = new System.Drawing.Size(86, 23);
+            this.textBoxZoom.Size = new System.Drawing.Size(86, 21);
             this.textBoxZoom.TabIndex = 0;
             // 
             // button27
@@ -9080,7 +9080,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxNoteSnapDistance.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxNoteSnapDistance.Location = new System.Drawing.Point(120, 181);
             this.textBoxNoteSnapDistance.Name = "textBoxNoteSnapDistance";
-            this.textBoxNoteSnapDistance.Size = new System.Drawing.Size(52, 23);
+            this.textBoxNoteSnapDistance.Size = new System.Drawing.Size(52, 21);
             this.textBoxNoteSnapDistance.TabIndex = 50;
             this.textBoxNoteSnapDistance.Text = "4";
             // 
@@ -9090,7 +9090,7 @@ namespace ProUpgradeEditor.UI
             this.label43.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label43.Location = new System.Drawing.Point(6, 184);
             this.label43.Name = "label43";
-            this.label43.Size = new System.Drawing.Size(113, 15);
+            this.label43.Size = new System.Drawing.Size(119, 15);
             this.label43.TabIndex = 51;
             this.label43.Text = "Note Snap Distance:";
             // 
@@ -9099,7 +9099,7 @@ namespace ProUpgradeEditor.UI
             this.textBoxGridSnapDistance.ForeColor = System.Drawing.SystemColors.ControlText;
             this.textBoxGridSnapDistance.Location = new System.Drawing.Point(120, 155);
             this.textBoxGridSnapDistance.Name = "textBoxGridSnapDistance";
-            this.textBoxGridSnapDistance.Size = new System.Drawing.Size(52, 23);
+            this.textBoxGridSnapDistance.Size = new System.Drawing.Size(52, 21);
             this.textBoxGridSnapDistance.TabIndex = 50;
             this.textBoxGridSnapDistance.Text = "4";
             // 
@@ -9109,7 +9109,7 @@ namespace ProUpgradeEditor.UI
             this.label26.ForeColor = System.Drawing.SystemColors.ControlText;
             this.label26.Location = new System.Drawing.Point(10, 159);
             this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(109, 15);
+            this.label26.Size = new System.Drawing.Size(116, 15);
             this.label26.TabIndex = 51;
             this.label26.Text = "Grid Snap Distance:";
             // 
@@ -9248,7 +9248,7 @@ namespace ProUpgradeEditor.UI
             this.buttonCloseG6Track.ForeColor = System.Drawing.Color.Gainsboro;
             this.buttonCloseG6Track.ImageKey = "close.png";
             this.buttonCloseG6Track.ImageList = this.imageList1;
-            this.buttonCloseG6Track.Location = new System.Drawing.Point(1077, -2);
+            this.buttonCloseG6Track.Location = new System.Drawing.Point(1002, -2);
             this.buttonCloseG6Track.Name = "buttonCloseG6Track";
             this.buttonCloseG6Track.Size = new System.Drawing.Size(23, 21);
             this.buttonCloseG6Track.TabIndex = 13;
@@ -9263,7 +9263,7 @@ namespace ProUpgradeEditor.UI
             this.buttonCloseG5Track.ForeColor = System.Drawing.Color.Gainsboro;
             this.buttonCloseG5Track.ImageKey = "close.png";
             this.buttonCloseG5Track.ImageList = this.imageList1;
-            this.buttonCloseG5Track.Location = new System.Drawing.Point(1077, -2);
+            this.buttonCloseG5Track.Location = new System.Drawing.Point(1002, -2);
             this.buttonCloseG5Track.Name = "buttonCloseG5Track";
             this.buttonCloseG5Track.Size = new System.Drawing.Size(23, 21);
             this.buttonCloseG5Track.TabIndex = 12;
@@ -9286,7 +9286,7 @@ namespace ProUpgradeEditor.UI
             this.panel5ButtonEditor.Location = new System.Drawing.Point(0, 24);
             this.panel5ButtonEditor.Margin = new System.Windows.Forms.Padding(0);
             this.panel5ButtonEditor.Name = "panel5ButtonEditor";
-            this.panel5ButtonEditor.Size = new System.Drawing.Size(1103, 139);
+            this.panel5ButtonEditor.Size = new System.Drawing.Size(1028, 139);
             this.panel5ButtonEditor.TabIndex = 13;
             // 
             // trackEditorG5
@@ -9310,7 +9310,6 @@ namespace ProUpgradeEditor.UI
             this.trackEditorG5.Margin = new System.Windows.Forms.Padding(0);
             this.trackEditorG5.MidiPlaybackPosition = 0;
             this.trackEditorG5.MP3PlaybackOffset = 0;
-            
             this.trackEditorG5.Name = "trackEditorG5";
             this.trackEditorG5.NoteSnapG5 = true;
             this.trackEditorG5.NoteSnapG6 = true;
@@ -9320,10 +9319,9 @@ namespace ProUpgradeEditor.UI
             this.trackEditorG5.SelectStartPoint = new System.Drawing.Point(0, 0);
             this.trackEditorG5.Show108Events = false;
             this.trackEditorG5.ShowNotesGrid = false;
-            this.trackEditorG5.Size = new System.Drawing.Size(1101, 117);
+            this.trackEditorG5.Size = new System.Drawing.Size(1026, 117);
             this.trackEditorG5.TabIndex = 8;
             this.trackEditorG5.ViewLyrics = false;
-            
             this.trackEditorG5.DragDrop += new System.Windows.Forms.DragEventHandler(this.trackEditorG5_DragDrop);
             this.trackEditorG5.DragEnter += new System.Windows.Forms.DragEventHandler(this.trackEditorG5_DragEnter);
             this.trackEditorG5.Enter += new System.EventHandler(this.trackEditorG5_Enter);
@@ -9344,7 +9342,7 @@ namespace ProUpgradeEditor.UI
             this.panelTrackEditorG5TitleBar.Location = new System.Drawing.Point(0, 0);
             this.panelTrackEditorG5TitleBar.Margin = new System.Windows.Forms.Padding(0);
             this.panelTrackEditorG5TitleBar.Name = "panelTrackEditorG5TitleBar";
-            this.panelTrackEditorG5TitleBar.Size = new System.Drawing.Size(1101, 20);
+            this.panelTrackEditorG5TitleBar.Size = new System.Drawing.Size(1026, 20);
             this.panelTrackEditorG5TitleBar.TabIndex = 11;
             // 
             // buttonMinimizeG5
@@ -9353,7 +9351,7 @@ namespace ProUpgradeEditor.UI
             this.buttonMinimizeG5.FlatAppearance.BorderSize = 0;
             this.buttonMinimizeG5.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightSteelBlue;
             this.buttonMinimizeG5.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonMinimizeG5.Location = new System.Drawing.Point(1035, -3);
+            this.buttonMinimizeG5.Location = new System.Drawing.Point(960, -3);
             this.buttonMinimizeG5.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.buttonMinimizeG5.Name = "buttonMinimizeG5";
             this.buttonMinimizeG5.Size = new System.Drawing.Size(22, 22);
@@ -9369,7 +9367,7 @@ namespace ProUpgradeEditor.UI
             this.buttonMaximizeG5.FlatAppearance.BorderSize = 0;
             this.buttonMaximizeG5.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightSteelBlue;
             this.buttonMaximizeG5.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonMaximizeG5.Location = new System.Drawing.Point(1056, -3);
+            this.buttonMaximizeG5.Location = new System.Drawing.Point(981, -3);
             this.buttonMaximizeG5.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.buttonMaximizeG5.Name = "buttonMaximizeG5";
             this.buttonMaximizeG5.Size = new System.Drawing.Size(22, 22);
@@ -9416,7 +9414,7 @@ namespace ProUpgradeEditor.UI
             this.panelProEditor.Location = new System.Drawing.Point(0, 163);
             this.panelProEditor.Margin = new System.Windows.Forms.Padding(0);
             this.panelProEditor.Name = "panelProEditor";
-            this.panelProEditor.Size = new System.Drawing.Size(1103, 139);
+            this.panelProEditor.Size = new System.Drawing.Size(1028, 139);
             this.panelProEditor.TabIndex = 14;
             // 
             // trackEditorG6
@@ -9440,7 +9438,6 @@ namespace ProUpgradeEditor.UI
             this.trackEditorG6.Margin = new System.Windows.Forms.Padding(0);
             this.trackEditorG6.MidiPlaybackPosition = 0;
             this.trackEditorG6.MP3PlaybackOffset = 0;
-            
             this.trackEditorG6.Name = "trackEditorG6";
             this.trackEditorG6.NoteSnapG5 = true;
             this.trackEditorG6.NoteSnapG6 = true;
@@ -9450,10 +9447,9 @@ namespace ProUpgradeEditor.UI
             this.trackEditorG6.SelectStartPoint = new System.Drawing.Point(0, 0);
             this.trackEditorG6.Show108Events = false;
             this.trackEditorG6.ShowNotesGrid = false;
-            this.trackEditorG6.Size = new System.Drawing.Size(1101, 117);
+            this.trackEditorG6.Size = new System.Drawing.Size(1026, 117);
             this.trackEditorG6.TabIndex = 9;
             this.trackEditorG6.ViewLyrics = false;
-            
             this.trackEditorG6.Load += new System.EventHandler(this.trackEditorG6_Load);
             this.trackEditorG6.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDropEditorPro);
             this.trackEditorG6.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnterEditorPro);
@@ -9476,7 +9472,7 @@ namespace ProUpgradeEditor.UI
             this.panelTrackEditorG6TitleBar.Location = new System.Drawing.Point(0, 0);
             this.panelTrackEditorG6TitleBar.Margin = new System.Windows.Forms.Padding(0);
             this.panelTrackEditorG6TitleBar.Name = "panelTrackEditorG6TitleBar";
-            this.panelTrackEditorG6TitleBar.Size = new System.Drawing.Size(1101, 20);
+            this.panelTrackEditorG6TitleBar.Size = new System.Drawing.Size(1026, 20);
             this.panelTrackEditorG6TitleBar.TabIndex = 12;
             // 
             // buttonMinimizeG6
@@ -9485,7 +9481,7 @@ namespace ProUpgradeEditor.UI
             this.buttonMinimizeG6.FlatAppearance.BorderSize = 0;
             this.buttonMinimizeG6.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightSkyBlue;
             this.buttonMinimizeG6.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonMinimizeG6.Location = new System.Drawing.Point(1035, -3);
+            this.buttonMinimizeG6.Location = new System.Drawing.Point(960, -3);
             this.buttonMinimizeG6.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.buttonMinimizeG6.Name = "buttonMinimizeG6";
             this.buttonMinimizeG6.Size = new System.Drawing.Size(22, 22);
@@ -9501,7 +9497,7 @@ namespace ProUpgradeEditor.UI
             this.buttonMaximizeG6.FlatAppearance.BorderColor = System.Drawing.Color.LightSteelBlue;
             this.buttonMaximizeG6.FlatAppearance.BorderSize = 0;
             this.buttonMaximizeG6.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonMaximizeG6.Location = new System.Drawing.Point(1056, -3);
+            this.buttonMaximizeG6.Location = new System.Drawing.Point(981, -3);
             this.buttonMaximizeG6.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.buttonMaximizeG6.Name = "buttonMaximizeG6";
             this.buttonMaximizeG6.Size = new System.Drawing.Size(22, 24);
@@ -9542,9 +9538,9 @@ namespace ProUpgradeEditor.UI
             // 
             this.statusStrip1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("statusStrip1.BackgroundImage")));
             this.statusStrip1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.statusStrip1.Location = new System.Drawing.Point(0, 852);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 724);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1103, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(1028, 22);
             this.statusStrip1.TabIndex = 3;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -9563,7 +9559,7 @@ namespace ProUpgradeEditor.UI
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(6, 2, 0, 0);
             this.menuStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.menuStrip1.Size = new System.Drawing.Size(1103, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1028, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -9578,20 +9574,20 @@ namespace ProUpgradeEditor.UI
             this.toolStripSeparator1,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 22);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(35, 22);
             this.fileToolStripMenuItem.Text = "&File";
             // 
             // newToolStripMenuItem
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
             this.newToolStripMenuItem.Text = "&New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
             this.closeToolStripMenuItem.Text = "&Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
@@ -9602,27 +9598,27 @@ namespace ProUpgradeEditor.UI
             this.openPro17ToolStripMenuItem,
             this.openConfigurationToolStripMenuItem});
             this.openToolStripMenuItem1.Name = "openToolStripMenuItem1";
-            this.openToolStripMenuItem1.Size = new System.Drawing.Size(110, 22);
+            this.openToolStripMenuItem1.Size = new System.Drawing.Size(117, 22);
             this.openToolStripMenuItem1.Text = "&Open";
             // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
             this.openToolStripMenuItem.Text = "&Open Guitar 5 Midi";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // openPro17ToolStripMenuItem
             // 
             this.openPro17ToolStripMenuItem.Name = "openPro17ToolStripMenuItem";
-            this.openPro17ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openPro17ToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
             this.openPro17ToolStripMenuItem.Text = "Open &Pro Midi";
             this.openPro17ToolStripMenuItem.Click += new System.EventHandler(this.openPro17ToolStripMenuItem_Click);
             // 
             // openConfigurationToolStripMenuItem
             // 
             this.openConfigurationToolStripMenuItem.Name = "openConfigurationToolStripMenuItem";
-            this.openConfigurationToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openConfigurationToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
             this.openConfigurationToolStripMenuItem.Text = "Open &Configuration";
             this.openConfigurationToolStripMenuItem.Click += new System.EventHandler(this.openConfigurationToolStripMenuItem_Click);
             // 
@@ -9637,13 +9633,13 @@ namespace ProUpgradeEditor.UI
             this.saveConfigurationAsToolStripMenuItem,
             this.saveProXMLToolStripMenuItem});
             this.saveToolStripMenuItem1.Name = "saveToolStripMenuItem1";
-            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(110, 22);
+            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(117, 22);
             this.saveToolStripMenuItem1.Text = "&Save";
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             this.saveToolStripMenuItem.Text = "Save Guitar 5 Midi";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
@@ -9651,42 +9647,42 @@ namespace ProUpgradeEditor.UI
             // 
             this.saveProToolStripMenuItem.Name = "saveProToolStripMenuItem";
             this.saveProToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveProToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
+            this.saveProToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             this.saveProToolStripMenuItem.Text = "&Save Pro Midi";
             this.saveProToolStripMenuItem.Click += new System.EventHandler(this.saveProToolStripMenuItem_Click);
             // 
             // saveProAsToolStripMenuItem
             // 
             this.saveProAsToolStripMenuItem.Name = "saveProAsToolStripMenuItem";
-            this.saveProAsToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
+            this.saveProAsToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             this.saveProAsToolStripMenuItem.Text = "Save Pro Midi As";
             this.saveProAsToolStripMenuItem.Click += new System.EventHandler(this.saveProAsToolStripMenuItem_Click);
             // 
             // saveCONPackageToolStripMenuItem
             // 
             this.saveCONPackageToolStripMenuItem.Name = "saveCONPackageToolStripMenuItem";
-            this.saveCONPackageToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
+            this.saveCONPackageToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             this.saveCONPackageToolStripMenuItem.Text = "Save CON Package";
             this.saveCONPackageToolStripMenuItem.Click += new System.EventHandler(this.saveCONPackageToolStripMenuItem_Click);
             // 
             // saveConfigurationToolStripMenuItem
             // 
             this.saveConfigurationToolStripMenuItem.Name = "saveConfigurationToolStripMenuItem";
-            this.saveConfigurationToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
+            this.saveConfigurationToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             this.saveConfigurationToolStripMenuItem.Text = "Save Configuration";
             this.saveConfigurationToolStripMenuItem.Click += new System.EventHandler(this.saveConfigurationToolStripMenuItem_Click);
             // 
             // saveConfigurationAsToolStripMenuItem
             // 
             this.saveConfigurationAsToolStripMenuItem.Name = "saveConfigurationAsToolStripMenuItem";
-            this.saveConfigurationAsToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
+            this.saveConfigurationAsToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             this.saveConfigurationAsToolStripMenuItem.Text = "Save Configuration As";
             this.saveConfigurationAsToolStripMenuItem.Click += new System.EventHandler(this.saveConfigurationAsToolStripMenuItem_Click);
             // 
             // saveProXMLToolStripMenuItem
             // 
             this.saveProXMLToolStripMenuItem.Name = "saveProXMLToolStripMenuItem";
-            this.saveProXMLToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
+            this.saveProXMLToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             this.saveProXMLToolStripMenuItem.Text = "Save Pro XML";
             this.saveProXMLToolStripMenuItem.Click += new System.EventHandler(this.saveProXMLToolStripMenuItem_Click);
             // 
@@ -9699,20 +9695,20 @@ namespace ProUpgradeEditor.UI
             this.mergeProMidiToolStripMenuItem,
             this.guitarProToolStripMenuItem});
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
             this.importToolStripMenuItem.Text = "&Import";
             // 
             // cONPackageToolStripMenuItem
             // 
             this.cONPackageToolStripMenuItem.Name = "cONPackageToolStripMenuItem";
-            this.cONPackageToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.cONPackageToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
             this.cONPackageToolStripMenuItem.Text = "CON Package";
             this.cONPackageToolStripMenuItem.Click += new System.EventHandler(this.cONPackageToolStripMenuItem_Click);
             // 
             // zipFileToolStripMenuItem
             // 
             this.zipFileToolStripMenuItem.Name = "zipFileToolStripMenuItem";
-            this.zipFileToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.zipFileToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
             this.zipFileToolStripMenuItem.Text = "Zip File";
             this.zipFileToolStripMenuItem.Click += new System.EventHandler(this.zipFileToolStripMenuItem_Click);
             // 
@@ -9721,39 +9717,39 @@ namespace ProUpgradeEditor.UI
             this.tabVToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.midiExportToolStripMenuItem});
             this.tabVToolStripMenuItem.Name = "tabVToolStripMenuItem";
-            this.tabVToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.tabVToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
             this.tabVToolStripMenuItem.Text = "Web Tab Exporter Site";
             // 
             // midiExportToolStripMenuItem
             // 
             this.midiExportToolStripMenuItem.Name = "midiExportToolStripMenuItem";
-            this.midiExportToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.midiExportToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.midiExportToolStripMenuItem.Text = "Import Midi XML";
             this.midiExportToolStripMenuItem.Click += new System.EventHandler(this.midiExportToolStripMenuItem_Click);
             // 
             // mergeProMidiToolStripMenuItem
             // 
             this.mergeProMidiToolStripMenuItem.Name = "mergeProMidiToolStripMenuItem";
-            this.mergeProMidiToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.mergeProMidiToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
             this.mergeProMidiToolStripMenuItem.Text = "Merge Pro Midi";
             this.mergeProMidiToolStripMenuItem.Click += new System.EventHandler(this.mergeProMidiToolStripMenuItem_Click);
             // 
             // guitarProToolStripMenuItem
             // 
             this.guitarProToolStripMenuItem.Name = "guitarProToolStripMenuItem";
-            this.guitarProToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.guitarProToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
             this.guitarProToolStripMenuItem.Text = "Guitar Pro";
             this.guitarProToolStripMenuItem.Click += new System.EventHandler(this.guitarProToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(107, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(114, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -9762,14 +9758,14 @@ namespace ProUpgradeEditor.UI
             this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.undoToolStripMenuItem});
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 22);
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(37, 22);
             this.editToolStripMenuItem.Text = "&Edit";
             this.editToolStripMenuItem.DropDownOpening += new System.EventHandler(this.editToolStripMenuItem_DropDownOpening);
             // 
             // undoToolStripMenuItem
             // 
             this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
-            this.undoToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.undoToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this.undoToolStripMenuItem.Text = "Undo";
             this.undoToolStripMenuItem.Click += new System.EventHandler(this.undoToolStripMenuItem_Click);
             // 
@@ -9778,13 +9774,13 @@ namespace ProUpgradeEditor.UI
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.xBoxUSBToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 22);
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(44, 22);
             this.toolsToolStripMenuItem.Text = "&Tools";
             // 
             // xBoxUSBToolStripMenuItem
             // 
             this.xBoxUSBToolStripMenuItem.Name = "xBoxUSBToolStripMenuItem";
-            this.xBoxUSBToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.xBoxUSBToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.xBoxUSBToolStripMenuItem.Text = "XBox USB";
             this.xBoxUSBToolStripMenuItem.Click += new System.EventHandler(this.xBoxUSBToolStripMenuItem_Click);
             // 
@@ -9793,13 +9789,13 @@ namespace ProUpgradeEditor.UI
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.aboutToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 22);
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(40, 22);
             this.helpToolStripMenuItem.Text = "&Help";
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
             this.aboutToolStripMenuItem.Text = "&About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
@@ -9809,14 +9805,14 @@ namespace ProUpgradeEditor.UI
             this.AutoValidate = System.Windows.Forms.AutoValidate.Disable;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.CausesValidation = false;
-            this.ClientSize = new System.Drawing.Size(1103, 874);
+            this.ClientSize = new System.Drawing.Size(1028, 746);
             this.Controls.Add(this.tabContainerMain);
             this.Controls.Add(this.panelProEditor);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.panel5ButtonEditor);
             this.Controls.Add(this.menuStrip1);
             this.DoubleBuffered = true;
-            this.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel, ((byte)(0)));
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainForm";

@@ -382,7 +382,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tools\EditorResources\EditorResources.csproj">
-      <Project>{f0f523da-3085-4be5-ac09-5f680f0e392e}</Project>
+      <Project>{F0F523DA-3085-4BE5-AC09-5F680F0E392E}</Project>
       <Name>EditorResources</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tools\NAudio\NAudio.WindowsMediaFormat\NAudio.WindowsMediaFormat.csproj">
@@ -410,7 +410,7 @@
       <Name>XPackage</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tools\ZipLib\ZipLib.csproj">
-      <Project>{dd8f2458-ba45-43a9-b433-943b293d069e}</Project>
+      <Project>{DD8F2458-BA45-43A9-B433-943B293D069E}</Project>
       <Name>ZipLib</Name>
     </ProjectReference>
   </ItemGroup>
